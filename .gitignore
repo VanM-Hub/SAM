@@ -1,0 +1,19 @@
+# .gitignore template
+# Add patterns to ignore files and directories
+.DS_Thumbs.db
+Thumbs.db
+*.log
+*.tmp
+*.temp
+bin/
+obj/
+__pycache__/
+*.pyc
+.env
+.idea/
+.vscode/
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates

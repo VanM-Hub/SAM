@@ -1,15 +1,15 @@
-# Normalize line endings for all text files
-* text=auto
+# Normalize all text files to LF
+* text=auto eol=lf
 
-# Explicitly set LF for Markdown files
+# Explicitly set LF for markdown files
 *.md text eol=lf
 
-# Explicitly set LF for YAML, JSON, and other config files
+# Explicitly set LF for YAML, JSON, and scripts
 *.yml text eol=lf
 *.yaml text eol=lf
 *.json text eol=lf
 *.sh text eol=lf
 
-# Keep Windows batch files as CRLF
+# Keep Windows batch files as CRLF (ini untuk kompatibilitas Windows)
 *.bat text eol=crlf
 *.cmd text eol=crlf
