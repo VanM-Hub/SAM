@@ -20,7 +20,7 @@ def apply_migrations(db_path):
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     
-    # Create base tables first (schema_version, knowledge_documents, knowledge)
+    # Create schema_version table so migrations can record their application
     cur.execute('''
         CREATE TABLE IF NOT EXISTS schema_version (
             version INTEGER PRIMARY KEY,
@@ -28,33 +28,9 @@ def apply_migrations(db_path):
             description TEXT
         )
     ''')
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS knowledge_documents (
-            id TEXT PRIMARY KEY,
-            path TEXT,
-            title TEXT,
-            created_at TEXT DEFAULT (datetime('now'))
-        )
-    ''')
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS knowledge (
-            id TEXT PRIMARY KEY,
-            document_id TEXT NOT NULL,
-            statement TEXT NOT NULL,
-            category TEXT NOT NULL,
-            confidence REAL NOT NULL DEFAULT 1.0,
-            metadata TEXT NOT NULL DEFAULT '{}',
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            version INTEGER NOT NULL DEFAULT 1,
-            previous_version INTEGER DEFAULT NULL,
-            FOREIGN KEY (document_id) REFERENCES knowledge_documents(id) ON DELETE CASCADE
-        )
-    ''')
-    cur.execute('CREATE INDEX IF NOT EXISTS idx_knowledge_category ON knowledge(category)')
-    cur.execute('CREATE INDEX IF NOT EXISTS idx_knowledge_document ON knowledge(document_id)')
-    
-    # Apply all migration files in order (009 onwards)
-    migration_files = sorted(glob.glob("src/sam/migrations/*.sql"))
+
+    # Apply all migration files in order
+    migration_files = sorted(glob.glob("src/sam/persistence/migrations/*.sql"))
     for f in migration_files:
         with open(f, 'r') as mf:
             sql = mf.read()
