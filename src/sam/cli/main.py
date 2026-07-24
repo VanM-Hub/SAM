@@ -840,5 +840,85 @@ def daemon_health():
     asyncio.run(_health())
 
 
+# ── Cluster management commands ────────────────────────────────────────
+
+cluster_app = typer.Typer()
+app.add_typer(cluster_app, name="cluster")
+
+
+@cluster_app.command("status")
+def cluster_status(
+    format: str = typer.Option("table", "--format", "-f", help="Output format: table or json"),
+):
+    """Show cluster state and health."""
+    async def _status():
+        try:
+            from sam.cluster.state import ClusterStateAggregator
+            from sam.cluster.node_registry import NodeRegistry
+            from sam.cluster.leader import LeaderElection
+            from sam.core.job_queue import JobQueue
+            from sam.core.event_bus import EventBus
+            from sam.core.daemon import DaemonConfig
+
+            config = DaemonConfig()
+
+            # Setup minimal components for state collection
+            event_bus = EventBus()
+            job_queue = JobQueue(event_bus)
+            node_registry = NodeRegistry()
+
+            # LeaderElection needs a DB — skip for CLI; pass a none-like
+            # We create a lightweight leader election with no DB backing
+            leader_election = LeaderElection(None, config.cluster_id)  # type: ignore[arg-type]
+
+            aggregator = ClusterStateAggregator(
+                node_registry=node_registry,
+                job_queue=job_queue,
+                leader_election=leader_election,
+                cluster_id=config.cluster_id,
+            )
+
+            state = await aggregator.collect()
+
+            if format == "json":
+                import json
+                typer.echo(json.dumps(state.to_dict(), indent=2, default=str))
+            else:
+                # Table format
+                typer.echo(f"\nCluster: {state.cluster_id}")
+                typer.echo(f"Updated : {state.updated_at.isoformat()}")
+                typer.echo()
+                typer.echo(f"  Leader: {state.leader_id or 'none'}")
+                typer.echo(f"  Nodes : {state.node_count} total")
+                typer.echo(f"          {state.online_nodes} online")
+                typer.echo(f"          {state.offline_nodes} offline")
+                typer.echo(f"          {state.degraded_nodes} degraded")
+                typer.echo()
+                typer.echo(f"  Active Workflows: {state.active_workflows}")
+                typer.echo(f"  Jobs (pending/running/failed): {state.pending_jobs}/{state.running_jobs}/{state.failed_jobs}")
+                typer.echo()
+                typer.echo(f"  Total Load: {state.total_load:.1f}%")
+
+                if state.node_details:
+                    typer.echo()
+                    typer.echo("Node Details:")
+                    for node_id, detail in state.node_details.items():
+                        status_emoji = {"ONLINE": "🟢", "OFFLINE": "🔴", "DEGRADED": "🟡"}.get(
+                            detail.get("status", ""), "⚪"
+                        )
+                        typer.echo(
+                            f"  {status_emoji} {node_id}"
+                            f" | {detail.get('hostname', '?')}"
+                            f" | v{detail.get('version', '?')}"
+                            f" | load={detail.get('load', 0):.1f}%"
+                        )
+
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+
+    asyncio.run(_status())
+
+
 if __name__ == "__main__":
     app()
