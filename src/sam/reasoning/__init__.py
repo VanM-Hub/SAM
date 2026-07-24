@@ -8,6 +8,8 @@ from .intent import Intent, IntentType, IntentStatus, IntentParser
 from .templates import GraphTemplate, BUILTIN_TEMPLATES, get_default_template
 from .planner import PlanningEngine, PlanError
 from .engine import ReasoningEngine, ReasoningResult
+from .candidate import PlanCandidate
+from .ranker import PlanRanker
 
 __all__ = [
     "Intent",
@@ -21,4 +23,6 @@ __all__ = [
     "PlanError",
     "ReasoningEngine",
     "ReasoningResult",
+    "PlanCandidate",
+    "PlanRanker",
 ]
