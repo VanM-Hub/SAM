@@ -22,6 +22,8 @@ from sam.plugin import (
     create_plugin_registry,
     PluginStatus,
     create_plugin_discovery,
+    PluginLifecycleManager,
+    PluginManifest,
 )
 from sam.models import Capability
 
@@ -590,6 +592,59 @@ def plugin_discover(
             raise typer.Exit(1)
     
     asyncio.run(_discover())
+
+
+@plugin_app.command("upgrade")
+def plugin_upgrade(
+    plugin_id: str = typer.Argument(..., help="Plugin ID to upgrade"),
+    manifest_path: str = typer.Argument(..., help="Path to new manifest.yaml"),
+    force: bool = typer.Option(False, "--force", help="Allow major version upgrade without confirmation"),
+):
+    """Upgrade a plugin with a new manifest (version must be greater).
+
+    Major version upgrade (1.x -> 2.x) requires --force flag.
+    On failure, automatically rolls back to old manifest.
+    """
+    async def _upgrade():
+        try:
+            loader = PluginManifestLoader()
+            m_path = Path(manifest_path)
+            if not m_path.exists():
+                typer.echo(f"Manifest not found: {manifest_path}", err=True)
+                raise typer.Exit(1)
+
+            new_manifest = loader.load_from_yaml(m_path)
+            if not new_manifest:
+                typer.echo(f"Failed to parse manifest: {manifest_path}", err=True)
+                raise typer.Exit(1)
+
+            # Ensure the manifest is a PluginManifest instance
+            if not isinstance(new_manifest, PluginManifest):
+                new_manifest = PluginManifest(**new_manifest)
+
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            mgr = PluginLifecycleManager(plugin_registry)
+
+            result_id = await mgr.upgrade(plugin_id, new_manifest, force=force)
+
+            descriptor = await plugin_registry.get_descriptor(result_id)
+            if descriptor:
+                typer.echo(
+                    f"Upgraded plugin: {descriptor.manifest.name} "
+                    f"v{descriptor.manifest.version} "
+                    f"[{descriptor.status.value}]"
+                )
+            else:
+                typer.echo(f"Plugin {result_id} upgraded successfully")
+
+        except ValueError as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+        except Exception as e:
+            typer.echo(f"Unexpected error: {e}", err=True)
+            raise typer.Exit(1)
+
+    asyncio.run(_upgrade())
 
 
 @plugin_app.command("health")

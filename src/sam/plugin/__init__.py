@@ -3,6 +3,7 @@ from .loader import PluginManifestLoader
 from .validator import PluginManifestValidator
 from .registry import PluginRegistry, PluginDescriptor
 from .persistent_registry import PersistentPluginRegistry, create_plugin_registry
+from .repository import PluginRepository
 from .discovery import PluginDiscovery, create_plugin_discovery
 from .lifecycle import PluginLifecycleManager
 from .dependency import DependencyResolver
@@ -19,6 +20,7 @@ __all__ = [
     "PluginDescriptor",
     "PersistentPluginRegistry",
     "create_plugin_registry",
+    "PluginRepository",
     "PluginDiscovery",
     "create_plugin_discovery",
     "PluginLifecycleManager",
