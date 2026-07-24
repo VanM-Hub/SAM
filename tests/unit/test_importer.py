@@ -29,8 +29,42 @@ def apply_migrations(db_path):
         )
     ''')
 
-    # Apply all migration files in order
-    migration_files = sorted(glob.glob("src/sam/persistence/migrations/*.sql"))
+    # Create knowledge_documents + knowledge base schema expected by tests (new schema)
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS knowledge_documents (
+            id TEXT PRIMARY KEY,
+            path TEXT,
+            title TEXT,
+            created_at TEXT DEFAULT (datetime('now'))
+        )
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS knowledge (
+            id TEXT PRIMARY KEY,
+            capability_id TEXT,
+            status TEXT,
+            source TEXT,
+            confidence REAL,
+            payload TEXT,
+            timestamp TEXT,
+            correlation_id TEXT,
+            document_id TEXT NOT NULL DEFAULT '',
+            statement TEXT NOT NULL DEFAULT '',
+            category TEXT NOT NULL DEFAULT '',
+            metadata TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            version INTEGER NOT NULL DEFAULT 1,
+            previous_version INTEGER DEFAULT NULL,
+            FOREIGN KEY (document_id) REFERENCES knowledge_documents(id) ON DELETE CASCADE
+        )
+    ''')
+    cur.execute('CREATE INDEX IF NOT EXISTS idx_knowledge_category ON knowledge(category)')
+    cur.execute('CREATE INDEX IF NOT EXISTS idx_knowledge_document ON knowledge(document_id)')
+
+    # Apply ONLY knowledge-related migrations (009, 010, 011) - earlier migrations create old schema
+    migration_files = sorted(glob.glob("src/sam/persistence/migrations/009_*.sql") +
+                             glob.glob("src/sam/persistence/migrations/010_*.sql") +
+                             glob.glob("src/sam/persistence/migrations/011_*.sql"))
     for f in migration_files:
         with open(f, 'r') as mf:
             sql = mf.read()
