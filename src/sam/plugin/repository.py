@@ -42,7 +42,7 @@ class PluginRepository:
                 """,
                 (
                     plugin_id,
-                    plugin.workflow_id,
+                    getattr(plugin, 'workflow_id', None),
                     plugin.name,
                     plugin.version,
                     manifest_json,
@@ -95,28 +95,34 @@ class PluginRepository:
             return [_manifest_from_row(row) for row in rows]
 
     async def update(self, plugin_id: str, updates: Dict[str, Any]) -> None:
-        # First get the current manifest to update it
+        # Check if plugin exists
         current = await self.get(plugin_id)
         if not current:
             raise ValueError(f"Plugin {plugin_id} not found")
 
-        # Apply updates to the manifest object
-        for key, value in updates.items():
-            if key == "status" and isinstance(value, PluginStatus):
-                value = value.value
-            setattr(current, key, value)
-
-        # Save updated manifest
-        manifest_json = current.model_dump_json()
         now = datetime.utcnow().isoformat()
-        db_status = _normalize_status(current.status)
-
+        
+        # Handle status update separately (not part of manifest_json)
+        db_status = None
+        if "status" in updates:
+            status_val = updates["status"]
+            if isinstance(status_val, PluginStatus):
+                db_status = status_val.value
+            else:
+                db_status = str(status_val)
+        
         async with aiosqlite.connect(self.db_path, check_same_thread=False) as conn:
             conn.row_factory = aiosqlite.Row
-            await conn.execute(
-                "UPDATE plugins SET manifest_json = ?, status = ?, updated_at = ? WHERE plugin_id = ?",
-                (manifest_json, db_status, now, plugin_id),
-            )
+            if db_status:
+                await conn.execute(
+                    "UPDATE plugins SET status = ?, updated_at = ? WHERE plugin_id = ?",
+                    (db_status, now, plugin_id),
+                )
+            else:
+                await conn.execute(
+                    "UPDATE plugins SET updated_at = ? WHERE plugin_id = ?",
+                    (now, plugin_id),
+                )
             await conn.commit()
 
     async def delete(self, plugin_id: str) -> None:
