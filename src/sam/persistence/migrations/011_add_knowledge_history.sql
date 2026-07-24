@@ -22,7 +22,3 @@ CREATE TABLE IF NOT EXISTS knowledge_history (
 CREATE INDEX IF NOT EXISTS idx_knowledge_history_knowledge_id ON knowledge_history(knowledge_id);
 CREATE INDEX IF NOT EXISTS idx_knowledge_history_changed_at ON knowledge_history(changed_at);
 CREATE INDEX IF NOT EXISTS idx_knowledge_history_version ON knowledge_history(version);
-
--- Migration version record
-INSERT OR REPLACE INTO schema_version (version, applied_at, description)
-VALUES (11, datetime('now'), 'Add knowledge versioning and history table');

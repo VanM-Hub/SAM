@@ -40,7 +40,3 @@ CREATE TRIGGER knowledge_fts_delete AFTER DELETE ON knowledge
 BEGIN
     DELETE FROM knowledge_fts WHERE rowid = OLD.rowid;
 END;
-
--- Migration version record
-INSERT OR REPLACE INTO schema_version (version, applied_at, description)
-VALUES (10, datetime('now'), 'Add defensive FTS5 virtual table for knowledge search');

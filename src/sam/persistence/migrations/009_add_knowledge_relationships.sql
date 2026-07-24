@@ -15,7 +15,3 @@ CREATE TABLE IF NOT EXISTS knowledge_relationships (
 CREATE INDEX IF NOT EXISTS idx_knowledge_relationships_source ON knowledge_relationships(source_id);
 CREATE INDEX IF NOT EXISTS idx_knowledge_relationships_target ON knowledge_relationships(target_id);
 CREATE INDEX IF NOT EXISTS idx_knowledge_relationships_type ON knowledge_relationships(relationship_type);
-
--- Migration version record
-INSERT OR REPLACE INTO schema_version (version, applied_at, description)
-VALUES (9, datetime('now'), 'Add knowledge_relationships table');
