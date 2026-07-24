@@ -1,3 +1,4 @@
+from .daemon import RuntimeDaemon, DaemonConfig
 from .service import RuntimeService
 from .service_manager import ServiceManager
 from .health import ServiceHealth, HealthStatus
@@ -11,6 +12,8 @@ from .notification_service import NotificationService
 from .scheduler import Scheduler
 
 __all__ = [
+    "RuntimeDaemon",
+    "DaemonConfig",
     "RuntimeService",
     "ServiceManager",
     "ServiceHealth",

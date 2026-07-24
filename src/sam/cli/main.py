@@ -25,6 +25,11 @@ from sam.plugin import (
     PluginLifecycleManager,
     PluginManifest,
 )
+from sam.core.daemon import RuntimeDaemon, DaemonConfig
+from sam.core.job_queue import JobQueue
+from sam.core.job import Job, JobType
+from sam.core.notification_service import NotificationService
+from sam.core.scheduler import Scheduler
 from sam.models import Capability
 
 app = typer.Typer()
@@ -684,6 +689,154 @@ def plugin_health(
             typer.echo(f"Error: {e}", err=True)
             raise typer.Exit(1)
     
+    asyncio.run(_health())
+
+
+# Daemon management commands
+daemon_app = typer.Typer()
+app.add_typer(daemon_app, name="daemon")
+
+
+# Global daemon reference for start/stop lifecycle across commands
+_daemon_instance: Optional[RuntimeDaemon] = None
+_daemon_task: Optional[asyncio.Task] = None
+
+
+def _get_daemon() -> RuntimeDaemon:
+    """Get or create a daemon instance with default services."""
+    global _daemon_instance
+    if _daemon_instance is None:
+        event_bus = EventBus()
+        job_queue = JobQueue(event_bus)
+        scheduler = Scheduler(job_queue, event_bus)
+        notification = NotificationService(event_bus)
+
+        config = DaemonConfig(
+            poll_interval=5.0,
+            shutdown_timeout=30.0,
+            health_check_interval=60.0,
+        )
+
+        _daemon_instance = RuntimeDaemon(
+            config=config,
+            event_bus=event_bus,
+            services=[scheduler, notification],
+        )
+    return _daemon_instance
+
+
+@daemon_app.command("start")
+def daemon_start():
+    """Start the runtime daemon in the foreground."""
+    async def _start():
+        global _daemon_instance, _daemon_task
+        try:
+            daemon = _get_daemon()
+
+            if daemon.running:
+                typer.echo("Daemon is already running.")
+                return
+
+            typer.echo("Starting daemon...")
+            await daemon.start()
+
+            # Run forever in background task
+            _daemon_task = asyncio.create_task(daemon.run_forever())
+
+            health = await daemon.health()
+            dh = health.get("daemon")
+            if dh:
+                typer.echo(f"Daemon started: {dh.status.value} ({dh.message})")
+            for name, h in health.items():
+                if name == "daemon":
+                    continue
+                typer.echo(f"  - {name}: {h.status.value}")
+
+        except Exception as e:
+            typer.echo(f"Error starting daemon: {e}", err=True)
+            raise typer.Exit(1)
+
+    asyncio.run(_start())
+
+
+@daemon_app.command("stop")
+def daemon_stop():
+    """Stop the runtime daemon."""
+    async def _stop():
+        global _daemon_instance, _daemon_task
+        if _daemon_instance is None or not _daemon_instance.running:
+            typer.echo("Daemon is not running.")
+            return
+
+        typer.echo("Stopping daemon...")
+        await _daemon_instance.stop(signal_name="CLI")
+
+        if _daemon_task:
+            _daemon_task.cancel()
+            try:
+                await _daemon_task
+            except asyncio.CancelledError:
+                pass
+            _daemon_task = None
+
+        _daemon_instance = None
+        typer.echo("Daemon stopped.")
+
+    asyncio.run(_stop())
+
+
+@daemon_app.command("status")
+def daemon_status():
+    """Show status of the daemon and its services."""
+    async def _status():
+        global _daemon_instance
+        if _daemon_instance is None:
+            typer.echo("Daemon is not running.")
+            return
+
+        if not _daemon_instance.running:
+            typer.echo("Daemon is registered but not running.")
+            return
+
+        health = await _daemon_instance.health()
+        dh = health.get("daemon")
+        if dh:
+            typer.echo(f"Daemon: {dh.status.value}")
+            typer.echo(f"  Message: {dh.message}")
+            typer.echo(f"  Last Check: {dh.last_check.isoformat()}")
+
+        for name, h in health.items():
+            if name == "daemon":
+                continue
+            typer.echo(f"  - {name}: {h.status.value}")
+            if h.message:
+                typer.echo(f"      {h.message}")
+            if h.metrics:
+                for k, v in h.metrics.items():
+                    typer.echo(f"      {k}: {v}")
+
+    asyncio.run(_status())
+
+
+@daemon_app.command("health")
+def daemon_health():
+    """Show health of all daemon services."""
+    async def _health():
+        global _daemon_instance
+        if _daemon_instance is None or not _daemon_instance.running:
+            typer.echo("Daemon is not running.")
+            return
+
+        health = await _daemon_instance.health()
+        typer.echo(f"Daemon Health ({len(health)} services):")
+        for name, h in health.items():
+            typer.echo(f"  {name}:")
+            typer.echo(f"    Status: {h.status.value}")
+            typer.echo(f"    Message: {h.message}")
+            typer.echo(f"    Last Check: {h.last_check.isoformat()}")
+            if h.metrics:
+                typer.echo(f"    Metrics: {h.metrics}")
+
     asyncio.run(_health())
 
 
