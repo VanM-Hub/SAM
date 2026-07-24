@@ -520,5 +520,101 @@ async def test_distribution_loop_survives_error(event_bus):
     await d.stop()
 
 
+# ── 10. Execution Engine Integration ─────────────────────────────
+
+
+class _MockExecutionEngine:
+    """Mock execution engine untuk test integrasi daemon."""
+
+    def __init__(self):
+        self._active_graphs: Dict[str, Any] = {}
+        self._paused_graphs: set = set()
+
+
+@pytest.mark.asyncio
+async def test_health_includes_execution_engine(event_bus):
+    """Health should report execution engine status when configured."""
+    engine = _MockExecutionEngine()
+    engine._active_graphs = {"g1": "mock", "g2": "mock"}
+    engine._paused_graphs = {"g1"}
+
+    config = DaemonConfig(
+        health_check_interval=9999,
+        enable_execution_engine=True,
+    )
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        services=[DummyService()],
+        execution_engine=engine,
+    )
+
+    await d.start()
+    health = await d.health()
+
+    assert "execution_engine" in health
+    assert health["execution_engine"].status == HealthStatus.HEALTHY
+    assert "2 active" in health["execution_engine"].message
+    assert "1 paused" in health["execution_engine"].message
+    assert health["execution_engine"].metrics["active_graphs"] == 2
+    assert health["execution_engine"].metrics["paused_graphs"] == 1
+
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_health_skips_engine_when_disabled(event_bus):
+    """Health should NOT include execution engine when enable_execution_engine=False."""
+    engine = _MockExecutionEngine()
+    engine._active_graphs = {"g1": "mock"}
+
+    config = DaemonConfig(
+        health_check_interval=9999,
+        enable_execution_engine=False,
+    )
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        services=[DummyService()],
+        execution_engine=engine,
+    )
+
+    await d.start()
+    health = await d.health()
+    assert "execution_engine" not in health
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_health_no_engine_when_none(event_bus):
+    """Health should NOT include execution engine when engine is None."""
+    config = DaemonConfig(
+        health_check_interval=9999,
+        enable_execution_engine=True,
+    )
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        services=[DummyService()],
+        execution_engine=None,
+    )
+
+    await d.start()
+    health = await d.health()
+    assert "execution_engine" not in health
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_execution_engine_property(event_bus):
+    """Daemon should expose execution_engine via property."""
+    engine = _MockExecutionEngine()
+    d = RuntimeDaemon(
+        execution_engine=engine,
+        event_bus=event_bus,
+    )
+    assert d.execution_engine is engine
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

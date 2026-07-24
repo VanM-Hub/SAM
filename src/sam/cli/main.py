@@ -920,5 +920,124 @@ def cluster_status(
     asyncio.run(_status())
 
 
+# ── sam graph ─────────────────────────────────────────────────────
+
+graph_app = typer.Typer()
+app.add_typer(graph_app, name="graph")
+
+
+@graph_app.command("run")
+def graph_run(
+    graph_file: str = typer.Argument(..., help="Path to YAML/JSON graph definition file"),
+    correlation_id: str = typer.Option("", "--correlation-id", "-c", help="Optional correlation ID"),
+):
+    """Execute an execution graph from a YAML or JSON file."""
+    async def _run():
+        import json
+        import yaml
+        from pathlib import Path
+        from sam.execution.graph import ExecutionGraph
+        from sam.execution.engine import ExecutionGraphEngine
+
+        fp = Path(graph_file)
+        if not fp.exists():
+            typer.echo(f"Error: File not found: {graph_file}", err=True)
+            raise typer.Exit(1)
+
+        raw = fp.read_text(encoding="utf-8")
+        if fp.suffix in (".yaml", ".yml"):
+            data = yaml.safe_load(raw)
+        else:
+            data = json.loads(raw)
+
+        try:
+            graph = ExecutionGraph.model_validate(data)
+        except Exception as e:
+            typer.echo(f"Error: Invalid graph definition — {e}", err=True)
+            raise typer.Exit(1)
+
+        if correlation_id:
+            graph.correlation_id = correlation_id
+
+        engine = ExecutionGraphEngine()
+        typer.echo(f"Running graph: {graph.name} ({graph.id})")
+        result = await engine.execute(graph)
+
+        if result.status.value == "COMPLETED":
+            typer.echo(f"✅ Graph completed in {result.duration_ms:.0f}ms")
+        else:
+            typer.echo(f"❌ Graph {result.status.value} in {result.duration_ms:.0f}ms")
+
+        typer.echo(f"   Nodes: {len(result.node_results)}")
+        for nr in result.node_results:
+            icon = "✅" if nr.status.value == "COMPLETED" else "❌" if nr.status.value == "FAILED" else "⏸️"
+            details = ""
+            if nr.error:
+                details = f" - {nr.error}"
+            typer.echo(f"   {icon} {nr.node_id} ({nr.status.value}){details}")
+        raise typer.Exit(0 if result.status.value == "COMPLETED" else 1)
+
+    asyncio.run(_run())
+
+
+@graph_app.command("status")
+def graph_status(
+    graph_id: str = typer.Argument(..., help="Graph ID to check"),
+):
+    """Show status of an execution graph."""
+    async def _status():
+        from sam.execution.engine import ExecutionGraphEngine
+
+        engine = ExecutionGraphEngine()
+        status = await engine.get_status(graph_id)
+
+        if status is None:
+            typer.echo(f"Graph '{graph_id}' not found (not running or already completed).")
+            raise typer.Exit(1)
+
+        paused = engine.is_paused(graph_id)
+        typer.echo(f"Graph ID : {graph_id}")
+        typer.echo(f"Status   : {status.value}")
+        typer.echo(f"Paused   : {paused}")
+
+        if graph_id in engine._active_graphs:
+            graph = engine._active_graphs[graph_id]
+            typer.echo(f"Name     : {graph.name}")
+            typer.echo(f"Nodes    : {len(graph.nodes)}")
+            typer.echo(f"Correl.  : {graph.correlation_id}")
+
+    asyncio.run(_status())
+
+
+@graph_app.command("pause")
+def graph_pause(
+    graph_id: str = typer.Argument(..., help="Graph ID to pause"),
+):
+    """Pause a running execution graph."""
+    async def _pause():
+        from sam.execution.engine import ExecutionGraphEngine
+
+        engine = ExecutionGraphEngine()
+        await engine.pause(graph_id)
+        typer.echo(f"⏸️  Graph '{graph_id}' paused.")
+
+    asyncio.run(_pause())
+
+
+@graph_app.command("resume")
+def graph_resume(
+    graph_id: str = typer.Argument(..., help="Graph ID to resume"),
+):
+    """Resume a paused execution graph."""
+    async def _resume():
+        from sam.execution.engine import ExecutionGraphEngine
+
+        engine = ExecutionGraphEngine()
+        await engine.resume(graph_id)
+        typer.echo(f"▶️  Graph '{graph_id}' resumed.")
+
+    asyncio.run(_resume())
+
+
 if __name__ == "__main__":
     app()

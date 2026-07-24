@@ -53,6 +53,7 @@ class DaemonConfig:
     distribution_interval: float = 30.0
     enable_cluster_state: bool = True
     cluster_state_interval: float = 30.0
+    enable_execution_engine: bool = True
 
 
 class RuntimeDaemon:
@@ -76,6 +77,7 @@ class RuntimeDaemon:
         distributor: Any = None,
         cluster_state_aggregator: Optional["ClusterStateAggregator"] = None,
         resource_directory: Any = None,
+        execution_engine: Any = None,
     ):
         self.config = config or DaemonConfig()
         self.clock = clock or SystemClock()
@@ -88,6 +90,7 @@ class RuntimeDaemon:
         self._distributor = distributor
         self._cluster_state_aggregator = cluster_state_aggregator
         self._resource_directory = resource_directory
+        self._execution_engine = execution_engine
         self._node: Optional[RuntimeNode] = None
         self._heartbeat_service: Optional[HeartbeatService] = None
         self._leader_election: Optional[LeaderElection] = None
@@ -115,6 +118,10 @@ class RuntimeDaemon:
     @property
     def running(self) -> bool:
         return self._running
+
+    @property
+    def execution_engine(self) -> Any:
+        return self._execution_engine
 
     def add_service(self, service: RuntimeService) -> None:
         """Add a service to the daemon."""
@@ -341,6 +348,21 @@ class RuntimeDaemon:
         )
         result: Dict[str, ServiceHealth] = {"daemon": daemon_health}
         result.update(health)
+
+        # Add execution engine health
+        if self._execution_engine and self.config.enable_execution_engine:
+            active_graphs = len(self._execution_engine._active_graphs)
+            paused_graphs = len(self._execution_engine._paused_graphs)
+            result["execution_engine"] = ServiceHealth(
+                status=HealthStatus.HEALTHY,
+                message=f"Engine ready ({active_graphs} active, {paused_graphs} paused)",
+                metrics={
+                    "active_graphs": active_graphs,
+                    "paused_graphs": paused_graphs,
+                },
+                last_check=self.clock.now(),
+            )
+
         return result
 
     async def run_forever(self) -> None:
