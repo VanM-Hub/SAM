@@ -24,6 +24,7 @@ from .health import ServiceHealth, HealthStatus
 from .events import ServiceStarted, ServiceStopped, ServiceHealthChanged
 from ..cluster.node import RuntimeNode, NodeStatus, NodeCapabilities
 from ..cluster.node_registry import NodeRegistry
+from ..cluster.heartbeat import HeartbeatService
 
 
 @dataclass
@@ -66,11 +67,11 @@ class RuntimeDaemon:
         self._service_manager = ServiceManager(self.event_bus)
         self._node_registry = node_registry
         self._node: Optional[RuntimeNode] = None
+        self._heartbeat_service: Optional[HeartbeatService] = None
         self._logger = structlog.get_logger()
         self._running = False
         self._shutdown_event = asyncio.Event()
         self._health_task: Optional[asyncio.Task] = None
-        self._heartbeat_task: Optional[asyncio.Task] = None
 
     @property
     def service_manager(self) -> ServiceManager:
@@ -145,9 +146,19 @@ class RuntimeDaemon:
         if self._node_registry and self._node:
             await self._node_registry.update_status(self._node.node_id, NodeStatus.ONLINE)
 
-        # Start health check loop & heartbeat loop
+        # Start heartbeat service via ServiceManager
+        if self._node_registry and self._node:
+            self._heartbeat_service = HeartbeatService(
+                node_registry=self._node_registry,
+                node_id=self._node.node_id,
+                interval=int(self.config.heartbeat_interval),
+            )
+            self._service_manager.register(self._heartbeat_service)
+            await self._heartbeat_service.initialize()
+            await self._heartbeat_service.start()
+
+        # Start health check loop
         self._health_task = asyncio.create_task(self._health_loop())
-        self._heartbeat_task = asyncio.create_task(self._heartbeat_loop())
 
         # Publish daemon started event
         await self.event_bus.publish(ServiceStarted(
@@ -173,16 +184,18 @@ class RuntimeDaemon:
         self._running = False
         self._shutdown_event.set()
 
-        # Cancel loops
-        for task in (self._health_task, self._heartbeat_task):
-            if task:
-                task.cancel()
-                try:
-                    await task
-                except asyncio.CancelledError:
-                    pass
+        # Stop heartbeat service
+        if self._heartbeat_service:
+            await self._heartbeat_service.stop()
+
+        # Cancel health loop
+        if self._health_task:
+            self._health_task.cancel()
+            try:
+                await self._health_task
+            except asyncio.CancelledError:
+                pass
         self._health_task = None
-        self._heartbeat_task = None
 
         # Set node OFFLINE
         if self._node_registry and self._node:
@@ -305,31 +318,4 @@ class RuntimeDaemon:
 
             await asyncio.sleep(self.config.health_check_interval)
 
-    async def _heartbeat_loop(self) -> None:
-        """Periodic heartbeat — update last_heartbeat + health di NodeRegistry."""
-        if not self._node_registry or not self._node:
-            return
-        while self._running:
-            try:
-                health_data: Dict[str, Any] = {
-                    "service_count": len(self._services),
-                    "running": self._running,
-                }
-                # Collect service health for heartbeat payload
-                try:
-                    svc_health = await self.health()
-                    for name, h in svc_health.items():
-                        health_data[f"{name}_status"] = h.status.value
-                except Exception:
-                    pass
 
-                await self._node_registry.heartbeat(
-                    self._node.node_id, health_data
-                )
-                self._logger.debug("heartbeat_sent", node_id=self._node.node_id)
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                self._logger.error("heartbeat_error", error=str(e))
-
-            await asyncio.sleep(self.config.heartbeat_interval)
