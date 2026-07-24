@@ -44,6 +44,8 @@ class DaemonConfig:
     orphan_timeout: int = 60
     leader_lease_seconds: int = 30
     try_become_leader: bool = False
+    enable_distribution: bool = True
+    distribution_interval: float = 30.0
 
 
 class RuntimeDaemon:
@@ -63,6 +65,8 @@ class RuntimeDaemon:
         services: Optional[List[RuntimeService]] = None,
         node_registry: Optional[NodeRegistry] = None,
         db: Any = None,
+        job_queue: Any = None,
+        distributor: Any = None,
     ):
         self.config = config or DaemonConfig()
         self.clock = clock or SystemClock()
@@ -71,6 +75,8 @@ class RuntimeDaemon:
         self._service_manager = ServiceManager(self.event_bus)
         self._node_registry = node_registry
         self._db = db
+        self._job_queue = job_queue
+        self._distributor = distributor
         self._node: Optional[RuntimeNode] = None
         self._heartbeat_service: Optional[HeartbeatService] = None
         self._leader_election: Optional[LeaderElection] = None
@@ -79,6 +85,7 @@ class RuntimeDaemon:
         self._running = False
         self._shutdown_event = asyncio.Event()
         self._health_task: Optional[asyncio.Task] = None
+        self._distribution_task: Optional[asyncio.Task] = None
 
     @property
     def service_manager(self) -> ServiceManager:
@@ -179,6 +186,14 @@ class RuntimeDaemon:
         # Start health check loop
         self._health_task = asyncio.create_task(self._health_loop())
 
+        # Start distribution loop (leader-only, if configured)
+        if (
+            self.config.enable_distribution
+            and self._distributor
+            and self._is_leader
+        ):
+            self._distribution_task = asyncio.create_task(self._distribution_loop())
+
         # Publish daemon started event
         await self.event_bus.publish(ServiceStarted(
             id=str(uuid.uuid4()),
@@ -206,6 +221,15 @@ class RuntimeDaemon:
         # Stop heartbeat service
         if self._heartbeat_service:
             await self._heartbeat_service.stop()
+
+        # Cancel distribution loop
+        if self._distribution_task:
+            self._distribution_task.cancel()
+            try:
+                await self._distribution_task
+            except asyncio.CancelledError:
+                pass
+        self._distribution_task = None
 
         # Cancel health loop
         if self._health_task:
@@ -341,5 +365,23 @@ class RuntimeDaemon:
                 self._logger.error("health_check_error", error=str(e))
 
             await asyncio.sleep(self.config.health_check_interval)
+
+    async def _distribution_loop(self) -> None:
+        """Periodic job/workflow distribution loop (leader-only)."""
+        while self._running:
+            try:
+                if self._is_leader and self._distributor:
+                    await self._distributor.distribute_jobs()
+                    await self._distributor.distribute_workflows()
+                    self._logger.debug(
+                        "distribution_completed",
+                        node_id=self._node.node_id if self._node else None,
+                    )
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                self._logger.error("distribution_error", error=str(e))
+
+            await asyncio.sleep(self.config.distribution_interval)
 
 

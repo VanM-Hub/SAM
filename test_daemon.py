@@ -353,5 +353,172 @@ async def test_event_bus_integration(event_bus):
     assert "service.started" in received
 
 
+# ── 9. Distributor Integration ───────────────────────────────────
+
+
+class _MockDistributor:
+    """Mock distributor untuk test integrasi daemon."""
+
+    def __init__(self):
+        self.distribute_jobs_calls = 0
+        self.distribute_workflows_calls = 0
+        self._error_on_call: Optional[int] = None
+        self._call_count = 0
+
+    async def distribute_jobs(self):
+        self._call_count += 1
+        self.distribute_jobs_calls += 1
+        if self._error_on_call is not None and self._call_count == self._error_on_call:
+            raise RuntimeError("distribute_jobs error")
+
+    async def distribute_workflows(self):
+        self.distribute_workflows_calls += 1
+
+
+@pytest.mark.asyncio
+async def test_distribution_loop_runs_when_leader(event_bus):
+    """Distribution loop starts when daemon is leader with distributor configured."""
+    distributor = _MockDistributor()
+
+    config = DaemonConfig(
+        health_check_interval=9999,
+        distribution_interval=0.1,  # fast poll for test
+        try_become_leader=False,  # we'll inject leader state manually
+        enable_distribution=True,
+    )
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        distributor=distributor,
+        services=[DummyService()],
+    )
+
+    await d.start()
+
+    # Inject leader state manually (bypassing actual LeaderElection)
+    d._is_leader = True
+    d._distributor = distributor
+    d._distribution_task = asyncio.create_task(d._distribution_loop())
+
+    # Wait for at least 2 distribution cycles
+    await asyncio.sleep(0.35)
+
+    assert distributor.distribute_jobs_calls >= 2
+    assert distributor.distribute_workflows_calls >= 2
+
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_distribution_skipped_when_not_leader(event_bus):
+    """Distribution loop should not call distribute when node is not leader."""
+    distributor = _MockDistributor()
+
+    config = DaemonConfig(
+        health_check_interval=9999,
+        distribution_interval=0.1,
+        enable_distribution=True,
+    )
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        distributor=distributor,
+        services=[DummyService()],
+    )
+
+    await d.start()
+
+    # Inject non-leader state
+    d._is_leader = False
+    d._distributor = distributor
+    d._distribution_task = asyncio.create_task(d._distribution_loop())
+
+    # Wait long enough that a cycle would have run
+    await asyncio.sleep(0.35)
+
+    # Distribution should not have been called
+    assert distributor.distribute_jobs_calls == 0
+    assert distributor.distribute_workflows_calls == 0
+
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_distribution_skipped_when_disabled(event_bus):
+    """Distribution loop does not start when enable_distribution=False."""
+    distributor = _MockDistributor()
+
+    config = DaemonConfig(
+        health_check_interval=9999,
+        enable_distribution=False,
+    )
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        distributor=distributor,
+        services=[DummyService()],
+    )
+
+    await d.start()
+    # Even if leader, task won't be created because enable_distribution is False
+    d._is_leader = True
+
+    assert d._distribution_task is None, "Distribution task should not be created when disabled"
+
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_distribution_no_distributor_no_task(event_bus):
+    """No distribution task created when distributor is None."""
+    config = DaemonConfig(
+        health_check_interval=9999,
+        enable_distribution=True,
+    )
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        distributor=None,
+        services=[DummyService()],
+    )
+
+    await d.start()
+    d._is_leader = True
+
+    assert d._distribution_task is None, "Distribution task should not be created without distributor"
+
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_distribution_loop_survives_error(event_bus):
+    """Distribution loop should continue running after an error in distribute_jobs."""
+    distributor = _MockDistributor()
+    distributor._error_on_call = 1  # fail first call only
+
+    config = DaemonConfig(
+        health_check_interval=9999,
+        distribution_interval=0.1,
+        enable_distribution=True,
+    )
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        distributor=distributor,
+        services=[DummyService()],
+    )
+
+    await d.start()
+    d._is_leader = True
+    d._distribution_task = asyncio.create_task(d._distribution_loop())
+
+    await asyncio.sleep(0.35)
+
+    # Should have at least gotten past the error and made more calls
+    assert distributor.distribute_jobs_calls >= 2, f"Expected >=2 calls, got {distributor.distribute_jobs_calls}"
+
+    await d.stop()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
