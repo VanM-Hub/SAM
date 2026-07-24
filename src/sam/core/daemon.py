@@ -27,6 +27,11 @@ from ..cluster.node_registry import NodeRegistry
 from ..cluster.heartbeat import HeartbeatService
 from ..cluster.leader import LeaderElection
 
+# Lazy import untuk hindari circular import (state → core → daemon → state)
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..cluster.state import ClusterStateAggregator
+
 
 @dataclass
 class DaemonConfig:
@@ -46,6 +51,8 @@ class DaemonConfig:
     try_become_leader: bool = False
     enable_distribution: bool = True
     distribution_interval: float = 30.0
+    enable_cluster_state: bool = True
+    cluster_state_interval: float = 30.0
 
 
 class RuntimeDaemon:
@@ -67,6 +74,8 @@ class RuntimeDaemon:
         db: Any = None,
         job_queue: Any = None,
         distributor: Any = None,
+        cluster_state_aggregator: Optional["ClusterStateAggregator"] = None,
+        resource_directory: Any = None,
     ):
         self.config = config or DaemonConfig()
         self.clock = clock or SystemClock()
@@ -77,6 +86,8 @@ class RuntimeDaemon:
         self._db = db
         self._job_queue = job_queue
         self._distributor = distributor
+        self._cluster_state_aggregator = cluster_state_aggregator
+        self._resource_directory = resource_directory
         self._node: Optional[RuntimeNode] = None
         self._heartbeat_service: Optional[HeartbeatService] = None
         self._leader_election: Optional[LeaderElection] = None
@@ -86,6 +97,8 @@ class RuntimeDaemon:
         self._shutdown_event = asyncio.Event()
         self._health_task: Optional[asyncio.Task] = None
         self._distribution_task: Optional[asyncio.Task] = None
+        self._cluster_state_task: Optional[asyncio.Task] = None
+        self._latest_cluster_state: Optional[Dict[str, Any]] = None
 
     @property
     def service_manager(self) -> ServiceManager:
@@ -194,6 +207,16 @@ class RuntimeDaemon:
         ):
             self._distribution_task = asyncio.create_task(self._distribution_loop())
 
+        # Start cluster state collection (leader-only, if configured)
+        if (
+            self.config.enable_cluster_state
+            and self._cluster_state_aggregator
+            and self._is_leader
+        ):
+            self._cluster_state_task = asyncio.create_task(
+                self._cluster_state_loop()
+            )
+
         # Publish daemon started event
         await self.event_bus.publish(ServiceStarted(
             id=str(uuid.uuid4()),
@@ -221,6 +244,15 @@ class RuntimeDaemon:
         # Stop heartbeat service
         if self._heartbeat_service:
             await self._heartbeat_service.stop()
+
+        # Cancel cluster state loop
+        if self._cluster_state_task:
+            self._cluster_state_task.cancel()
+            try:
+                await self._cluster_state_task
+            except asyncio.CancelledError:
+                pass
+        self._cluster_state_task = None
 
         # Cancel distribution loop
         if self._distribution_task:
@@ -383,5 +415,57 @@ class RuntimeDaemon:
                 self._logger.error("distribution_error", error=str(e))
 
             await asyncio.sleep(self.config.distribution_interval)
+
+    async def _cluster_state_loop(self) -> None:
+        """Periodic cluster state collection loop (leader-only).
+
+        Mengumpulkan state cluster via ClusterStateAggregator dan
+        menyimpannya ke ResourceDirectory jika tersedia.
+        """
+        while self._running:
+            try:
+                if self._is_leader and self._cluster_state_aggregator:
+                    state = await self._cluster_state_aggregator.collect()
+                    self._latest_cluster_state = state.to_dict()
+
+                    # Persist to ResourceDirectory jika tersedia
+                    if self._resource_directory:
+                        try:
+                            await self._resource_directory.update_data(
+                                self.config.cluster_id,
+                                state.to_dict(),
+                                version=int(state.updated_at.timestamp()),
+                            )
+                        except Exception:
+                            # Resource mungkin belum terdaftar; coba daftarkan
+                            from ..core.resource import (
+                                RuntimeResource,
+                                ResourceType,
+                                ResourceStatus,
+                            )
+                            try:
+                                resource = RuntimeResource(
+                                    id=self.config.cluster_id,
+                                    type=ResourceType.JOB,  # reused JOB type for cluster state
+                                    name=f"cluster-state-{self.config.cluster_id}",
+                                    status=ResourceStatus.ACTIVE,
+                                    data=state.to_dict(),
+                                )
+                                await self._resource_directory.register(resource)
+                            except Exception:
+                                pass
+
+                    self._logger.debug(
+                        "cluster_state_collected",
+                        cluster=self.config.cluster_id,
+                        nodes=f"{state.online_nodes}/{state.node_count}",
+                        load=f"{state.total_load:.1f}%",
+                    )
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                self._logger.error("cluster_state_error", error=str(e))
+
+            await asyncio.sleep(self.config.cluster_state_interval)
 
 
