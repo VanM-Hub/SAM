@@ -10,6 +10,8 @@ from .planner import PlanningEngine, PlanError
 from .engine import ReasoningEngine, ReasoningResult
 from .candidate import PlanCandidate
 from .ranker import PlanRanker
+from .revision import GraphRevision, RevisionManager, RevisionTrigger
+from .evolution import IntentEvolution, EvolutionManager
 
 __all__ = [
     "Intent",
@@ -25,4 +27,9 @@ __all__ = [
     "ReasoningResult",
     "PlanCandidate",
     "PlanRanker",
+    "GraphRevision",
+    "RevisionManager",
+    "RevisionTrigger",
+    "IntentEvolution",
+    "EvolutionManager",
 ]

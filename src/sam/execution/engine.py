@@ -29,6 +29,7 @@ from .node import (
 from .decision import DecisionNode
 
 from sam.core.clock import TimeProvider, SystemClock
+from sam.reasoning.revision import RevisionManager, RevisionTrigger
 from sam.core.event_bus import EventBus
 from sam.core.events import Event
 from sam.core.resource_directory import ResourceDirectory
@@ -99,11 +100,13 @@ class ExecutionGraphEngine:
         event_bus: Optional[EventBus] = None,
         clock: Optional[TimeProvider] = None,
         resource_directory: Optional[ResourceDirectory] = None,
+        revision_manager: Optional[RevisionManager] = None,
     ) -> None:
         self.runtime = runtime
         self.event_bus = event_bus or EventBus()
         self.clock = clock or SystemClock()
         self.resource_directory = resource_directory or None
+        self.revision_manager = revision_manager
         self._logger = structlog.get_logger().bind(component="ExecutionGraphEngine")
 
         # Internal state for pause/resume
@@ -429,6 +432,11 @@ class ExecutionGraphEngine:
                         target=target_id,
                         evidence_keys=list(evidence.keys()),
                     )
+
+                # Check for revision trigger based on decision evidence
+                await self._check_and_propose_revision(
+                    node, result, evidence, graph,
+                )
 
                 # ABORT propagation on failure
                 if result.status == NodeStatus.FAILED:
@@ -849,6 +857,86 @@ class ExecutionGraphEngine:
                 "event_publish_failed",
                 event_type=event_type,
             )
+
+    # ── Internal: Revision Integration ────────────────────────────
+
+    async def _check_and_propose_revision(
+        self,
+        node: ExecutionNode,
+        result: NodeResult,
+        evidence: Dict[str, Any],
+        graph: ExecutionGraph,
+    ) -> Optional[Any]:
+        """Check if a completed node triggers a graph revision.
+
+        Called after each node completes. If the node is a decision node
+        and its evidence suggests a significant change, a revision is
+        proposed via RevisionManager.
+
+        Returns:
+            Optional GraphRevision if proposed, None otherwise.
+        """
+        if not self.revision_manager:
+            return None
+
+        # Only trigger revisions for decision nodes with evidence
+        if not node.is_decision:
+            return None
+
+        # Check decision evidence: did we branch away from the "happy path"?
+        # Heuristic: look for node evidence that indicates failure or warning
+        ev = evidence.get("node", {})
+        node_ev = ev.get(node.id, {})
+        decision_outcome = node_ev.get("output", {}).get("decision_outcome", "")
+
+        # Inspect all accumulated evidence for significant signals
+        trigger_reasons = []
+        for nid, ned in ev.items():
+            if nid == node.id:
+                continue
+            status = ned.get("status", "")
+            if status in ("FAILED", "COMPENSATED"):
+                trigger_reasons.append(f"Node {nid} is {status}")
+            output = ned.get("output", {})
+            if output and isinstance(output, dict):
+                for key, val in output.items():
+                    if isinstance(val, str) and "unhealthy" in val.lower():
+                        trigger_reasons.append(f"{nid}.{key}: {val}")
+                    elif isinstance(val, str) and "warning" in val.lower():
+                        trigger_reasons.append(f"{nid}.{key}: {val}")
+
+        if not trigger_reasons:
+            return None
+
+        reason = "; ".join(trigger_reasons)
+        self._logger.info(
+            "revision.trigger_detected",
+            graph_id=graph.id,
+            node_id=node.id,
+            reason=reason,
+        )
+
+        # Propose revision
+        revision = await self.revision_manager.propose_revision(
+            graph_id=graph.id,
+            reason=reason,
+            changes={
+                "new_nodes": [],
+                "modified_nodes": [],
+                "removed_nodes": [],
+            },
+            trigger=RevisionTrigger.DECISION_NODE,
+            current_graph=graph,
+        )
+
+        self._logger.info(
+            "revision.proposed_for_graph",
+            graph_id=graph.id,
+            revision_id=revision.id,
+            version=revision.version,
+        )
+
+        return revision
 
     # ── Internal: Resource Integration ────────────────────────────
 
