@@ -6,6 +6,7 @@ from .event_bus import EventBus
 from .events import Event
 from .job import Job, JobType, JobRecord, JobStatus
 from .job_queue import JobQueue
+from .scheduler import Scheduler
 
 __all__ = [
     "RuntimeService",
@@ -23,4 +24,5 @@ __all__ = [
     "JobRecord",
     "JobStatus",
     "JobQueue",
+    "Scheduler",
 ]
