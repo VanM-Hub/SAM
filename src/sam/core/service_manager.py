@@ -1,20 +1,27 @@
 from __future__ import annotations
 
+import uuid
+from datetime import datetime
 from typing import Dict, List, Optional
 import structlog
 
 from .service import RuntimeService
 from .health import ServiceHealth
 from .event_bus import EventBus
+from .state import StateStore, StateRecord, StateType
 
 
 class ServiceManager:
-    """Manages lifecycle of all runtime services."""
+    """Manages lifecycle of all runtime services.
 
-    def __init__(self, event_bus: EventBus):
+    Optionally integrates with StateStore to persist service lifecycle states.
+    """
+
+    def __init__(self, event_bus: EventBus, state_store: Optional[StateStore] = None):
         self._services: Dict[str, RuntimeService] = {}
         self._logger = structlog.get_logger()
         self._event_bus = event_bus
+        self._state_store = state_store
 
     def register(self, service: RuntimeService) -> None:
         """Register a service and inject EventBus if supported."""
@@ -37,6 +44,7 @@ class ServiceManager:
                 await service.initialize()
                 service._initialized = True
                 self._logger.info("service_initialized", name=name)
+                await self._save_service_state(name, "initialized")
             except Exception as e:
                 self._logger.error("service_initialize_failed", name=name, error=str(e))
                 raise
@@ -51,6 +59,7 @@ class ServiceManager:
                 await service.start()
                 service._started = True
                 self._logger.info("service_started", name=name)
+                await self._save_service_state(name, "running")
             except Exception as e:
                 self._logger.error("service_start_failed", name=name, error=str(e))
                 raise
@@ -75,6 +84,7 @@ class ServiceManager:
                 service._stopped = True
                 service._started = False
                 self._logger.info("service_stopped", name=name)
+                await self._save_service_state(name, "stopped")
             except Exception as e:
                 self._logger.error("service_stop_failed", name=name, error=str(e))
 
@@ -89,3 +99,57 @@ class ServiceManager:
     def list_services(self) -> List[str]:
         """List all registered service names."""
         return list(self._services.keys())
+
+    # ── State store integration ──────────────────────────────────────
+
+    def get_state_store(self) -> Optional[StateStore]:
+        """Return the StateStore instance."""
+        return self._state_store
+
+    async def _save_service_state(self, name: str, status: str) -> None:
+        """Persist service state to the StateStore if available."""
+        if not self._state_store:
+            return
+        service = self._services.get(name)
+
+        # Check if a state record already exists for this service name+type
+        existing = await self._state_store.get_by_type_and_name("SERVICE", name)
+
+        if existing:
+            # Update existing record with new status + incremented version
+            existing.status = status
+            existing.data = {
+                "initialized": service.initialized if service else False,
+                "started": service.started if service else False,
+                "stopped": service.stopped if service else False,
+            }
+            existing.updated_at = datetime.now()
+            await self._state_store.save(existing)
+        else:
+            record = StateRecord(
+                id=str(uuid.uuid4()),
+                type=StateType.SERVICE,
+                name=name,
+                status=status,
+                data={
+                    "initialized": service.initialized if service else False,
+                    "started": service.started if service else False,
+                    "stopped": service.stopped if service else False,
+                },
+                updated_at=datetime.now(),
+                version=1,
+            )
+            await self._state_store.save(record)
+
+    async def restore_service_states(self) -> Dict[str, str]:
+        """Restore service states from StateStore.
+
+        Returns a dict of service name -> last known status.
+        """
+        if not self._state_store:
+            return {}
+        records = await self._state_store.list(type=StateType.SERVICE)
+        result: Dict[str, str] = {}
+        for rec in records:
+            result[rec.name] = rec.status
+        return result

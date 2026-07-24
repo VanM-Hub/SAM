@@ -10,6 +10,9 @@ from .job_queue import JobQueue
 from .notification import Notification, NotificationSeverity
 from .notification_service import NotificationService
 from .scheduler import Scheduler
+from .state import StateStore, StateRecord, StateType
+from .state import StateSavedEvent, StateDeletedEvent
+from .state import StateStoreError, OptimisticLockError
 
 __all__ = [
     "RuntimeDaemon",
@@ -33,4 +36,11 @@ __all__ = [
     "Notification",
     "NotificationSeverity",
     "NotificationService",
+    "StateStore",
+    "StateRecord",
+    "StateType",
+    "StateSavedEvent",
+    "StateDeletedEvent",
+    "StateStoreError",
+    "OptimisticLockError",
 ]
