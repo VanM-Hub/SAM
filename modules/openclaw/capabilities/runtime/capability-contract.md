@@ -1,280 +1,412 @@
 # Capability Contract
 
-
-
 Version: 1.0
-
-
 
 Status: Draft
 
+Capability Type: Runtime Infrastructure
 
+Execution Mode: Contract Definition
 
-Capability Type: Runtime Architecture
+Risk Level: None
 
+Owner: OpenClaw Runtime
 
+Knowledge Type: Implementation
 
-Execution Mode: System
+Evidence Level: Designed
 
-
-
-Risk Level: Low
-
-
-
-Owner: OpenClaw Module
-
-
-
-Related Documents
-
-
-
-Capabilities
-
-
-
-\- capability-runtime.md
-
-\- capability-registry.md
-
-\- capability-composition.md
-
-
-
-Sprint 2
-
-
-
-\- health-checks.md
-
-\- configuration-validation.md
-
-
-
-Framework
-
-
-
-\- docs/models/TRUST\_MODEL.md
-
-\- docs/models/DECISION\_MODEL.md
-
-
+Confidence: High
 
 ---
-
-
 
 # Purpose
 
+Define the standardized execution contract shared by every executable capability within the SAM Framework.
 
+The Capability Contract specifies how capabilities communicate with the runtime, workflow engine, orchestrator, and other capabilities while remaining implementation-independent.
 
-Define the formal contract for every capability.
-
-
-
-The contract specifies how a capability interacts with the rest of the system.
-
-
-
-Contracts ensure consistent, predictable, and verifiable capability execution.
-
-
+The contract establishes a stable interface that separates runtime behavior from implementation details.
 
 ---
 
+# Authority
 
+Primary Reference
 
-# Contract Structure
+- docs/specifications/SAM_FRAMEWORK_v1.0_SPECIFICATION.md
 
+Supporting References
 
+- docs/core/CONSTITUTION.md
+- docs/models/EXECUTION_MODEL.md
+- docs/GLOSSARY.md
 
-A capability contract contains the following sections:
+Related Runtime Components
 
-
-
----
-
-
-
-## 1. Metadata
-
-
-
-| Field | Description |
-
-| :--- | :--- |
-
-| `capability\_id` | Unique identifier. |
-
-| `version` | Semantic version of the contract. |
-
-| `contract\_version` | Version of the contract schema (e.g., "1.0"). |
-
-
+- capability-runtime.md
+- capability-registry.md
+- capability-composition.md
+- workflow-engine.md
 
 ---
 
+# Contract Philosophy
 
+Every capability exposes behavior through a contract.
 
-## 2. Inputs
+Consumers interact with the contract rather than implementation details.
 
-
-
-Defines the required and optional inputs for the capability.
-inputs:
-
-name: workspace_path
-type: string
-required: true
-description: "Path to the OpenClaw workspace"
-
-name: timeout_seconds
-type: integer
-required: false
-default: 30
-
+Changing implementation shall not require changing the contract.
 
 ---
 
-## 3. Outputs
+# Standard Contract
 
-Defines the output structure.
-outputs:
+Every capability shall define:
 
-name: status
-type: enum
-values: ["success", "warning", "failure"]
+- Identity
+- Purpose
+- Inputs
+- Outputs
+- Preconditions
+- Required Evidence
+- Generated Evidence
+- Required Permissions
+- Dependencies
+- Risk Classification
+- Rollback Support
+- Audit Events
 
-name: data
-type: object
-description: "Detailed output data"
-
-name: evidence
-type: array
-items: { type: object }
-description: "Collected evidence"
-
-
----
-
-## 4. Required Permissions
-
-permissions:
-
-read:configuration
-
-read:workspace
-
-read:runtime
-
-read:filesystem
-
-execute:provider (read-only)
-
+These fields form the minimum executable contract.
 
 ---
 
-## 5. Risk Classification
+# Identity
 
-risk:
-level: Low # Low, Medium, High, Critical
-blast_radius: Minimal
-rollback_support: true
+Every contract shall include:
 
+Capability ID
 
----
+Version
 
-## 6. Audit Events
+Category
 
-Events to be recorded during execution:
-audit_events:
+Display Name
 
-initialized
+Owner
 
-executed
+Runtime Version
 
-completed
+Specification Version
 
-failed
-
-retry_attempted
-
+Identity remains immutable for the lifetime of the contract version.
 
 ---
 
-## 7. Dependencies
+# Purpose
 
-Capabilities required by this capability:
-dependencies:
+Purpose describes:
 
-capability_id: diagnostics-automation
-version: ">=1.0.0"
+- operational responsibility
+- expected outcome
+- architectural role
 
+Purpose shall never describe implementation.
 
 ---
 
-## 8. Error Handling
+# Inputs
 
-Defines common error codes and recovery behavior:
-error_handling:
-timeout:
-action: retry
-max_retries: 3
-backoff: exponential
-invalid_input:
-action: fail
-message: "Input validation failed"
+Inputs represent information required before execution.
 
+Examples include:
+
+- runtime context
+- workflow state
+- configuration
+- evidence references
+- operator parameters
+
+Inputs shall be validated before execution begins.
+
+---
+
+# Outputs
+
+Outputs represent information produced after execution.
+
+Typical outputs include:
+
+- observations
+- decisions
+- execution results
+- verification status
+- generated evidence
+
+Outputs become available only after successful completion of execution.
+
+---
+
+# Preconditions
+
+Execution may begin only when all preconditions are satisfied.
+
+Examples:
+
+- capability registered
+- permissions granted
+- dependencies available
+- required evidence collected
+- approval completed
+
+Unsatisfied preconditions prevent execution.
+
+---
+
+# Required Evidence
+
+Capabilities declare the evidence they require.
+
+Examples
+
+Health Checks
+
+- configuration
+- runtime state
+
+Reasoning
+
+- diagnostic evidence
+
+Execution
+
+- approved execution plan
+
+Capabilities shall never invent missing evidence.
+
+---
+
+# Generated Evidence
+
+Capabilities may generate new evidence.
+
+Examples:
+
+- health reports
+- reasoning trace
+- verification reports
+- execution metadata
+- rollback evidence
+
+Generated evidence becomes available to downstream capabilities.
+
+---
+
+# Dependencies
+
+Capabilities may depend on:
+
+- other capabilities
+- runtime services
+- workflow state
+- external providers
+
+Dependencies shall be explicit.
+
+Hidden dependencies are prohibited.
+
+---
+
+# Permission Requirements
+
+Capabilities shall declare required permissions.
+
+Examples:
+
+Read Configuration
+
+Read Workspace
+
+Read Logs
+
+Modify Configuration
+
+Write Audit Trail
+
+Execute Provider Request
+
+Permission validation occurs before execution.
+
+---
+
+# Risk Classification
+
+Each capability declares an operational risk level.
+
+Typical values:
+
+- None
+- Low
+- Medium
+- High
+- Critical
+
+Risk classification determines governance requirements.
+
+---
+
+# Rollback Support
+
+Capabilities shall specify rollback behavior.
+
+Possible values include:
+
+Supported
+
+Conditionally Supported
+
+Not Applicable
+
+Unsupported
+
+Execution workflows rely on this declaration during planning.
+
+---
+
+# Audit Events
+
+Capabilities shall define which events are emitted.
+
+Typical events:
+
+Execution Started
+
+Execution Completed
+
+Execution Failed
+
+Evidence Generated
+
+Verification Completed
+
+Rollback Executed
+
+Audit events shall be deterministic and reproducible.
+
+---
+
+# Error Contract
+
+Execution failures shall produce structured errors.
+
+Errors should include:
+
+- identifier
+- category
+- severity
+- source capability
+- evidence reference
+- timestamp
+
+Failures remain observable rather than hidden.
 
 ---
 
 # Contract Validation
 
-Before execution, the Runtime validates:
+Contracts are validated during registration.
 
-- Inputs match the contract schema.
-- Permissions are satisfied.
-- Dependencies are available.
-- Risk level is permitted for the current context.
+Validation includes:
 
----
+- metadata completeness
+- schema compliance
+- dependency resolution
+- permission declarations
+- version compatibility
 
-# Immutability
-
-Contracts are immutable once published.
-
-Changes to contracts require a new version.
+Invalid contracts shall not become executable.
 
 ---
 
-# Relationship with Composition
+# Contract Compatibility
 
-Contracts enable safe composition:
+Minor implementation changes shall preserve contract compatibility.
 
-- Composition checks that outputs of one step match inputs of the next.
-- Contracts define data types that must be compatible.
+Breaking changes require:
+
+- new contract version
+- compatibility declaration
+- migration guidance
+
+Version compatibility is managed by the Capability Registry.
 
 ---
 
-# Relationship with Audit
+# Relationship to Runtime
 
-Audit records each contract validation step.
+Capability Runtime executes contracts.
+
+Contracts define behavior.
+
+Runtime performs execution.
+
+The contract never executes itself.
+
+---
+
+# Relationship to Workflow Engine
+
+Workflow Engine exchanges data exclusively through capability contracts.
+
+The engine shall never depend on implementation-specific behavior.
+
+---
+
+# Relationship to Capability Composition
+
+Capability Composition combines contracts into larger operational workflows.
+
+Composition depends upon compatible contracts rather than runtime implementations.
+
+---
+
+# Operational Boundaries
+
+Capability Contracts shall never:
+
+- perform execution
+- contain business logic
+- enforce workflow sequencing
+- bypass governance
+- modify runtime state
+
+Contracts define interfaces only.
 
 ---
 
 # Future Evolution
 
-Future versions may support:
+Future versions may introduce:
 
-- JSON Schema for input/output validation.
-- Contract version negotiation.
-- Dynamic contract discovery.
+contracts/
+
+typed-contracts.md
+
+contract-inheritance.md
+
+contract-versioning.md
+
+contract-testing.md
+
+schema-validation.md
+
+remote-contracts.md
 
 ---
 
 # Summary
 
-The Capability Contract formalizes the interaction boundaries for every capability. By defining inputs, outputs, permissions, risk, and dependencies, contracts ensure predictable and verifiable capability execution across all workflows.
+Capability Contract defines the standardized executable interface for every capability within the SAM Framework.
 
+By separating operational interfaces from implementation details, contracts enable interoperability, modularity, version compatibility, workflow composition, and long-term architectural stability.

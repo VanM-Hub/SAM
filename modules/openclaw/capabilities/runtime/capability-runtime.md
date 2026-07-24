@@ -1,330 +1,399 @@
 # Capability Runtime
 
-
-
 Version: 1.0
-
-
 
 Status: Draft
 
+Capability Type: Runtime Infrastructure
 
+Execution Mode: Lifecycle Management
 
-Capability Type: Runtime Architecture
+Risk Level: None
 
+Owner: OpenClaw Runtime
 
+Knowledge Type: Implementation
 
-Execution Mode: System
+Evidence Level: Designed
 
-
-
-Risk Level: Low
-
-
-
-Owner: OpenClaw Module
-
-
-
-Related Documents
-
-
-
-Capabilities
-
-
-
-\- capability-registry.md
-
-\- capability-contract.md
-
-\- capability-composition.md
-
-
-
-Sprint 2
-
-
-
-\- health-checks.md
-
-\- diagnostic-automation.md
-
-
-
-Sprint 3
-
-
-
-\- execution-planning.md
-
-
-
-Sprint 5
-
-
-
-\- diagnostic-reasoning-engine.md
-
-
-
-Framework
-
-
-
-\- docs/core/EXECUTION\_MODEL.md
-
-\- docs/models/MEMORY\_MODEL.md
-
-
+Confidence: High
 
 ---
-
-
 
 # Purpose
 
+Define the executable lifecycle shared by every capability within the SAM Framework.
 
+The Capability Runtime transforms architectural capabilities into executable runtime objects while preserving governance, traceability, and lifecycle consistency.
 
-Define the runtime environment and execution lifecycle for a capability.
-
-
-
-A capability moves through a predictable sequence of states during execution. The Capability Runtime manages these states, ensures resource isolation, and enforces operational boundaries.
-
-
+This document serves as the runtime contract for all capabilities defined throughout Sprint 2–6.
 
 ---
 
+# Authority
 
+Primary Reference
 
-# Capability Lifecycle
+- docs/specifications/SAM_FRAMEWORK_v1.0_SPECIFICATION.md
 
+Supporting References
 
-
-Every capability progresses through the following states:
-
-┌──────────┐
-
-│ LOADED │ Capability is discovered and metadata is loaded.
-
-└────┬─────┘
-
-▼
-
-┌──────────┐
-
-│INITIALIZE│ Inputs validated, resources allocated, dependencies resolved.
-
-└────┬─────┘
-
-▼
-
-┌──────────┐
-
-│ EXECUTING│ Capability performs its primary function (e.g., health check, reasoning).
-
-└────┬─────┘
-
-▼
-
-┌──────────┐
-
-│ OBSERVING│ Capability monitors its own execution for anomalies.
-
-└────┬─────┘
-
-▼
-
-┌──────────┐ ┌─────────┐
-
-│ COMPLETED│──────►│ ARCHIVED│ Final state.
-
-└──────────┘ └─────────┘
-
-│
-
-▼
-
-┌──────────┐
-
-│ FAILED │ Unrecoverable error occurred.
-
-└──────────┘
-
-
-
-
+- docs/core/CONSTITUTION.md
+- docs/models/EXECUTION_MODEL.md
+- docs/GLOSSARY.md
 
 ---
 
+# Runtime Philosophy
 
+Capabilities are executable units.
 
-# Lifecycle State Definitions
+A capability does not "exist" simply because documentation exists.
 
+A capability exists only after it has been:
 
+- loaded
+- initialized
+- executed
+- observed
+- completed
+- archived
 
-| State | Description | Criteria |
-
-| :--- | :--- | :--- |
-
-| **LOADED** | Capability is registered and available. | Capability exists in registry. |
-
-| **INITIALIZING** | Runtime validates inputs and acquires dependencies. | Inputs match contract; dependencies are available. |
-
-| **EXECUTING** | Capability is actively performing its purpose. | Process is running; timers are active. |
-
-| **OBSERVING** | Capability monitors side effects and system state. | No errors detected; metrics are collected. |
-
-| **COMPLETED** | Capability finished successfully. | Outputs generated; state is consistent. |
-
-| **FAILED** | Capability failed due to error. | Error is logged; rollback may be triggered. |
-
-| **ARCHIVED** | Results are persisted and cleaned up. | Audit trail is written; resources are released. |
-
-
+Every capability shares the same lifecycle regardless of its internal implementation.
 
 ---
 
+# Runtime Lifecycle
 
+```
+Load
 
-# State Transitions
+↓
 
+Initialize
 
+↓
 
-Transitions shall be:
+Execute
 
+↓
 
+Observe
 
-\- **Explicit**: Each transition is triggered by a defined event.
+↓
 
-\- **Auditable**: Every transition is recorded in the audit trail.
+Complete
 
-\- **Deterministic**: Given the same inputs, the transition sequence is predictable.
+↓
 
+Archive
+```
 
+Each state has a single responsibility.
 
----
-
-
-
-# Runtime Resource Isolation
-
-
-
-To prevent capability interference:
-
-
-
-\- Each capability executes in a sandboxed environment (e.g., isolated process or container).
-
-\- Resource limits (CPU, memory, time) are enforced.
-
-\- File system access is restricted to approved paths.
-
-
+Capabilities shall never skip lifecycle stages.
 
 ---
 
+# Lifecycle Stages
 
+## Load
 
-# Concurrency Model
+Purpose
 
+Load the capability definition into runtime.
 
+Responsibilities
 
-Capabilities may execute:
+- discover capability
+- validate metadata
+- verify version
+- resolve dependencies
+- prepare runtime context
 
+Outputs
 
+- Loaded Capability Object
 
-\- **Sequentially**: One after another.
-
-\- **Concurrently**: Multiple capabilities in parallel (within resource limits).
-
-\- **Interleaved**: Preemptive scheduling for long-running capabilities.
-
-
-
-The runtime determines concurrency based on operational priority and resource availability.
-
-
-
----
-
-
-
-# Timeouts \& Retries
-
-
-
-\- **Timeouts**: Each capability has a maximum execution time. Timeout triggers a FAILED state.
-
-\- **Retries**: Failed capabilities may be retried (with exponential backoff) if defined in contract.
-
-
+No operational work occurs during Load.
 
 ---
 
+## Initialize
 
+Purpose
 
-# Relationship with Registry
+Prepare runtime resources.
 
+Responsibilities
 
+- allocate runtime state
+- load configuration
+- bind evidence interfaces
+- initialize audit context
+- validate permissions
 
-The Registry provides capability metadata to the Runtime.
+Outputs
 
+- Initialized Runtime Instance
 
-
-Runtime uses Registry to resolve capability IDs and versions.
-
-
-
----
-
-
-
-# Relationship with Contract
-
-
-
-The Contract defines inputs/outputs and permissions.
-
-
-
-Runtime validates capability execution against the Contract.
-
-
+Initialization must not change external system state.
 
 ---
 
+## Execute
 
+Purpose
+
+Perform the capability's operational responsibility.
+
+Responsibilities depend entirely on the capability itself.
+
+Examples
+
+Health Check
+
+↓
+
+Collect Evidence
+
+Reasoning
+
+↓
+
+Evaluate Hypotheses
+
+Execution
+
+↓
+
+Apply Approved Change
+
+Execution shall follow the contracts defined by the capability.
+
+---
+
+## Observe
+
+Purpose
+
+Collect execution outcomes.
+
+Responsibilities
+
+- gather results
+- collect metrics
+- record evidence
+- capture exceptions
+- update runtime state
+
+Observation occurs regardless of success or failure.
+
+---
+
+## Complete
+
+Purpose
+
+Finalize execution.
+
+Responsibilities
+
+- determine execution status
+- finalize audit record
+- publish outputs
+- notify orchestrator
+
+Completion indicates the runtime has finished processing.
+
+It does not imply operational success.
+
+---
+
+## Archive
+
+Purpose
+
+Preserve execution history.
+
+Responsibilities
+
+- store execution metadata
+- preserve evidence references
+- preserve reasoning trace
+- preserve audit identifiers
+
+Historical records become immutable after archival.
+
+---
+
+# Runtime State Model
+
+Every capability exists in one runtime state.
+
+```
+Unloaded
+
+↓
+
+Loaded
+
+↓
+
+Initialized
+
+↓
+
+Running
+
+↓
+
+Observing
+
+↓
+
+Completed
+
+↓
+
+Archived
+```
+
+Illegal transitions shall be rejected by the runtime.
+
+---
+
+# Runtime Context
+
+Each execution receives a runtime context.
+
+Typical context includes:
+
+- Workflow ID
+- Execution ID
+- Capability ID
+- Workspace
+- Runtime Configuration
+- Evidence References
+- Audit Context
+- Permission Context
+
+The runtime context remains immutable during execution unless explicitly extended through documented mechanisms.
+
+---
+
+# Failure Handling
+
+Failures may occur during any lifecycle stage.
+
+Examples:
+
+Load
+
+- missing dependency
+- incompatible version
+
+Initialize
+
+- invalid configuration
+- missing permission
+
+Execute
+
+- provider unavailable
+- execution failure
+
+Observe
+
+- incomplete evidence collection
+
+Complete
+
+- audit finalization failure
+
+Archive
+
+- storage unavailable
+
+Each failure shall generate observable evidence.
+
+---
+
+# Lifecycle Guarantees
+
+The runtime guarantees:
+
+- deterministic lifecycle ordering
+- complete auditability
+- lifecycle isolation
+- evidence preservation
+- orchestration compatibility
+
+Capability implementations shall not weaken these guarantees.
+
+---
+
+# Relationship to Workflow Engine
+
+The Workflow Engine invokes lifecycle stages.
+
+Capability Runtime performs lifecycle management.
+
+Workflow Engine controls sequencing.
+
+Capability Runtime controls execution.
+
+---
+
+# Relationship to Capability Contract
+
+Capability Runtime executes capability contracts.
+
+The contract defines:
+
+- inputs
+- outputs
+- permissions
+- evidence
+
+The runtime enforces them.
+
+---
+
+# Operational Boundaries
+
+Capability Runtime shall never:
+
+- perform diagnostic reasoning
+- bypass guardrails
+- alter governance
+- replace workflow orchestration
+- modify historical evidence
+
+Its responsibility is lifecycle execution.
+
+---
 
 # Future Evolution
 
-
-
 Future versions may support:
 
+runtime/
 
+parallel-runtime.md
 
-\- Hot-reloading of capabilities (no restart).
+distributed-runtime.md
 
-\- A/B testing of capability versions.
+capability-hot-reload.md
 
-\- Distributed execution across nodes.
+runtime-sandbox.md
 
-
+runtime-versioning.md
 
 ---
 
-
-
 # Summary
 
+Capability Runtime defines the standardized executable lifecycle for every capability within SAM.
 
-
-The Capability Runtime provides the execution environment and lifecycle management for all SAM capabilities. By enforcing state transitions, isolation, and auditability, the runtime ensures reliable, secure, and observable capability execution.
-
-
-
-
-
+By separating lifecycle management from operational behavior, the runtime provides a consistent implementation model that preserves governance, auditability, composability, and architectural integrity across the framework.

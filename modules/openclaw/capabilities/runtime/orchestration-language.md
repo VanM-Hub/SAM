@@ -1,416 +1,486 @@
-```markdown
-
 # Orchestration Language
-
-
 
 Version: 1.0
 
-
-
 Status: Draft
 
+Capability Type: Runtime Infrastructure
 
+Execution Mode: Declarative Workflow Definition
 
-Capability Type: Runtime Architecture
+Risk Level: None
 
+Owner: OpenClaw Runtime
 
+Knowledge Type: Implementation
 
-Execution Mode: System
+Evidence Level: Designed
 
-
-
-Risk Level: Low
-
-
-
-Owner: OpenClaw Module
-
-
-
-Related Documents
-
-
-
-Capabilities
-
-
-
-\- workflow-engine.md
-
-\- capability-composition.md
-
-\- capability-contract.md
-
-\- capability-registry.md
-
-
-
-Sprint 3
-
-
-
-\- approval-gate.md
-
-\- rollback.md
-
-
-
-Framework
-
-
-
-\- docs/core/EXECUTION\_MODEL.md
-
-\- docs/models/DECISION\_MODEL.md
-
-
+Confidence: High
 
 ---
-
-
 
 # Purpose
 
+Define the declarative language used to describe executable workflows within the SAM Framework.
 
+The Orchestration Language provides a platform-independent representation of workflow behavior.
 
-Define a Domain-Specific Language (DSL) for describing capability workflows in a human-readable and machine-executable format.
+It describes *what* should happen.
 
-
-
-The Orchestration Language enables declarative workflow definitions. Workflows are defined as structured YAML (or JSON).
-
-
+It does not describe *how* the runtime performs execution.
 
 ---
 
+# Authority
 
+Primary Reference
 
-# Language Principles
+- docs/specifications/SAM_FRAMEWORK_v1.0_SPECIFICATION.md
 
+Supporting References
 
+- docs/core/CONSTITUTION.md
+- docs/core/EXECUTION_MODEL.md
+- docs/GLOSSARY.md
 
-\- **Declarative**: Specify *what* to execute, not *how*.
+Related Runtime Components
 
-\- **Readable**: Operators can understand the flow without reading code.
-
-\- **Validatable**: Syntax and structure can be validated before execution.
-
-\- **Extensible**: Can evolve to support new patterns.
-
-
-
----
-
-
-
-# Language Structure
-
-
-
-## Top-Level Fields
-
-
-
-| Field | Description |
-
-| :--- | :--- |
-
-| `name` | Workflow name. |
-
-| `description` | Workflow purpose. |
-
-| `version` | Workflow version. |
-
-| `capabilities` | List of capabilities required by this workflow. |
-
-| `parameters` | Global parameters for the workflow. |
-
-| `steps` | Ordered list of execution steps. |
-
-| `on\_error` | Error handling strategy for the entire workflow. |
-
-
+- workflow-engine.md
+- capability-runtime.md
+- capability-contract.md
+- capability-composition.md
+- capability-registry.md
 
 ---
 
+# Language Philosophy
 
+Workflow definitions shall be:
 
-## Step Definition
+- declarative
+- deterministic
+- human-readable
+- machine-executable
+- versionable
+- auditable
 
-
-
-Each step includes:
-
-
-
-| Field | Description |
-
-| :--- | :--- |
-
-| `id` | Unique step identifier. |
-
-| `capability` | Capability ID or reference. |
-
-| `inputs` | Map of input parameters (can reference previous steps). |
-
-| `on\_success` | Next step ID to execute on success. |
-
-| `on\_failure` | Next step ID to execute on failure. |
-
-| `on\_timeout` | Action on timeout. |
-
-| `retry` | Retry configuration (max attempts, backoff). |
-
-
+The language shall describe operational intent rather than implementation details.
 
 ---
 
+# Design Principles
 
+The language shall:
 
-## Data Reference Syntax
+- separate definition from execution
+- reference capabilities by ID
+- remain implementation independent
+- support composition
+- preserve auditability
+- preserve governance
 
+---
 
+# Core Concepts
 
-Step outputs can be referenced using a variable syntax:
+A workflow consists of:
 
-{{ step\_id.output\_field }}
+- Metadata
+- Inputs
+- Variables
+- Stages
+- Conditions
+- Parallel Blocks
+- Error Policies
+- Outputs
 
+---
 
+# Workflow Metadata
 
-text
+Every workflow shall define:
 
+- Workflow ID
+- Version
+- Name
+- Description
+- Owner
+- Required Runtime Version
+- Specification Version
 
+---
 
-Example:
+# Capability Invocation
 
+Capabilities are referenced by Capability ID.
 
+Example
 
-```yaml
+```
+run:
 
+- capability: openclaw.observation.health-checks
+
+- capability: openclaw.reasoning.diagnostic-engine
+
+- capability: openclaw.execution.execution-planning
+```
+
+The language never references implementation classes.
+
+---
+
+# Sequential Execution
+
+Example
+
+```
+workflow:
+
+- health-check
+
+- diagnostics
+
+- reasoning
+
+- planning
+
+- approval
+
+- execution
+
+- verification
+```
+
+Stages execute in order.
+
+---
+
+# Conditional Execution
+
+Example
+
+```
+if:
+
+condition: provider_unhealthy
+
+then:
+
+- provider-testing
+
+else:
+
+- verification
+```
+
+Conditions evaluate workflow state rather than implementation state.
+
+---
+
+# Parallel Execution
+
+Example
+
+```
+parallel:
+
+- workspace-validation
+
+- configuration-validation
+
+- provider-testing
+```
+
+All branches execute independently.
+
+Synchronization occurs automatically before subsequent stages.
+
+---
+
+# Nested Workflow
+
+Example
+
+```
+workflow:
+
+- diagnose
+
+- execute:
+
+workflow: recovery-workflow
+
+- verify
+```
+
+Nested workflows inherit execution context.
+
+---
+
+# Variables
+
+Workflow variables store execution state.
+
+Examples:
+
+```
+variables:
+
+provider: NVIDIA
+
+risk: Medium
+
+workspace: default
+```
+
+Variables remain scoped to workflow execution.
+
+---
+
+# Evidence References
+
+Evidence is exchanged through references.
+
+Example
+
+```
 inputs:
 
-&#x20; diagnosis: {{ diagnose.result }}
+evidence:
 
-&#x20; plan: {{ plan.output }}
+- runtime-report
 
-Example Workflow
+- provider-status
 
-yaml
+- configuration-report
+```
 
-name: "Provider Recovery Workflow"
+Capabilities never modify existing evidence.
 
-description: "Automatically diagnose and recover from Provider failures"
+---
 
-version: "1.0.0"
+# Error Policy
 
+Each workflow defines error handling behavior.
 
+Example
 
-parameters:
+```
+on_failure:
 
-&#x20; provider\_name:
+policy: rollback
 
-&#x20;   type: string
+retry: 3
 
-&#x20;   required: true
+escalate: operator
+```
 
-&#x20; workspace\_path:
+Policies are interpreted by the Workflow Engine.
 
-&#x20;   type: string
+---
 
-&#x20;   required: true
+# Approval Gate
 
+Approval requirements are declarative.
 
+Example
 
-capabilities:
+```
+approval:
 
-&#x20; - health-checks
+required: true
 
-&#x20; - provider-testing
+risk: High
+```
 
-&#x20; - diagnostic-reasoning-engine
+Approval execution belongs to the Approval capability.
 
-&#x20; - self-healing-executor
+---
 
+# Rollback
 
+Rollback workflows are defined explicitly.
 
-steps:
+Example
 
-&#x20; - id: "diagnose"
+```
+rollback:
 
-&#x20;   capability: "diagnostic-reasoning-engine"
+workflow: restore-last-backup
+```
 
-&#x20;   inputs:
+Rollback remains a workflow rather than embedded runtime behavior.
 
-&#x20;     symptom: "Provider unresponsive"
+---
 
-&#x20;     workspace: "{{ workspace\_path }}"
+# Verification
 
-&#x20;   on\_success: "plan"
+Post-execution verification may be declared.
 
-&#x20;   on\_failure: "escalate"
+Example
 
+```
+verify:
 
+workflow:
 
-&#x20; - id: "plan"
+- health-check
 
-&#x20;   capability: "execution-planning"
+- provider-testing
 
-&#x20;   inputs:
+- configuration-validation
+```
 
-&#x20;     diagnosis: "{{ diagnose.output }}"
+Verification becomes part of the workflow definition.
 
-&#x20;     provider: "{{ provider\_name }}"
+---
 
-&#x20;   on\_success: "approve"
+# Audit
 
+Workflow definitions declare required audit events.
 
+Example
 
-&#x20; - id: "approve"
+```
+audit:
 
-&#x20;   capability: "approval-gate"
+capture:
 
-&#x20;   inputs:
+- execution
 
-&#x20;     plan: "{{ plan.output }}"
+- evidence
 
-&#x20;     risk\_level: "medium"
+- reasoning
 
-&#x20;   on\_success: "execute"
+- verification
+```
 
-&#x20;   on\_failure: "abort"
+Audit recording remains the responsibility of the runtime.
 
+---
 
+# Workflow Example
 
-&#x20; - id: "execute"
+```
+workflow:
 
-&#x20;   capability: "self-healing-executor"
+- capability: openclaw.observation.health-checks
 
-&#x20;   inputs:
+- capability: openclaw.diagnostics.runtime
 
-&#x20;     plan: "{{ approve.plan }}"
+- capability: openclaw.reasoning.engine
 
-&#x20;   on\_success: "verify"
+- capability: openclaw.execution.planning
 
-&#x20;   on\_failure: "rollback"
+- capability: openclaw.governance.approval
 
-&#x20;   retry:
+- capability: openclaw.execution.apply
 
-&#x20;     max\_attempts: 2
+- capability: openclaw.execution.verify
 
-&#x20;     backoff: "exponential"
+- capability: openclaw.learning.knowledge-update
+```
 
+This represents the complete operational lifecycle.
 
+---
 
-&#x20; - id: "verify"
+# Validation
 
-&#x20;   capability: "continuous-verification"
+Workflow definitions are validated before execution.
 
-&#x20;   inputs:
+Validation includes:
 
-&#x20;     execution: "{{ execute.output }}"
+- syntax
+- capability existence
+- dependency resolution
+- contract compatibility
+- permission requirements
+- cycle detection
+- version compatibility
 
-&#x20;     provider: "{{ provider\_name }}"
+Invalid workflows shall not execute.
 
-&#x20;   on\_success: "complete"
+---
 
-&#x20;   on\_failure: "rollback"
+# Versioning
 
+Workflow definitions shall declare:
 
+- Language Version
+- Specification Version
+- Runtime Compatibility
 
-&#x20; - id: "rollback"
+Backward compatibility shall be maintained whenever possible.
 
-&#x20;   capability: "rollback"
+---
 
-&#x20;   inputs:
+# Relationship to Workflow Engine
 
-&#x20;     execution\_id: "{{ execute.id }}"
+The Orchestration Language defines workflows.
 
-&#x20;   on\_success: "escalate"
+The Workflow Engine executes them.
 
+The language never performs execution.
 
+---
 
-&#x20; - id: "escalate"
+# Relationship to Capability Registry
 
-&#x20;   capability: "escalation"
+Capability references are resolved through the Capability Registry.
 
-&#x20;   inputs:
+Workflow definitions never reference implementation locations.
 
-&#x20;     message: "Provider recovery failed. Manual intervention required."
+---
 
-&#x20;   on\_success: "abort"
+# Relationship to Capability Contracts
 
+Workflow definitions interact with capabilities exclusively through their contracts.
 
+Contract compatibility determines workflow validity.
 
-on\_error:
+---
 
-&#x20; action: "abort"
+# Operational Boundaries
 
-&#x20; message: "Workflow aborted due to unrecoverable error."
+The Orchestration Language shall never:
 
-Workflow Validation
+- execute workflows
+- perform reasoning
+- bypass governance
+- implement runtime behavior
+- modify evidence
 
-Before execution, the Workflow Engine validates:
+Its responsibility is declarative workflow definition only.
 
+---
 
-
-Syntax validity (e.g., YAML parsable).
-
-
-
-Step references are valid.
-
-
-
-Capability IDs exist in the Registry.
-
-
-
-Data references ({{ }}) resolve correctly.
-
-
-
-No circular dependencies.
-
-
-
-Relationship with Workflow Engine
-
-Orchestration Language defines the workflow.
-
-
-
-Workflow Engine executes the workflow.
-
-
-
-Future Evolution
+# Future Evolution
 
 Future versions may support:
 
+dsl/
 
+expressions.md
 
-Conditional statements (if/else).
+event-triggers.md
 
+dynamic-workflows.md
 
+imports.md
 
-Parallel steps (parallel).
+reusable-templates.md
 
+visual-editor.md
 
+policy-library.md
 
-Loops (for/while).
+---
 
+# Summary
 
+The Orchestration Language provides the declarative representation of operational workflows within the SAM Framework.
 
-Workflow composition (call another workflow as a step).
-
-
-
-Declarative rollback definition.
-
-
-
-Summary
-
-The Orchestration Language provides a declarative, readable, and validatable format for defining capability workflows. By using a structured DSL, operators and systems can define complex operational procedures while maintaining consistency, auditability, and ease of maintenance.
-
+By separating workflow definition from execution, the language enables portable, auditable, versioned, and implementation-independent operational automation across the entire capability ecosystem.

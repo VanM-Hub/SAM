@@ -32,6 +32,12 @@ from sam.core.notification_service import NotificationService
 from sam.core.scheduler import Scheduler
 from sam.models import Capability
 
+# ── Evolution CLI ─────────────────────────────────────────────
+from sam.cli.evolution_app import evolution_app
+from sam.cli.cluster_app import cluster_app
+from sam.cli.federation_app import federation_app
+from sam.cli.autonomy_app import autonomy_app
+
 app = typer.Typer()
 logger = structlog.get_logger()
 
@@ -1037,6 +1043,19 @@ def graph_resume(
         typer.echo(f"▶️  Graph '{graph_id}' resumed.")
 
     asyncio.run(_resume())
+
+
+# ── sam evolution ────────────────────────────────────────────────
+app.add_typer(evolution_app, name="evolution")
+
+# ── sam cluster ──────────────────────────────────────────────────
+app.add_typer(cluster_app, name="cluster")
+
+# ── sam federation ────────────────────────────────────────────────
+app.add_typer(federation_app, name="federation")
+
+# ── sam autonomy ──────────────────────────────────────────────────
+app.add_typer(autonomy_app, name="autonomy")
 
 
 # ── sam governance ─────────────────────────────────────────────────
