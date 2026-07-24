@@ -25,6 +25,7 @@ from .events import ServiceStarted, ServiceStopped, ServiceHealthChanged
 from ..cluster.node import RuntimeNode, NodeStatus, NodeCapabilities
 from ..cluster.node_registry import NodeRegistry
 from ..cluster.heartbeat import HeartbeatService
+from ..cluster.leader import LeaderElection
 
 
 @dataclass
@@ -41,6 +42,8 @@ class DaemonConfig:
     node_capabilities: List[str] = field(default_factory=lambda: ["WORKER"])
     heartbeat_interval: float = 15.0
     orphan_timeout: int = 60
+    leader_lease_seconds: int = 30
+    try_become_leader: bool = False
 
 
 class RuntimeDaemon:
@@ -59,6 +62,7 @@ class RuntimeDaemon:
         event_bus: Optional[EventBus] = None,
         services: Optional[List[RuntimeService]] = None,
         node_registry: Optional[NodeRegistry] = None,
+        db: Any = None,
     ):
         self.config = config or DaemonConfig()
         self.clock = clock or SystemClock()
@@ -66,8 +70,11 @@ class RuntimeDaemon:
         self._services = services or []
         self._service_manager = ServiceManager(self.event_bus)
         self._node_registry = node_registry
+        self._db = db
         self._node: Optional[RuntimeNode] = None
         self._heartbeat_service: Optional[HeartbeatService] = None
+        self._leader_election: Optional[LeaderElection] = None
+        self._is_leader: bool = False
         self._logger = structlog.get_logger()
         self._running = False
         self._shutdown_event = asyncio.Event()
@@ -157,6 +164,18 @@ class RuntimeDaemon:
             await self._heartbeat_service.initialize()
             await self._heartbeat_service.start()
 
+        # Try to become leader
+        if self.config.try_become_leader and self._db and self._node:
+            self._leader_election = LeaderElection(self._db, self.config.cluster_id)
+            self._is_leader = await self._leader_election.elect(
+                self._node.node_id,
+                self.config.leader_lease_seconds,
+            )
+            if self._is_leader:
+                self._logger.info("daemon_elected_leader", node_id=self._node.node_id)
+            else:
+                self._logger.debug("daemon_follower", node_id=self._node.node_id)
+
         # Start health check loop
         self._health_task = asyncio.create_task(self._health_loop())
 
@@ -196,6 +215,11 @@ class RuntimeDaemon:
             except asyncio.CancelledError:
                 pass
         self._health_task = None
+
+        # Resign as leader
+        if self._leader_election and self._node:
+            await self._leader_election.resign(self._node.node_id)
+            self._is_leader = False
 
         # Set node OFFLINE
         if self._node_registry and self._node:
