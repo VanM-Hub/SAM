@@ -1,6 +1,7 @@
-"""SAM Strategy Package — Sprint 27 Fase 1.
+"""SAM Strategy Package — Sprint 27.
 
-Strategic Planning: Strategic Goals & Long-Term Objectives.
+Strategic Planning: Strategic Goals, Long-Term Objectives, Strategic Plans,
+and Strategy Planner.
 """
 
 from .goal import (
@@ -14,6 +15,15 @@ from .objective import (
     ObjectiveManager,
     OBJECTIVE_STATUSES,
 )
+from .plan import (
+    StrategicPlan,
+    StrategicPlanManager,
+    PLAN_STATUSES,
+)
+from .planner import (
+    StrategyPlanner,
+    PHASE_TEMPLATES,
+)
 
 __all__ = [
     "StrategicGoal",
@@ -23,4 +33,9 @@ __all__ = [
     "LongTermObjective",
     "ObjectiveManager",
     "OBJECTIVE_STATUSES",
+    "StrategicPlan",
+    "StrategicPlanManager",
+    "PLAN_STATUSES",
+    "StrategyPlanner",
+    "PHASE_TEMPLATES",
 ]
