@@ -6,6 +6,8 @@ from .event_bus import EventBus
 from .events import Event
 from .job import Job, JobType, JobRecord, JobStatus
 from .job_queue import JobQueue
+from .notification import Notification, NotificationSeverity
+from .notification_service import NotificationService
 from .scheduler import Scheduler
 
 __all__ = [
@@ -25,4 +27,7 @@ __all__ = [
     "JobStatus",
     "JobQueue",
     "Scheduler",
+    "Notification",
+    "NotificationSeverity",
+    "NotificationService",
 ]
