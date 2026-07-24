@@ -54,6 +54,7 @@ class DaemonConfig:
     enable_cluster_state: bool = True
     cluster_state_interval: float = 30.0
     enable_execution_engine: bool = True
+    enable_governance: bool = True
 
 
 class RuntimeDaemon:
@@ -78,6 +79,7 @@ class RuntimeDaemon:
         cluster_state_aggregator: Optional["ClusterStateAggregator"] = None,
         resource_directory: Any = None,
         execution_engine: Any = None,
+        governance_engine: Any = None,
     ):
         self.config = config or DaemonConfig()
         self.clock = clock or SystemClock()
@@ -91,6 +93,7 @@ class RuntimeDaemon:
         self._cluster_state_aggregator = cluster_state_aggregator
         self._resource_directory = resource_directory
         self._execution_engine = execution_engine
+        self._governance_engine = governance_engine
         self._node: Optional[RuntimeNode] = None
         self._heartbeat_service: Optional[HeartbeatService] = None
         self._leader_election: Optional[LeaderElection] = None
@@ -122,6 +125,10 @@ class RuntimeDaemon:
     @property
     def execution_engine(self) -> Any:
         return self._execution_engine
+
+    @property
+    def governance_engine(self) -> Any:
+        return self._governance_engine
 
     def add_service(self, service: RuntimeService) -> None:
         """Add a service to the daemon."""
@@ -363,7 +370,61 @@ class RuntimeDaemon:
                 last_check=self.clock.now(),
             )
 
+        # Add governance health
+        if self._governance_engine and self.config.enable_governance:
+            rules = self._governance_engine.get_rules()
+            evaluators = self._governance_engine.get_evaluators()
+            result["governance"] = ServiceHealth(
+                status=HealthStatus.HEALTHY,
+                message=f"Governance active ({len(evaluators)} evaluators, {len(rules)} rules)",
+                metrics={
+                    "evaluators": len(evaluators),
+                    "rules": len(rules),
+                    "evaluator_names": [e.name for e in evaluators],
+                },
+                last_check=self.clock.now(),
+            )
+
         return result
+
+    async def gate_graph_execution(self, graph: Any, context: Any = None) -> Any:
+        """Run governance before graph execution.
+
+        Returns:
+            None if execution should proceed (ALLOW / ALLOW_WITH_WARNING).
+            GovernanceResult if execution is blocked/paused (WAIT / APPROVAL / REJECT / ESCALATE).
+        """
+        if not self.config.enable_governance or not self._governance_engine:
+            return None
+
+        result = await self._governance_engine.evaluate(graph, context)
+
+        if result.is_blocked():
+            self._logger.warning(
+                "governance_blocked",
+                graph_id=graph.id,
+                decision=result.decision.value,
+                reason=result.reason,
+            )
+            return result
+
+        if result.decision.value == "WAIT":
+            self._logger.info(
+                "governance_wait",
+                graph_id=graph.id,
+                delay=result.suggested_delay,
+            )
+            return result
+
+        # ALLOW or ALLOW_WITH_WARNING — proceed
+        if result.decision.value == "ALLOW_WITH_WARNING":
+            self._logger.info(
+                "governance_warnings",
+                graph_id=graph.id,
+                warnings=result.warnings,
+            )
+
+        return None
 
     async def run_forever(self) -> None:
         """Run the daemon indefinitely with signal handling."""

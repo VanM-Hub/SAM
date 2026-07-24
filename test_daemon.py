@@ -616,5 +616,255 @@ async def test_execution_engine_property(event_bus):
     assert d.execution_engine is engine
 
 
+# ── Governance Engine Integration Tests ───────────────────────────
+
+class _MockGovernanceEngine:
+    """Mock governance engine for daemon integration tests."""
+
+    def __init__(self, decision="ALLOW", reason="", warnings=None,
+                 approvals=None, delay=None):
+        self.decision = decision
+        self.reason = reason
+        self.warnings = warnings or []
+        self.required_approvals = approvals or []
+        self.suggested_delay = delay
+        self.evaluate_calls = 0
+        self.evaluate_graphs = []
+
+    async def evaluate(self, graph, context=None):
+        self.evaluate_calls += 1
+        self.evaluate_graphs.append(graph.id if hasattr(graph, "id") else str(graph))
+        from src.sam.governance.models import GovernanceDecision, GovernanceResult
+        return GovernanceResult(
+            decision=GovernanceDecision(self.decision),
+            reason=self.reason,
+            warnings=self.warnings,
+            required_approvals=self.required_approvals,
+            suggested_delay=self.suggested_delay,
+        )
+
+    def get_rules(self):
+        return []
+
+    def get_evaluators(self):
+        return []
+
+    def is_blocked(self):
+        return self.decision in ("REQUIRE_APPROVAL", "REJECT", "ESCALATE")
+
+
+class _MockGraph:
+    """Minimal graph mock for governance gate tests."""
+
+    def __init__(self, id="test-graph", name="Test"):
+        self.id = id
+        self.name = name
+
+
+@pytest.mark.asyncio
+async def test_governance_gate_allowed_returns_none(event_bus):
+    """gate_graph_execution returns None when governance ALLOWs."""
+    gov = _MockGovernanceEngine(decision="ALLOW")
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    graph = _MockGraph()
+    result = await d.gate_graph_execution(graph)
+    assert result is None
+    assert gov.evaluate_calls == 1
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_governance_gate_warning_returns_none(event_bus):
+    """gate_graph_execution returns None for ALLOW_WITH_WARNING."""
+    gov = _MockGovernanceEngine(decision="ALLOW_WITH_WARNING", warnings=["low disk"])
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    graph = _MockGraph()
+    result = await d.gate_graph_execution(graph)
+    assert result is None
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_governance_gate_reject_returns_result(event_bus):
+    """gate_graph_execution returns GovernanceResult when REJECTed."""
+    gov = _MockGovernanceEngine(decision="REJECT", reason="too risky")
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    graph = _MockGraph()
+    result = await d.gate_graph_execution(graph)
+    assert result is not None
+    assert result.decision.value == "REJECT"
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_governance_gate_escalate_returns_result(event_bus):
+    """gate_graph_execution returns result for ESCALATE."""
+    gov = _MockGovernanceEngine(decision="ESCALATE", reason="needs manual review")
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    graph = _MockGraph()
+    result = await d.gate_graph_execution(graph)
+    assert result is not None
+    assert result.decision.value == "ESCALATE"
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_governance_gate_wait_returns_result(event_bus):
+    """gate_graph_execution returns result for WAIT."""
+    gov = _MockGovernanceEngine(decision="WAIT", reason="maintenance", delay=60)
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    graph = _MockGraph()
+    result = await d.gate_graph_execution(graph)
+    assert result is not None
+    assert result.decision.value == "WAIT"
+    assert result.suggested_delay == 60
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_governance_gate_approval_returns_result(event_bus):
+    """gate_graph_execution returns result for REQUIRE_APPROVAL."""
+    gov = _MockGovernanceEngine(
+        decision="REQUIRE_APPROVAL", reason="needs ops approval", approvals=["ops"]
+    )
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    graph = _MockGraph()
+    result = await d.gate_graph_execution(graph)
+    assert result is not None
+    assert result.decision.value == "REQUIRE_APPROVAL"
+    assert "ops" in result.required_approvals
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_governance_disabled_always_returns_none(event_bus):
+    """gate_graph_execution returns None when governance is disabled."""
+    gov = _MockGovernanceEngine(decision="REJECT", reason="should be ignored")
+    config = DaemonConfig(enable_governance=False, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    graph = _MockGraph()
+    result = await d.gate_graph_execution(graph)
+    assert result is None
+    assert gov.evaluate_calls == 0  # Never called
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_governance_no_engine_returns_none(event_bus):
+    """gate_graph_execution returns None when no governance engine is configured."""
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=None,
+    )
+    await d.start()
+    graph = _MockGraph()
+    result = await d.gate_graph_execution(graph)
+    assert result is None
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_health_includes_governance_when_enabled(event_bus):
+    """Health should include governance status when engine is present and enabled."""
+    gov = _MockGovernanceEngine(decision="ALLOW")
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    health = await d.health()
+    assert "governance" in health
+    assert health["governance"].status == HealthStatus.HEALTHY
+    assert "Governance active" in health["governance"].message
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_health_skips_governance_when_disabled(event_bus):
+    """Health should NOT include governance when enable_governance=False."""
+    gov = _MockGovernanceEngine(decision="ALLOW")
+    config = DaemonConfig(enable_governance=False, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=gov,
+    )
+    await d.start()
+    health = await d.health()
+    assert "governance" not in health
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_health_no_governance_when_none(event_bus):
+    """Health should NOT include governance when engine is None."""
+    config = DaemonConfig(enable_governance=True, health_check_interval=9999)
+    d = RuntimeDaemon(
+        config=config,
+        event_bus=event_bus,
+        governance_engine=None,
+    )
+    await d.start()
+    health = await d.health()
+    assert "governance" not in health
+    await d.stop()
+
+
+@pytest.mark.asyncio
+async def test_governance_engine_property(event_bus):
+    """Daemon should expose governance_engine via property."""
+    gov = _MockGovernanceEngine()
+    d = RuntimeDaemon(
+        governance_engine=gov,
+        event_bus=event_bus,
+    )
+    assert d.governance_engine is gov
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

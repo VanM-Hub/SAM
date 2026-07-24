@@ -1039,5 +1039,135 @@ def graph_resume(
     asyncio.run(_resume())
 
 
+# ── sam governance ─────────────────────────────────────────────────
+
+governance_app = typer.Typer()
+app.add_typer(governance_app, name="governance")
+
+
+@governance_app.command("evaluate")
+def governance_evaluate(
+    graph_file: str = typer.Argument(..., help="Path to YAML/JSON graph file to evaluate"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show per-evaluator results"),
+):
+    """Run governance checks on a graph without executing it."""
+    async def _evaluate():
+        import json
+        import yaml
+        from pathlib import Path
+        from sam.execution.graph import ExecutionGraph
+        from sam.governance.engine import GovernanceEngine
+        from sam.governance.evaluators.risk import RiskEvaluator
+        from sam.governance.evaluators.approval import ApprovalEvaluator
+        from sam.governance.evaluators.maintenance import MaintenanceEvaluator
+        from sam.governance.evaluators.cluster import ClusterEvaluator
+        from sam.governance.evaluators.resource import ResourceEvaluator
+        from sam.governance.evaluators.capability import CapabilityEvaluator
+        from sam.governance.evaluators.policy import PolicyEvaluator
+
+        fp = Path(graph_file)
+        if not fp.exists():
+            typer.echo(f"Error: File not found: {graph_file}", err=True)
+            raise typer.Exit(1)
+
+        raw = fp.read_text(encoding="utf-8")
+        if fp.suffix in (".yaml", ".yml"):
+            data = yaml.safe_load(raw)
+        else:
+            data = json.loads(raw)
+
+        try:
+            graph = ExecutionGraph.model_validate(data)
+        except Exception as e:
+            typer.echo(f"Error: Invalid graph definition — {e}", err=True)
+            raise typer.Exit(1)
+
+        engine = GovernanceEngine()
+        await engine.add_evaluator(RiskEvaluator())
+        await engine.add_evaluator(ApprovalEvaluator())
+        await engine.add_evaluator(MaintenanceEvaluator())
+        await engine.add_evaluator(ClusterEvaluator())
+        await engine.add_evaluator(ResourceEvaluator())
+        await engine.add_evaluator(CapabilityEvaluator())
+        await engine.add_evaluator(PolicyEvaluator())
+
+        # Create minimal context for governance evaluation
+        result = await engine.evaluate(graph, {})
+
+        icon_map = {
+            "ALLOW": "[OK]",
+            "ALLOW_WITH_WARNING": "[WARN]",
+            "WAIT": "[WAIT]",
+            "REQUIRE_APPROVAL": "[APPROVAL]",
+            "REJECT": "[REJECT]",
+            "ESCALATE": "[ESCALATE]",
+        }
+        icon = icon_map.get(result.decision.value, "[?]")
+
+        typer.echo()
+        typer.echo(f"  Graph    : {graph.name} ({graph.id})")
+        typer.echo(f"  Decision : {icon} {result.decision.value}")
+        typer.echo(f"  Blocked  : {result.is_blocked()}")
+        if result.reason:
+            typer.echo(f"  Reason   : {result.reason}")
+        if result.warnings:
+            for i, w in enumerate(result.warnings, 1):
+                typer.echo(f"  Warning #{i}: {w}")
+        if result.required_approvals:
+            typer.echo(f"  Approvals: {', '.join(result.required_approvals)}")
+        if result.suggested_delay:
+            typer.echo(f"  Delay    : {result.suggested_delay}s")
+
+        if verbose and result.evaluator_results:
+            typer.echo()
+            typer.echo("  -- Per-Evaluator Results --")
+            for ename, er in result.evaluator_results.items():
+                eicon = icon_map.get(er.decision.value, "[?]")
+                typer.echo(f"  {eicon} {ename}: {er.decision.value}" + (f" -- {er.reason}" if er.reason else ""))
+
+        if result.is_blocked():
+            typer.echo()
+            typer.echo("Governance blocked execution.")
+            raise typer.Exit(1)
+
+        typer.echo()
+        typer.echo("Governance check passed.\n")
+        raise typer.Exit(0)
+
+    asyncio.run(_evaluate())
+
+
+@governance_app.command("rules")
+def governance_rules_list(
+    db_path: str = typer.Option("D:/Project AI/SAM/sam.db", "--db", help="Path to SAM database"),
+):
+    """List active governance rules from the database."""
+    async def _list():
+        from sam.persistence.database import Database
+        from sam.governance.engine import GovernanceEngine
+        from sam.governance.models import GovernanceDecision
+
+        db = Database(db_path)
+        engine = GovernanceEngine(db=db)
+        rules = await engine.load_rules()
+        await db.close()
+
+        if not rules:
+            typer.echo("No governance rules found.")
+            return
+
+        typer.echo()
+        typer.echo(f"  {'ID':<32} {'Name':<24} {'Type':<16} {'Condition':<24} {'Override'}")
+        typer.echo(f"  {'─'*32} {'─'*24} {'─'*16} {'─'*24} {'─'*16}")
+        for r in sorted(rules, key=lambda x: x.evaluator_type):
+            override_str = r.decision_override.value if r.decision_override else "-"
+            enabled_mark = "" if r.enabled else " [DISABLED]"
+            cond = r.condition if r.condition else "-"
+            typer.echo(f"  {r.id:<32} {r.name:<24} {r.evaluator_type:<16} {cond:<24} {override_str}{enabled_mark}")
+        typer.echo()
+
+    asyncio.run(_list())
+
+
 if __name__ == "__main__":
     app()
