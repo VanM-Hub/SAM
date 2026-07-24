@@ -17,6 +17,7 @@ from .resource import RuntimeResource, ResourceType, ResourceStatus, ResourceOwn
 from .resource import ResourceError, ResourceNotFoundError, ResourceVersionConflictError
 from .resource import ResourceNotOwnedError, ResourceOwnershipConflictError
 from .resource_manager import ResourceManager
+from .resource_directory import ResourceDirectory
 
 __all__ = [
     "RuntimeDaemon",
@@ -57,4 +58,5 @@ __all__ = [
     "ResourceNotOwnedError",
     "ResourceOwnershipConflictError",
     "ResourceManager",
+    "ResourceDirectory",
 ]
