@@ -13,6 +13,10 @@ from .scheduler import Scheduler
 from .state import StateStore, StateRecord, StateType
 from .state import StateSavedEvent, StateDeletedEvent
 from .state import StateStoreError, OptimisticLockError
+from .resource import RuntimeResource, ResourceType, ResourceStatus, ResourceOwner
+from .resource import ResourceError, ResourceNotFoundError, ResourceVersionConflictError
+from .resource import ResourceNotOwnedError, ResourceOwnershipConflictError
+from .resource_manager import ResourceManager
 
 __all__ = [
     "RuntimeDaemon",
@@ -43,4 +47,14 @@ __all__ = [
     "StateDeletedEvent",
     "StateStoreError",
     "OptimisticLockError",
+    "RuntimeResource",
+    "ResourceType",
+    "ResourceStatus",
+    "ResourceOwner",
+    "ResourceError",
+    "ResourceNotFoundError",
+    "ResourceVersionConflictError",
+    "ResourceNotOwnedError",
+    "ResourceOwnershipConflictError",
+    "ResourceManager",
 ]

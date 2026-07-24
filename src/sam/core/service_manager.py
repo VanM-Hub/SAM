@@ -5,23 +5,39 @@ from datetime import datetime
 from typing import Dict, List, Optional
 import structlog
 
+import uuid
+from datetime import datetime
+from typing import Dict, List, Optional
+
+import structlog
+
 from .service import RuntimeService
 from .health import ServiceHealth
 from .event_bus import EventBus
 from .state import StateStore, StateRecord, StateType
+from .resource import RuntimeResource, ResourceType, ResourceStatus
+from .resource_manager import ResourceManager
 
 
 class ServiceManager:
     """Manages lifecycle of all runtime services.
 
-    Optionally integrates with StateStore to persist service lifecycle states.
+    Integrates with:
+    - StateStore: persist service lifecycle states
+    - ResourceManager: register services as managed RuntimeResources
     """
 
-    def __init__(self, event_bus: EventBus, state_store: Optional[StateStore] = None):
+    def __init__(
+        self,
+        event_bus: EventBus,
+        state_store: Optional[StateStore] = None,
+        resource_manager: Optional[ResourceManager] = None,
+    ):
         self._services: Dict[str, RuntimeService] = {}
         self._logger = structlog.get_logger()
         self._event_bus = event_bus
         self._state_store = state_store
+        self._resource_manager = resource_manager
 
     def register(self, service: RuntimeService) -> None:
         """Register a service and inject EventBus if supported."""
@@ -35,6 +51,16 @@ class ServiceManager:
 
         self._services[service.name] = service
         self._logger.info("service_registered", name=service.name)
+
+        # Register as a RuntimeResource
+        if self._resource_manager:
+            import asyncio
+            try:
+                asyncio.get_running_loop()
+                # event loop available — we can await directly
+                asyncio.ensure_future(self._register_service_resource(service))
+            except RuntimeError:
+                pass  # no event loop, skip resource registration for now
 
     async def initialize_all(self) -> None:
         """Initialize all registered services."""
@@ -106,8 +132,69 @@ class ServiceManager:
         """Return the StateStore instance."""
         return self._state_store
 
+    async def restore_service_states(self) -> Dict[str, str]:
+        """Restore service states from StateStore.
+
+        Returns a dict of service name -> last known status.
+        """
+        if not self._state_store:
+            return {}
+        records = await self._state_store.list(type=StateType.SERVICE)
+        result: Dict[str, str] = {}
+        for rec in records:
+            result[rec.name] = rec.status
+        return result
+
+    # ── Resource manager integration ────────────────────────────────
+
+    def get_resource_manager(self) -> Optional[ResourceManager]:
+        """Return the ResourceManager instance."""
+        return self._resource_manager
+
+    async def _register_service_resource(self, service: RuntimeService) -> None:
+        """Register a service as a RuntimeResource with ResourceManager."""
+        if not self._resource_manager:
+            return
+        # Check if already registered
+        existing = await self._resource_manager.list(type=ResourceType.SERVICE)
+        for res in existing:
+            if res.name == service.name:
+                self._logger.debug("service_resource_exists", name=service.name, id=res.id)
+                return
+
+        resource = RuntimeResource(
+            id=str(uuid.uuid4()),
+            type=ResourceType.SERVICE,
+            name=service.name,
+            status=ResourceStatus.CREATED,
+            data={
+                "initialized": service.initialized,
+                "started": service.started,
+            },
+        )
+        await self._resource_manager.register(resource)
+        self._logger.info("service_resource_registered", name=service.name, id=resource.id)
+
+    async def update_service_resource_status(self, name: str, status: ResourceStatus) -> None:
+        """Update the ResourceManager status for a given service."""
+        if not self._resource_manager:
+            return
+        existing = await self._resource_manager.list(type=ResourceType.SERVICE)
+        for res in existing:
+            if res.name == name:
+                await self._resource_manager.update_status(res.id, status)
+                break
+
     async def _save_service_state(self, name: str, status: str) -> None:
-        """Persist service state to the StateStore if available."""
+        """Persist service state to the StateStore and update resource status."""
+        # Update ResourceManager status
+        if status == "running":
+            await self.update_service_resource_status(name, ResourceStatus.ACTIVE)
+        elif status == "stopped":
+            await self.update_service_resource_status(name, ResourceStatus.RETIRED)
+        elif status == "initialized":
+            await self.update_service_resource_status(name, ResourceStatus.LOADED)
+
         if not self._state_store:
             return
         service = self._services.get(name)
@@ -140,16 +227,3 @@ class ServiceManager:
                 version=1,
             )
             await self._state_store.save(record)
-
-    async def restore_service_states(self) -> Dict[str, str]:
-        """Restore service states from StateStore.
-
-        Returns a dict of service name -> last known status.
-        """
-        if not self._state_store:
-            return {}
-        records = await self._state_store.list(type=StateType.SERVICE)
-        result: Dict[str, str] = {}
-        for rec in records:
-            result[rec.name] = rec.status
-        return result
