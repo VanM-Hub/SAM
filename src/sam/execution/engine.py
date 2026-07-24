@@ -26,6 +26,7 @@ from .node import (
     NodeStatus,
     CompensationOnFailure,
 )
+from .decision import DecisionNode
 
 from sam.core.clock import TimeProvider, SystemClock
 from sam.core.event_bus import EventBus
@@ -251,25 +252,66 @@ class ExecutionGraphEngine:
         - Each cycle: find all nodes whose dependencies are all completed.
         - Run them in parallel via asyncio.gather.
         - Repeat until all nodes are in a terminal state.
+        - Decision nodes evaluate conditions and dynamically resolve next targets.
         """
         results: Dict[str, NodeResult] = {}
         pending: Set[str] = {n.id for n in graph.nodes}
         node_map = graph.node_map
+        evidence: Dict[str, Any] = {}  # Accumulated evidence for decision nodes
+
+        # Precompute mapping: branch target node -> decision execution node id
+        branch_to_decision_exec: Dict[str, str] = {}
+        for exec_node in graph.nodes:
+            if exec_node.is_decision and exec_node.decision_id:
+                decision = graph.decision_nodes.get(exec_node.decision_id)
+                if decision:
+                    for t in decision.branch_targets.values():
+                        branch_to_decision_exec[t] = exec_node.id
+                    if decision.default_target:
+                        branch_to_decision_exec[decision.default_target] = exec_node.id
+
+        # Inject implicit dependencies: ensure branch target nodes depend on their decision exec node
+        for exec_node in graph.nodes:
+            if exec_node.is_decision and exec_node.decision_id:
+                decision = graph.decision_nodes.get(exec_node.decision_id)
+                if not decision:
+                    continue
+                for target in set(decision.branch_targets.values()) | ({decision.default_target} if decision.default_target else set()):
+                    if not target:
+                        continue
+                    target_node = graph.get_node(target)
+                    if target_node and exec_node.id not in target_node.dependencies:
+                        # mutate a copy of dependencies to avoid pydantic list immutability surprises
+                        deps = list(target_node.dependencies)
+                        deps.append(exec_node.id)
+                        target_node.dependencies = deps
+                        self._logger.debug(
+                            "decision.inject_dependency",
+                            decision_exec=exec_node.id,
+                            target=target,
+                        )
 
         while pending:
             # Check for pause
             if graph.id in self._paused_graphs:
-                # Wait and retry — the graph may be resumed later
                 await self.clock.sleep(0.1)
                 continue
 
-            # Find ready nodes: all deps completed
+            # Find ready nodes: all deps completed (allow terminal states)
             ready: List[ExecutionNode] = []
             for nid in sorted(pending):
                 node = node_map[nid]
+                # If this node is a branch target, delay until its decision exec node has completed
+                if nid in branch_to_decision_exec:
+                    decision_exec_id = branch_to_decision_exec[nid]
+                    if decision_exec_id not in results or results[decision_exec_id].status not in (
+                        NodeStatus.COMPLETED, NodeStatus.SKIPPED, NodeStatus.FAILED, NodeStatus.COMPENSATED
+                    ):
+                        continue
+
                 deps_done = all(
                     dep in results and results[dep].status in (
-                        NodeStatus.COMPLETED, NodeStatus.SKIPPED
+                        NodeStatus.COMPLETED, NodeStatus.SKIPPED, NodeStatus.FAILED, NodeStatus.COMPENSATED
                     )
                     for dep in node.dependencies
                 )
@@ -277,8 +319,6 @@ class ExecutionGraphEngine:
                     ready.append(node)
 
             if not ready:
-                # Check for deadlock: no ready nodes but nodes still pending
-                # This can happen if some nodes failed/compensated and never became COMPLETED
                 stuck = pending - {nid for nid, r in results.items() if r.status in (
                     NodeStatus.COMPLETED, NodeStatus.SKIPPED, NodeStatus.FAILED,
                     NodeStatus.COMPENSATED,
@@ -296,7 +336,7 @@ class ExecutionGraphEngine:
 
             # Execute ready nodes in parallel
             tasks = [
-                self._execute_with_retry(node, capability_executor)
+                self._execute_with_retry(node, capability_executor, evidence)
                 for node in ready
             ]
             batch_results: List[NodeResult] = await asyncio.gather(*tasks)
@@ -305,20 +345,99 @@ class ExecutionGraphEngine:
                 results[result.node_id] = result
                 node_map[result.node_id].status = result.status
 
+                # Accumulate evidence from completed nodes as nested dicts
+                evidence.setdefault("node", {}).setdefault(result.node_id, {})["status"] = result.status.value
+                if result.output is not None:
+                    evidence.setdefault("node", {}).setdefault(result.node_id, {})["output"] = result.output
+
             pending -= {r.node_id for r in batch_results}
 
-            # If any node failed and on_failure is ABORT, propagate ABORT
-            # (only stop if the graph hasn't been compensated)
+            # Handle decision nodes and ABORT propagation
             for result in batch_results:
+                node = node_map[result.node_id]
+
+                # If this is a decision node, evaluate and resolve branch
+                if node.is_decision and result.status in (
+                    NodeStatus.COMPLETED, NodeStatus.SKIPPED
+                ):
+                    try:
+                        target_id = graph.get_branch_target(node.id, evidence)
+                    except (ValueError, KeyError) as exc:
+                        self._logger.error(
+                            "decision_evaluation_failed",
+                            node_id=node.id,
+                            error=str(exc),
+                        )
+                        continue
+
+                    if target_id is not None:
+                        # Ensure target node dependency on this decision node
+                        if target_id in pending:
+                            target_node = node_map[target_id]
+                            if node.id not in target_node.dependencies:
+                                target_node.dependencies = list(target_node.dependencies) + [node.id]
+                                self._logger.debug(
+                                    "decision.dynamic_dependency",
+                                    from_node=node.id,
+                                    to_node=target_id,
+                                )
+
+                        # Skip all other branch targets (they should not run)
+                        decision = graph.decision_nodes.get(node.decision_id)
+                        if decision:
+                            branch_ids = set(decision.branch_targets.values())
+                            # also include default_target as a possible branch
+                            if decision.default_target:
+                                branch_ids.add(decision.default_target)
+
+                            for bid in branch_ids:
+                                if bid != target_id and bid in pending:
+                                    self._logger.info(
+                                        "decision.skip_branch",
+                                        decision_id=node.decision_id,
+                                        skipped_node=bid,
+                                        selected=target_id,
+                                    )
+                                    node_map[bid].status = NodeStatus.SKIPPED
+                                    results[bid] = NodeResult(
+                                        node_id=bid,
+                                        status=NodeStatus.SKIPPED,
+                                        error="Skipped by decision branch",
+                                    )
+                                    pending.discard(bid)
+
+                    else:
+                        # No target found — skip all branch targets
+                        decision = graph.decision_nodes.get(node.decision_id)
+                        if decision:
+                            branch_ids = set(decision.branch_targets.values())
+                            if decision.default_target:
+                                branch_ids.add(decision.default_target)
+                            for bid in branch_ids:
+                                if bid in pending:
+                                    node_map[bid].status = NodeStatus.SKIPPED
+                                    results[bid] = NodeResult(
+                                        node_id=bid,
+                                        status=NodeStatus.SKIPPED,
+                                        error="Skipped by decision (no matching condition and no default)",
+                                    )
+                                    pending.discard(bid)
+
+                    self._logger.info(
+                        "decision.branch",
+                        node_id=node.id,
+                        target=target_id,
+                        evidence_keys=list(evidence.keys()),
+                    )
+
+                # ABORT propagation on failure
                 if result.status == NodeStatus.FAILED:
-                    node = node_map[result.node_id]
                     if node.compensation_policy.on_failure == CompensationOnFailure.ABORT:
                         self._logger.info(
                             "aborting_graph_on_node_failure",
                             node_id=result.node_id,
                             graph_id=graph.id,
                         )
-                        # Mark remaining pending nodes as SKIPPED
                         for nid in sorted(pending):
                             node_map[nid].status = NodeStatus.SKIPPED
                             results[nid] = NodeResult(
@@ -327,15 +446,22 @@ class ExecutionGraphEngine:
                             )
                         pending.clear()
 
-        # Return results in node-list order for deterministic output
         return [results[n.id] for n in graph.nodes if n.id in results]
 
     async def _execute_with_retry(
         self,
         node: ExecutionNode,
         capability_executor: Optional[Callable[[ExecutionNode], Any]] = None,
+        evidence: Optional[Dict[str, Any]] = None,
     ) -> NodeResult:
-        """Execute a single node with retry and compensation logic."""
+        """Execute a single node with retry and compensation logic.
+
+        Decision nodes (is_decision=True) are treated as lightweight:
+        they just record a COMPLETED status rather than invoking a capability.
+        """
+        # Decision nodes: skip capability invocation; mark as COMPLETED
+        if node.is_decision:
+            return await self._execute_decision_node(node, evidence or {})
         started_at = self.clock.now()
         attempts = 0
         last_error: Optional[Exception] = None
@@ -413,6 +539,53 @@ class ExecutionGraphEngine:
             node, last_error or RuntimeError("unknown"),
             attempts, started_at, capability_executor,
         )
+
+    async def _execute_decision_node(
+        self,
+        node: ExecutionNode,
+        evidence: Dict[str, Any],
+    ) -> NodeResult:
+        """Execute a decision node: evaluate conditions and resolve branch.
+
+        Decision nodes don't invoke capabilities; they evaluate evidence
+        and determine the next target node. The topological loop uses
+        get_branch_target() to resolve the actual path.
+        """
+        started_at = self.clock.now()
+        node.status = NodeStatus.RUNNING
+        node.started_at = started_at
+
+        await self._publish(EXECUTION_NODE_STARTED, node_id=node.id, graph_id=node.graph_id)
+
+        # Lightweight: just mark COMPLETED after collecting outcome
+        completed_at = self.clock.now()
+        duration_ms = (completed_at - started_at).total_seconds() * 1000
+
+        node.status = NodeStatus.COMPLETED
+        node.completed_at = completed_at
+
+        outcome = f"decision: {node.id}"
+        node.outputs = {
+            "decision_id": node.decision_id,
+            "decision_outcome": outcome,
+        }
+
+        result = NodeResult(
+            node_id=node.id,
+            status=NodeStatus.COMPLETED,
+            output=node.outputs,
+            attempts=0,
+            duration_ms=duration_ms,
+        )
+
+        await self._publish(
+            EXECUTION_NODE_COMPLETED,
+            node_id=node.id,
+            graph_id=node.graph_id,
+            is_decision=True,
+        )
+
+        return result
 
     async def _handle_node_failure(
         self,

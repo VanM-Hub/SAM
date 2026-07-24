@@ -128,6 +128,14 @@ class ExecutionNode(BaseModel):
         default_factory=list,
         description="Evidence records linked to this execution",
     )
+    is_decision: bool = Field(
+        default=False,
+        description="Whether this node is a decision/branching point",
+    )
+    decision_id: Optional[str] = Field(
+        default=None,
+        description="Reference to a DecisionNode ID (only when is_decision=True)",
+    )
     started_at: Optional[datetime] = Field(default=None, description="When execution started")
     completed_at: Optional[datetime] = Field(default=None, description="When execution completed")
 

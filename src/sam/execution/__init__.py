@@ -4,6 +4,7 @@ from .node import ExecutionNode, NodeStatus, RetryPolicy, CompensationPolicy
 from .node import RetryBackoff, CompensationOnFailure
 from .graph import ExecutionGraph, GraphStatus, ExecutionEdge
 from .engine import ExecutionGraphEngine, GraphResult, NodeResult
+from .decision import DecisionNode, DecisionCondition, DecisionType
 
 __all__ = [
     "ExecutionNode",
@@ -18,4 +19,7 @@ __all__ = [
     "ExecutionGraphEngine",
     "GraphResult",
     "NodeResult",
+    "DecisionNode",
+    "DecisionCondition",
+    "DecisionType",
 ]

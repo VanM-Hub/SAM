@@ -16,6 +16,7 @@ from typing import Any, Dict, List, Optional, Set
 from pydantic import BaseModel, Field
 
 from .node import ExecutionNode, NodeStatus
+from .decision import DecisionNode
 
 
 # ── Enums ────────────────────────────────────────────────────────────
@@ -65,6 +66,10 @@ class ExecutionGraph(BaseModel):
     id: str = Field(description="Unique graph identifier (UUID)")
     name: str = Field(description="Human-readable graph name")
     nodes: List[ExecutionNode] = Field(default_factory=list, description="All execution nodes")
+    decision_nodes: Dict[str, DecisionNode] = Field(
+        default_factory=dict,
+        description="Decision nodes keyed by decision_id",
+    )
     entry_nodes: List[str] = Field(
         default_factory=list,
         description="Node IDs with no upstream dependencies",
@@ -127,6 +132,8 @@ class ExecutionGraph(BaseModel):
         - No cycles in the dependency graph
         - Entry nodes match nodes with zero dependencies
         - Exit nodes match nodes not depended upon by others
+        - Decision nodes have valid branch_targets referencing existing nodes
+        - Decision nodes are referenced by an ExecutionNode with is_decision=True
         """
         errors: List[str] = []
         node_ids = self.node_map.keys()
@@ -166,7 +173,87 @@ class ExecutionGraph(BaseModel):
                         f"Exit node '{exit_id}' is a dependency of: {', '.join(downstream)}"
                     )
 
+        # 5. Decision node validation
+        for decision_id, decision_node in self.decision_nodes.items():
+            # 5a. Each branch target must reference an existing node
+            for cond_idx, target_id in decision_node.branch_targets.items():
+                if target_id not in node_ids:
+                    errors.append(
+                        f"Decision node '{decision_id}' branch target '{target_id}' "
+                        f"(condition {cond_idx}) not found in nodes list"
+                    )
+
+            # 5b. Default target must reference an existing node (if set)
+            if decision_node.default_target is not None:
+                if decision_node.default_target not in node_ids:
+                    errors.append(
+                        f"Decision node '{decision_id}' default target "
+                        f"'{decision_node.default_target}' not found in nodes list"
+                    )
+
+            # 5c. Branch targets must exist for each condition index
+            for idx in range(len(decision_node.conditions)):
+                if str(idx) not in decision_node.branch_targets:
+                    errors.append(
+                        f"Decision node '{decision_id}' condition {idx} has no "
+                        f"corresponding branch_target entry for 'str(idx)'"
+                    )
+
+            # 5d. At least one of branch_targets or default_target must be set
+            if not decision_node.branch_targets and decision_node.default_target is None:
+                errors.append(
+                    f"Decision node '{decision_id}' has no branch_targets "
+                    f"and no default_target"
+                )
+
+        # 6. is_decision nodes must have a valid decision_id
+        for node in self.nodes:
+            if node.is_decision:
+                if not node.decision_id:
+                    errors.append(
+                        f"Node '{node.id}' has is_decision=True but no decision_id"
+                    )
+                elif node.decision_id not in self.decision_nodes:
+                    errors.append(
+                        f"Node '{node.id}' references unknown decision_id "
+                        f"'{node.decision_id}'"
+                    )
+
         return errors
+
+    def get_branch_target(
+        self,
+        node_id: str,
+        evidence: Dict[str, Any],
+    ) -> Optional[str]:
+        """Evaluate a decision node's conditions and return the target node ID.
+
+        Args:
+            node_id: The ExecutionNode ID (must have is_decision=True).
+            evidence: Collected execution evidence dict.
+
+        Returns:
+            The target node ID from the first matching condition, default_target,
+            or None if neither matches and no default is set.
+
+        Raises:
+            ValueError: If node_id is not a decision node or decision_id is invalid.
+        """
+        node = self.get_node(node_id)
+        if node is None:
+            raise ValueError(f"Node '{node_id}' not found in graph")
+        if not node.is_decision:
+            raise ValueError(f"Node '{node_id}' is not a decision node")
+
+        decision_id = node.decision_id
+        if not decision_id or decision_id not in self.decision_nodes:
+            raise ValueError(
+                f"Node '{node_id}' has invalid or missing decision_id "
+                f"'{decision_id}'"
+            )
+
+        decision = self.decision_nodes[decision_id]
+        return decision.evaluate(evidence)
 
     def is_valid(self) -> bool:
         """Return True if the graph passes all structural validations."""
