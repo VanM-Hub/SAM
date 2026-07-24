@@ -55,6 +55,7 @@ class DaemonConfig:
     cluster_state_interval: float = 30.0
     enable_execution_engine: bool = True
     enable_governance: bool = True
+    enable_reasoning: bool = True
 
 
 class RuntimeDaemon:
@@ -80,6 +81,7 @@ class RuntimeDaemon:
         resource_directory: Any = None,
         execution_engine: Any = None,
         governance_engine: Any = None,
+        reasoning_engine: Any = None,
     ):
         self.config = config or DaemonConfig()
         self.clock = clock or SystemClock()
@@ -94,6 +96,7 @@ class RuntimeDaemon:
         self._resource_directory = resource_directory
         self._execution_engine = execution_engine
         self._governance_engine = governance_engine
+        self._reasoning_engine = reasoning_engine
         self._node: Optional[RuntimeNode] = None
         self._heartbeat_service: Optional[HeartbeatService] = None
         self._leader_election: Optional[LeaderElection] = None
@@ -129,6 +132,10 @@ class RuntimeDaemon:
     @property
     def governance_engine(self) -> Any:
         return self._governance_engine
+
+    @property
+    def reasoning_engine(self) -> Any:
+        return self._reasoning_engine
 
     def add_service(self, service: RuntimeService) -> None:
         """Add a service to the daemon."""
@@ -367,6 +374,14 @@ class RuntimeDaemon:
                     "active_graphs": active_graphs,
                     "paused_graphs": paused_graphs,
                 },
+                last_check=self.clock.now(),
+            )
+
+        # Add reasoning engine health
+        if self._reasoning_engine and self.config.enable_reasoning:
+            result["reasoning"] = ServiceHealth(
+                status=HealthStatus.HEALTHY,
+                message="Reasoning engine ready (intent → plan → graph)",
                 last_check=self.clock.now(),
             )
 

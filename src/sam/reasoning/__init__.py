@@ -7,6 +7,7 @@ Intent → Plan → Execution Graph → Governance → Execute
 from .intent import Intent, IntentType, IntentStatus, IntentParser
 from .templates import GraphTemplate, BUILTIN_TEMPLATES, get_default_template
 from .planner import PlanningEngine, PlanError
+from .engine import ReasoningEngine, ReasoningResult
 
 __all__ = [
     "Intent",
@@ -18,4 +19,6 @@ __all__ = [
     "get_default_template",
     "PlanningEngine",
     "PlanError",
+    "ReasoningEngine",
+    "ReasoningResult",
 ]

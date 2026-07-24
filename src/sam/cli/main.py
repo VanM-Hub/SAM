@@ -1169,5 +1169,174 @@ def governance_rules_list(
     asyncio.run(_list())
 
 
+# ── sam reason / plan / intent ─────────────────────────────────────
+
+reasoning_app = typer.Typer()
+app.add_typer(reasoning_app, name="reasoning")
+
+
+async def _get_reasoning_engine() -> Any:
+    """Build a ReasoningEngine with default dependencies."""
+    from sam.reasoning import ReasoningEngine
+    return ReasoningEngine()
+
+
+@reasoning_app.command("parse")
+def reasoning_intent(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Parse intent text without planning (sam intent alias).
+
+    Example: sam reasoning parse "diagnose provider:nvidia"
+    """
+    async def _parse():
+        engine = await _get_reasoning_engine()
+        intent = await engine.parse_intent(text)
+        if json_output:
+            import json
+            typer.echo(json.dumps({
+                "id": intent.id,
+                "type": intent.type.value,
+                "target": intent.target,
+                "description": intent.description,
+                "status": intent.status.value,
+                "parameters": dict(intent.parameters),
+                "correlation_id": intent.correlation_id,
+            }, indent=2))
+        else:
+            typer.echo(f"  Intent ID : {intent.id}")
+            typer.echo(f"  Type      : {intent.type.value}")
+            typer.echo(f"  Target    : {intent.target or '(none)'}")
+            typer.echo(f"  Status    : {intent.status.value}")
+            typer.echo(f"  Params    : {dict(intent.parameters) if intent.parameters else '(none)'}")
+            typer.echo(f"  Context   : {dict(intent.context) if intent.context else '(none)'}")
+
+    asyncio.run(_parse())
+
+
+@reasoning_app.command("plan")
+def reasoning_plan(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Parse and plan an intent, producing an execution graph.
+
+    Example: sam reasoning plan "deploy version=3.1 workspace=prod to provider:openai"
+    """
+    async def _plan():
+        engine = await _get_reasoning_engine()
+        result = await engine.reason(text)
+
+        if result.error:
+            typer.echo(f"❌ {result.error}", err=True)
+            raise typer.Exit(1)
+
+        if json_output:
+            import json
+            typer.echo(json.dumps(result.to_dict(), indent=2, default=str))
+        else:
+            typer.echo(f"  Intent    : {result.intent.type.value} -> {result.intent.target or '(no target)'}")
+            typer.echo(f"  Graph ID  : {result.graph.id}")
+            typer.echo(f"  Graph Name: {result.graph.name}")
+            typer.echo(f"  Nodes     : {len(result.graph.nodes)}")
+            typer.echo(f"  Entry     : {result.graph.entry_nodes}")
+            typer.echo(f"  Exit      : {result.graph.exit_nodes}")
+            typer.echo()
+            typer.echo(f"  Nodes:")
+            for node in result.graph.nodes:
+                deps = node.dependencies if node.dependencies else "-"
+                typer.echo(f"    - {node.id}: {node.capability_id}")
+                typer.echo(f"        inputs: {node.inputs}")
+                typer.echo(f"        deps  : {deps}")
+                if node.retry_policy:
+                    typer.echo(f"        retry : attempts={node.retry_policy.max_attempts}, backoff={node.retry_policy.backoff.value}")
+                if node.compensation_policy and node.compensation_policy.compensation_node_id:
+                    typer.echo(f"        comp  : {node.compensation_policy.on_failure.value} => {node.compensation_policy.compensation_node_id}")
+
+    asyncio.run(_plan())
+
+
+@reasoning_app.command("run")
+def reasoning_run(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Parse, plan, and execute an intent (full pipeline).
+
+    Example: sam reasoning run "diagnose provider:nvidia"
+    """
+    async def _run():
+        engine = await _get_reasoning_engine()
+        result = await engine.reason_and_execute(text)
+
+        if result.error:
+            typer.echo(f"❌ {result.error}", err=True)
+            if result.governance_blocked:
+                typer.echo(f"   (blocked by governance: {result.governance_decision})")
+            raise typer.Exit(1)
+
+        if json_output:
+            import json
+            typer.echo(json.dumps(result.to_dict(), indent=2, default=str))
+        else:
+            typer.echo(f"✅ Completed")
+            typer.echo(f"  Intent    : {result.intent.type.value} -> {result.intent.target}")
+            typer.echo(f"  Graph     : {result.graph.name} ({result.graph.id})")
+            if result.graph_result:
+                typer.echo(f"  Status    : {result.graph_result.status.value}")
+                typer.echo(f"  Duration  : {result.graph_result.duration_ms:.0f}ms")
+                typer.echo(f"  Nodes     : {len(result.graph_result.node_results)}")
+                for nr in result.graph_result.node_results:
+                    icon = "✅" if nr.status.value == "COMPLETED" else "❌"
+                    details = f" - {nr.error}" if nr.error else ""
+                    typer.echo(f"    {icon} {nr.node_id} ({nr.status.value}){details}")
+
+    asyncio.run(_run())
+
+
+# Legacy aliases for convenience
+
+
+@app.command(name="intent")
+def cli_intent(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Alias for sam reasoning parse — parse intent text.
+
+    Example: sam intent "diagnose provider:nvidia"
+    """
+    from typer import Context
+
+    # Delegate to reasoning parse
+    ctx = Context(reasoning_intent)
+    reasoning_intent(text=text, json_output=json_output)
+
+
+@app.command(name="plan")
+def cli_plan(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Alias for sam reasoning plan — parse and plan an intent.
+
+    Example: sam plan "deploy version=3.1 workspace=prod to provider:openai"
+    """
+    reasoning_plan(text=text, json_output=json_output)
+
+
+@app.command(name="reason")
+def cli_reason(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Alias for sam reasoning run — parse, plan, and execute.
+
+    Example: sam reason "diagnose provider:nvidia"
+    """
+    reasoning_run(text=text, json_output=json_output)
+
+
 if __name__ == "__main__":
     app()
