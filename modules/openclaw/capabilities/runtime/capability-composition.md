@@ -1,374 +1,495 @@
 # Capability Composition
 
-
-
 Version: 1.0
-
-
 
 Status: Draft
 
+Capability Type: Runtime Infrastructure
 
+Execution Mode: Workflow Composition
 
-Capability Type: Runtime Architecture
+Risk Level: None
 
+Owner: OpenClaw Runtime
 
+Knowledge Type: Implementation
 
-Execution Mode: Orchestration
+Evidence Level: Designed
 
-
-
-Risk Level: Low
-
-
-
-Owner: OpenClaw Module
-
-
-
-Related Documents
-
-
-
-Capabilities
-
-
-
-\- runtime/capability-runtime.md
-
-\- runtime/capability-registry.md
-
-\- runtime/capability-contract.md
-
-\- runtime/workflow-engine.md
-
-\- runtime/orchestration-language.md
-
-
-
-Sprint 3
-
-
-
-\- approval-gate.md
-
-\- execution-planning.md
-
-
-
-Sprint 5
-
-
-
-\- diagnostic-reasoning-engine.md
-
-
-
-Framework
-
-
-
-\- docs/core/EXECUTION\_MODEL.md
-
-\- docs/models/DECISION\_MODEL.md
-
-
+Confidence: High
 
 ---
-
-
 
 # Purpose
 
+Define how individual capabilities are composed into executable operational workflows.
 
+Capability Composition provides the architectural model that enables small, independently testable capabilities to cooperate while preserving modularity, governance, traceability, and lifecycle isolation.
 
-Define how capabilities are composed into larger operational workflows.
+Composition defines relationships between capabilities.
 
-
-
-Capability Composition describes the logical relationships between capabilities, how they coordinate, and how they exchange information.
-
-
+Execution remains the responsibility of the Workflow Engine.
 
 ---
 
+# Authority
 
+Primary Reference
 
-# Scope
+- docs/specifications/SAM_FRAMEWORK_v1.0_SPECIFICATION.md
 
+Supporting References
 
+- docs/core/CONSTITUTION.md
+- docs/core/EXECUTION_MODEL.md
+- docs/GLOSSARY.md
 
-Capability Composition covers:
+Related Runtime Components
 
-
-
-\- capability ordering
-
-\- dependency relationships
-
-\- information exchange
-
-\- state management
-
-\- error propagation
-
-\- composition patterns
-
-
+- capability-runtime.md
+- capability-registry.md
+- capability-contract.md
+- workflow-engine.md
 
 ---
 
+# Composition Philosophy
 
+A capability performs exactly one operational responsibility.
+
+Complex operational behavior emerges through composition rather than increasingly complex capabilities.
+
+Composition is preferred over capability specialization.
+
+---
+
+# Composition Model
+
+Capabilities are connected through contracts.
+
+```
+
+Capability
+
+↓
+
+Output
+
+↓
+
+Workflow State
+
+↓
+
+Input
+
+↓
+
+Capability
+
+```
+
+Capabilities never communicate directly.
+
+The Workflow Engine manages all data exchange.
+
+---
 
 # Composition Principles
 
+Every composition shall satisfy the following principles:
 
+- loose coupling
+- explicit dependencies
+- deterministic sequencing
+- immutable evidence
+- governed execution
+- auditability
+- replaceability
 
-Capabilities shall be:
-
-
-
-\- **Composable**: Capabilities can be combined into larger workflows.
-
-\- **Independently Testable**: Each capability can be tested in isolation.
-
-\- **Loosely Coupled**: Capabilities depend on contracts, not implementations.
-
-\- **Information-Explicit**: Data flow between capabilities is explicit.
-
-\- **Failure-Aware**: Each capability knows how to report and propagate failures.
-
-
-
-No capability shall assume the responsibilities of another.
-
-
+No composition shall violate these principles.
 
 ---
 
+# Composition Units
 
+The smallest executable unit is a single capability.
 
-# Composition Patterns
+Higher-level operational behavior is created by combining capabilities into workflows.
 
-
-
-## Sequential Composition
-
-
-
-Capabilities execute in a deterministic order.
-
-
-
-Example:
-
-Health Check → Diagnostics → Planning → Execution → Verification
-
-
-
-
-
-The result of one becomes the input for the next.
-
-
+Composition never modifies the internal behavior of a capability.
 
 ---
 
+# Sequential Composition
 
+Capabilities execute in a predefined order.
 
-## Conditional Composition
+Example
 
+```
+Health Check
 
+↓
 
-Execution path depends on capability results.
+Configuration Validation
 
+↓
 
+Provider Testing
 
-Example:
+↓
+
+Verification Report
+```
+
+Each capability begins only after its predecessor completes successfully.
+
+---
+
+# Conditional Composition
+
+Workflow execution may branch based on runtime conditions.
+
+Example
+
+```
+Verification
+
+↓
+
+Healthy?
+
+↓
+
+Yes --------→ Complete
+
+↓
+
+No
+
+↓
+
+Diagnostic Reasoning
+```
+
+Branching decisions are evaluated by the Workflow Engine.
+
+---
+
+# Parallel Composition
+
+Independent capabilities may execute simultaneously.
+
+Example
+
+```
+Configuration Validation
+
+Workspace Validation
+
+Provider Testing
+
+Filesystem Validation
+```
+
+Parallel execution requires:
+
+- no shared mutable state
+- independent contracts
+- deterministic merge behavior
+
+---
+
+# Iterative Composition
+
+Some workflows require repeated execution.
+
+Example
+
+```
+Observe
+
+↓
+
+Verify
+
+↓
+
+Still Unhealthy?
+
+↓
+
+Repeat
+```
+
+Iteration shall define explicit termination conditions.
+
+Infinite execution is prohibited.
+
+---
+
+# Nested Composition
+
+A workflow may invoke another workflow.
+
+Example
+
+```
+Auto Recovery
+
+↓
+
+Verification Workflow
+
+↓
+
+Health Check
+
+↓
+
+Provider Test
+
+↓
+
+Configuration Validation
+```
+
+Nested workflows remain independent execution contexts.
+
+---
+
+# Composite Workflow Example
+
+```
+Observe
+
+↓
+
+Health Check
+
+↓
+
+Diagnostics
+
+↓
+
+Reasoning
+
+↓
+
+Decision
+
+↓
+
+Execution Planning
+
+↓
+
+Approval
+
+↓
+
+Execution
+
+↓
 
 Verification
 
-│
+↓
 
-├── Success → Complete
+Learning
 
-└── Failure → Rollback
+↓
 
+Archive
+```
 
+Each stage is an independent capability.
 
-
-
-Different paths may execute different capabilities.
-
-
-
----
-
-
-
-## Parallel Composition
-
-
-
-Capabilities execute independently.
-
-
-
-Results are aggregated for final assessment.
-
-
-
-Example:
-
-Parallel Health Checks
-
-│
-
-├── Runtime Health
-
-├── Workspace Health
-
-└── Provider Health
-
-│
-
-▼
-
-Aggregated Health Report
-
-
-
-
+The composition defines the operational process.
 
 ---
 
+# State Propagation
 
+Workflow state propagates between capabilities.
 
-## Iterative Composition
+Shared state may include:
 
+- workflow identifier
+- execution identifier
+- evidence references
+- execution status
+- verification state
+- audit context
 
+Capabilities receive state through their contracts.
 
-Capabilities execute in a loop.
-
-
-
-Loop condition determines continuation.
-
-
-
-Example:
-
-Verify → Health Check → (Failed) → Retry → Health Check → ...
-
-
-
-
+They shall not modify shared state directly.
 
 ---
 
+# Evidence Flow
 
+Evidence is passed between capabilities through references.
 
-# Information Flow
+```
+Evidence
 
+↓
 
+Evidence Store
 
-Information between capabilities should be:
+↓
 
+Evidence Reference
 
+↓
 
-\- **Explicit**: Passing data through defined inputs/outputs.
+Next Capability
+```
 
-\- **Typed**: Data has a defined schema.
-
-\- **Validated**: Data is checked against the contract.
-
-\- **Traceable**: Data origin and transformations are logged.
-
-
-
-Implicit global state or shared memory should be avoided.
-
-
+Evidence shall remain immutable after publication.
 
 ---
 
+# Failure Propagation
 
+Failures propagate according to workflow policy.
 
-# Error Handling
+Typical policies include:
 
+Fail Fast
 
+↓
 
-Composition should define:
+Stop Workflow
 
+Continue
 
+↓
 
-\- **Failure Boundaries**: Where failures can occur and be isolated.
+Record Failure
 
-\- **Recovery Strategies**: Retry, fallback, or abort.
+↓
 
-\- **Rollback Behavior**: How to undo partial work.
+Continue Remaining Steps
 
-\- **Escalation Paths**: When to involve human operators.
+Retry
 
+↓
 
+Repeat Capability
 
----
+Escalate
 
+↓
 
+Transfer Control
 
-# Relationship with Workflow Engine
-
-
-
-\- **Capability Composition** defines the *what* (structure, order, conditions).
-
-\- **Workflow Engine** executes the *how* (state, transitions, logging).
-
-
-
----
-
-
-
-# Relationship with Capability Contract
-
-
-
-Contracts define capability inputs/outputs.
-
-
-
-Composition uses contracts to validate data flow between steps.
-
-
+Policy selection belongs to the Workflow Engine.
 
 ---
 
+# Dependency Rules
 
+Composition shall only use registered capabilities.
+
+Dependencies shall be:
+
+- explicit
+- validated
+- version compatible
+- permission compatible
+
+Hidden runtime dependencies are prohibited.
+
+---
+
+# Composition Validation
+
+Every composition should be validated before execution.
+
+Validation includes:
+
+- dependency graph
+- contract compatibility
+- permission requirements
+- workflow integrity
+- cycle detection
+- unreachable stages
+
+Invalid workflows shall not execute.
+
+---
+
+# Relationship to Capability Runtime
+
+Capability Runtime executes one capability.
+
+Capability Composition defines how multiple capabilities cooperate.
+
+Execution and composition remain independent concerns.
+
+---
+
+# Relationship to Workflow Engine
+
+Workflow Engine interprets compositions.
+
+Composition defines structure.
+
+Workflow Engine performs execution.
+
+---
+
+# Relationship to Orchestration Language
+
+The Orchestration Language describes compositions declaratively.
+
+Capability Composition defines the conceptual execution graph.
+
+The DSL becomes one possible representation of that graph.
+
+---
+
+# Operational Boundaries
+
+Capability Composition shall never:
+
+- execute capabilities
+- evaluate evidence
+- perform reasoning
+- bypass governance
+- allocate runtime resources
+
+Its responsibility is structural composition only.
+
+---
 
 # Future Evolution
 
+Future versions may introduce:
 
+composition/
 
-Future versions may support:
+dynamic-composition.md
 
+policy-based-composition.md
 
+distributed-composition.md
 
-\- Dynamic composition based on runtime conditions.
+event-driven-composition.md
 
-\- Adaptive composition based on historical success rates.
+graph-execution.md
 
-\- Visual composition tools.
-
-
+workflow-templates.md
 
 ---
 
-
-
 # Summary
 
+Capability Composition defines how independent capabilities are assembled into larger operational workflows.
 
-
-Capability Composition defines how individual capabilities coordinate to achieve operational objectives. By specifying relationships, information flow, and error handling, the composition model enables reliable workflow execution while preserving capability independence.
-
+By separating workflow structure from execution behavior, the framework preserves modularity, auditability, replaceability, and long-term architectural flexibility while enabling increasingly sophisticated operational automation.

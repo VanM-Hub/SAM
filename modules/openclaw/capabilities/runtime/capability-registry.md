@@ -1,306 +1,459 @@
 # Capability Registry
 
-
-
 Version: 1.0
-
-
 
 Status: Draft
 
+Capability Type: Runtime Infrastructure
 
+Execution Mode: Discovery & Registration
 
-Capability Type: Runtime Architecture
+Risk Level: None
 
+Owner: OpenClaw Runtime
 
+Knowledge Type: Implementation
 
-Execution Mode: System
+Evidence Level: Designed
 
-
-
-Risk Level: Low
-
-
-
-Owner: OpenClaw Module
-
-
-
-Related Documents
-
-
-
-Capabilities
-
-
-
-\- capability-runtime.md
-
-\- capability-contract.md
-
-
-
-Sprint 2
-
-
-
-\- health-checks.md
-
-\- provider-testing.md
-
-
-
-Sprint 4
-
-
-
-\- operational-reports.md
-
-
-
-Framework
-
-
-
-\- docs/models/DECISION\_MODEL.md
-
-
+Confidence: High
 
 ---
-
-
 
 # Purpose
 
+Define the centralized registry responsible for discovering, identifying, validating, and exposing executable capabilities within the SAM Framework.
 
+The Capability Registry acts as the authoritative catalog of all runtime capabilities.
 
-Maintain a central registry of all available capabilities.
-
-
-
-The Capability Registry provides capability discovery, metadata management, dependency resolution, and version control.
-
-
+No capability may participate in workflow execution unless it has been successfully registered.
 
 ---
 
+# Authority
 
+Primary Reference
 
-# Registry Information
+- docs/specifications/SAM_FRAMEWORK_v1.0_SPECIFICATION.md
 
+Supporting References
 
+- docs/core/CONSTITUTION.md
+- docs/models/EXECUTION_MODEL.md
+- docs/GLOSSARY.md
 
-Each registered capability includes the following metadata:
+Related Runtime Components
 
-
-
-| Field | Description | Example |
-
-| :--- | :--- | :--- |
-
-| `id` | Unique capability identifier. | `health-check` |
-
-| `version` | Semantic version. | `1.2.0` |
-
-| `owner` | Module or team responsible. | `OpenClaw Module` |
-
-| `description` | Human-readable summary. | `Perform health checks on OpenClaw components` |
-
-| `type` | Capability category. | `Observation`, `Execution`, `Reasoning` |
-
-| `dependencies` | Capabilities required. | `diagnostic-automation` |
-
-| `permissions` | Required permissions (read/write). | `read:workspace` |
-
-| `risk\_level` | Operational risk classification. | `Low`, `Medium`, `High` |
-
-| `contract` | Reference to contract definition. | `contracts/health-check.json` |
-
-| `status` | Lifecycle status of the capability. | `active`, `deprecated`, `disabled` |
-
-
+- capability-runtime.md
+- capability-contract.md
+- capability-composition.md
+- workflow-engine.md
 
 ---
 
+# Registry Responsibilities
 
+The registry is responsible for:
 
-# Discovery Methods
+- discovering capabilities
+- assigning runtime identity
+- validating metadata
+- resolving dependencies
+- exposing capability lookup
+- version compatibility checks
+- lifecycle registration
 
+The registry never executes capabilities.
 
-
-Capabilities may be discovered by:
-
-
-
-\- **ID**: Direct lookup.
-
-\- **Type**: Filter by capability type.
-
-\- **Domain**: Filter by operational domain (e.g., `provider`, `runtime`).
-
-\- **Dependency**: Find capabilities that depend on this capability.
-
-
+Execution belongs to Capability Runtime.
 
 ---
 
+# Registry Philosophy
 
+Capabilities are not identified by filenames.
 
-# Registry Lifecycle
+Capabilities are identified by immutable runtime identities.
 
-
-
-Capabilities registered in the registry go through a lifecycle:
-
-REGISTERED → ACTIVE → DEPRECATED → DISABLED → REMOVED
-
-
-
-
-
-\- **REGISTERED**: Capability metadata is recorded.
-
-\- **ACTIVE**: Capability is available for execution.
-
-\- **DEPRECATED**: Capability is scheduled for replacement. New workflows should avoid it.
-
-\- **DISABLED**: Capability is temporarily unavailable.
-
-\- **REMOVED**: Capability is permanently removed from the registry.
-
-
+Documentation location shall never determine runtime identity.
 
 ---
 
+# Capability Identity
 
+Every capability shall possess a globally unique identifier.
+
+Example
+
+Capability ID
+
+openclaw.health-checks
+
+Display Name
+
+Health Checks
+
+Version
+
+1.0
+
+Category
+
+Observation
+
+Owner
+
+OpenClaw
+
+Runtime Class
+
+HealthCheckCapability
+
+---
+
+# Required Metadata
+
+Every capability shall provide:
+
+- Capability ID
+- Display Name
+- Description
+- Version
+- Category
+- Owner
+- Runtime Version
+- Status
+- Risk Level
+
+Capabilities lacking required metadata shall not be registered.
+
+---
+
+# Optional Metadata
+
+Optional metadata may include:
+
+- Tags
+- Documentation URL
+- Supported Platforms
+- Implementation Language
+- Experimental Status
+- Deprecation Status
+
+Optional metadata shall never replace required metadata.
+
+---
+
+# Capability Categories
+
+Typical categories include:
+
+- Observation
+- Diagnostics
+- Reasoning
+- Decision
+- Execution
+- Verification
+- Recovery
+- Learning
+- Runtime
+- Governance
+
+Categories support discovery rather than execution.
+
+---
+
+# Capability Registration Process
+
+```
+Discovery
+
+↓
+
+Metadata Validation
+
+↓
+
+Identity Validation
+
+↓
+
+Dependency Resolution
+
+↓
+
+Version Compatibility
+
+↓
+
+Permission Validation
+
+↓
+
+Registry Entry
+
+↓
+
+Available for Runtime
+```
+
+Registration shall fail immediately upon validation failure.
+
+---
+
+# Registry State
+
+Each capability exists in one registry state.
+
+```
+Discovered
+
+↓
+
+Validated
+
+↓
+
+Registered
+
+↓
+
+Available
+
+↓
+
+Deprecated
+
+↓
+
+Disabled
+
+↓
+
+Removed
+```
+
+Capabilities shall never transition directly from Discovered to Available.
+
+Validation is mandatory.
+
+---
 
 # Dependency Resolution
 
+Capabilities may depend upon other capabilities.
 
+Example
 
-When a workflow requests a capability, the Registry:
+Reasoning Engine
 
+depends on
 
+Evidence Evaluation
 
-1\.  Resolves the capability ID to a specific version (latest, or pinned).
+Hypothesis Generation
 
-2\.  Checks that all dependencies are available.
+Confidence Scoring
 
-3\.  Validates that dependencies are active and compatible.
+The registry validates dependency availability before registration.
 
-
-
----
-
-
-
-# Version Management
-
-
-
-Registry supports:
-
-
-
-\- **Semantic Versioning**: MAJOR.MINOR.PATCH.
-
-\- **Version Pinning**: Workflows may pin to a specific version.
-
-\- **Compatibility Matrix**: Declares compatible versions between dependent capabilities.
-
-
+Circular dependencies shall be rejected.
 
 ---
 
+# Version Compatibility
 
+Each capability shall declare:
 
-# Security \& Permissions
+Minimum Runtime Version
 
+Maximum Runtime Version (optional)
 
+Supported Specification Version
 
-Capabilities may require specific permissions to execute:
+Example
 
+Runtime
 
+>=1.0
 
-\- `read:configuration`
+Specification
 
-\- `write:workspace`
+SAM Framework v1.0
 
-\- `read:runtime`
-
-\- `execute:provider`
-
-\- `modify:system`
-
-
-
-The Registry enforces that only capabilities with the appropriate permissions are invoked by workflows.
-
-
+Incompatible capabilities shall remain unavailable.
 
 ---
 
+# Permission Model
 
+Capabilities declare required permissions.
 
-# Relationship with Runtime
+Examples
 
+Read Configuration
 
+Read Workspace
 
-The Runtime queries the Registry to:
+Read Logs
 
+Modify Configuration
 
+Execute Provider Tests
 
-\- Load capability metadata.
+Write Audit Records
 
-\- Validate capability versions.
+The registry validates declared permissions before runtime activation.
 
-\- Resolve dependencies.
-
-
-
----
-
-
-
-# Relationship with Audit
-
-
-
-All registry changes (registration, deprecation, version updates) are audited.
-
-
+Permission enforcement remains the responsibility of Capability Runtime.
 
 ---
 
+# Registry Lookup
 
+The registry shall support lookup by:
+
+- Capability ID
+- Category
+- Version
+- Tags
+- Owner
+- Runtime Status
+
+Lookup operations shall be read-only.
+
+---
+
+# Registry Record
+
+Each registry entry should contain:
+
+Identity
+
+Version
+
+Owner
+
+Dependencies
+
+Permission Requirements
+
+Risk Classification
+
+Contract Reference
+
+Implementation Reference
+
+Documentation Reference
+
+Current Status
+
+Runtime Compatibility
+
+---
+
+# Registry Integrity
+
+Registry entries shall be:
+
+- deterministic
+- unique
+- versioned
+- immutable during execution
+
+Registry updates occur outside workflow execution.
+
+---
+
+# Relationship to Capability Runtime
+
+Capability Registry
+
+↓
+
+Discovery
+
+Capability Runtime
+
+↓
+
+Execution
+
+Registry prepares.
+
+Runtime executes.
+
+---
+
+# Relationship to Workflow Engine
+
+Workflow Engine resolves capabilities through the registry.
+
+The workflow engine shall never instantiate capabilities directly.
+
+---
+
+# Relationship to Capability Contract
+
+Registry stores capability metadata.
+
+Capability Contract defines operational behavior.
+
+Both remain independent.
+
+---
+
+# Failure Handling
+
+Registration may fail due to:
+
+- duplicate identifiers
+- invalid metadata
+- unresolved dependencies
+- incompatible versions
+- invalid permissions
+- corrupted definitions
+
+Every failure shall generate diagnostic evidence.
+
+---
+
+# Operational Boundaries
+
+Capability Registry shall never:
+
+- execute capabilities
+- modify workflows
+- bypass governance
+- perform reasoning
+- alter runtime state
+
+Its responsibility is capability discovery and registration.
+
+---
 
 # Future Evolution
 
-
-
 Future versions may support:
 
+registry/
 
+remote-registry.md
 
-\- Remote Registries for multi-node deployments.
+distributed-registry.md
 
-\- Automatic discovery of capabilities via plugins.
+plugin-registry.md
 
-\- Runtime capability update without restarting the system.
+signed-capabilities.md
 
+capability-marketplace.md
 
+semantic-search.md
 
 ---
 
-
-
 # Summary
 
+Capability Registry provides the authoritative catalog of executable capabilities within the SAM Framework.
 
-
-The Capability Registry acts as the central catalog for all SAM capabilities, providing discovery, metadata, dependency resolution, and version management to ensure consistent and secure capability execution.
-
-
-
-
-
+By separating discovery, identity, dependency management, and version validation from execution, the registry enables modularity, compatibility, composability, and safe runtime evolution.

@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "sam-framework"
+version = "1.0.0"
+description = "Self-evolving AI Operations Framework"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "SAM Project", email = "sam@example.com" },
+]
+keywords = ["aiops", "automation", "self-healing", "autonomous", "operations"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "structlog>=20.0",
+    "typer>=0.4",
+    "pydantic>=2.0",
+]
+optional-dependencies = {
+    "metrics" = ["psutil>=5.0"],
+    "knowledge" = ["pyyaml>=5.0"],
+    "dev" = [
+        "pytest>=7.0",
+        "pytest-asyncio>=0.21",
+    ],
+}
+
+[project.urls]
+"Homepage" = "https://github.com/your-org/sam"
+"Documentation" = "https://github.com/your-org/sam/docs"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests", "."]
+python_files = ["test_*.py"]
+filterwarnings = [
+    "ignore::DeprecationWarning:pydantic.*",
+    "ignore::UserWarning:pydantic.*",
+]

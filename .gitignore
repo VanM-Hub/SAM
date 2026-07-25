@@ -17,3 +17,14 @@ __pycache__/
 *.user
 *.userosscache
 *.sln.docstates
+# Embedded repos
+ACC/
+# Build artifacts
+src/sam.egg-info/
+# Test DBs
+*.db.backup*
+sam_test_*.db
+test.db
+# Temp files
+*.pyc
+__pycache__/

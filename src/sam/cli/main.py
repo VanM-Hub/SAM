@@ -1,0 +1,1361 @@
+import typer
+import asyncio
+import uuid
+import structlog
+from pathlib import Path
+from typing import Optional, List, Dict, Any
+
+from sam.runtime.registry import CapabilityRegistry
+from sam.runtime.runtime import CapabilityRuntime
+from sam.runtime.context import ExecutionContext
+from sam.runtime.workflow import WorkflowEngine
+from sam.knowledge.loader import KnowledgeLoader
+from sam.knowledge.importer import KnowledgeImporter
+from sam.knowledge.store import create_knowledge_store
+from sam.knowledge.graph import create_knowledge_graph
+from uuid import UUID
+from sam.runtime.discovery import CapabilityDiscovery
+from sam.events import EventBus, Event
+from sam.services import AuditService
+from sam.plugin import (
+    PluginManifestLoader,
+    create_plugin_registry,
+    PluginStatus,
+    create_plugin_discovery,
+    PluginLifecycleManager,
+    PluginManifest,
+)
+from sam.core.daemon import RuntimeDaemon, DaemonConfig
+from sam.core.job_queue import JobQueue
+from sam.core.job import Job, JobType
+from sam.core.notification_service import NotificationService
+from sam.core.scheduler import Scheduler
+from sam.models import Capability
+
+# ── Evolution CLI ─────────────────────────────────────────────
+from sam.cli.evolution_app import evolution_app
+from sam.cli.cluster_app import cluster_app
+from sam.cli.federation_app import federation_app
+from sam.cli.autonomy_app import autonomy_app
+
+app = typer.Typer()
+logger = structlog.get_logger()
+
+# Path to SAM repository (default)
+SAM_ROOT = "D:/Project AI/SAM"
+DB_PATH = "D:/Project AI/SAM/sam.db"
+
+
+async def _run_capability(
+    capability_id: str,
+    inputs: Optional[Dict[str, Any]] = None,
+    enable_audit: bool = True
+) -> Dict[str, Any]:
+    """Internal function to run a single capability with audit."""
+    execution_id = str(uuid.uuid4())
+
+    # Setup Event Bus & Audit
+    event_bus = EventBus()
+    audit_service = AuditService(event_bus) if enable_audit else None
+
+    # Load knowledge & discovery
+    loader = KnowledgeLoader(SAM_ROOT)
+    store = await create_knowledge_store(DB_PATH)
+    await loader.load_all(store=store)
+
+    registry = CapabilityRegistry()
+    discovery = CapabilityDiscovery(registry, loader)
+    await discovery.discover()
+
+    runtime = CapabilityRuntime(registry)
+    context = ExecutionContext(
+        execution_id=uuid.UUID(execution_id),
+        workflow_id="",
+        step_name="standalone",
+        inputs=inputs or {},
+    )
+
+    # Publish CapabilityStarted
+    await event_bus.publish(Event(
+        type="CapabilityStarted",
+        source="cli",
+        payload={
+            "capability_id": capability_id,
+            "execution_id": execution_id,
+            "inputs": inputs or {}
+        }
+    ))
+
+    try:
+        result = await runtime.execute_capability(capability_id, context)
+
+        # Publish CapabilityExecuted
+        await event_bus.publish(Event(
+            type="CapabilityExecuted",
+            source="cli",
+            payload={
+                "capability_id": capability_id,
+                "execution_id": execution_id,
+                "result": result
+            }
+        ))
+        return {"success": True, "result": result, "execution_id": execution_id}
+
+    except Exception as e:
+        # Publish CapabilityFailed
+        await event_bus.publish(Event(
+            type="CapabilityFailed",
+            source="cli",
+            payload={
+                "capability_id": capability_id,
+                "execution_id": execution_id,
+                "error": str(e)
+            }
+        ))
+        raise
+
+
+async def _run_workflow(
+    steps: List[str],
+    inputs: Optional[Dict[str, Any]] = None,
+    enable_audit: bool = True
+) -> List[Any]:
+    """Internal function to run a workflow with audit."""
+    execution_id = str(uuid.uuid4())
+
+    event_bus = EventBus()
+    audit_service = AuditService(event_bus) if enable_audit else None
+
+    loader = KnowledgeLoader(SAM_ROOT)
+    store = await create_knowledge_store(DB_PATH)
+    await loader.load_all(store=store)
+
+    registry = CapabilityRegistry()
+    discovery = CapabilityDiscovery(registry, loader)
+    await discovery.discover()
+
+    runtime = CapabilityRuntime(registry)
+    context = ExecutionContext(
+        execution_id=uuid.UUID(execution_id),
+        workflow_id="workflow",
+        step_name="workflow_start",
+        inputs=inputs or {},
+    )
+
+    await event_bus.publish(Event(
+        type="WorkflowStarted",
+        source="cli",
+        payload={
+            "steps": steps,
+            "execution_id": execution_id
+        }
+    ))
+
+    try:
+        engine = WorkflowEngine(runtime)
+        results = await engine.run(steps, context)
+
+        await event_bus.publish(Event(
+            type="WorkflowCompleted",
+            source="cli",
+            payload={
+                "steps": steps,
+                "execution_id": execution_id,
+                "results": results
+            }
+        ))
+        return results
+
+    except Exception as e:
+        await event_bus.publish(Event(
+            type="WorkflowFailed",
+            source="cli",
+            payload={
+                "steps": steps,
+                "execution_id": execution_id,
+                "error": str(e)
+            }
+        ))
+        raise
+
+
+@app.command()
+def run(
+    capability_id: str,
+    no_audit: bool = False
+):
+    """Run a single capability by ID."""
+    async def _run():
+        try:
+            result = await _run_capability(capability_id, enable_audit=not no_audit)
+            typer.echo(f"Result: {result['result']}")
+            if not no_audit:
+                typer.echo(f"Execution ID: {result['execution_id']}")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+
+    asyncio.run(_run())
+
+
+@app.command()
+def workflow(
+    steps: str,
+    no_audit: bool = False
+):
+    """Run a workflow with comma-separated capability IDs."""
+    step_list = [s.strip() for s in steps.split(",") if s.strip()]
+
+    async def _run():
+        try:
+            results = await _run_workflow(step_list, enable_audit=not no_audit)
+            typer.echo(f"Workflow results: {results}")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+
+    asyncio.run(_run())
+
+
+# Keep existing knowledge and discovery commands unchanged
+@app.command()
+def knowledge_load(
+    root_path: str = typer.Option(
+        "D:/Project AI/SAM", help="Root path of the SAM repository"
+    ),
+):
+    """Load all knowledge markdown files from docs/ and modules/ and persist to DB."""
+    async def _load():
+        loader = KnowledgeLoader(root_path=root_path)
+        store = await create_knowledge_store(DB_PATH)
+        docs = await loader.load_all(store=store)
+        typer.echo(f"Loaded {len(docs)} knowledge documents.")
+        for doc in docs[:5]:  # Show first few
+            typer.echo(f" - {doc.title} ({doc.path})")
+        if len(docs) > 5:
+            typer.echo(f"   ... and {len(docs) - 5} more")
+        await store.close()
+    asyncio.run(_load())
+
+
+@app.command()
+def knowledge_list():
+    """List currently loaded knowledge documents from DB."""
+    async def _list():
+        root_path = "D:/Project AI/SAM"
+        loader = KnowledgeLoader(root_path=root_path)
+        store = await create_knowledge_store(DB_PATH)
+        docs = await loader.load_all(store=store)
+        if not docs:
+            typer.echo("No knowledge documents loaded.")
+            await store.close()
+            return
+        typer.echo(f"Loaded {len(docs)} knowledge documents:")
+        for doc in docs:
+            typer.echo(
+                f" - {doc.title} | {doc.path} | v{doc.version} | {doc.status}"
+            )
+        await store.close()
+    asyncio.run(_list())
+
+
+@app.command()
+def discover():
+    """Discover capabilities from knowledge metadata and register them."""
+    async def _discover():
+        root_path = "D:/Project AI/SAM"
+        loader = KnowledgeLoader(root_path=root_path)
+        store = await create_knowledge_store(DB_PATH)
+        await loader.load_all(store=store)
+        registry = CapabilityRegistry()
+        discovery = CapabilityDiscovery(registry=registry, loader=loader)
+        registered = await discovery.discover()
+        typer.echo(f"Discovered and registered {len(registered)} capability(ies):")
+        for cid in registered:
+            typer.echo(f" - {cid}")
+        await store.close()
+    asyncio.run(_discover())
+
+
+# Knowledge Relationship subcommands
+knowledge_app = typer.Typer()
+app.add_typer(knowledge_app, name="knowledge")
+
+
+@knowledge_app.command("rel-add")
+def knowledge_rel_add(
+    source_id: str = typer.Argument(..., help="Source fact UUID"),
+    target_id: str = typer.Argument(..., help="Target fact UUID"),
+    rel_type: str = typer.Argument(..., help="Relationship type (e.g., supports, depends_on, related_to)"),
+):
+    """Add a relationship between two knowledge facts."""
+    async def _add():
+        graph = await create_knowledge_graph(DB_PATH)
+        rel_id = await graph.add_relationship(
+            source_id=UUID(source_id),
+            target_id=UUID(target_id),
+            rel_type=rel_type,
+        )
+        typer.echo(f"Created relationship {rel_id}")
+        await graph.close()
+    asyncio.run(_add())
+
+
+@knowledge_app.command("rel-list")
+def knowledge_rel_list(
+    source_id: str = typer.Option(None, "--source", help="Filter by source fact UUID"),
+    target_id: str = typer.Option(None, "--target", help="Filter by target fact UUID"),
+    rel_type: str = typer.Option(None, "--type", help="Filter by relationship type"),
+):
+    """List knowledge relationships with optional filters."""
+    async def _list():
+        graph = await create_knowledge_graph(DB_PATH)
+        rels = await graph.get_relationships(
+            source_id=UUID(source_id) if source_id else None,
+            target_id=UUID(target_id) if target_id else None,
+            rel_type=rel_type,
+        )
+        if not rels:
+            typer.echo("No relationships found.")
+            await graph.close()
+            return
+        for rel in rels:
+            typer.echo(f" - {rel.id} | {rel.relationship_type} | {rel.source_id} -> {rel.target_id}")
+        await graph.close()
+    asyncio.run(_list())
+
+
+@knowledge_app.command("rel-delete")
+def knowledge_rel_delete(
+    rel_id: str = typer.Argument(..., help="Relationship UUID to delete"),
+):
+    """Delete a knowledge relationship by ID."""
+    async def _delete():
+        graph = await create_knowledge_graph(DB_PATH)
+        await graph.delete_relationship(UUID(rel_id))
+        typer.echo(f"Deleted relationship {rel_id}")
+        await graph.close()
+    asyncio.run(_delete())
+
+
+@knowledge_app.command("query")
+def knowledge_query(
+    source_id: Optional[str] = typer.Option(None, "--source", help="Filter by source fact UUID"),
+    target_id: Optional[str] = typer.Option(None, "--target", help="Filter by target fact UUID"),
+    rel_type: Optional[str] = typer.Option(None, "--type", help="Filter by relationship type"),
+    metadata: Optional[str] = typer.Option(None, "--metadata", help="JSON metadata filter, e.g. '{\"key\": \"value\"}'"),
+    search: Optional[str] = typer.Option(None, "--search", help="Text search across facts and metadata"),
+    limit: int = typer.Option(50, "--limit", help="Limit results"),
+    offset: int = typer.Option(0, "--offset", help="Offset results"),
+):
+    """Query knowledge relationships with filters or text search."""
+    async def _query():
+        graph = await create_knowledge_graph(DB_PATH)
+        try:
+            if search:
+                results = await graph.search_fts(search, limit=limit)
+                if not results:
+                    typer.echo("No results for search.")
+                    await graph.close()
+                    return
+                for r in results:
+                    typer.echo(f"- {r['knowledge_id']} | rank={r['rank']:.3f} | {r['category']} | {r['statement']}")
+                    if r['metadata']:
+                        typer.echo(f"   metadata: {r['metadata']}")
+                await graph.close()
+                return
+
+            metadata_filter = None
+            if metadata:
+                try:
+                    import json as _json
+                    metadata_filter = _json.loads(metadata)
+                except Exception:
+                    typer.echo("Invalid metadata JSON", err=True)
+                    await graph.close()
+                    raise typer.Exit(1)
+
+            rels = await graph.query(
+                source_id=UUID(source_id) if source_id else None,
+                target_id=UUID(target_id) if target_id else None,
+                rel_type=rel_type,
+                metadata_filter=metadata_filter,
+                limit=limit,
+                offset=offset,
+            )
+
+            if not rels:
+                typer.echo("No relationships found.")
+                await graph.close()
+                return
+
+            for rel in rels:
+                typer.echo(f" - {rel.id} | {rel.relationship_type} | {rel.source_id} -> {rel.target_id}")
+        finally:
+            await graph.close()
+
+    asyncio.run(_query())
+
+
+@knowledge_app.command("import")
+def knowledge_import(
+    path: str = typer.Argument(..., help="Path to file to import (.md, .yaml, .json)"),
+    file_type: Optional[str] = typer.Option(None, "--type", help="File type: yaml|json|md (auto-detected from extension)"),
+):
+    """Import knowledge facts from a file into the store (supports .md, .yaml, .json)."""
+    async def _import():
+        p = Path(path)
+        if not p.exists():
+            typer.echo(f"File not found: {path}", err=True)
+            raise typer.Exit(1)
+
+        ftype = file_type or p.suffix.lstrip('.').lower()
+        store = await create_knowledge_store(DB_PATH)
+
+        try:
+            if ftype in ("yaml", "yml"):
+                importer = KnowledgeImporter()
+                created = await importer.import_yaml(p, store)
+                typer.echo(f"Imported {len(created)} facts from {path}")
+            elif ftype == "json":
+                importer = KnowledgeImporter()
+                created = await importer.import_json(p, store)
+                typer.echo(f"Imported {len(created)} facts from {path}")
+            elif ftype == "md":
+                loader = KnowledgeLoader(p.parent)
+                docs = await loader.load_all(store=store)
+                typer.echo(f"Loaded {len(docs)} documents from {p.parent}")
+            else:
+                typer.echo(f"Unsupported file type: {ftype}", err=True)
+                raise typer.Exit(1)
+        finally:
+            await store.close()
+
+    asyncio.run(_import())
+
+
+@knowledge_app.command("history")
+def knowledge_history(
+    fact_id: str = typer.Argument(..., help="Fact UUID to show history for")
+):
+    """Show version history for a knowledge fact."""
+    async def _history():
+        store = await create_knowledge_store(DB_PATH)
+        try:
+            from uuid import UUID as _UUID
+
+            h = await store.list_history(_UUID(fact_id))
+            if not h:
+                typer.echo("No history found for fact")
+                await store.close()
+                return
+            typer.echo(f"History for fact {fact_id}:")
+            for entry in h:
+                typer.echo(f" - v{entry.version} | {entry.change_type} | by {entry.changed_by} @ {entry.changed_at}")
+                typer.echo(f"   snapshot: {entry.payload_snapshot}")
+        finally:
+            await store.close()
+
+    asyncio.run(_history())
+
+
+# Plugin management commands
+plugin_app = typer.Typer()
+app.add_typer(plugin_app, name="plugin")
+
+
+@plugin_app.command("install")
+def plugin_install(
+    path: str = typer.Argument(..., help="Path to plugin directory containing manifest.yaml"),
+):
+    """Install a plugin from a directory."""
+    async def _install():
+        try:
+            loader = PluginManifestLoader()
+            manifest = loader.load_from_directory(Path(path))
+            if not manifest:
+                typer.echo("No manifest found in directory", err=True)
+                raise typer.Exit(1)
+            
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            
+            for m in manifest:
+                plugin_id = await plugin_registry.install_from_manifest(m)
+                typer.echo(f"Installed plugin: {m.name} (ID: {plugin_id})")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+    
+    asyncio.run(_install())
+
+
+@plugin_app.command("list")
+def plugin_list(
+    status: Optional[str] = typer.Option(None, help="Filter by status (INSTALLED, VALIDATED, REGISTERED, ENABLED, DISABLED, UNINSTALLED)"),
+):
+    """List all installed plugins."""
+    async def _list():
+        try:
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            plugins = await plugin_registry.list_descriptors()
+            
+            if not plugins:
+                typer.echo("No plugins installed.")
+                return
+            
+            if status:
+                try:
+                    filter_status = PluginStatus[status.upper()]
+                    plugins = [p for p in plugins if p.status == filter_status]
+                except KeyError:
+                    typer.echo(f"Invalid status: {status}", err=True)
+                    raise typer.Exit(1)
+            
+            typer.echo(f"Plugins ({len(plugins)}):")
+            for p in plugins:
+                typer.echo(f"  - {p.manifest.name} v{p.manifest.version} [{p.status.value}] ID: {p.manifest.id}")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+    
+    asyncio.run(_list())
+
+
+@plugin_app.command("enable")
+def plugin_enable(
+    plugin_id: str = typer.Argument(..., help="Plugin ID to enable"),
+):
+    """Enable a registered plugin."""
+    async def _enable():
+        try:
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            await plugin_registry.enable(plugin_id)
+            typer.echo(f"Plugin {plugin_id} enabled")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+    
+    asyncio.run(_enable())
+
+
+@plugin_app.command("disable")
+def plugin_disable(
+    plugin_id: str = typer.Argument(..., help="Plugin ID to disable"),
+):
+    """Disable an enabled plugin."""
+    async def _disable():
+        try:
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            await plugin_registry.disable(plugin_id)
+            typer.echo(f"Plugin {plugin_id} disabled")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+    
+    asyncio.run(_disable())
+
+
+@plugin_app.command("uninstall")
+def plugin_uninstall(
+    plugin_id: str = typer.Argument(..., help="Plugin ID to uninstall"),
+):
+    """Uninstall a plugin completely."""
+    async def _uninstall():
+        try:
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            await plugin_registry.uninstall(plugin_id)
+            typer.echo(f"Plugin {plugin_id} uninstalled")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+    
+    asyncio.run(_uninstall())
+
+
+@plugin_app.command("discover")
+def plugin_discover(
+    path: str = typer.Argument(
+        "plugins",
+        help="Directory to discover plugins from (default: plugins/)",
+    ),
+):
+    """Discover and auto-install plugins from a directory."""
+    async def _discover():
+        try:
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            plugin_discovery = await create_plugin_discovery(DB_PATH, plugin_registry)
+            
+            plugin_ids = await plugin_discovery.discover_from_directory(Path(path))
+            
+            if not plugin_ids:
+                typer.echo(f"No plugins found in {path}")
+                return
+            
+            typer.echo(f"Discovered and installed {len(plugin_ids)} plugin(s) from {path}:")
+            for pid in plugin_ids:
+                descriptor = await plugin_registry.get_descriptor(pid)
+                if descriptor:
+                    typer.echo(f"  - {descriptor.manifest.name} v{descriptor.manifest.version} [{descriptor.status.value}] (ID: {pid})")
+                else:
+                    typer.echo(f"  - Plugin {pid} (descriptor not found)")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+    
+    asyncio.run(_discover())
+
+
+@plugin_app.command("upgrade")
+def plugin_upgrade(
+    plugin_id: str = typer.Argument(..., help="Plugin ID to upgrade"),
+    manifest_path: str = typer.Argument(..., help="Path to new manifest.yaml"),
+    force: bool = typer.Option(False, "--force", help="Allow major version upgrade without confirmation"),
+):
+    """Upgrade a plugin with a new manifest (version must be greater).
+
+    Major version upgrade (1.x -> 2.x) requires --force flag.
+    On failure, automatically rolls back to old manifest.
+    """
+    async def _upgrade():
+        try:
+            loader = PluginManifestLoader()
+            m_path = Path(manifest_path)
+            if not m_path.exists():
+                typer.echo(f"Manifest not found: {manifest_path}", err=True)
+                raise typer.Exit(1)
+
+            new_manifest = loader.load_from_yaml(m_path)
+            if not new_manifest:
+                typer.echo(f"Failed to parse manifest: {manifest_path}", err=True)
+                raise typer.Exit(1)
+
+            # Ensure the manifest is a PluginManifest instance
+            if not isinstance(new_manifest, PluginManifest):
+                new_manifest = PluginManifest(**new_manifest)
+
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            mgr = PluginLifecycleManager(plugin_registry)
+
+            result_id = await mgr.upgrade(plugin_id, new_manifest, force=force)
+
+            descriptor = await plugin_registry.get_descriptor(result_id)
+            if descriptor:
+                typer.echo(
+                    f"Upgraded plugin: {descriptor.manifest.name} "
+                    f"v{descriptor.manifest.version} "
+                    f"[{descriptor.status.value}]"
+                )
+            else:
+                typer.echo(f"Plugin {result_id} upgraded successfully")
+
+        except ValueError as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+        except Exception as e:
+            typer.echo(f"Unexpected error: {e}", err=True)
+            raise typer.Exit(1)
+
+    asyncio.run(_upgrade())
+
+
+@plugin_app.command("health")
+def plugin_health(
+    plugin_id: str = typer.Argument(None, help="Plugin ID to check (optional, checks all if omitted)"),
+):
+    """Check health of a plugin or all plugins."""
+    async def _health():
+        try:
+            plugin_registry = await create_plugin_registry(DB_PATH)
+            from sam.plugin import PluginHealthChecker
+            checker = PluginHealthChecker(plugin_registry)
+            
+            if plugin_id:
+                # Check single plugin
+                result = await checker.check(plugin_id)
+                typer.echo(f"Plugin: {result.plugin_id}")
+                typer.echo(f"  Status: {result.status}")
+                typer.echo(f"  Version: {result.version}")
+                typer.echo(f"  Capabilities: {', '.join(result.capabilities) if result.capabilities else 'none'}")
+                typer.echo(f"  Last Check: {result.last_check.isoformat()}")
+                if result.message:
+                    typer.echo(f"  Message: {result.message}")
+            else:
+                # Check all plugins
+                results = await checker.check_all()
+                if not results:
+                    typer.echo("No plugins registered.")
+                    return
+                
+                typer.echo(f"Health status for {len(results)} plugin(s):")
+                for pid, status in results.items():
+                    typer.echo(f"  - {pid}: {status.status} (v{status.version}) {', '.join(status.capabilities) if status.capabilities else 'no capabilities'}")
+                    if status.message:
+                        typer.echo(f"      {status.message}")
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+    
+    asyncio.run(_health())
+
+
+# Daemon management commands
+daemon_app = typer.Typer()
+app.add_typer(daemon_app, name="daemon")
+
+
+# Global daemon reference for start/stop lifecycle across commands
+_daemon_instance: Optional[RuntimeDaemon] = None
+_daemon_task: Optional[asyncio.Task] = None
+
+
+def _get_daemon() -> RuntimeDaemon:
+    """Get or create a daemon instance with default services."""
+    global _daemon_instance
+    if _daemon_instance is None:
+        event_bus = EventBus()
+        job_queue = JobQueue(event_bus)
+        scheduler = Scheduler(job_queue, event_bus)
+        notification = NotificationService(event_bus)
+
+        config = DaemonConfig(
+            poll_interval=5.0,
+            shutdown_timeout=30.0,
+            health_check_interval=60.0,
+        )
+
+        _daemon_instance = RuntimeDaemon(
+            config=config,
+            event_bus=event_bus,
+            services=[scheduler, notification],
+        )
+    return _daemon_instance
+
+
+@daemon_app.command("start")
+def daemon_start():
+    """Start the runtime daemon in the foreground."""
+    async def _start():
+        global _daemon_instance, _daemon_task
+        try:
+            daemon = _get_daemon()
+
+            if daemon.running:
+                typer.echo("Daemon is already running.")
+                return
+
+            typer.echo("Starting daemon...")
+            await daemon.start()
+
+            # Run forever in background task
+            _daemon_task = asyncio.create_task(daemon.run_forever())
+
+            health = await daemon.health()
+            dh = health.get("daemon")
+            if dh:
+                typer.echo(f"Daemon started: {dh.status.value} ({dh.message})")
+            for name, h in health.items():
+                if name == "daemon":
+                    continue
+                typer.echo(f"  - {name}: {h.status.value}")
+
+        except Exception as e:
+            typer.echo(f"Error starting daemon: {e}", err=True)
+            raise typer.Exit(1)
+
+    asyncio.run(_start())
+
+
+@daemon_app.command("stop")
+def daemon_stop():
+    """Stop the runtime daemon."""
+    async def _stop():
+        global _daemon_instance, _daemon_task
+        if _daemon_instance is None or not _daemon_instance.running:
+            typer.echo("Daemon is not running.")
+            return
+
+        typer.echo("Stopping daemon...")
+        await _daemon_instance.stop(signal_name="CLI")
+
+        if _daemon_task:
+            _daemon_task.cancel()
+            try:
+                await _daemon_task
+            except asyncio.CancelledError:
+                pass
+            _daemon_task = None
+
+        _daemon_instance = None
+        typer.echo("Daemon stopped.")
+
+    asyncio.run(_stop())
+
+
+@daemon_app.command("status")
+def daemon_status():
+    """Show status of the daemon and its services."""
+    async def _status():
+        global _daemon_instance
+        if _daemon_instance is None:
+            typer.echo("Daemon is not running.")
+            return
+
+        if not _daemon_instance.running:
+            typer.echo("Daemon is registered but not running.")
+            return
+
+        health = await _daemon_instance.health()
+        dh = health.get("daemon")
+        if dh:
+            typer.echo(f"Daemon: {dh.status.value}")
+            typer.echo(f"  Message: {dh.message}")
+            typer.echo(f"  Last Check: {dh.last_check.isoformat()}")
+
+        for name, h in health.items():
+            if name == "daemon":
+                continue
+            typer.echo(f"  - {name}: {h.status.value}")
+            if h.message:
+                typer.echo(f"      {h.message}")
+            if h.metrics:
+                for k, v in h.metrics.items():
+                    typer.echo(f"      {k}: {v}")
+
+    asyncio.run(_status())
+
+
+@daemon_app.command("health")
+def daemon_health():
+    """Show health of all daemon services."""
+    async def _health():
+        global _daemon_instance
+        if _daemon_instance is None or not _daemon_instance.running:
+            typer.echo("Daemon is not running.")
+            return
+
+        health = await _daemon_instance.health()
+        typer.echo(f"Daemon Health ({len(health)} services):")
+        for name, h in health.items():
+            typer.echo(f"  {name}:")
+            typer.echo(f"    Status: {h.status.value}")
+            typer.echo(f"    Message: {h.message}")
+            typer.echo(f"    Last Check: {h.last_check.isoformat()}")
+            if h.metrics:
+                typer.echo(f"    Metrics: {h.metrics}")
+
+    asyncio.run(_health())
+
+
+# ── Cluster management commands ────────────────────────────────────────
+
+cluster_app = typer.Typer()
+app.add_typer(cluster_app, name="cluster")
+
+
+@cluster_app.command("status")
+def cluster_status(
+    format: str = typer.Option("table", "--format", "-f", help="Output format: table or json"),
+):
+    """Show cluster state and health."""
+    async def _status():
+        try:
+            from sam.cluster.state import ClusterStateAggregator
+            from sam.cluster.node_registry import NodeRegistry
+            from sam.cluster.leader import LeaderElection
+            from sam.core.job_queue import JobQueue
+            from sam.core.event_bus import EventBus
+            from sam.core.daemon import DaemonConfig
+
+            config = DaemonConfig()
+
+            # Setup minimal components for state collection
+            event_bus = EventBus()
+            job_queue = JobQueue(event_bus)
+            node_registry = NodeRegistry()
+
+            # LeaderElection needs a DB — skip for CLI; pass a none-like
+            # We create a lightweight leader election with no DB backing
+            leader_election = LeaderElection(None, config.cluster_id)  # type: ignore[arg-type]
+
+            aggregator = ClusterStateAggregator(
+                node_registry=node_registry,
+                job_queue=job_queue,
+                leader_election=leader_election,
+                cluster_id=config.cluster_id,
+            )
+
+            state = await aggregator.collect()
+
+            if format == "json":
+                import json
+                typer.echo(json.dumps(state.to_dict(), indent=2, default=str))
+            else:
+                # Table format
+                typer.echo(f"\nCluster: {state.cluster_id}")
+                typer.echo(f"Updated : {state.updated_at.isoformat()}")
+                typer.echo()
+                typer.echo(f"  Leader: {state.leader_id or 'none'}")
+                typer.echo(f"  Nodes : {state.node_count} total")
+                typer.echo(f"          {state.online_nodes} online")
+                typer.echo(f"          {state.offline_nodes} offline")
+                typer.echo(f"          {state.degraded_nodes} degraded")
+                typer.echo()
+                typer.echo(f"  Active Workflows: {state.active_workflows}")
+                typer.echo(f"  Jobs (pending/running/failed): {state.pending_jobs}/{state.running_jobs}/{state.failed_jobs}")
+                typer.echo()
+                typer.echo(f"  Total Load: {state.total_load:.1f}%")
+
+                if state.node_details:
+                    typer.echo()
+                    typer.echo("Node Details:")
+                    for node_id, detail in state.node_details.items():
+                        status_emoji = {"ONLINE": "🟢", "OFFLINE": "🔴", "DEGRADED": "🟡"}.get(
+                            detail.get("status", ""), "⚪"
+                        )
+                        typer.echo(
+                            f"  {status_emoji} {node_id}"
+                            f" | {detail.get('hostname', '?')}"
+                            f" | v{detail.get('version', '?')}"
+                            f" | load={detail.get('load', 0):.1f}%"
+                        )
+
+        except Exception as e:
+            typer.echo(f"Error: {e}", err=True)
+            raise typer.Exit(1)
+
+    asyncio.run(_status())
+
+
+# ── sam graph ─────────────────────────────────────────────────────
+
+graph_app = typer.Typer()
+app.add_typer(graph_app, name="graph")
+
+
+@graph_app.command("run")
+def graph_run(
+    graph_file: str = typer.Argument(..., help="Path to YAML/JSON graph definition file"),
+    correlation_id: str = typer.Option("", "--correlation-id", "-c", help="Optional correlation ID"),
+):
+    """Execute an execution graph from a YAML or JSON file."""
+    async def _run():
+        import json
+        import yaml
+        from pathlib import Path
+        from sam.execution.graph import ExecutionGraph
+        from sam.execution.engine import ExecutionGraphEngine
+
+        fp = Path(graph_file)
+        if not fp.exists():
+            typer.echo(f"Error: File not found: {graph_file}", err=True)
+            raise typer.Exit(1)
+
+        raw = fp.read_text(encoding="utf-8")
+        if fp.suffix in (".yaml", ".yml"):
+            data = yaml.safe_load(raw)
+        else:
+            data = json.loads(raw)
+
+        try:
+            graph = ExecutionGraph.model_validate(data)
+        except Exception as e:
+            typer.echo(f"Error: Invalid graph definition — {e}", err=True)
+            raise typer.Exit(1)
+
+        if correlation_id:
+            graph.correlation_id = correlation_id
+
+        engine = ExecutionGraphEngine()
+        typer.echo(f"Running graph: {graph.name} ({graph.id})")
+        result = await engine.execute(graph)
+
+        if result.status.value == "COMPLETED":
+            typer.echo(f"✅ Graph completed in {result.duration_ms:.0f}ms")
+        else:
+            typer.echo(f"❌ Graph {result.status.value} in {result.duration_ms:.0f}ms")
+
+        typer.echo(f"   Nodes: {len(result.node_results)}")
+        for nr in result.node_results:
+            icon = "✅" if nr.status.value == "COMPLETED" else "❌" if nr.status.value == "FAILED" else "⏸️"
+            details = ""
+            if nr.error:
+                details = f" - {nr.error}"
+            typer.echo(f"   {icon} {nr.node_id} ({nr.status.value}){details}")
+        raise typer.Exit(0 if result.status.value == "COMPLETED" else 1)
+
+    asyncio.run(_run())
+
+
+@graph_app.command("status")
+def graph_status(
+    graph_id: str = typer.Argument(..., help="Graph ID to check"),
+):
+    """Show status of an execution graph."""
+    async def _status():
+        from sam.execution.engine import ExecutionGraphEngine
+
+        engine = ExecutionGraphEngine()
+        status = await engine.get_status(graph_id)
+
+        if status is None:
+            typer.echo(f"Graph '{graph_id}' not found (not running or already completed).")
+            raise typer.Exit(1)
+
+        paused = engine.is_paused(graph_id)
+        typer.echo(f"Graph ID : {graph_id}")
+        typer.echo(f"Status   : {status.value}")
+        typer.echo(f"Paused   : {paused}")
+
+        if graph_id in engine._active_graphs:
+            graph = engine._active_graphs[graph_id]
+            typer.echo(f"Name     : {graph.name}")
+            typer.echo(f"Nodes    : {len(graph.nodes)}")
+            typer.echo(f"Correl.  : {graph.correlation_id}")
+
+    asyncio.run(_status())
+
+
+@graph_app.command("pause")
+def graph_pause(
+    graph_id: str = typer.Argument(..., help="Graph ID to pause"),
+):
+    """Pause a running execution graph."""
+    async def _pause():
+        from sam.execution.engine import ExecutionGraphEngine
+
+        engine = ExecutionGraphEngine()
+        await engine.pause(graph_id)
+        typer.echo(f"⏸️  Graph '{graph_id}' paused.")
+
+    asyncio.run(_pause())
+
+
+@graph_app.command("resume")
+def graph_resume(
+    graph_id: str = typer.Argument(..., help="Graph ID to resume"),
+):
+    """Resume a paused execution graph."""
+    async def _resume():
+        from sam.execution.engine import ExecutionGraphEngine
+
+        engine = ExecutionGraphEngine()
+        await engine.resume(graph_id)
+        typer.echo(f"▶️  Graph '{graph_id}' resumed.")
+
+    asyncio.run(_resume())
+
+
+# ── sam evolution ────────────────────────────────────────────────
+app.add_typer(evolution_app, name="evolution")
+
+# ── sam cluster ──────────────────────────────────────────────────
+app.add_typer(cluster_app, name="cluster")
+
+# ── sam federation ────────────────────────────────────────────────
+app.add_typer(federation_app, name="federation")
+
+# ── sam autonomy ──────────────────────────────────────────────────
+app.add_typer(autonomy_app, name="autonomy")
+
+
+# ── sam governance ─────────────────────────────────────────────────
+
+governance_app = typer.Typer()
+app.add_typer(governance_app, name="governance")
+
+
+@governance_app.command("evaluate")
+def governance_evaluate(
+    graph_file: str = typer.Argument(..., help="Path to YAML/JSON graph file to evaluate"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show per-evaluator results"),
+):
+    """Run governance checks on a graph without executing it."""
+    async def _evaluate():
+        import json
+        import yaml
+        from pathlib import Path
+        from sam.execution.graph import ExecutionGraph
+        from sam.governance.engine import GovernanceEngine
+        from sam.governance.evaluators.risk import RiskEvaluator
+        from sam.governance.evaluators.approval import ApprovalEvaluator
+        from sam.governance.evaluators.maintenance import MaintenanceEvaluator
+        from sam.governance.evaluators.cluster import ClusterEvaluator
+        from sam.governance.evaluators.resource import ResourceEvaluator
+        from sam.governance.evaluators.capability import CapabilityEvaluator
+        from sam.governance.evaluators.policy import PolicyEvaluator
+
+        fp = Path(graph_file)
+        if not fp.exists():
+            typer.echo(f"Error: File not found: {graph_file}", err=True)
+            raise typer.Exit(1)
+
+        raw = fp.read_text(encoding="utf-8")
+        if fp.suffix in (".yaml", ".yml"):
+            data = yaml.safe_load(raw)
+        else:
+            data = json.loads(raw)
+
+        try:
+            graph = ExecutionGraph.model_validate(data)
+        except Exception as e:
+            typer.echo(f"Error: Invalid graph definition — {e}", err=True)
+            raise typer.Exit(1)
+
+        engine = GovernanceEngine()
+        await engine.add_evaluator(RiskEvaluator())
+        await engine.add_evaluator(ApprovalEvaluator())
+        await engine.add_evaluator(MaintenanceEvaluator())
+        await engine.add_evaluator(ClusterEvaluator())
+        await engine.add_evaluator(ResourceEvaluator())
+        await engine.add_evaluator(CapabilityEvaluator())
+        await engine.add_evaluator(PolicyEvaluator())
+
+        # Create minimal context for governance evaluation
+        result = await engine.evaluate(graph, {})
+
+        icon_map = {
+            "ALLOW": "[OK]",
+            "ALLOW_WITH_WARNING": "[WARN]",
+            "WAIT": "[WAIT]",
+            "REQUIRE_APPROVAL": "[APPROVAL]",
+            "REJECT": "[REJECT]",
+            "ESCALATE": "[ESCALATE]",
+        }
+        icon = icon_map.get(result.decision.value, "[?]")
+
+        typer.echo()
+        typer.echo(f"  Graph    : {graph.name} ({graph.id})")
+        typer.echo(f"  Decision : {icon} {result.decision.value}")
+        typer.echo(f"  Blocked  : {result.is_blocked()}")
+        if result.reason:
+            typer.echo(f"  Reason   : {result.reason}")
+        if result.warnings:
+            for i, w in enumerate(result.warnings, 1):
+                typer.echo(f"  Warning #{i}: {w}")
+        if result.required_approvals:
+            typer.echo(f"  Approvals: {', '.join(result.required_approvals)}")
+        if result.suggested_delay:
+            typer.echo(f"  Delay    : {result.suggested_delay}s")
+
+        if verbose and result.evaluator_results:
+            typer.echo()
+            typer.echo("  -- Per-Evaluator Results --")
+            for ename, er in result.evaluator_results.items():
+                eicon = icon_map.get(er.decision.value, "[?]")
+                typer.echo(f"  {eicon} {ename}: {er.decision.value}" + (f" -- {er.reason}" if er.reason else ""))
+
+        if result.is_blocked():
+            typer.echo()
+            typer.echo("Governance blocked execution.")
+            raise typer.Exit(1)
+
+        typer.echo()
+        typer.echo("Governance check passed.\n")
+        raise typer.Exit(0)
+
+    asyncio.run(_evaluate())
+
+
+@governance_app.command("rules")
+def governance_rules_list(
+    db_path: str = typer.Option("D:/Project AI/SAM/sam.db", "--db", help="Path to SAM database"),
+):
+    """List active governance rules from the database."""
+    async def _list():
+        from sam.persistence.database import Database
+        from sam.governance.engine import GovernanceEngine
+        from sam.governance.models import GovernanceDecision
+
+        db = Database(db_path)
+        engine = GovernanceEngine(db=db)
+        rules = await engine.load_rules()
+        await db.close()
+
+        if not rules:
+            typer.echo("No governance rules found.")
+            return
+
+        typer.echo()
+        typer.echo(f"  {'ID':<32} {'Name':<24} {'Type':<16} {'Condition':<24} {'Override'}")
+        typer.echo(f"  {'─'*32} {'─'*24} {'─'*16} {'─'*24} {'─'*16}")
+        for r in sorted(rules, key=lambda x: x.evaluator_type):
+            override_str = r.decision_override.value if r.decision_override else "-"
+            enabled_mark = "" if r.enabled else " [DISABLED]"
+            cond = r.condition if r.condition else "-"
+            typer.echo(f"  {r.id:<32} {r.name:<24} {r.evaluator_type:<16} {cond:<24} {override_str}{enabled_mark}")
+        typer.echo()
+
+    asyncio.run(_list())
+
+
+# ── sam reason / plan / intent ─────────────────────────────────────
+
+reasoning_app = typer.Typer()
+app.add_typer(reasoning_app, name="reasoning")
+
+
+async def _get_reasoning_engine() -> Any:
+    """Build a ReasoningEngine with default dependencies."""
+    from sam.reasoning import ReasoningEngine
+    return ReasoningEngine()
+
+
+@reasoning_app.command("parse")
+def reasoning_intent(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Parse intent text without planning (sam intent alias).
+
+    Example: sam reasoning parse "diagnose provider:nvidia"
+    """
+    async def _parse():
+        engine = await _get_reasoning_engine()
+        intent = await engine.parse_intent(text)
+        if json_output:
+            import json
+            typer.echo(json.dumps({
+                "id": intent.id,
+                "type": intent.type.value,
+                "target": intent.target,
+                "description": intent.description,
+                "status": intent.status.value,
+                "parameters": dict(intent.parameters),
+                "correlation_id": intent.correlation_id,
+            }, indent=2))
+        else:
+            typer.echo(f"  Intent ID : {intent.id}")
+            typer.echo(f"  Type      : {intent.type.value}")
+            typer.echo(f"  Target    : {intent.target or '(none)'}")
+            typer.echo(f"  Status    : {intent.status.value}")
+            typer.echo(f"  Params    : {dict(intent.parameters) if intent.parameters else '(none)'}")
+            typer.echo(f"  Context   : {dict(intent.context) if intent.context else '(none)'}")
+
+    asyncio.run(_parse())
+
+
+@reasoning_app.command("plan")
+def reasoning_plan(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Parse and plan an intent, producing an execution graph.
+
+    Example: sam reasoning plan "deploy version=3.1 workspace=prod to provider:openai"
+    """
+    async def _plan():
+        engine = await _get_reasoning_engine()
+        result = await engine.reason(text)
+
+        if result.error:
+            typer.echo(f"❌ {result.error}", err=True)
+            raise typer.Exit(1)
+
+        if json_output:
+            import json
+            typer.echo(json.dumps(result.to_dict(), indent=2, default=str))
+        else:
+            typer.echo(f"  Intent    : {result.intent.type.value} -> {result.intent.target or '(no target)'}")
+            typer.echo(f"  Graph ID  : {result.graph.id}")
+            typer.echo(f"  Graph Name: {result.graph.name}")
+            typer.echo(f"  Nodes     : {len(result.graph.nodes)}")
+            typer.echo(f"  Entry     : {result.graph.entry_nodes}")
+            typer.echo(f"  Exit      : {result.graph.exit_nodes}")
+            typer.echo()
+            typer.echo(f"  Nodes:")
+            for node in result.graph.nodes:
+                deps = node.dependencies if node.dependencies else "-"
+                typer.echo(f"    - {node.id}: {node.capability_id}")
+                typer.echo(f"        inputs: {node.inputs}")
+                typer.echo(f"        deps  : {deps}")
+                if node.retry_policy:
+                    typer.echo(f"        retry : attempts={node.retry_policy.max_attempts}, backoff={node.retry_policy.backoff.value}")
+                if node.compensation_policy and node.compensation_policy.compensation_node_id:
+                    typer.echo(f"        comp  : {node.compensation_policy.on_failure.value} => {node.compensation_policy.compensation_node_id}")
+
+    asyncio.run(_plan())
+
+
+@reasoning_app.command("run")
+def reasoning_run(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Parse, plan, and execute an intent (full pipeline).
+
+    Example: sam reasoning run "diagnose provider:nvidia"
+    """
+    async def _run():
+        engine = await _get_reasoning_engine()
+        result = await engine.reason_and_execute(text)
+
+        if result.error:
+            typer.echo(f"❌ {result.error}", err=True)
+            if result.governance_blocked:
+                typer.echo(f"   (blocked by governance: {result.governance_decision})")
+            raise typer.Exit(1)
+
+        if json_output:
+            import json
+            typer.echo(json.dumps(result.to_dict(), indent=2, default=str))
+        else:
+            typer.echo(f"✅ Completed")
+            typer.echo(f"  Intent    : {result.intent.type.value} -> {result.intent.target}")
+            typer.echo(f"  Graph     : {result.graph.name} ({result.graph.id})")
+            if result.graph_result:
+                typer.echo(f"  Status    : {result.graph_result.status.value}")
+                typer.echo(f"  Duration  : {result.graph_result.duration_ms:.0f}ms")
+                typer.echo(f"  Nodes     : {len(result.graph_result.node_results)}")
+                for nr in result.graph_result.node_results:
+                    icon = "✅" if nr.status.value == "COMPLETED" else "❌"
+                    details = f" - {nr.error}" if nr.error else ""
+                    typer.echo(f"    {icon} {nr.node_id} ({nr.status.value}){details}")
+
+    asyncio.run(_run())
+
+
+# Legacy aliases for convenience
+
+
+@app.command(name="intent")
+def cli_intent(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Alias for sam reasoning parse — parse intent text.
+
+    Example: sam intent "diagnose provider:nvidia"
+    """
+    from typer import Context
+
+    # Delegate to reasoning parse
+    ctx = Context(reasoning_intent)
+    reasoning_intent(text=text, json_output=json_output)
+
+
+@app.command(name="plan")
+def cli_plan(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Alias for sam reasoning plan — parse and plan an intent.
+
+    Example: sam plan "deploy version=3.1 workspace=prod to provider:openai"
+    """
+    reasoning_plan(text=text, json_output=json_output)
+
+
+@app.command(name="reason")
+def cli_reason(
+    text: str = typer.Argument(..., help="Natural language intent description"),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Alias for sam reasoning run — parse, plan, and execute.
+
+    Example: sam reason "diagnose provider:nvidia"
+    """
+    reasoning_run(text=text, json_output=json_output)
+
+
+if __name__ == "__main__":
+    app()
