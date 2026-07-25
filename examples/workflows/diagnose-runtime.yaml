@@ -1,0 +1,13 @@
+name: Diagnose Runtime
+description: Diagnosa kesehatan runtime OpenClaw
+version: "1.0.0"
+steps:
+  - id: health-check
+    capability: openclaw.health-checks
+    transition:
+      on_success: report-success
+      on_failure: report-failure
+  - id: report-success
+    capability: openclaw.health-checks
+  - id: report-failure
+    capability: openclaw.health-checks

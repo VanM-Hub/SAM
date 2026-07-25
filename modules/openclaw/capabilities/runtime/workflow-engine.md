@@ -1,364 +1,419 @@
-markdown
-
 # Workflow Engine
-
-
 
 Version: 1.0
 
-
-
 Status: Draft
 
+Capability Type: Runtime Infrastructure
 
+Execution Mode: Workflow Orchestration
 
-Capability Type: Runtime Architecture
+Risk Level: None
 
+Owner: OpenClaw Runtime
 
+Knowledge Type: Implementation
 
-Execution Mode: System
+Evidence Level: Designed
 
-
-
-Risk Level: Low
-
-
-
-Owner: OpenClaw Module
-
-
-
-Related Documents
-
-
-
-Capabilities
-
-
-
-\- capability-runtime.md
-
-\- capability-registry.md
-
-\- capability-contract.md
-
-\- orchestration-language.md
-
-\- capability-composition.md
-
-
-
-Sprint 3
-
-
-
-\- approval-gate.md
-
-\- execution-planning.md
-
-\- rollback.md
-
-
-
-Sprint 5
-
-
-
-\- diagnostic-reasoning-engine.md
-
-
-
-Framework
-
-
-
-\- docs/core/EXECUTION\_MODEL.md
-
-\- docs/models/DECISION\_MODEL.md
-
-
+Confidence: High
 
 ---
-
-
 
 # Purpose
 
+Define the execution engine responsible for interpreting, scheduling, coordinating, and monitoring workflows composed of registered capabilities.
 
+The Workflow Engine executes workflow definitions while preserving lifecycle ordering, governance, evidence flow, and execution state.
 
-Execute composed capability workflows.
+It coordinates execution.
 
-
-
-The Workflow Engine manages state, transitions, error handling, and auditability of operational workflows.
-
-
+It does not implement operational logic.
 
 ---
 
+# Authority
 
+Primary Reference
 
-# Workflow Definition
+- docs/specifications/SAM_FRAMEWORK_v1.0_SPECIFICATION.md
 
+Supporting References
 
+- docs/core/CONSTITUTION.md
+- docs/core/EXECUTION_MODEL.md
+- docs/GLOSSARY.md
 
-A workflow is a structured sequence of capability invocations.
+Related Runtime Components
 
-
-
-Example:
-
-Diagnose → Reason → Plan → Approve → Execute → Verify → Learn
-
-
-
-text
-
-
+- capability-runtime.md
+- capability-registry.md
+- capability-contract.md
+- capability-composition.md
+- orchestration-language.md
 
 ---
 
+# Workflow Philosophy
 
+A workflow represents an operational process.
+
+The Workflow Engine transforms a workflow definition into runtime execution.
+
+Capabilities remain responsible for operational work.
+
+The engine remains responsible for execution coordination.
+
+---
+
+# Responsibilities
+
+The Workflow Engine shall:
+
+- load workflow definitions
+- resolve capability references
+- validate execution graph
+- schedule capability execution
+- manage workflow state
+- propagate execution context
+- coordinate evidence flow
+- monitor execution progress
+- collect execution status
+- notify orchestration layer
+
+The engine shall never perform reasoning or modify capability behavior.
+
+---
+
+# Execution Model
+
+A workflow is executed as an ordered execution graph.
+
+```
+Workflow Definition
+
+↓
+
+Validation
+
+↓
+
+Execution Graph
+
+↓
+
+Scheduling
+
+↓
+
+Capability Runtime
+
+↓
+
+Results
+
+↓
+
+Workflow State
+
+↓
+
+Completion
+```
+
+Execution proceeds only after successful validation.
+
+---
 
 # Workflow Lifecycle
 
+Each workflow follows a standardized lifecycle.
 
+```
+Created
 
-Every workflow progresses through the following states:
+↓
 
-┌──────────┐
+Validated
 
-│ DEFINED │ Workflow is defined in orchestration language.
+↓
 
-└────┬─────┘
+Scheduled
 
-▼
+↓
 
-┌──────────┐
+Running
 
-│INITIALIZE│ Registry checks capability availability.
+↓
 
-└────┬─────┘
+Observing
 
-▼
+↓
 
-┌──────────┐
+Completed
 
-│ EXECUTING│ Steps are being processed.
+↓
 
-└────┬─────┘
+Archived
+```
 
-▼
-
-┌──────────┐
-
-│ COMPLETED│ All steps finished successfully.
-
-└──────────┘
-
-│
-
-▼
-
-┌──────────┐
-
-│ FAILED │ Unrecoverable error.
-
-└──────────┘
-
-│
-
-▼
-
-┌──────────┐
-
-│ ABORTED │ Emergency stop invoked.
-
-└──────────┘
-
-
-
-text
-
-
+Illegal state transitions shall be rejected.
 
 ---
 
+# Workflow Context
 
+Every workflow execution receives an immutable execution context.
 
-# Step Execution
+Typical context includes:
 
+- Workflow ID
+- Execution ID
+- Parent Workflow ID (optional)
+- Runtime Configuration
+- Evidence References
+- Audit Context
+- Permission Context
+- Execution Timestamp
 
-
-Each workflow step:
-
-
-
-\- References a capability.
-
-\- Defines input parameters (literal values or references to previous step outputs).
-
-\- Defines transition rules (success → next step, failure → rollback/escalation).
-
-
+Child capabilities inherit context from the workflow.
 
 ---
 
+# Scheduling
 
+The engine determines execution order based on the workflow definition.
+
+Scheduling strategies may include:
+
+- sequential
+- conditional
+- parallel
+- iterative
+- nested
+
+Scheduling policy is independent of capability implementation.
+
+---
 
 # State Management
 
+The engine maintains workflow state.
 
+Typical state includes:
 
-The Workflow Engine maintains the state for each active workflow:
+- current stage
+- completed stages
+- pending stages
+- failed stages
+- evidence references
+- execution status
 
+Workflow state is authoritative during execution.
 
-
-\- **Current Step**: The step being executed.
-
-\- **Completed Steps**: List of finished steps with their outputs.
-
-\- **Step Results**: Outputs from each step.
-
-\- **Context Variables**: Variables shared across steps.
-
-\- **Execution Metadata**: Timestamps, versions, and run IDs.
-
-
+Capabilities receive state but do not own it.
 
 ---
 
+# Evidence Propagation
 
+Evidence flows through the workflow using immutable references.
 
-# Error Handling
+```
+Capability
 
+↓
 
+Generated Evidence
 
-Workflow Engine supports:
+↓
 
+Evidence Store
 
+↓
 
-\- **Step-Level Retries**: Retry a failed step.
+Evidence Reference
 
-\- **Rollback Execution**: Execute rollback capabilities (e.g., `rollback.md`).
+↓
 
-\- **Escalation**: Pause workflow and notify operator.
+Next Capability
+```
 
-\- **Abort**: Immediately terminate the workflow.
+The Workflow Engine manages evidence routing.
 
-
+Evidence remains immutable after publication.
 
 ---
 
+# Failure Handling
 
+The engine supports configurable failure policies.
 
-# Transition Rules
+Common policies include:
 
+## Fail Fast
 
+Stop execution immediately.
 
-Transitions are defined in the orchestration language:
+## Continue
 
+Record failure and continue where permitted.
 
+## Retry
 
-```yaml
+Re-execute the failed capability according to retry policy.
 
-\- id: "plan"
+## Escalate
 
-&#x20; capability: "execution-planning"
+Transfer control to a higher-level workflow or operator.
 
-&#x20; on\_success: "approve"
+## Rollback
 
-&#x20; on\_failure: "rollback"
+Invoke rollback workflow when applicable.
 
-&#x20; on\_timeout: "abort"
+The policy is defined by the workflow, not by the engine.
 
-Concurrency
+---
 
-Multiple workflows may execute concurrently.
+# Timeout Management
 
+Each workflow may define execution limits.
 
+Examples:
 
-Resource limits (CPU, memory) are shared across workflows.
+- maximum runtime
+- capability timeout
+- retry timeout
+- observation timeout
 
+Timeout events become diagnostic evidence.
 
+---
 
-Priority queues may be used for urgent workflows.
+# Concurrency
 
+The engine may execute capabilities concurrently when:
 
+- dependencies are satisfied
+- contracts are compatible
+- shared mutable state is absent
+- governance permits
 
-Relationship with Composition
+Concurrency shall never compromise determinism or auditability.
 
-Composition defines the what (the sequence and logic).
+---
 
+# Event Model
 
+The engine emits structured events throughout execution.
 
-Workflow Engine executes the how (state, scheduling, error handling).
+Examples:
 
+- Workflow Started
+- Capability Scheduled
+- Capability Started
+- Capability Completed
+- Capability Failed
+- Evidence Published
+- Workflow Completed
+- Workflow Failed
+- Workflow Archived
 
+Events feed the Audit Trail and Operational Reports.
 
-Relationship with Registry
+---
 
-The Engine queries the Registry to resolve capability IDs and versions at runtime.
+# Validation
 
+Before execution, the engine validates:
 
+- workflow syntax
+- dependency graph
+- capability availability
+- contract compatibility
+- permission requirements
+- cycle detection
+- unreachable stages
 
-Relationship with Audit
+Validation failures prevent execution.
 
-Every workflow execution is audited.
+---
 
+# Relationship to Capability Runtime
 
+The Workflow Engine schedules capabilities.
 
-Audit records include:
+The Capability Runtime executes them.
 
+The engine never bypasses the runtime lifecycle.
 
+---
 
-Workflow ID
+# Relationship to Capability Registry
 
+Capability discovery occurs through the registry.
 
+The Workflow Engine never loads capabilities directly from the filesystem.
 
-Start time
+---
 
+# Relationship to Capability Composition
 
+Composition defines the workflow structure.
 
-End time
+The Workflow Engine interprets and executes that structure.
 
+---
 
+# Relationship to Orchestration Language
 
-Step transitions
+Workflow definitions are expressed using the Orchestration Language.
 
+The engine parses and executes those definitions.
 
+The DSL is declarative.
 
-Errors
+The engine is executable.
 
+---
 
+# Operational Boundaries
 
-Rollback events
+The Workflow Engine shall never:
 
+- perform diagnostic reasoning
+- evaluate evidence
+- generate hypotheses
+- bypass guardrails
+- modify capability contracts
+- implement business logic
 
+Its responsibility is execution coordination only.
 
-Future Evolution
+---
+
+# Future Evolution
 
 Future versions may support:
 
+workflow/
 
+distributed-engine.md
 
-Distributed workflows across multiple nodes.
+priority-scheduling.md
 
+event-driven-engine.md
 
+checkpoint-recovery.md
 
-Pause/resume execution.
+workflow-versioning.md
 
+adaptive-scheduling.md
 
+---
 
-Conditional branches (if/else) and loops.
+# Summary
 
+The Workflow Engine is the execution coordinator of the SAM Framework.
 
-
-Parallel execution (fan-out/fan-in).
-
-
-
-Summary
-
-The Workflow Engine executes composed capability workflows. By managing state, transitions, error handling, and concurrency, the engine ensures reliable and auditable operational execution while maintaining consistency across all capability orchestration.
-
+By separating workflow interpretation from capability implementation, it provides deterministic execution, state management, evidence propagation, and lifecycle coordination while preserving modularity, governance, and long-term architectural flexibility.

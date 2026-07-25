@@ -1,0 +1,36 @@
+id: sample-plugin
+name: Sample Plugin
+version: 1.0.0
+author: SAM Framework Team
+license: MIT
+description: Example plugin for SAM Framework
+
+entrypoint: sam.plugins.sample_plugin.main
+
+capabilities:
+  - sample.capability
+  - sample.another-capability
+
+dependencies: []
+
+permissions:
+  - read:workspace
+  - read:configuration
+  - read:knowledge
+  - write:knowledge
+
+network_allowlist:
+  - api.example.com
+
+filesystem_paths:
+  data: ./data
+  cache: ./cache
+
+metadata:
+  tags:
+    - example
+    - sample
+
+lifecycle_hooks:
+  initialize: initialize
+  shutdown: shutdown
