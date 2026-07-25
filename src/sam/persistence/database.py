@@ -32,8 +32,10 @@ class Database:
     """
 
     def __init__(self, db_path: str) -> None:
-        self._db_path = db_path
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        self._db_path = os.path.abspath(db_path)
+        db_dir = os.path.dirname(self._db_path)
+        if db_dir:
+            os.makedirs(db_dir, exist_ok=True)
         # Use check_same_thread=False because we'll access connection from threads
         self._conn = sqlite3.connect(db_path, check_same_thread=False)
         # Return rows as dict

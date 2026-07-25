@@ -875,7 +875,7 @@ def cluster_status(
 
             # LeaderElection needs a DB — skip for CLI; pass a none-like
             # We create a lightweight leader election with no DB backing
-            leader_election = LeaderElection(None, config.cluster_id)  # type: ignore[arg-type]
+            leader_election = LeaderElection(None, config.cluster_id)
 
             aggregator = ClusterStateAggregator(
                 node_registry=node_registry,
