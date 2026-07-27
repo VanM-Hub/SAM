@@ -1,8 +1,8 @@
 """
-Activity Page v3.2 — Satu produk.
+Activity Page v4.0 — Conversation-powered.
 
 'What happened?'
-Menggunakan TimelineWidget reusable.
+Menggunakan Conversation.answer() untuk timeline.
 """
 
 from PySide6.QtWidgets import (
@@ -10,18 +10,16 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer
 
-from ...experience.engine import ExperienceEngine
+from ...operations.conversation_api import Conversation
 from ..widgets import TimelineWidget, StatusCard
-from ..context import ExperienceContextBuilder
 
 
 class ActivityPage(QWidget):
-    """Activity — 'What happened?'"""
+    """Activity — 'What happened?' — dari Conversation."""
 
-    def __init__(self, experience, ctx_builder):
+    def __init__(self, conversation: Conversation):
         super().__init__()
-        self.experience = experience
-        self._ctx_builder = ctx_builder
+        self.conversation = conversation
         self._init_ui()
 
     def _init_ui(self):
@@ -87,15 +85,25 @@ class ActivityPage(QWidget):
 
     def refresh(self):
         try:
-            model = self.experience.build_activity()
+            # ================================================================
+            # DARI Conversation — answer(CHANGES)
+            # ================================================================
+            answer = self.conversation.answer("What changed?")
             query = self.search_input.text().lower()
 
+            # Bangun kelompok dari answer.sections
             groups = []
-            for g in model.groups[:7]:
-                entries = [e for e in g.entries[:15] if not query or query in e.description.lower()]
-                if entries:
-                    groups.append((g.label, entries))
+            if answer.sections:
+                for label, text in answer.sections[:7]:
+                    # Parse text jadi entries
+                    lines = [l.strip() for l in text.split("\n") if l.strip()]
+                    if query:
+                        lines = [l for l in lines if query in l.lower()]
+                    if lines:
+                        entries = [(l, "") for l in lines[:15]]
+                        groups.append((label, entries))
 
             self._timeline.set_groups(groups)
+
         except Exception:
             pass

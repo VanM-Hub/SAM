@@ -1,8 +1,8 @@
 """
-Notification + Assistant Pages v3.1 — Narrative Edition.
+Notification + Assistant Pages v4.0 — Conversation-powered.
 
-Notification = Narrative cards.
-Assistant = Narrative-aware answers.
+Notification = Conversation.answer() → alerts.
+Assistant = Conversation.answer() → tanya langsung.
 """
 
 from PySide6.QtWidgets import (
@@ -11,17 +11,17 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer
 
-from ...experience.engine import ExperienceEngine
+from ...operations.conversation_api import Conversation
 
 
 # ============================================================================
-# NOTIFICATION — Narrative cards
+# NOTIFICATION — dari Conversation
 # ============================================================================
 
 class NotificationPage(QWidget):
-    def __init__(self, experience):
+    def __init__(self, conversation: Conversation):
         super().__init__()
-        self.experience = experience
+        self.conversation = conversation
         self._init_ui()
 
     def _init_ui(self):
@@ -75,114 +75,105 @@ class NotificationPage(QWidget):
 
     def refresh(self):
         try:
-            model = self.experience.build_notifications()
-            narratives = self.experience.narrative.build_from_notifications(model)
-            attention_items = self.experience.get_all_attention()
-            self._render(model, narratives, attention_items)
+            # ================================================================
+            # DARI Conversation — answer() untuk alert
+            # ================================================================
+            overview = self.conversation.answer("What's happening?")
+            actions = self.conversation.actions()
+            self._render(overview, actions)
         except Exception:
             pass
 
-    def _render(self, model, narratives, attention_items=None):
+    def _render(self, overview, actions):
         self._clear()
         has_items = False
 
-        # Attention items
-        if attention_items:
-            for item in attention_items[:10]:
-                has_items = True
-                card = QFrame()
-                card.setStyleSheet("""
-                    QFrame {{
-                        background: #0a0a12;
-                        border: 1px solid {};
-                        border-radius: 8px;
-                        padding: 10px 14px;
-                    }}
-                    QFrame:hover {{ border: 1px solid #3a3a5a; }}
-                """.format(item.color))
-                c_layout = QVBoxLayout(card)
-                c_layout.setSpacing(2)
-                row = QHBoxLayout()
-                from ...operations.attention import SCORE_TO_LABEL
-                label = SCORE_TO_LABEL.get(item.score, "Normal")
-                score = QLabel("[{}]".format(label))
-                score.setStyleSheet("color: {}; font-size: 10px; font-weight: bold;".format(item.color))
-                row.addWidget(score)
-                text = QLabel(item.message or item.title)
-                text.setStyleSheet("color: #c0c0d0; font-size: 13px;")
-                text.setWordWrap(True)
-                row.addWidget(text, 1)
-                c_layout.addLayout(row)
-                if item.reason:
-                    r = QLabel(item.reason)
-                    r.setStyleSheet("color: #707080; font-size: 11px; padding-left: 16px;")
-                    r.setWordWrap(True)
-                    c_layout.addWidget(r)
-                self._layout.addWidget(card)
-
-        # Narrative cards first
-        for n in narratives:
+        # User action needed sebagai kartu utama
+        if overview.user_action_needed and "No action" not in overview.user_action_needed:
+            has_items = True
             card = QFrame()
             card.setStyleSheet("""
                 QFrame {
                     background: #0a0a12;
-                    border: 1px solid #2a2a4a;
+                    border: 1px solid #3a3a1a;
                     border-radius: 8px;
                     padding: 10px 14px;
                 }
-                QFrame:hover {
-                    border: 1px solid #3a3a5a;
-                }
+                QFrame:hover { border: 1px solid #3a3a5a; }
             """)
             c_layout = QVBoxLayout(card)
             c_layout.setSpacing(2)
-
-            icon_map = {
-                "action_required": "\u26a0\ufe0f",
-                "attention": "\U0001f4a1",
-                "information": "\U0001f514",
-                "critical": "\U0001f6a8",
-            }
-            icon = icon_map.get(n.importance.value, "\U0001f514")
-
             row = QHBoxLayout()
-            i_w = QLabel(icon)
-            i_w.setStyleSheet("font-size: 14px;")
-            row.addWidget(i_w)
-
-            text = QLabel(n.title)
+            score = QLabel("[ACTION REQUIRED]")
+            score.setStyleSheet("color: #e0c06a; font-size: 10px; font-weight: bold;")
+            row.addWidget(score)
+            text = QLabel(overview.user_action_needed)
             text.setStyleSheet("color: #c0c0d0; font-size: 13px;")
             text.setWordWrap(True)
             row.addWidget(text, 1)
             c_layout.addLayout(row)
-
-            if n.details:
-                d = QLabel(n.details)
-                d.setStyleSheet("color: #707080; font-size: 11px; padding-left: 20px;")
-                d.setWordWrap(True)
-                c_layout.addWidget(d)
-
-            if n.recommended_action:
-                btn = QPushButton(n.recommended_action)
-                btn.setStyleSheet("""
-                    QPushButton {
-                        background: #1a1a2a;
-                        border: 1px solid #2a2a3a;
-                        border-radius: 4px;
-                        padding: 4px 10px;
-                        color: #c0c0d0;
-                        font-size: 11px;
-                        max-width: 100px;
-                    }
-                    QPushButton:hover {
-                        background: #2a2a3a;
-                    }
-                """)
-                c_layout.addWidget(btn)
-
+            if overview.summary:
+                r = QLabel(overview.summary)
+                r.setStyleSheet("color: #707080; font-size: 11px; padding-left: 16px;")
+                r.setWordWrap(True)
+                c_layout.addWidget(r)
             self._layout.addWidget(card)
 
-        if not narratives:
+        # Actions
+        if actions.actions:
+            for action in actions.actions:
+                has_items = True
+                card = QFrame()
+                card.setStyleSheet("""
+                    QFrame {
+                        background: #0a0a12;
+                        border: 1px solid #3a3a1a;
+                        border-radius: 8px;
+                        padding: 10px 14px;
+                    }
+                    QFrame:hover { border: 1px solid #3a3a5a; }
+                """)
+                c_layout = QVBoxLayout(card)
+                c_layout.setSpacing(2)
+                row = QHBoxLayout()
+                score = QLabel("[ACTION]")
+                score.setStyleSheet("color: #e0c06a; font-size: 10px; font-weight: bold;")
+                row.addWidget(score)
+                text = QLabel(action)
+                text.setStyleSheet("color: #c0c0d0; font-size: 13px;")
+                text.setWordWrap(True)
+                row.addWidget(text, 1)
+                c_layout.addLayout(row)
+                self._layout.addWidget(card)
+
+        # Predictions sebagai "forecast alerts"
+        if overview.predictions:
+            for p in overview.predictions[:3]:
+                has_items = True
+                card = QFrame()
+                card.setStyleSheet("""
+                    QFrame {
+                        background: #0a0a12;
+                        border: 1px solid #2a2a4a;
+                        border-radius: 8px;
+                        padding: 10px 14px;
+                    }
+                    QFrame:hover { border: 1px solid #3a3a5a; }
+                """)
+                c_layout = QVBoxLayout(card)
+                c_layout.setSpacing(2)
+                row = QHBoxLayout()
+                score = QLabel("[PREDICTION]")
+                score.setStyleSheet("color: #aa80c0; font-size: 10px; font-weight: bold;")
+                row.addWidget(score)
+                text = QLabel(p)
+                text.setStyleSheet("color: #c0c0d0; font-size: 13px;")
+                text.setWordWrap(True)
+                row.addWidget(text, 1)
+                c_layout.addLayout(row)
+                self._layout.addWidget(card)
+
+        if not has_items:
             empty = QLabel("\U0001f514  No alerts")
             empty.setStyleSheet("color: #606070; font-size: 14px; padding: 24px;")
             self._layout.addWidget(empty)
@@ -197,13 +188,13 @@ class NotificationPage(QWidget):
 
 
 # ============================================================================
-# ASSISTANT — Narrative-aware
+# ASSISTANT — Conversation-powered
 # ============================================================================
 
 class AssistantPage(QWidget):
-    def __init__(self, experience):
+    def __init__(self, conversation: Conversation):
         super().__init__()
-        self.experience = experience
+        self.conversation = conversation
         self._init_ui()
 
     def _init_ui(self):
@@ -356,9 +347,9 @@ class AssistantPage(QWidget):
             return
 
         # ================================================================
-        # SATU PANGGILAN — QuestionEngine
+        # SATU PANGGILAN — Conversation.answer()
         # ================================================================
-        answer = self.experience.get_live_answer(question)
+        answer = self.conversation.answer(question)
 
         card = QFrame()
         card.setStyleSheet("""
@@ -377,7 +368,7 @@ class AssistantPage(QWidget):
         c_layout.addWidget(q_label)
 
         # Title
-        a_title = QLabel(answer.title)
+        a_title = QLabel(answer.title or "")
         a_title.setStyleSheet("color: #e0e0e0; font-size: 14px; font-weight: bold;")
         a_title.setWordWrap(True)
         c_layout.addWidget(a_title)

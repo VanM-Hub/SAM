@@ -1,7 +1,7 @@
 """
-Knowledge Page v3.1 — Things SAM Learned.
-History Page v3.1 — Cerita operasional.
-Settings Page v3.1 — Pengaturan dalam kelompok manusia.
+Knowledge Page v4.0 — Conversation-powered.
+History Page v4.0 — Cerita operasional dari Conversation.
+Settings Page v4.0 — Pengaturan dari Conversation.
 """
 
 from PySide6.QtWidgets import (
@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
 
-from ...experience.engine import ExperienceEngine
+from ...operations.conversation_api import Conversation
 
 
 # ============================================================================
@@ -19,9 +19,9 @@ from ...experience.engine import ExperienceEngine
 # ============================================================================
 
 class KnowledgePage(QWidget):
-    def __init__(self, experience):
+    def __init__(self, conversation: Conversation):
         super().__init__()
-        self.experience = experience
+        self.conversation = conversation
         self._init_ui()
 
     def _init_ui(self):
@@ -76,15 +76,25 @@ class KnowledgePage(QWidget):
 
     def refresh(self):
         try:
-            model = self.experience.build_knowledge()
-            self._render(model)
+            # DARI Conversation — explain() untuk insight
+            answer = self.conversation.answer("What did SAM learn?")
+            self._render(answer)
         except Exception:
             pass
 
-    def _render(self, model):
+    def _render(self, answer):
         self._clear()
 
-        if not model.items:
+        # Gunakan sections + predictions sebagai knowledge
+        items = []
+        if answer.sections:
+            for label, text in answer.sections[:10]:
+                items.append({"title": label, "details": text[:100], "severity": "info"})
+        if answer.predictions:
+            for p in answer.predictions[:3]:
+                items.append({"title": p[:80], "details": "", "severity": "recommendation"})
+
+        if not items:
             empty = QLabel("SAM has not learned anything yet. As SAM operates, it will collect patterns, incidents and lessons.")
             empty.setStyleSheet("color: #606070; font-size: 14px; padding: 24px;")
             empty.setWordWrap(True)
@@ -92,17 +102,18 @@ class KnowledgePage(QWidget):
             self._layout.addStretch()
             return
 
-        for item in model.items[:20]:
-            # Icon + color per severity
-            if item.severity == "recommendation":
-                color = "#6aaae0"
-                icon = "\U0001f4a1"
-            elif item.severity == "warning":
-                color = "#e0c06a"
-                icon = "\u26a0\ufe0f"
-            else:
-                color = "#a0a0b0"
-                icon = "\U0001f4cc"
+        for item in items:
+            severity = item.get("severity", "info")
+            color_map = {
+                "recommendation": "#6aaae0",
+                "warning": "#e0c06a",
+            }
+            color = color_map.get(severity, "#a0a0b0")
+            icon_map = {
+                "recommendation": "\U0001f4a1",
+                "warning": "\u26a0\ufe0f",
+            }
+            icon = icon_map.get(severity, "\U0001f4cc")
 
             card = QFrame()
             card.setStyleSheet("""
@@ -119,32 +130,22 @@ class KnowledgePage(QWidget):
             c_layout = QVBoxLayout(card)
             c_layout.setSpacing(4)
 
-            # Title row
             row = QHBoxLayout()
             row.setSpacing(8)
             icon_w = QLabel(icon)
             icon_w.setStyleSheet("font-size: 14px;")
             row.addWidget(icon_w)
 
-            text = QLabel(item.title)
+            text = QLabel(item["title"])
             text.setStyleSheet("color: {}; font-size: 13px;".format(color))
             text.setWordWrap(True)
             row.addWidget(text, 1)
             c_layout.addLayout(row)
 
-            # Meta row
-            meta = QHBoxLayout()
-            meta.setSpacing(12)
-            if item.confidence:
-                conf = QLabel("Confidence: {:.0f}%".format(item.confidence * 100))
-                conf.setStyleSheet("color: #606070; font-size: 10px;")
-                meta.addWidget(conf)
-            if item.timestamp:
-                ts = QLabel(item.timestamp)
-                ts.setStyleSheet("color: #505060; font-size: 10px;")
-                meta.addWidget(ts)
-            meta.addStretch()
-            c_layout.addLayout(meta)
+            if item.get("details"):
+                dt = QLabel(item["details"])
+                dt.setStyleSheet("color: #606070; font-size: 11px; padding-left: 22px;")
+                c_layout.addWidget(dt)
 
             self._layout.addWidget(card)
 
@@ -162,9 +163,9 @@ class KnowledgePage(QWidget):
 # ============================================================================
 
 class HistoryPage(QWidget):
-    def __init__(self, experience):
+    def __init__(self, conversation: Conversation):
         super().__init__()
-        self.experience = experience
+        self.conversation = conversation
         self._init_ui()
 
     def _init_ui(self):
@@ -218,15 +219,16 @@ class HistoryPage(QWidget):
 
     def refresh(self):
         try:
-            model = self.experience.build_history()
-            self._render(model)
+            # DARI Conversation — timeline()
+            answer = self.conversation.timeline()
+            self._render(answer)
         except Exception:
             pass
 
-    def _render(self, model):
+    def _render(self, answer):
         self._clear()
 
-        if not model.stories:
+        if not answer.sections and not answer.stories:
             empty = QLabel("No history yet. Once SAM completes operations, activity summaries will appear here.")
             empty.setStyleSheet("color: #606070; font-size: 14px; padding: 24px;")
             empty.setWordWrap(True)
@@ -234,7 +236,8 @@ class HistoryPage(QWidget):
             self._layout.addStretch()
             return
 
-        for story in model.stories[:7]:
+        # Stories
+        for story in (answer.stories or [])[:7]:
             # Day label
             label_container = QWidget()
             label_container.setStyleSheet("background: transparent;")
@@ -242,7 +245,8 @@ class HistoryPage(QWidget):
             l_layout.setContentsMargins(0, 12, 0, 4)
             l_layout.setSpacing(12)
 
-            label_w = QLabel(story.label.upper())
+            label = "Event" if len(story) > 40 else story.upper()
+            label_w = QLabel(label)
             label_w.setStyleSheet("""
                 color: #606070;
                 font-size: 11px;
@@ -258,8 +262,8 @@ class HistoryPage(QWidget):
 
             self._layout.addWidget(label_container)
 
-            # Events
-            for event in story.events[:10]:
+            # Items dari sections
+            for section_label, section_text in (answer.sections or [])[:10]:
                 e_card = QFrame()
                 e_card.setStyleSheet("""
                     QFrame {
@@ -280,7 +284,7 @@ class HistoryPage(QWidget):
                 bullet.setStyleSheet("color: #404060; font-size: 14px;")
                 e_layout.addWidget(bullet)
 
-                e_text = QLabel(event)
+                e_text = QLabel(section_label)
                 e_text.setStyleSheet("color: #b0b0c0; font-size: 13px;")
                 e_text.setWordWrap(True)
                 e_layout.addWidget(e_text, 1)
@@ -301,9 +305,9 @@ class HistoryPage(QWidget):
 # ============================================================================
 
 class SettingsPage(QWidget):
-    def __init__(self, experience):
+    def __init__(self, conversation: Conversation):
         super().__init__()
-        self.experience = experience
+        self.conversation = conversation
         self._init_ui()
 
     def _init_ui(self):
@@ -350,16 +354,38 @@ class SettingsPage(QWidget):
 
     def refresh(self):
         try:
-            model = self.experience.build_settings()
-            self._render(model)
+            # DARI Conversation — technical details
+            answer = self.conversation.technical_details()
+            # Juga health untuk mendapat konfigurasi
+            health = self.conversation.health()
+            self._render(answer, health)
         except Exception:
             pass
 
-    def _render(self, model):
+    def _render(self, answer, health):
         self._clear()
 
-        for group in model.groups:
-            gb = QGroupBox(group.name)
+        # Build groups from answer + health
+        groups = [
+            ("System", {
+                "Label": answer.title or "SAM",
+                "Status": health.title or "Healthy",
+            }),
+            ("Conversation", {
+                "Intent": answer.intent or "technical",
+                "Severity": health.severity or "information",
+            }),
+        ]
+
+        # Technical details
+        if answer.details:
+            groups.append(("Technical Details", {
+                "Description": answer.details[:200],
+            }))
+
+        for group in groups:
+            name, settings = group
+            gb = QGroupBox(name)
             gb.setStyleSheet("""
                 QGroupBox {
                     border: 1px solid #1a1a2a;
@@ -382,18 +408,21 @@ class SettingsPage(QWidget):
             form.setSpacing(6)
             form.setContentsMargins(16, 8, 16, 8)
 
-            for key, value in group.settings.items():
+            for key, value in settings.items():
                 label = QLabel(key)
                 label.setStyleSheet("color: #a0a0b0; font-size: 12px;")
 
-                # Color-code values
                 val_color = "#e0e0e0"
-                if value.lower() in ("true", "enabled", "autonomous"):
-                    val_color = "#4ae04a"
-                elif value.lower() in ("false", "disabled"):
-                    val_color = "#e06a6a"
+                if isinstance(value, str):
+                    v_lower = value.lower()
+                    if v_lower in ("true", "enabled", "autonomous"):
+                        val_color = "#4ae04a"
+                    elif v_lower in ("false", "disabled"):
+                        val_color = "#e06a6a"
+                    elif v_lower in ("healthy", "normal", "information"):
+                        val_color = "#4ae04a"
 
-                val = QLabel(value)
+                val = QLabel(str(value))
                 val.setStyleSheet("color: {}; font-size: 13px;".format(val_color))
 
                 form.addRow(label, val)

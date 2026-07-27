@@ -1,8 +1,9 @@
 """
-ExperienceContext — satu konteks untuk seluruh Desktop Console.
+DesktopContext — konteks Desktop dari Conversation, bukan ExperienceEngine.
 
-Setiap halaman menerima ExperienceContext yang sama.
+Setiap halaman menerima Conversation (dari sam.observe()).
 Tidak ada halaman yang query Runtime secara independen.
+Semua data berasal dari Conversation.answer() dan Conversation.recommendations() dll.
 """
 
 from dataclasses import dataclass, field
@@ -68,23 +69,22 @@ class HumanTimeFormatter:
 
 
 # ============================================================================
-# ExperienceContext — satu konteks untuk semua halaman
+# DesktopContext — konteks desktop dari Conversation
 # ============================================================================
 
 @dataclass
-class ExperienceContext:
-    """Konteks operasional yang sama untuk semua halaman.
+class DesktopContext:
+    """Konteks operasional untuk Desktop Console.
 
-    Tidak ada halaman yang query Runtime secara independen.
-    Semua data berasal dari Experience Engine → Narrative Engine.
+    Dibangun dari Conversation — bukan dari ExperienceEngine.
     """
     # Mission
     mission_name: str = "Protect OpenClaw Runtime"
     mission_status: str = "active"
 
     # Status
-    status_label: str = "Healthy"      # "Healthy" | "Attention" | "Problem" | "Recovering"
-    status_color: str = "#4ae04a"      # Hijau / Kuning / Merah
+    status_label: str = "Healthy"
+    status_color: str = "#4ae04a"
     status_detail: str = "Everything is operating normally."
 
     # Attention
@@ -117,103 +117,92 @@ class ExperienceContext:
         return self.attention_count > 0 or self.pending_approval_count > 0
 
 
-class ExperienceContextBuilder:
-    """Membangun ExperienceContext dari Experience Engine."""
+class DesktopContextBuilder:
+    """Membangun DesktopContext dari Conversation — bukan ExperienceEngine."""
 
-    def __init__(self, experience_engine):
-        self._ee = experience_engine
+    def __init__(self, conversation):
+        self._conversation = conversation
         self._time = HumanTimeFormatter()
 
-    def build(self) -> ExperienceContext:
-        """Bangun konteks terkini."""
+    def build(self) -> DesktopContext:
+        """Bangun konteks terkini dari Conversation."""
         try:
-            home = self._ee.build_home()
-            work = self._ee.build_work()
-            pres = self._ee.build_presentation()
+            # ================================================================
+            # SATU SUMBER — Conversation.answer() dan recommendations()
+            # ================================================================
+
+            # Overview — status sistem
+            overview = self._conversation.answer("What's happening?")
+            health = self._conversation.health()
+            recs = self._conversation.recommendations()
+            user_actions = self._conversation.actions()
 
             # Status
-            condition = pres.system_condition if pres else "Healthy"
-            status_map = {
-                "normal": ("Healthy", "#4ae04a"),
-                "progress": ("Deploying", "#6aaae0"),
-                "recovery": ("Recovering", "#e0c06a"),
-                "attention": ("Attention", "#e0c06a"),
-                "action": ("Action Required", "#e06a6a"),
-                "learning": ("Learning", "#6aaae0"),
-            }
-            condition_lower = condition.lower()
-            status_label, status_color = ("Healthy", "#4ae04a")
-            for key, val in status_map.items():
-                if key in condition_lower:
+            title_lower = (overview.title or "").lower()
+            status_map = [
+                ("action", ("Action Required", "#e06a6a")),
+                ("attention", ("Attention", "#e0c06a")),
+                ("approval", ("Attention", "#e0c06a")),
+                ("recovery", ("Recovering", "#e0a06a")),
+                ("progress", ("Deploying", "#6aaae0")),
+                ("learning", ("Learning", "#6aaae0")),
+                ("normal", ("Healthy", "#4ae04a")),
+            ]
+            status_label, status_color = "Healthy", "#4ae04a"
+            for key, val in status_map:
+                if key in title_lower:
                     status_label, status_color = val
                     break
 
-            # Attention count dari presentation
-            att_label = pres.attention_label if pres else "Normal"
-            att_count = 1 if att_label in ("Immediate", "Soon") else 0
-            att_msg = pres.user_action_needed if pres else ""
-            att_reason = pres.current_activity if pres else ""
+            # Attention count
+            att_count = 1 if any(
+                s in title_lower for s in ["action", "attention", "approval", "required"]
+            ) else 0
+            att_msg = (
+                overview.user_action_needed
+                or (user_actions.actions[0] if user_actions and user_actions.actions else "")
+            )
+            att_reason = overview.summary or ""
 
-            # Last activity
-            last_time = ""
-            last_desc = ""
-            try:
-                activity = self._ee.build_activity()
-                if activity and activity.groups:
-                    entries = activity.groups[0].entries
-                    if entries:
-                        last_entry = entries[0]
-                        last_time = last_entry.time
-                        last_desc = last_entry.description
-            except Exception:
-                pass
-
-            # Work
+            # Active work / pending approval dari recommendations
             active_count = 0
             pending_approval = 0
-            if work and work.items:
-                for w in work.items:
-                    if w.status == "running":
-                        active_count += 1
-                    if w.approval_needed:
+            if recs:
+                active_count = len(recs.recommendations) if recs.recommendations else 0
+                for rec in (recs.recommendations or []):
+                    if "approve" in rec.lower():
                         pending_approval += 1
 
             # Notifications
             unread = 0
-            notif_items = []
-            try:
-                notif_model = self._ee.build_notifications()
-                if notif_model and notif_model.items:
-                    for n in notif_model.items[:5]:
-                        if n.type != "info" or n.message != "No notifications":
-                            notif_items.append(n)
-                    unread = len(notif_items)
-            except Exception:
-                pass
+            if overview and overview.badges:
+                unread = len([b for b in overview.badges if "action" in b[0].lower()])
 
-            return ExperienceContext(
+            return DesktopContext(
                 mission_name="Protect OpenClaw Runtime",
                 mission_status="active",
                 status_label=status_label,
                 status_color=status_color,
-                status_detail=home.health.detail if home.health else "",
+                status_detail=overview.summary or "",
                 attention_count=att_count + pending_approval,
                 attention_message=att_msg,
                 attention_reason=att_reason,
-                last_activity_time=last_time,
-                last_activity_description=last_desc,
+                last_activity_time="",
+                last_activity_description=(
+                    overview.sections[0][1][:50] if overview.sections
+                    else (overview.summary or "")[:50]
+                ),
                 active_work_count=active_count,
                 pending_approval_count=pending_approval,
                 unread_count=unread,
-                recent_notifications=notif_items,
-                health_score=home.health.health_score if home.health else 100.0,
-                protection_level=getattr(home.health, 'protection_level', ''),
-                protection_summary=getattr(home.health, 'protection_summary', ''),
+                recent_notifications=[],
+                health_score=health.severity_score if hasattr(health, 'severity_score') else 100.0,
+                protection_summary=health.summary or "All systems healthy.",
             )
 
         except Exception as e:
-            return ExperienceContext(
+            return DesktopContext(
                 status_label="Unknown",
                 status_color="#606070",
-                status_detail=f"Unable to retrieve runtime information.",
+                status_detail=f"Unable to retrieve runtime information: {str(e)}",
             )
