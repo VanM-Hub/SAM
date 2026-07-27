@@ -317,14 +317,14 @@ class AssistantPage(QWidget):
         c_layout.addWidget(tip)
 
         questions = [
-            "Good morning briefing",
-            "What happened today?",
-            "What is the current situation?",
-            "Anything needs attention?",
-            "Show unfinished work.",
-            "What has the system learned?",
-            "Why is action needed?",
-            "Are there any approvals?",
+            "What's happening?",
+            "Is everything okay?",
+            "Do I need to do anything?",
+            "Why?",
+            "What changed?",
+            "What should happen next?",
+            "What happens if nothing is done?",
+            "Show technical details.",
         ]
         for q in questions:
             btn = QPushButton(q)
@@ -355,7 +355,10 @@ class AssistantPage(QWidget):
         if not question:
             return
 
-        answer = self.experience.ask(question)
+        # ================================================================
+        # SATU PANGGILAN — QuestionEngine
+        # ================================================================
+        answer = self.experience.get_live_answer(question)
 
         card = QFrame()
         card.setStyleSheet("""
@@ -373,32 +376,57 @@ class AssistantPage(QWidget):
         q_label.setStyleSheet("color: #707080; font-size: 12px; font-style: italic;")
         c_layout.addWidget(q_label)
 
-        a_label = QLabel(answer.answer)
-        a_label.setStyleSheet("color: #e0e0e0; font-size: 14px;")
-        a_label.setWordWrap(True)
-        c_layout.addWidget(a_label)
+        # Title
+        a_title = QLabel(answer.title)
+        a_title.setStyleSheet("color: #e0e0e0; font-size: 14px; font-weight: bold;")
+        a_title.setWordWrap(True)
+        c_layout.addWidget(a_title)
 
+        # Summary
+        if answer.summary:
+            a_summary = QLabel(answer.summary)
+            a_summary.setStyleSheet("color: #b0b0c0; font-size: 13px;")
+            a_summary.setWordWrap(True)
+            c_layout.addWidget(a_summary)
+
+        # SAM action
+        if answer.sam_action:
+            sam_lbl = QLabel("SAM: {}".format(answer.sam_action))
+            sam_lbl.setStyleSheet("color: #6aaae0; font-size: 12px; padding-left: 4px; margin-top: 4px;")
+            c_layout.addWidget(sam_lbl)
+
+        # User action needed
+        if answer.user_action_needed and answer.user_action_needed != "No action required.":
+            action_lbl = QLabel("\U0001f6a8 {}".format(answer.user_action_needed))
+            action_lbl.setStyleSheet("color: #e0c06a; font-size: 12px; padding-left: 4px; margin-top: 2px;")
+            c_layout.addWidget(action_lbl)
+
+        # Recommendations
+        if answer.recommendations:
+            rec_title = QLabel("Recommendations:")
+            rec_title.setStyleSheet("color: #808090; font-size: 11px; margin-top: 6px;")
+            c_layout.addWidget(rec_title)
+            for r in answer.recommendations:
+                r_lbl = QLabel("  \U0001f4a1 {}".format(r))
+                r_lbl.setStyleSheet("color: #c0c0d0; font-size: 11px;")
+                c_layout.addWidget(r_lbl)
+
+        # Predictions
+        if answer.predictions:
+            pred_title = QLabel("Predictions:")
+            pred_title.setStyleSheet("color: #808090; font-size: 11px; margin-top: 4px;")
+            c_layout.addWidget(pred_title)
+            for p in answer.predictions:
+                p_lbl = QLabel("  \U0001f52e {}".format(p))
+                p_lbl.setStyleSheet("color: #c0c0d0; font-size: 11px;")
+                c_layout.addWidget(p_lbl)
+
+        # Details (Level 2)
         if answer.details:
             d_label = QLabel(answer.details)
-            d_label.setStyleSheet("color: #808090; font-size: 11px; padding-left: 8px;")
+            d_label.setStyleSheet("color: #808090; font-size: 11px; padding-left: 8px; margin-top: 4px;")
             d_label.setWordWrap(True)
             c_layout.addWidget(d_label)
-
-        if answer.action:
-            btn = QPushButton(answer.action)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background: #2a5a3a;
-                    border: none;
-                    border-radius: 4px;
-                    padding: 6px 14px;
-                    color: #fff;
-                    font-size: 12px;
-                    max-width: 100px;
-                }
-                QPushButton:hover { background: #3a7a4a; }
-            """)
-            c_layout.addWidget(btn)
 
         self._layout.insertWidget(self._layout.count() - 1, card)
         self.question_input.clear()

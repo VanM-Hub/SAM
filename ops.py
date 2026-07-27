@@ -212,32 +212,33 @@ def cmd_settings(args):
 
 
 def cmd_ask(args):
-    """Narrative: Ask the Assistant."""
+    """Question Engine — Conversation. Antarmuka manusia pertama."""
     engine = _get_engine()
     question = " ".join(args.extra) if args.extra else ""
 
     if not question:
+        # Interactive mode
         print()
-        print("Usage: ask <question>")
+        print("SAM — Ask anything about the system.")
+        print("(Type 'exit' to quit)")
         print()
-        print("Try:")
-        print("  python ops.py ask \"Good morning briefing\"")
-        print("  python ops.py ask \"What is the current situation?\"")
-        print("  python ops.py ask \"What happened today?\"")
-        print("  python ops.py ask \"Anything needs attention?\"")
-        print("  python ops.py ask \"Show unfinished work.\"")
-        print()
+        while True:
+            try:
+                q = input("> ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print()
+                break
+            if not q or q.lower() in ("exit", "quit", "q"):
+                break
+            answer = engine.get_live_answer(q)
+            print()
+            print(answer.display_cli())
+            print()
         return
 
-    answer = engine.ask(question)
+    answer = engine.get_live_answer(question)
     print()
-    print(answer.answer)
-    if answer.details:
-        print()
-        print(answer.details)
-    if answer.action:
-        print()
-        print("Recommended action: " + answer.action)
+    print(answer.display_cli())
     print()
 
 

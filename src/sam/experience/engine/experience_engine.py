@@ -19,6 +19,7 @@ from ...operations.story import StoryBuilder, Story, StoryType
 from ...operations.presentation import PresentationEngine, Presentation, Decision
 from ...operations.recommendation import RecommendationEngine, Recommendation
 from ...operations.prediction import PredictionEngine, Prediction
+from ...operations.question_engine import QuestionEngine, HumanAnswer
 from ...narrative import NarrativeBuilder, DailyBriefing, SituationBrief
 from ...openclaw.connection import OpenClawAdapter
 from ...telemetry.service import TelemetryService
@@ -58,6 +59,7 @@ class ExperienceEngine:
         self.presentation = PresentationEngine()
         self.recommendation_engine = RecommendationEngine(self)
         self.prediction_engine = PredictionEngine(self)
+        self.question_engine = QuestionEngine(self)
 
     # ======================================================================
     # HOME
@@ -511,6 +513,19 @@ class ExperienceEngine:
         return self.prediction_engine.get_predictions(
             situation=sit.situation.value, limit=limit,
         )
+
+    # ======================================================================
+    # QUESTION ENGINE — Conversation-first
+    # ======================================================================
+
+    def get_live_answer(self, question: str = "") -> HumanAnswer:
+        """Satu-satunya cara UI/CLI/Assistant bertanya.
+
+        Desktop: home.answer("What's happening?")
+        CLI: sam ask "What's happening?"
+        Assistant: semua jawaban lewat sini.
+        """
+        return self.question_engine.answer(question)
 
     # ======================================================================
     # ASSISTANT
