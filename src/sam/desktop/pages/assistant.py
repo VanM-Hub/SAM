@@ -215,7 +215,7 @@ class AssistantPage(QWidget):
         title = QLabel("Ask")
         title.setStyleSheet("font-size: 22px; font-weight: bold; color: #e0e0e0;")
         h_layout.addWidget(title)
-        sub = QLabel("Ask me anything about SAM.")
+        sub = QLabel("Ask me anything about the system.")
         sub.setStyleSheet("color: #606070; font-size: 12px; margin-top: 2px;")
         h_layout.addWidget(sub)
         root.addWidget(header)
@@ -320,8 +320,8 @@ class AssistantPage(QWidget):
             "What is the current situation?",
             "Anything needs attention?",
             "Show unfinished work.",
-            "What did SAM learn?",
-            "Why is SAM waiting?",
+            "What has the system learned?",
+            "Why is action needed?",
             "Are there any approvals?",
         ]
         for q in questions:

@@ -3,7 +3,7 @@ Activity Story Builder — event groups jadi CERITA, bukan daftar.
 
 Contoh:
   Workflow Started + Task Created + Plugin Loaded + Task Finished + Workflow Finished
-  → "SAM completed Deploy Workspace. Duration 2m 14s. Everything completed successfully."
+  → "Deploy completed. Duration 2m 14s. Everything completed successfully."
 
 BUKAN lima event.
 SATU cerita.
@@ -33,7 +33,7 @@ class StoryType(str, Enum):
 class ActivityStory:
     """Satu cerita dari sekelompok event."""
     story_type: StoryType
-    title: str                      # "SAM completed Deploy Workspace"
+    title: str                      # "Deploy completed"
     summary: str                    # "Duration 2m 14s. Everything completed successfully."
     details: str = ""               # Level 2 (diklik)
     duration: str = ""              # "2m 14s"
@@ -150,9 +150,9 @@ class ActivityStoryBuilder:
             story_type = StoryType.PROTECTION_TRIGGERED
             status = "recovery"
             icon = "\U0001f504"
-            title = "SAM prevented a failure."
+            title = "A failure was prevented."
             summary = "Rollback completed successfully. No manual action required."
-            details = "SAM detected an issue and automatically recovered.\n\nEvents:\n" + "\n".join(
+            details = "An issue was detected and automatically recovered.\n\nEvents:\n" + "\n".join(
                 "  - {}".format(e.description if hasattr(e, 'description') else str(e)[:60])
                 for e in events
             )
@@ -162,7 +162,7 @@ class ActivityStoryBuilder:
             status = "failed"
             icon = "\u274c"
             title = "One operation could not be completed."
-            summary = "SAM has already started recovery."
+            summary = "Recovery has already started."
             details = "Failed events:\n" + "\n".join(
                 "  - {}".format(e.description if hasattr(e, 'description') else str(e)[:60])
                 for e in events
@@ -172,7 +172,7 @@ class ActivityStoryBuilder:
             story_type = StoryType.PROTECTION_TRIGGERED
             status = "recovery"
             icon = "\u2705"
-            title = "SAM recovered a service."
+            title = "A service was recovered."
             summary = "Everything is stable again."
             details = "Recovery events:\n" + "\n".join(
                 "  - {}".format(e.description if hasattr(e, 'description') else str(e)[:60])
@@ -183,7 +183,7 @@ class ActivityStoryBuilder:
             story_type = StoryType.WORKFLOW_COMPLETE
             status = "success"
             icon = "\u2705"
-            title = "SAM completed {}".format(name)
+            title = "{} completed".format(name)
             summary = "Everything completed successfully."
             if duration:
                 summary = "Duration {}. Everything completed successfully.".format(duration)

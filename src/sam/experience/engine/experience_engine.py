@@ -65,23 +65,23 @@ class ExperienceEngine:
         # System health
         if raw_status.value == "healthy":
             status = SystemStatus.HEALTHY
-            message = "SAM is Healthy"
+            message = "The system is healthy"
             detail = "Everything is operating normally."
         elif raw_status.value == "degraded" or raw_status.value == "unhealthy":
             status = SystemStatus.PROBLEM
-            message = "SAM needs attention"
+            message = "The system needs attention"
             detail = self.status_engine.get_status_message()
         elif raw_status.value == "recovering":
             status = SystemStatus.RECOVERING
-            message = "SAM is recovering"
+            message = "The system is recovering"
             detail = self.status_engine.get_status_message()
         elif raw_status.value == "learning":
             status = SystemStatus.LEARNING
-            message = "SAM is learning"
+            message = "The system is learning"
             detail = self.status_engine.get_status_message()
         else:
             status = SystemStatus.HEALTHY
-            message = "SAM is Healthy"
+            message = "The system is healthy"
             detail = "Everything is operating normally."
 
         # Protection cycle
@@ -507,14 +507,14 @@ class ExperienceEngine:
             msg = self.status_engine.get_status_message()
             return AssistantAnswer(
                 question=question,
-                answer="SAM is {}: {}".format(health.value, msg),
+                answer="Status: {} — {}".format(health.value, msg),
             )
 
         elif "kenapa" in question_lower or "why" in question_lower:
             # Mengapa? — Format: Reason → Evidence → Decision → Impact → Recommendation
             sit = self.situation.detect()
             lines = []
-            lines.append("SAM {} because:".format(sit.label.lower().rstrip('.')))
+            lines.append("The system {} because:".format(sit.label.lower().rstrip('.')))
             lines.append("")
             lines.append("  Reason:")
             lines.append("    {}".format(sit.focus_message))

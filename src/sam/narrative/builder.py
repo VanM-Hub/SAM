@@ -154,15 +154,15 @@ class NarrativeBuilder:
             summary = "All systems healthy. No issues detected."
             importance = NarrativeImportance.INFORMATION
         elif status == "recovering":
-            title = "SAM is recovering from a recent issue."
+            title = "The system is recovering from a recent issue."
             summary = "Systems are stabilizing. Monitoring continues."
             importance = NarrativeImportance.ATTENTION
         elif status in ("problem", "attention"):
-            title = "SAM needs your attention."
+            title = "The system needs your attention."
             summary = health.message or "One or more systems require review."
             importance = NarrativeImportance.ACTION_REQUIRED
         else:
-            title = "SAM is operating."
+            title = "The system is operating."
             summary = health.message or "Status unknown."
             importance = NarrativeImportance.INFORMATION
 
@@ -246,7 +246,7 @@ class NarrativeBuilder:
         for item in work_model.items[:3]:
             if item.approval_needed:
                 narratives.append(Narrative(
-                    title="SAM is waiting for your approval.",
+                    title="Approval is needed to continue.",
                     summary="{} needs review.".format(item.title),
                     details=item.approval_reason or "",
                     importance=NarrativeImportance.ACTION_REQUIRED,
@@ -315,7 +315,7 @@ class NarrativeBuilder:
         if healthy:
             health_summary = "Everything is healthy."
         else:
-            health_summary = "SAM requires your attention."
+            health_summary = "The system requires your attention."
 
         # Yesterday recap — dari activity model
         yesterday_recap = "No significant events from yesterday."
@@ -362,13 +362,13 @@ class NarrativeBuilder:
             summary = "Everything is operating normally."
             health_statement = "Runtime healthy."
         else:
-            summary = "SAM requires review."
+            summary = "The system requires review."
             health_statement = "Runtime requires attention."
 
         # Knowledge
         knowledge_statement = "Knowledge synchronized."
         if knowledge_model and knowledge_model.items:
-            knowledge_statement = "SAM has {} learning points.".format(
+            knowledge_statement = "{} learning points recorded.".format(
                 len(knowledge_model.items)
             )
 

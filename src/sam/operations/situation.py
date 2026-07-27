@@ -23,12 +23,12 @@ class Situation(str, Enum):
 
 
 SITUATION_LABELS = {
-    Situation.EVERYTHING_HEALTHY: ("SAM is healthy.", "No action required."),
-    Situation.DEPLOYMENT_RUNNING: ("Deployment in progress.", "SAM is working."),
-    Situation.WAITING_APPROVAL: ("SAM needs your approval.", "No execution will continue until approval is given."),
-    Situation.RECOVERING: ("SAM is recovering.", "Systems are stabilizing."),
-    Situation.LEARNING: ("SAM is learning.", "New patterns are being analyzed."),
-    Situation.NEEDS_ATTENTION: ("SAM needs attention.", "Something requires your review."),
+    Situation.EVERYTHING_HEALTHY: ("The system is healthy.", "No action required."),
+    Situation.DEPLOYMENT_RUNNING: ("Deployment in progress.", "Everything is running."),
+    Situation.WAITING_APPROVAL: ("Approval needed.", "No execution will continue until approval is given."),
+    Situation.RECOVERING: ("System recovering.", "Systems are stabilizing."),
+    Situation.LEARNING: ("Learning in progress.", "New patterns are being analyzed."),
+    Situation.NEEDS_ATTENTION: ("Attention needed.", "Something requires your review."),
     Situation.ACTION_REQUIRED: ("Action required.", "Immediate review needed."),
 }
 
@@ -62,7 +62,7 @@ class SituationReport:
     icon: str
     color: str
     attention_score: int = 0
-    focus_message: str = ""           # "SAM is healthy."
+    focus_message: str = ""           # "The system is healthy."
     focus_detail: str = ""            # "Watching OpenClaw."
     action_message: str = ""          # "No action required."
     progress_percent: int = 0          # 0-100, untuk deployment
@@ -138,27 +138,27 @@ class SituationEngine:
 
             # Focus message
             if sit == Situation.EVERYTHING_HEALTHY:
-                focus_msg = "SAM is healthy."
+                focus_msg = "The system is healthy."
                 focus_detail = "Watching OpenClaw."
                 action_msg = "No action required."
             elif sit == Situation.DEPLOYMENT_RUNNING:
                 focus_msg = "{} in progress.".format(deployment_name or "Deployment")
                 focus_detail = ""
-                action_msg = "SAM is working."
+                action_msg = "Everything is running."
             elif sit == Situation.WAITING_APPROVAL:
-                focus_msg = "SAM needs your approval."
+                focus_msg = "Approval needed."
                 focus_detail = ""
                 action_msg = "No execution will continue until approval is given."
             elif sit == Situation.RECOVERING:
-                focus_msg = "SAM is recovering."
+                focus_msg = "The system is recovering."
                 focus_detail = ""
                 action_msg = "No manual action required."
             elif sit == Situation.LEARNING:
-                focus_msg = "SAM is learning."
+                focus_msg = "The system is learning."
                 focus_detail = "New patterns are being analyzed."
                 action_msg = "No action required."
             elif sit == Situation.NEEDS_ATTENTION:
-                focus_msg = home.attention.message if home.attention else "SAM needs attention."
+                focus_msg = home.attention.message if home.attention else "The system needs attention."
                 focus_detail = home.attention.reason if hasattr(home.attention, 'reason') else ""
                 action_msg = "Review recommended."
             elif sit == Situation.ACTION_REQUIRED:
@@ -166,7 +166,7 @@ class SituationEngine:
                 focus_detail = home.attention.message if home.attention and home.attention.needs_attention else ""
                 action_msg = "Immediate review needed."
             else:
-                focus_msg = "SAM is operating."
+                focus_msg = "The system is operating."
                 focus_detail = ""
                 action_msg = ""
 
@@ -209,11 +209,11 @@ class SituationEngine:
         except Exception:
             return SituationReport(
                 situation=Situation.EVERYTHING_HEALTHY,
-                label="SAM is operating.",
+                label="The system is operating.",
                 description="Status unknown.",
                 icon="\u2753",
                 color="#606070",
                 attention_score=0,
-                focus_message="SAM is operating.",
+                focus_message="The system is operating.",
                 action_message="No action required.",
             )

@@ -153,7 +153,7 @@ def cmd_approvals(args):
 
 
 def cmd_knowledge(args):
-    """Narrative: What SAM Learned."""
+    """Narrative: System Knowledge."""
     engine = _get_engine()
     narratives = engine.build_narrative_knowledge()
 
@@ -172,7 +172,7 @@ def cmd_knowledge(args):
             for item in model.items[:5]:
                 print("  - {}".format(item.title))
         else:
-            print("  SAM is still learning. No knowledge yet.")
+            print("  No knowledge recorded yet.")
         print()
 
 
