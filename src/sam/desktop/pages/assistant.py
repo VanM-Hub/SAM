@@ -77,12 +77,46 @@ class NotificationPage(QWidget):
         try:
             model = self.experience.build_notifications()
             narratives = self.experience.narrative.build_from_notifications(model)
-            self._render(model, narratives)
+            attention_items = self.experience.get_all_attention()
+            self._render(model, narratives, attention_items)
         except Exception:
             pass
 
-    def _render(self, model, narratives):
+    def _render(self, model, narratives, attention_items=None):
         self._clear()
+        has_items = False
+
+        # Attention items
+        if attention_items:
+            for item in attention_items[:10]:
+                has_items = True
+                card = QFrame()
+                card.setStyleSheet("""
+                    QFrame {{
+                        background: #0a0a12;
+                        border: 1px solid {};
+                        border-radius: 8px;
+                        padding: 10px 14px;
+                    }}
+                    QFrame:hover {{ border: 1px solid #3a3a5a; }}
+                """.format(item.color))
+                c_layout = QVBoxLayout(card)
+                c_layout.setSpacing(2)
+                row = QHBoxLayout()
+                score = QLabel("[{}]".format(item.score))
+                score.setStyleSheet("color: {}; font-size: 10px; font-weight: bold;".format(item.color))
+                row.addWidget(score)
+                text = QLabel(item.message or item.title)
+                text.setStyleSheet("color: #c0c0d0; font-size: 13px;")
+                text.setWordWrap(True)
+                row.addWidget(text, 1)
+                c_layout.addLayout(row)
+                if item.reason:
+                    r = QLabel(item.reason)
+                    r.setStyleSheet("color: #707080; font-size: 11px; padding-left: 16px;")
+                    r.setWordWrap(True)
+                    c_layout.addWidget(r)
+                self._layout.addWidget(card)
 
         # Narrative cards first
         for n in narratives:

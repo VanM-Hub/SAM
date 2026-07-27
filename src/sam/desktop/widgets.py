@@ -70,6 +70,22 @@ class StatusCard(QFrame):
         )
         self._detail.setText(ctx.status_detail)
 
+    def set_human_focus(self, focus_message: str, focus_detail: str,
+                        action_message: str, color: str = "#e0e0e0"):
+        """Set satu fokus — bukan dashboard.
+
+        Hanya satu pesan besar yang dilihat user.
+        """
+        self._icon.setText("")
+        self._label.setText(focus_message)
+        self._label.setStyleSheet(
+            "color: {}; font-size: 22px; font-weight: bold;".format(color)
+        )
+        if focus_detail:
+            self._detail.setText(focus_detail)
+        else:
+            self._detail.setText("")
+
 
 # ============================================================================
 # AttentionBanner — bukan modal dialog
