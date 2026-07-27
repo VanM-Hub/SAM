@@ -7,7 +7,7 @@ Dipisah dari experience_contract agar QuestionEngine bisa independen.
 from dataclasses import dataclass, field
 from typing import Optional
 
-from .intent import QuestionIntent
+from .intent import InteractionIntent
 from .human_answer import HumanAnswer
 
 
@@ -22,7 +22,7 @@ class ConversationContext:
     selected_incident: str = ""
     selected_workspace: str = ""
     current_page: str = "home"
-    last_intent: Optional[QuestionIntent] = None
+    last_intent: Optional[InteractionIntent] = None
     last_answer: Optional[str] = ""
 
 
@@ -30,12 +30,12 @@ class ConversationContext:
 class InteractionMemory:
     """Memori percakapan — membuat Why? terasa natural tanpa LLM."""
     last_question: str = ""
-    last_intent: Optional[QuestionIntent] = None
+    last_intent: Optional[InteractionIntent] = None
     last_answer: Optional[HumanAnswer] = None
     last_context: Optional[ConversationContext] = None
     current_page: str = "home"
 
-    def update(self, question: str, intent: QuestionIntent,
+    def update(self, question: str, intent: InteractionIntent,
                answer: HumanAnswer, context: Optional[ConversationContext] = None):
         self.last_question = question
         self.last_intent = intent

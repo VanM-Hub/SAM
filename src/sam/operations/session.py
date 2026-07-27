@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from typing import Optional, List
 from datetime import datetime
 
-from .intent import QuestionIntent
+from .intent import InteractionIntent
 from .audience import AudienceProfile, get_profile, AudienceType
 from .human_answer import HumanAnswer
 
@@ -43,7 +43,7 @@ class MissionSession:
 
     # Riwayat percakapan dalam sesi ini
     last_question: str = ""
-    last_intent: Optional[QuestionIntent] = None
+    last_intent: Optional[InteractionIntent] = None
     last_answer: Optional[HumanAnswer] = None
     question_count: int = 0
     context_hint: str = ""              # Petunjuk untuk pertanyaan berikutnya
@@ -95,7 +95,7 @@ class SessionManager:
         """
         self._session.context_hint = hint
 
-    def record_interaction(self, question: str, intent: QuestionIntent,
+    def record_interaction(self, question: str, intent: InteractionIntent,
                            answer: HumanAnswer):
         """Catat interaksi dalam sesi."""
         self._session.last_question = question

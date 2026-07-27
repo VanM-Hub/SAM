@@ -1,8 +1,11 @@
 """
-SAM Operations CLI — Entry point tanpa dependensi legacy.
-Semua output pakai teks ASCII/UTF-8 aman untuk Windows console.
+SAM Operations CLI — Entry point utama.
 
-Semua user-facing language berasal dari Narrative Engine.
+Dua mode:
+  1. sam ask [question]  — tanya langsung
+  2. sam                — shell interaktif
+
+Semua melalui Conversation API.
 """
 
 import sys
@@ -14,17 +17,92 @@ if src_path not in sys.path:
     sys.path.insert(0, src_path)
 
 
-def _get_engine():
-    """Buat ExperienceEngine dengan Narrative."""
-    from sam.experience.engine import ExperienceEngine
-    from sam.telemetry.service import TelemetryService
-    svc = TelemetryService()
-    return ExperienceEngine(svc)
+def _create_sam():
+    """Buat SAM instance."""
+    from sam.operations.conversation_api import SAM
+    return SAM()
 
 
-def cmd_briefing(args):
-    """Narrative: Daily Briefing."""
-    engine = _get_engine()
+_USAGE = """
+SAM — Operating System for AI Operations.
+
+Commands:
+  exit, quit, q      — exit
+  why, explain       — alasan situasi saat ini
+  activity, timeline — aktivitas terbaru
+  details, technical — detail teknis
+  recs, next         — rekomendasi
+  preds, risk        — prediksi risiko
+  health, status     — kesehatan sistem
+  actions, todo      — tindakan yang perlu dilakukan
+  json               — export JSON
+  [any question]     — tanya bebas
+
+Examples:
+  > What's happening?
+  > Why?
+  > Show details.
+  > Is everything okay?
+"""
+
+
+def interactive_shell(audience="administrator"):
+    """Shell interaktif SAM."""
+    sam = _create_sam()
+    conv = sam.observe(audience_type=audience)
+
+    try:
+        # Tampilkan overview dulu
+        ans = conv.answer("What's happening?")
+        print()
+        print(conv.render_cli(ans))
+    except Exception:
+        pass
+
+    while True:
+        try:
+            q = input("\nsam> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
+
+        if not q:
+            continue
+        if q.lower() in ("exit", "quit", "q"):
+            break
+        if q.lower() in ("help", "?"):
+            print(_USAGE)
+            continue
+        if q.lower() in ("why", "explain"):
+            ans = conv.explain()
+        elif q.lower() in ("activity", "timeline"):
+            ans = conv.timeline()
+        elif q.lower() in ("details", "technical"):
+            ans = conv.technical_details()
+        elif q.lower() in ("recs", "next"):
+            ans = conv.recommendations()
+        elif q.lower() in ("preds", "risk"):
+            ans = conv.predictions()
+        elif q.lower() in ("health", "status"):
+            ans = conv.health()
+        elif q.lower() in ("actions", "todo"):
+            ans = conv.actions()
+        elif q.lower() == "json":
+            data = conv.export_json()
+            print()
+            import json
+            print(json.dumps(data, indent=2))
+            continue
+        else:
+            ans = conv.answer(q)
+
+        print()
+        print(conv.render_cli(ans))
+
+
+# =========================================================================
+# Legacy commands — backward compatibility
+# =========================================================================
     brief = engine.build_daily_briefing()
 
     print()
@@ -212,37 +290,19 @@ def cmd_settings(args):
 
 
 def cmd_ask(args):
-    """Question Engine — Conversation. Antarmuka manusia pertama."""
-    engine = _get_engine()
+    """Conversation — CLI interaktif atau tanya langsung."""
     question = " ".join(args.extra) if args.extra else ""
-
-    # Parse audience flag
-    audience = "administrator"
-    if args.audience:
-        audience = args.audience[0] if isinstance(args.audience, list) else args.audience
+    audience = getattr(args, 'audience', None) or "administrator"
 
     if not question:
-        # Interactive mode
-        print()
-        print("SAM — Ask anything. (Type 'exit' to quit)")
-        print()
-        while True:
-            try:
-                q = input("> ").strip()
-            except (EOFError, KeyboardInterrupt):
-                print()
-                break
-            if not q or q.lower() in ("exit", "quit", "q"):
-                break
-            answer = engine.get_live_answer(q, audience_type=audience)
-            print()
-            print(engine.render_for_cli(answer))
-            print()
+        interactive_shell(audience)
         return
 
-    answer = engine.get_live_answer(question, audience_type=audience)
+    sam = _create_sam()
+    conv = sam.observe(audience_type=audience)
+    answer = conv.answer(question)
     print()
-    print(engine.render_for_cli(answer))
+    print(conv.render_cli(answer))
     print()
 
 
