@@ -28,3 +28,21 @@ test.db
 # Temp files
 *.pyc
 __pycache__/
+
+# Workspace artifacts (local runtime data)
+workspace/sessions/
+workspace/desired-state.yaml
+workspace/mission.yaml
+
+# Test databases
+*.db
+
+# Coverage
+.coverage
+htmlcov/
+
+# Test results
+test-results.xml
+
+# SAM runtime databases
+sam*.db
