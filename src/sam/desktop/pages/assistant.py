@@ -292,10 +292,15 @@ class AssistantPage(QWidget):
 
         questions = [
             "What is happening?",
+            "What happened today?",
             "Is the system healthy?",
             "What do you recommend?",
+            "Anything needs attention?",
+            "Why is SAM waiting?",
+            "Show unfinished work.",
+            "What did SAM learn?",
+            "Good morning briefing",
             "Are there any approvals?",
-            "Why is autonomy disabled?",
         ]
         for q in questions:
             btn = QPushButton(q)
