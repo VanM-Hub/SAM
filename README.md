@@ -1,125 +1,99 @@
-# SAM — Self-evolving AI Operations Framework
+# SAM Framework
 
-SAM is an AI-driven operations framework that can observe, diagnose, heal, optimize, and evolve itself autonomously.
+**Self-evolving AI Operations Framework**
 
-## Features Overview
+SAM (Self-evolving AI Manager) adalah framework untuk mengelola, memonitor, dan mengoperasikan runtime AI secara otonom. Dari runtime kernel hingga web dashboard — SAM menangani seluruh siklus operasi.
 
-### Self-Healing
-- **Detect → Diagnose → Decide → Execute → Verify → Learn** — 9-phase healing pipeline
-- Pattern-based diagnosis with confidence scoring
-- Automatic reflection and lesson extraction
+## Fitur v2.0
 
-### Self-Optimization
-- **ParamManager**: 9 default tunable parameters across 5 categories
-- **SelfOptimizer**: analyze → suggest → apply → rollback with full history
-- **EvolutionPolicy**: Proposal lifecycle with PolicyRule constraints
-
-### Performance Autotuning
-- **MetricsCollector**: System metric collection (CPU, memory, queue, latency)
-- **Autotuner**: analyze → apply → monitor → rollback with 12 binding rules
-- **TuningSuggestion**: confidence-scored parameter adjustments
-
-### Cognitive Runtime
-- **CognitiveState** — health, confidence, focus, risk, autonomy tracking
-- **WorkingMemory** — session-scoped key-value store with TTL expiry
-- **AttentionManager** — 6 priority rules for focus determination
-- **GoalArbitrator** — weighted scoring for competing goals
-- **ContextWindow** — TTL-based context with importance filtering
-- **CognitiveSession** — full reasoning cycle tracking with reflections & decisions
-
-### Governance
-- 7 evaluators (Risk, Approval, Maintenance, Cluster, Resource, Capability, Policy)
-- Policy-based rules with condition matching
-- Wait/approval/reject/escalate decisions
-
-### Cluster & Collaboration
-- Node discovery and heartbeat service
-- Delegation workflow with full lifecycle
-- Workflow distribution across cluster
-
-### Institutional Memory
-- Long-term storage of lessons, patterns, and knowledge
-- Evidence-based learning and retrieval
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     CLI (sam.cli)                       │
-├─────────────────────────────────────────────────────────┤
-│                     Capabilities                        │
-├─────────────────────────────────────────────────────────┤
-│  Healing    Evolution    Cognition    Governance        │
-│  Autotuning  Reasoning   Strategy     Collaboration     │
-├─────────────────────────────────────────────────────────┤
-│  Runtime (execution, scheduling, job queue)             │
-├─────────────────────────────────────────────────────────┤
-│  Persistence (Database, Migrations)                    │
-├─────────────────────────────────────────────────────────┤
-│  Infrastructure (Plugin, Events, Messaging)            │
-└─────────────────────────────────────────────────────────┘
-```
+| Fitur | Deskripsi |
+|---|---|
+| **Runtime Kernel** | State machine (12 state), bootstrap, session, shutdown, recovery |
+| **Guardian Kernel** | Observe-Analyze-Decide-Act-Verify (GDP) pipeline |
+| **Hosting** | Desktop, Docker, Windows Service, systemd, Desktop Launcher |
+| **Observability** | Telemetry events, metrics collector, FastAPI REST API |
+| **OpenClaw Integration** | Discovery, health check, log analysis |
+| **Operational Intelligence** | Incident detection, root cause analysis, recommendations |
+| **Autonomous Operations** | Auto restart, recovery, resume, isolate, escalate, human approval |
+| **Web Dashboard** | 8 halaman: Dashboard, Runtime, Workflow, Incidents, Autonomous, OpenClaw, Knowledge, Settings |
+| **CLI** | 17 commands — status, health, session, runtime, guardian, events, logs, metrics, service, openclaw, intelligence, autonomous |
 
 ## Quick Start
 
-### Requirements
-- Python 3.8+ (3.12+ recommended)
-- pip
-
-### Installation
-
 ```bash
-git clone https://github.com/your-org/sam.git
-cd sam
-pip install -e .
+# Clone atau masuk ke direktori SAM
+cd D:\Project AI\SAM
+
+# Set environment
+$env:PYTHONPATH = "D:\Project AI\SAM\src"
+
+# Lihat semua CLI commands
+python -m sam.cli.main --help
+
+# Lihat status runtime
+python -m sam.cli.main status
+
+# Start web dashboard
+python -m sam.cli.main web --port 8080
+# Buka http://127.0.0.1:8080
 ```
 
-### Basic Usage
+## CLI Commands (17)
 
-```bash
-# Run health checks
-sam health
-
-# List evolution proposals
-sam evolution list
-
-# Approve a proposal
-sam evolution approve <proposal_id>
+```
+status      — Tampilkan status Runtime
+health      — Tampilkan status kesehatan
+session     — Kelola session runtime
+runtime     — Runtime Container Tree
+plugins     — Daftar plugin runtime
+knowledge   — Knowledge Store
+memory      — Memory Store
+workflow    — Workflow Engine
+events      — Event stream dan history
+guardian    — Guardian Kernel
+service     — Kelola service runtime
+logs        — Telemetry logs (--follow)
+metrics     — Runtime metrics (CPU, memory, uptime)
+openclaw    — OpenClaw integration (discover, status, monitor)
+intelligence — Operational intelligence (incident, rca, recommend)
+autonomous  — Autonomous operations (status, approve, deny, history)
+web         — Web Dashboard (--host, --port)
 ```
 
-### Development
+## Web Dashboard
 
-```bash
-# Install dev dependencies
-pip install -e ".[dev]"
-
-# Run tests
-cd src
-PYTHONPATH=. pytest
-
-# Run specific test file
-PYTHONPATH=. pytest tests/test_healing_loop.py -v
+```
+sam web --host 127.0.0.1 --port 8080
 ```
 
-## Test Statistics
+- **Dashboard** — Ringkasan state, health, metrics, incidents, pending actions
+- **Runtime** — Detail runtime, hosting, metrics
+- **Workflow** — Workflow list dengan progress bars
+- **Incidents** — Incident dashboard dengan severity counters
+- **Autonomous** — Pending approvals dan action history
+- **OpenClaw** — Discovered workspaces dan component health
+- **Knowledge** — Knowledge explorer dengan search
+- **Settings** — DOS dan Mission YAML (read-only)
 
-| Metric | Value |
-|---|---|
-| Total tests | 1694 |
-| Passing | 1693 |
-| Failing | 0 |
-| Skipped | 1 |
-| Duration | ~7.5 min |
+## Testing
 
-## Project Status
+```powershell
+$env:PYTHONPATH = "D:\Project AI\SAM\src"
+python -m pytest tests/unit/ tests/integration/ --ignore=tests/test_autonomy.py --ignore=tests/test_cluster_intelligence.py --ignore=tests/test_plugin_integration.py -v
+```
 
-- [x] Sprint 0–10: Workflow Engine, DSL, Scheduler, Validation
-- [x] Sprint 11–15: Runtime, Plugin System, Governance, Reasoning
-- [x] Sprint 16–20: Cluster, Collaboration, Goals, Strategy
-- [x] Sprint 21–27: Institutional Memory, Cognitive, Healing
-- [x] **Sprint 28**: Self-Evolution Engine (Optimization, Healing, Autotuning)
-- [x] **Sprint 29**: Cognitive Runtime (State, Memory, Attention, Arbitration, Context, Sessions)
+287 tests, 0 regresi.
 
-## License
+## Arsitektur
 
-MIT
+Dokumentasi arsitektur lengkap di `docs/architecture/`:
+
+- `SAM_CONSTITUTION.md` — 10 pasal, hukum tertinggi SAM
+- `SAM_ARCHITECTURE_MASTER.md` — 7 layer + Golden Rule
+- `runtime-kernel-specification-v1.md` — 19 bab spesifikasi
+- `design/operations-console.md` — 11 bab CLI
+- `adr/ADR-015-020.md` — 6 ADR terkait
+
+## Lisensi
+
+MIT — lihat file LICENSE.
