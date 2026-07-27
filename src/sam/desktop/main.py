@@ -119,7 +119,7 @@ class Sidebar(QFrame):
         self.buttons = []
         for icon, text, index in NAV_ITEMS:
             btn = NavButton(icon, text, index)
-            btn.clicked.connect(lambda ch, idx=index: parent.switch_page(idx))
+            btn.clicked.connect(lambda *a, idx=index: parent.switch_page(idx))
             layout.addWidget(btn)
             self.buttons.append(btn)
 
