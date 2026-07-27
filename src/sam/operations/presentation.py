@@ -68,7 +68,7 @@ class Presentation:
 
 
 # ============================================================================
-# PresentationEngine
+# PresentationRenderer
 # ============================================================================
 
 # Mapping Situation → Human Language untuk Mission Target
@@ -100,7 +100,7 @@ ATTENTION_LABELS = {
 }
 
 
-class PresentationEngine:
+class PresentationRenderer:
     """Mengubah semantic state + decision menjadi tampilan manusia."""
 
     def __init__(self):

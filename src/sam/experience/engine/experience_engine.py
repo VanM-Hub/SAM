@@ -22,12 +22,12 @@ from ...operations.engine.history import HistoryEngine
 from ...operations.engine.settings import SettingsEngine
 from ...operations.engine.explain import ExplainabilityEngine
 from ...operations.protection import ProtectionEngine
-from ...operations.situation import SituationEngine, SituationReport, Situation
-from ...operations.attention import AttentionEngine, AttentionItem, AttentionScore
-from ...operations.story import StoryBuilder, Story, StoryType
-from ...operations.presentation import PresentationEngine, Presentation, Decision
-from ...operations.recommendation import RecommendationEngine, Recommendation
-from ...operations.prediction import PredictionEngine, Prediction
+from ...operations.situation import SituationAnalyzer, SituationReport, Situation
+from ...operations.attention import AttentionAnalyzer, AttentionItem, AttentionScore
+from ...operations.story import StoryService, Story, StoryType
+from ...operations.presentation import PresentationRenderer, Presentation, Decision
+from ...operations.recommendation import RecommendationPolicy, Recommendation
+from ...operations.prediction import PredictionPolicy, Prediction
 from ...operations.question_engine import QuestionEngine, HumanAnswer
 from ...narrative import NarrativeBuilder, DailyBriefing, SituationBrief
 from ...openclaw.connection import OpenClawAdapter
@@ -62,12 +62,12 @@ class ExperienceEngine:
         self.openclaw = OpenClawAdapter()
         self.openclaw.bind_telemetry(telemetry)
         self.narrative = NarrativeBuilder()
-        self.situation = SituationEngine(self)
-        self.attention = AttentionEngine(self)
-        self.story_builder = StoryBuilder()
-        self.presentation = PresentationEngine()
-        self.recommendation_engine = RecommendationEngine(self)
-        self.prediction_engine = PredictionEngine(self)
+        self.situation = SituationAnalyzer(self)
+        self.attention = AttentionAnalyzer(self)
+        self.story_builder = StoryService()
+        self.presentation = PresentationRenderer()
+        self.recommendation_engine = RecommendationPolicy(self)
+        self.prediction_engine = PredictionPolicy(self)
         self.question_engine = QuestionEngine(self)
 
     # ======================================================================

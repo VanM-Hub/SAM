@@ -29,7 +29,7 @@ class Recommendation:
         return "{} — {}".format(self.action, self.reason)
 
 
-class RecommendationEngine:
+class RecommendationPolicy:
     """Menjawab: 'What should happen next?'"""
 
     def __init__(self, experience_engine=None):

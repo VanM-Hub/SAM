@@ -71,7 +71,7 @@ class SituationReport:
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
 
 
-class SituationEngine:
+class SituationAnalyzer:
     """Mendeteksi situasi dari Experience Model.
 
     BUKAN dari Runtime.

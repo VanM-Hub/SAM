@@ -25,7 +25,7 @@ class Prediction:
         return "{} {}. Risk: {}.".format(self.event, self.timeframe, self.risk)
 
 
-class PredictionEngine:
+class PredictionPolicy:
     """Menjawab: 'What happens if nothing is done?'"""
 
     def __init__(self, experience_engine=None):

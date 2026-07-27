@@ -54,7 +54,7 @@ class Story:
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
 
 
-class StoryBuilder:
+class StoryService:
     """Membangun cerita tentang Mission Target — bukan tentang SAM."""
 
     def build_stories(self, activity_model) -> List[Story]:

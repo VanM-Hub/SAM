@@ -24,7 +24,7 @@ from .conversation import ConversationObject
 from .conversation_context import ConversationContext
 from .intent import InteractionIntent as QuestionIntent
 from .intent_resolver import IntentResolver
-from .understanding import UnderstandingEngine
+from .understanding import SystemAnalyzer
 from .audience import AudienceProfile, get_profile, AudienceType
 from .session import MissionSession, SessionManager
 from ..render import CLIRenderer, DesktopRenderer, JSONRenderer
@@ -38,7 +38,7 @@ class QuestionEngine:
     """
 
     def __init__(self, experience_engine=None):
-        self.understanding = UnderstandingEngine(experience_engine)
+        self.understanding = SystemAnalyzer(experience_engine)
         self.session = SessionManager()
         self.renderers = {
             "cli": CLIRenderer(),
