@@ -219,8 +219,7 @@ def cmd_ask(args):
     if not question:
         # Interactive mode
         print()
-        print("SAM — Ask anything about the system.")
-        print("(Type 'exit' to quit)")
+        print("SAM — Ask anything. (Type 'exit' to quit)")
         print()
         while True:
             try:
