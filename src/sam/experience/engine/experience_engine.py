@@ -518,14 +518,15 @@ class ExperienceEngine:
     # QUESTION ENGINE — Conversation-first
     # ======================================================================
 
-    def get_live_answer(self, question: str = "") -> HumanAnswer:
+    def get_live_answer(self, question: str = "",
+                         audience_type: str = "") -> HumanAnswer:
         """Satu-satunya cara UI/CLI/Assistant bertanya.
 
-        Desktop: home.answer("What's happening?")
-        CLI: sam ask "What's happening?"
+        Desktop: ee.get_live_answer("What's happening?")
+        CLI: ee.get_live_answer("Why?", audience_type="developer")
         Assistant: semua jawaban lewat sini.
         """
-        return self.question_engine.answer(question)
+        return self.question_engine.answer(question, audience_type=audience_type)
 
     # ======================================================================
     # ASSISTANT
