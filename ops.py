@@ -216,6 +216,11 @@ def cmd_ask(args):
     engine = _get_engine()
     question = " ".join(args.extra) if args.extra else ""
 
+    # Parse audience flag
+    audience = "administrator"
+    if args.audience:
+        audience = args.audience[0] if isinstance(args.audience, list) else args.audience
+
     if not question:
         # Interactive mode
         print()
@@ -229,15 +234,15 @@ def cmd_ask(args):
                 break
             if not q or q.lower() in ("exit", "quit", "q"):
                 break
-            answer = engine.get_live_answer(q)
+            answer = engine.get_live_answer(q, audience_type=audience)
             print()
-            print(answer.display_cli())
+            print(engine.render_for_cli(answer))
             print()
         return
 
-    answer = engine.get_live_answer(question)
+    answer = engine.get_live_answer(question, audience_type=audience)
     print()
-    print(answer.display_cli())
+    print(engine.render_for_cli(answer))
     print()
 
 
@@ -251,6 +256,10 @@ def main():
                         help="Command — semua narrative-aware")
     parser.add_argument("extra", nargs=argparse.REMAINDER,
                         help="Additional arguments (for ask)")
+    parser.add_argument("-a", "--audience",
+                        choices=["administrator", "developer", "operator", "observer"],
+                        default=None,
+                        help="Audience profile for responses (default: administrator)")
 
     parsed = parser.parse_args()
 
