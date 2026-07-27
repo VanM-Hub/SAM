@@ -1,4 +1,4 @@
-from .pages.home import HomePage  # noqa: F401
-from .main import run  # noqa: F401
+from .home import HomePage  # noqa: F401
+from .timeline import TimelinePage  # noqa: F401
 
-__all__ = ["HomePage", "run"]
+__all__ = ["HomePage", "TimelinePage"]
