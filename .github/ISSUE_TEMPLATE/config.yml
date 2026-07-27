@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: SAM Framework Documentation
-    url: https://github.com/your-org/sam-framework/tree/main/docs
-    about: Please check the documentation before creating an issue.
-  - name: Discussions
-    url: https://github.com/your-org/sam-framework/discussions
-    about: For questions, suggestions, and general discussion.
+  - name: SAM Documentation
+    url: https://github.com/VanM-Hub/SAM/tree/main/docs
+    about: Dokumentasi SAM Framework

@@ -1,0 +1,9 @@
+{
+  "runtime_version": "2.0.0",
+  "workspace": "./workspace",
+  "hosting": "desktop",
+  "state": "RUNNING",
+  "health": "UNHEALTHY",
+  "uptime": 0,
+  "generated_at": "2026-07-27T11:28:39.574858"
+}
