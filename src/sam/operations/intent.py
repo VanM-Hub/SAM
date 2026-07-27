@@ -1,23 +1,18 @@
 """
-QuestionIntent — Kontrak percakapan manusia.
+InteractionIntent — Semua bentuk interaksi manusia.
 
-BUKAN string.
-BUKAN NLP.
-Intent adalah jenis pertanyaan.
-
-Semua UI mengirim Intent, bukan string mentah.
-Desktop, CLI, API, Voice, semuanya Intent yang sama.
+Bukan cuma pertanyaan teks.
+Click, Voice, Notification, API, Automation — semuanya interaksi.
 """
 
 from enum import Enum
 
 
-class QuestionIntent(Enum):
-    """Jenis pertanyaan — kontrak antara interface dan QuestionEngine.
+class InteractionIntent(Enum):
+    """Jenis interaksi — menggantikan QuestionIntent.
 
-    Setiap intent memiliki:
-    - semantic_group: untuk fallback
-    - priority: urutan pemrosesan
+    Intent tidak lagi diasumsikan dari pertanyaan teks.
+    Intent berasal dari semua bentuk interaksi.
     """
     OVERVIEW = ("overview", "read", 10)
     HEALTH = ("health", "read", 20)

@@ -22,7 +22,7 @@ from typing import Optional
 from .human_answer import HumanAnswer
 from .conversation import ConversationObject
 from .conversation_context import ConversationContext
-from .intent import QuestionIntent
+from .intent import InteractionIntent as QuestionIntent
 from .intent_resolver import IntentResolver
 from .understanding import UnderstandingEngine
 from .audience import AudienceProfile, get_profile, AudienceType
