@@ -1,31 +1,33 @@
+"""
+Home Page — Ringkasan operasional.
+
+Apakah sistem sehat? Apa yang terjadi? Perlu tindakan?
+"""
+
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout,
-    QFrame, QScrollArea
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame,
+    QScrollArea, QSizePolicy,
 )
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont, QColor, QPalette
+from PySide6.QtGui import QFont
 
-from ...experience.builder import ExperienceBuilder
-from ...experience.pages.home import HomeModel, HomeStatus
+from ...experience.engine import ExperienceEngine, HomeExperience, SystemStatus
 
 
 class HomePage(QWidget):
-    """Halaman Home untuk Desktop Operations Console."""
+    """Halaman Home — dapat dibaca < 5 detik."""
 
-    def __init__(self, builder: ExperienceBuilder):
+    def __init__(self, experience):
         super().__init__()
-        self.builder = builder
-        self.current_model = None
+        self.experience = experience
         self._init_ui()
-        self._start_refresh()
 
     def _init_ui(self):
-        """Initialize UI components."""
         layout = QVBoxLayout()
-        layout.setSpacing(16)
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(20)
 
-        # Scroll area
+        # Scroll
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
@@ -34,166 +36,155 @@ class HomePage(QWidget):
         self.content = QWidget()
         self.content.setStyleSheet("background: transparent;")
         self.content_layout = QVBoxLayout(self.content)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
         self.content_layout.setSpacing(16)
+
+        # --- Widget containers ---
+        self.status_card = QLabel("SAM is Healthy")
+        self.detail_card = QLabel("Everything is operating normally.")
+        self.purpose_label = QLabel("")
+        self.activity_label = QLabel("")
+        self.attention_label = QLabel("No action required")
+        self.rec_label = QLabel("")
+
+        # Build structure
+        self._build_structure()
 
         scroll.setWidget(self.content)
         layout.addWidget(scroll)
-
         self.setLayout(layout)
 
-        # Timer untuk refresh
+        # Refresh
         self.refresh_timer = QTimer()
         self.refresh_timer.timeout.connect(self.refresh)
-        self.refresh_timer.start(5000)  # 5 detik
-
-    def _start_refresh(self):
-        """Mulai refresh (dipanggil di __init__)."""
+        self.refresh_timer.start(5000)
         self.refresh()
 
+    def _build_structure(self):
+        # 1. Status — big card
+        self.status_label = QLabel()
+        font = QFont()
+        font.setPointSize(20)
+        font.setBold(True)
+        self.status_label.setFont(font)
+        self.status_label.setStyleSheet("color: #4ae04a; padding: 0;")
+        self.content_layout.addWidget(self.status_label)
+
+        self.detail_label = QLabel()
+        self.detail_label.setStyleSheet("color: #a0a0b0; font-size: 14px; padding: 0 0 8px 0;")
+        self.detail_label.setWordWrap(True)
+        self.content_layout.addWidget(self.detail_label)
+
+        # Separator
+        sep = QFrame()
+        sep.setFrameShape(QFrame.HLine)
+        sep.setStyleSheet("color: #1a1a2a;")
+        self.content_layout.addWidget(sep)
+
+        # 2. Purpose
+        purpose_title = QLabel("Purpose")
+        purpose_title.setStyleSheet("color: #808090; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;")
+        self.content_layout.addWidget(purpose_title)
+        self.purpose_label.setStyleSheet("color: #e0e0e0; font-size: 15px;")
+        self.content_layout.addWidget(self.purpose_label)
+
+        # Separator
+        sep2 = QFrame()
+        sep2.setFrameShape(QFrame.HLine)
+        sep2.setStyleSheet("color: #1a1a2a;")
+        self.content_layout.addWidget(sep2)
+
+        # 3. Current Activity
+        activity_title = QLabel("Current Activity")
+        activity_title.setStyleSheet("color: #808090; font-size: 11px; letter-spacing: 1px;")
+        self.content_layout.addWidget(activity_title)
+        self.activity_label.setStyleSheet("color: #c0c0c0; font-size: 14px;")
+        self.activity_label.setWordWrap(True)
+        self.content_layout.addWidget(self.activity_label)
+
+        # Separator
+        sep3 = QFrame()
+        sep3.setFrameShape(QFrame.HLine)
+        sep3.setStyleSheet("color: #1a1a2a;")
+        self.content_layout.addWidget(sep3)
+
+        # 4. Attention
+        attention_title = QLabel("Attention")
+        attention_title.setStyleSheet("color: #808090; font-size: 11px; letter-spacing: 1px;")
+        self.content_layout.addWidget(attention_title)
+        self.attention_label.setStyleSheet("color: #4ae04a; font-size: 14px;")
+        self.attention_label.setWordWrap(True)
+        self.content_layout.addWidget(self.attention_label)
+
+        # Separator
+        sep4 = QFrame()
+        sep4.setFrameShape(QFrame.HLine)
+        sep4.setStyleSheet("color: #1a1a2a;")
+        self.content_layout.addWidget(sep4)
+
+        # 5. Recommendations
+        rec_title = QLabel("Recommendations")
+        rec_title.setStyleSheet("color: #808090; font-size: 11px; letter-spacing: 1px;")
+        self.content_layout.addWidget(rec_title)
+        self.rec_label.setStyleSheet("color: #6aaae0; font-size: 13px;")
+        self.rec_label.setWordWrap(True)
+        self.content_layout.addWidget(self.rec_label)
+
+        # Spacer
+        self.content_layout.addStretch()
+
     def refresh(self):
-        """Refresh tampilan dari Experience Builder."""
         try:
-            model = self.builder.build_home()
-            self.current_model = model
+            model = self.experience.build_home()
             self._render(model)
         except Exception as e:
-            self._render_error(str(e))
+            self.status_label.setText("Error loading Home")
+            self.detail_label.setText(str(e))
 
-    def _render(self, model: HomeModel):
-        """Render HomeModel ke UI."""
-        # Bersihkan layout
-        self._clear_layout(self.content_layout)
+    def _render(self, model):
+        # Status
+        if model.health.status == SystemStatus.HEALTHY:
+            color = "#4ae04a"
+            icon = "\u2705"
+        elif model.health.status == SystemStatus.PROBLEM:
+            color = "#e06a6a"
+            icon = "\u274c"
+        elif model.health.status == SystemStatus.RECOVERING:
+            color = "#e0c06a"
+            icon = "\U0001f504"
+        else:
+            color = "#6aaae0"
+            icon = "\U0001f9e0"
 
-        # 1. Header — Salam dan Status
-        header = QHBoxLayout()
-        greeting = QLabel("Good {}.".format('morning' if 8 < 12 else 'afternoon'))
-        greeting.setStyleSheet("font-size: 24px; font-weight: bold; color: #e0e0e0;")
-        status_label = QLabel(self._status_text(model.status))
-        status_label.setStyleSheet(self._status_style(model.status))
-        header.addWidget(greeting)
-        header.addStretch()
-        header.addWidget(status_label)
-        self.content_layout.addLayout(header)
+        self.status_label.setText("{}  {}".format(icon, model.health.message))
+        self.status_label.setStyleSheet("color: {}; font-size: 20px; font-weight: bold; padding: 0;".format(color))
 
-        # 2. Stat Grid — 3 kolom
-        grid = QGridLayout()
-        grid.setSpacing(16)
+        self.detail_label.setText(model.health.detail)
 
-        # System Health
-        health_box = self._stat_box("System Health", "{:.0f}%".format(model.system_health))
-        grid.addWidget(health_box, 0, 0)
+        # Purpose
+        self.purpose_label.setText("\U0001f3af  {}".format(model.purpose.name))
 
-        # Mission Health
-        mission_box = self._stat_box("Mission Health", "{:.0f}%".format(model.mission_health))
-        grid.addWidget(mission_box, 0, 1)
+        # Current activity
+        self.activity_label.setText(model.current_activity.title)
+        if model.current_activity.activity_log:
+            log_text = ""
+            for item in model.current_activity.activity_log[:3]:
+                log_text += "{}  {}\n".format(item.time, item.description)
+            self.activity_label.setText(log_text.strip())
 
-        # Uptime
-        uptime_box = self._stat_box("Uptime", model.uptime)
-        grid.addWidget(uptime_box, 0, 2)
+        # Attention
+        if model.attention.needs_attention:
+            self.attention_label.setStyleSheet("color: #e0c06a; font-size: 14px;")
+            text = "\u26a0\ufe0f  {}".format(model.attention.message)
+            if model.attention.reason:
+                text += "\n    Reason: {}".format(model.attention.reason)
+            self.attention_label.setText(text)
+        else:
+            self.attention_label.setStyleSheet("color: #4ae04a; font-size: 14px;")
+            self.attention_label.setText("\u2705  {}".format(model.attention.message))
 
-        self.content_layout.addLayout(grid)
-
-        # 3. Recent Activity
-        activity_label = QLabel("Recent Activity")
-        activity_label.setStyleSheet(
-            "font-size: 16px; font-weight: bold; color: #c0c0c0; margin-top: 8px;"
-        )
-        self.content_layout.addWidget(activity_label)
-
-        for change in model.recent_changes[:5]:
-            change_widget = QLabel(change["message"])
-            change_widget.setStyleSheet(
-                "padding: 6px 12px; background: #1a1a2a; border-radius: 4px; color: #a0a0b0;"
-            )
-            self.content_layout.addWidget(change_widget)
-
-        # 4. Recommendations / Attention
-        if model.needs_attention:
-            attention_label = QLabel("\u26a0\ufe0f Needs Attention")
-            attention_label.setStyleSheet(
-                "font-size: 16px; font-weight: bold; color: #e0c06a; margin-top: 8px;"
-            )
-            self.content_layout.addWidget(attention_label)
-
-            if model.pending_approvals > 0:
-                self.content_layout.addWidget(
-                    QLabel("\U0001f4cb {} pending approvals".format(model.pending_approvals))
-                )
-            if model.pending_tasks > 0:
-                self.content_layout.addWidget(
-                    QLabel("\U0001f4cc {} pending tasks".format(model.pending_tasks))
-                )
-            if model.recommendations:
-                for rec in model.recommendations[:3]:
-                    rec_widget = QLabel("\U0001f4a1 {}".format(rec))
-                    rec_widget.setStyleSheet(
-                        "padding: 6px 12px; background: #1a2a3a; border-radius: 4px; color: #6aaae0;"
-                    )
-                    self.content_layout.addWidget(rec_widget)
-
-    def _clear_layout(self, layout):
-        """Hapus semua widget dari layout."""
-        while layout.count():
-            item = layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
-
-    def _stat_box(self, label: str, value: str):
-        """Buat box statistik."""
-        widget = QFrame()
-        widget.setStyleSheet("""
-            QFrame {
-                background: #12121a;
-                border: 1px solid #2a2a3a;
-                border-radius: 8px;
-                padding: 12px;
-            }
-        """)
-        layout = QVBoxLayout()
-        label_widget = QLabel(label)
-        label_widget.setStyleSheet(
-            "color: #888; font-size: 12px; letter-spacing: 0.5px;"
-        )
-        value_widget = QLabel(value)
-        value_widget.setStyleSheet(
-            "color: #e0e0e0; font-size: 28px; font-weight: 600;"
-        )
-        layout.addWidget(label_widget)
-        layout.addWidget(value_widget)
-        widget.setLayout(layout)
-        return widget
-
-    def _status_text(self, status: HomeStatus) -> str:
-        """Status manusia."""
-        mapping = {
-            HomeStatus.HEALTHY: "\u2705 Healthy",
-            HomeStatus.BUSY: "\U0001f504 Busy",
-            HomeStatus.RECOVERING: "\U0001f527 Recovering",
-            HomeStatus.LEARNING: "\U0001f9e0 Learning",
-            HomeStatus.STARTING: "\U0001f680 Starting",
-            HomeStatus.STOPPING: "\u23f9\ufe0f Stopping",
-            HomeStatus.DEGRADED: "\u26a0\ufe0f Degraded",
-            HomeStatus.UNHEALTHY: "\u274c Unhealthy",
-        }
-        return mapping.get(status, "\u2753 Unknown")
-
-    def _status_style(self, status: HomeStatus) -> str:
-        """CSS style untuk status."""
-        styles = {
-            HomeStatus.HEALTHY: "color: #4ae04a; font-weight: bold; font-size: 18px;",
-            HomeStatus.BUSY: "color: #e0c06a; font-weight: bold; font-size: 18px;",
-            HomeStatus.RECOVERING: "color: #e09a6a; font-weight: bold; font-size: 18px;",
-            HomeStatus.LEARNING: "color: #6aaae0; font-weight: bold; font-size: 18px;",
-            HomeStatus.STARTING: "color: #6aaae0; font-weight: bold; font-size: 18px;",
-            HomeStatus.STOPPING: "color: #e06a6a; font-weight: bold; font-size: 18px;",
-            HomeStatus.DEGRADED: "color: #e0c06a; font-weight: bold; font-size: 18px;",
-            HomeStatus.UNHEALTHY: "color: #e06a6a; font-weight: bold; font-size: 18px;",
-        }
-        return styles.get(status, "color: #a0a0b0; font-weight: bold; font-size: 18px;")
-
-    def _render_error(self, error: str):
-        """Tampilkan error di UI."""
-        self._clear_layout(self.content_layout)
-        error_label = QLabel("\u26a0\ufe0f Error loading Home: {}".format(error))
-        error_label.setStyleSheet("color: #e06a6a; font-size: 14px; padding: 16px;")
-        self.content_layout.addWidget(error_label)
+        # Recommendations
+        recs = []
+        for r in model.recommendations:
+            recs.append(r.message)
+        self.rec_label.setText("\n".join(recs))

@@ -1,8 +1,6 @@
-from .home import HomePage  # noqa: F401
-from .timeline import TimelinePage  # noqa: F401
-from .tasks import TaskPage  # noqa: F401
-from .knowledge import KnowledgePage  # noqa: F401
-from .history import HistoryPage  # noqa: F401
-from .settings import SettingsPage  # noqa: F401
+from .home import HomePage
+from .activity import ActivityPage
+from .work import WorkPage
+from .knowledge import KnowledgePage, HistoryPage, SettingsPage
 
-__all__ = ["HomePage", "TimelinePage", "TaskPage", "KnowledgePage", "HistoryPage", "SettingsPage"]
+__all__ = ["HomePage", "ActivityPage", "WorkPage", "KnowledgePage", "HistoryPage", "SettingsPage"]
