@@ -13,6 +13,7 @@ from ...operations.engine.history import HistoryEngine
 from ...operations.engine.settings import SettingsEngine
 from ...operations.engine.explain import ExplainabilityEngine
 from ...operations.protection import ProtectionEngine
+from ...openclaw.connection import OpenClawAdapter
 from ...telemetry.service import TelemetryService
 
 from .models import (
@@ -41,6 +42,8 @@ class ExperienceEngine:
         self.settings_engine = SettingsEngine()
         self.explain_engine = ExplainabilityEngine(telemetry)
         self.protection = ProtectionEngine()
+        self.openclaw = OpenClawAdapter()
+        self.openclaw.bind_telemetry(telemetry)
 
     # ======================================================================
     # HOME
@@ -386,6 +389,25 @@ class ExperienceEngine:
             ))
 
         return NotificationExperience(items=items)
+
+    # ======================================================================
+    # OPENCLAW
+    # ======================================================================
+
+    def build_openclaw_status(self) -> dict:
+        """Status koneksi OpenClaw."""
+        status = self.openclaw.get_connection_status()
+        return {
+            "connected": status.connected,
+            "last_sync": status.last_sync,
+            "error": status.error,
+            "status_sent": status.status_sent,
+            "commands_processed": status.commands_processed,
+        }
+
+    async def sync_openclaw(self):
+        """Kirim status SAM ke OpenClaw."""
+        await self.openclaw.cycle(self)
 
     # ======================================================================
     # ASSISTANT
