@@ -1,171 +1,272 @@
+"""
+Knowledge Page — Things SAM Learned.
+History Page — Cerita operasional.
+Settings Page — Pengaturan dalam kelompok manusia.
+"""
+
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QListWidget, QListWidgetItem, QStackedWidget, QFrame,
-    QLineEdit, QScrollArea
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame,
+    QScrollArea, QGroupBox, QFormLayout,
 )
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QFont
 
-from ...operations.engine.knowledge import KnowledgeEngine
-from ...experience.models.knowledge import KnowledgeEntry, KnowledgeType
-from ...telemetry.service import TelemetryService
+from ...experience.engine import ExperienceEngine
 
+
+# ============================================================================
+# KNOWLEDGE
+# ============================================================================
 
 class KnowledgePage(QWidget):
-    """Halaman Knowledge untuk Desktop."""
-
-    def __init__(self, telemetry, knowledge_store=None):
+    def __init__(self, experience):
         super().__init__()
-        self.telemetry = telemetry
-        self.engine = KnowledgeEngine(telemetry, knowledge_store)
-        self.current_model = None
+        self.experience = experience
         self._init_ui()
-        self._start_refresh()
 
     def _init_ui(self):
         layout = QVBoxLayout()
-        layout.setSpacing(12)
-        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setContentsMargins(24, 24, 24, 24)
 
-        # Header
-        header = QHBoxLayout()
-        title = QLabel("\U0001f9e0 Knowledge & Insights")
-        title.setStyleSheet("font-size: 20px; font-weight: bold; color: #e0e0e0;")
-        header.addWidget(title)
-        header.addStretch()
+        title = QLabel("Things SAM Learned")
+        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #e0e0e0; margin-bottom: 8px;")
+        layout.addWidget(title)
 
-        # Search
-        self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("\U0001f50d Search knowledge...")
-        self.search_input.setStyleSheet("""
-            QLineEdit {
-                background: #12121a;
-                border: 1px solid #2a2a3a;
-                border-radius: 6px;
-                padding: 6px 12px;
-                color: #e0e0e0;
-                min-width: 200px;
-            }
-        """)
-        self.search_input.returnPressed.connect(self._search)
-        header.addWidget(self.search_input)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setStyleSheet("QScrollArea { background: transparent; border: none; }")
 
-        refresh_btn = QPushButton("\U0001f504 Refresh")
-        refresh_btn.setStyleSheet("""
-            QPushButton {
-                background: #2a4a6a;
-                border: none;
-                border-radius: 6px;
-                padding: 6px 16px;
-                color: #fff;
-            }
-            QPushButton:hover { background: #3a5a7a; }
-        """)
-        refresh_btn.clicked.connect(self.refresh)
-        header.addWidget(refresh_btn)
-        layout.addLayout(header)
+        self.content = QWidget()
+        self.content.setStyleSheet("background: transparent;")
+        self.content_layout = QVBoxLayout(self.content)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
+        self.content_layout.setSpacing(8)
 
-        # Split: Insights + Entries
-        split = QHBoxLayout()
-
-        # Left: Insights
-        insight_widget = QFrame()
-        insight_widget.setStyleSheet(
-            "background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px; padding: 12px;"
-        )
-        insight_layout = QVBoxLayout(insight_widget)
-        insight_label = QLabel("\U0001f4a1 Insights")
-        insight_label.setStyleSheet("font-weight: bold; color: #c0c0c0;")
-        insight_layout.addWidget(insight_label)
-
-        self.insight_list = QListWidget()
-        self.insight_list.setStyleSheet("background: transparent; border: none;")
-        insight_layout.addWidget(self.insight_list)
-        split.addWidget(insight_widget, 1)
-
-        # Right: Knowledge entries
-        entry_widget = QFrame()
-        entry_widget.setStyleSheet(
-            "background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px; padding: 12px;"
-        )
-        entry_layout = QVBoxLayout(entry_widget)
-        entry_label = QLabel("\U0001f4da Knowledge")
-        entry_label.setStyleSheet("font-weight: bold; color: #c0c0c0;")
-        entry_layout.addWidget(entry_label)
-
-        self.entry_list = QListWidget()
-        self.entry_list.setStyleSheet("background: transparent; border: none;")
-        entry_layout.addWidget(self.entry_list)
-        split.addWidget(entry_widget, 2)
-
-        layout.addLayout(split)
+        scroll.setWidget(self.content)
+        layout.addWidget(scroll)
         self.setLayout(layout)
 
         self.refresh_timer = QTimer()
         self.refresh_timer.timeout.connect(self.refresh)
         self.refresh_timer.start(15000)
-
-    def _start_refresh(self):
         self.refresh()
 
     def refresh(self):
         try:
-            self.current_model = self.engine.get_knowledge()
-            self._render()
+            model = self.experience.build_knowledge()
+            self._render(model)
         except Exception:
             pass
 
-    def _search(self):
-        query = self.search_input.text().strip()
-        if not query:
-            self.refresh()
-            return
-        results = self.engine.search(query)
-        self._render_results(results)
+    def _render(self, model):
+        self._clear()
 
-    def _render(self):
-        if not self.current_model:
-            return
+        for item in model.items[:20]:
+            # Determine color
+            if item.severity == "recommendation":
+                color = "#6aaae0"
+                icon = "\U0001f4a1"
+            elif item.severity == "warning":
+                color = "#e0c06a"
+                icon = "\u26a0\ufe0f"
+            else:
+                color = "#a0a0b0"
+                icon = "\U0001f4cc"
 
-        # Insights
-        self.insight_list.clear()
-        for insight in self.current_model.insights:
-            colors = {"info": "#6aaae0", "warning": "#e0c06a", "critical": "#e06a6a"}
-            color = colors.get(insight.severity, "#a0a0b0")
-            item = QListWidgetItem(insight.title)
-            item.setForeground(QColor(color))
-            item.setToolTip(insight.description)
-            self.insight_list.addItem(item)
+            card = QFrame()
+            card.setStyleSheet("""
+                QFrame {
+                    background: #0d0d16;
+                    border: 1px solid #1a1a2a;
+                    border-radius: 6px;
+                    padding: 10px 14px;
+                }
+            """)
+            card_layout = QVBoxLayout(card)
+            card_layout.setSpacing(2)
 
-        if not self.current_model.insights:
-            item = QListWidgetItem("No insights yet")
-            item.setForeground(QColor("#666"))
-            self.insight_list.addItem(item)
+            row = QLabel("{}  {}".format(icon, item.title))
+            row.setStyleSheet("color: {}; font-size: 13px;".format(color))
+            row.setWordWrap(True)
+            card_layout.addWidget(row)
 
-        # Entries
-        self.entry_list.clear()
-        for entry in self.current_model.entries[:20]:
-            icon = {
-                KnowledgeType.FACT: "\U0001f4cc",
-                KnowledgeType.PATTERN: "\U0001f50d",
-                KnowledgeType.RECOMMENDATION: "\U0001f4a1",
-                KnowledgeType.INSIGHT: "\U0001f9e0",
-                KnowledgeType.LESSON: "\U0001f4d6",
-                KnowledgeType.TIP: "\U0001f4a1",
-            }.get(entry.type, "\U0001f4c4")
-            text = "{} {}".format(icon, entry.title[:50])
-            item = QListWidgetItem(text)
-            item.setToolTip(entry.content[:200])
-            self.entry_list.addItem(item)
+            if item.confidence:
+                conf = QLabel("   Confidence: {:.0f}%".format(item.confidence * 100))
+                conf.setStyleSheet("color: #606070; font-size: 11px;")
+                card_layout.addWidget(conf)
 
-        if not self.current_model.entries:
-            item = QListWidgetItem("No knowledge yet")
-            item.setForeground(QColor("#666"))
-            self.entry_list.addItem(item)
+            if item.timestamp:
+                ts = QLabel("   {}".format(item.timestamp))
+                ts.setStyleSheet("color: #505060; font-size: 10px;")
+                card_layout.addWidget(ts)
 
-    def _render_results(self, results):
-        self.entry_list.clear()
-        for entry in results:
-            item = QListWidgetItem("\U0001f50d {}".format(entry.title[:50]))
-            item.setToolTip(entry.content[:200])
-            self.entry_list.addItem(item)
+            self.content_layout.addWidget(card)
+
+    def _clear(self):
+        while self.content_layout.count():
+            item = self.content_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+
+# ============================================================================
+# HISTORY
+# ============================================================================
+
+class HistoryPage(QWidget):
+    def __init__(self, experience):
+        super().__init__()
+        self.experience = experience
+        self._init_ui()
+
+    def _init_ui(self):
+        layout = QVBoxLayout()
+        layout.setContentsMargins(24, 24, 24, 24)
+
+        title = QLabel("History")
+        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #e0e0e0; margin-bottom: 8px;")
+        layout.addWidget(title)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setStyleSheet("QScrollArea { background: transparent; border: none; }")
+
+        self.content = QWidget()
+        self.content.setStyleSheet("background: transparent;")
+        self.content_layout = QVBoxLayout(self.content)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
+        self.content_layout.setSpacing(4)
+
+        scroll.setWidget(self.content)
+        layout.addWidget(scroll)
+        self.setLayout(layout)
+
+        self.refresh_timer = QTimer()
+        self.refresh_timer.timeout.connect(self.refresh)
+        self.refresh_timer.start(15000)
+        self.refresh()
+
+    def refresh(self):
+        try:
+            model = self.experience.build_history()
+            self._render(model)
+        except Exception:
+            pass
+
+    def _render(self, model):
+        self._clear()
+
+        for story in model.stories[:7]:
+            # Label
+            label = QLabel(story.label)
+            label.setStyleSheet("""
+                color: #808090;
+                font-size: 12px;
+                font-weight: bold;
+                letter-spacing: 1px;
+                padding: 8px 0 4px 0;
+            """)
+            self.content_layout.addWidget(label)
+
+            # Events
+            for event in story.events[:10]:
+                e = QLabel("  \u2022  {}".format(event))
+                e.setStyleSheet("color: #b0b0c0; font-size: 13px; padding: 2px 0;")
+                self.content_layout.addWidget(e)
+
+            # Separator
+            sep = QFrame()
+            sep.setFrameShape(QFrame.HLine)
+            sep.setStyleSheet("color: #12121a; margin: 4px 0;")
+            self.content_layout.addWidget(sep)
+
+    def _clear(self):
+        while self.content_layout.count():
+            item = self.content_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+
+# ============================================================================
+# SETTINGS
+# ============================================================================
+
+class SettingsPage(QWidget):
+    def __init__(self, experience):
+        super().__init__()
+        self.experience = experience
+        self._init_ui()
+
+    def _init_ui(self):
+        layout = QVBoxLayout()
+        layout.setContentsMargins(24, 24, 24, 24)
+
+        title = QLabel("Settings")
+        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #e0e0e0; margin-bottom: 8px;")
+        layout.addWidget(title)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setStyleSheet("QScrollArea { background: transparent; border: none; }")
+
+        self.content = QWidget()
+        self.content.setStyleSheet("background: transparent;")
+        self.content_layout = QVBoxLayout(self.content)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
+        self.content_layout.setSpacing(12)
+
+        scroll.setWidget(self.content)
+        layout.addWidget(scroll)
+        self.setLayout(layout)
+
+        self.refresh()
+
+    def refresh(self):
+        try:
+            model = self.experience.build_settings()
+            self._render(model)
+        except Exception:
+            pass
+
+    def _render(self, model):
+        self._clear()
+
+        for group in model.groups:
+            gb = QGroupBox(group.name)
+            gb.setStyleSheet("""
+                QGroupBox {
+                    border: 1px solid #1a1a2a;
+                    border-radius: 8px;
+                    margin-top: 12px;
+                    padding-top: 16px;
+                    font-size: 14px;
+                    color: #e0e0e0;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 14px;
+                    padding: 0 8px;
+                }
+            """)
+            form = QFormLayout()
+            form.setSpacing(6)
+            form.setContentsMargins(16, 12, 16, 12)
+
+            for key, value in group.settings.items():
+                label = QLabel(key)
+                label.setStyleSheet("color: #a0a0b0;")
+                val = QLabel(value)
+                val.setStyleSheet("color: #e0e0e0;")
+                form.addRow(label, val)
+
+            gb.setLayout(form)
+            self.content_layout.addWidget(gb)
+
+    def _clear(self):
+        while self.content_layout.count():
+            item = self.content_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
