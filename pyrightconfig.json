@@ -1,0 +1,19 @@
+{
+  "include": ["src"],
+  "exclude": [
+    "**/__pycache__",
+    "**/.git",
+    "**/node_modules"
+  ],
+  "typeCheckingMode": "basic",
+  "reportMissingTypeStubs": false,
+  "reportMissingImports": false,
+  "reportUnusedImport": "warning",
+  "reportUnusedClass": "warning",
+  "reportUnusedFunction": "warning",
+  "reportUnusedVariable": "warning",
+  "reportPrivateUsage": "none",
+  "stubPath": "src",
+  "pythonVersion": "3.8",
+  "pythonPlatform": "Windows"
+}

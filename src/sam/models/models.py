@@ -7,7 +7,7 @@ from datetime import datetime
 from uuid import UUID
 from typing import List, Dict, Optional, Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class CapabilityDescriptor(BaseModel):
@@ -51,13 +51,13 @@ class Entity(BaseModel):
     created_at: datetime
     version: str = Field(default="1.0")
 
-    class Config:
-        # Enable use of mutable structures with caution
-        allow_mutation = False  # instances are immutable by default
-        json_encoders = {
+    model_config = ConfigDict(
+        frozen=True,
+        json_encoders={
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v),
-        }
+        },
+    )
 
 
 class Capability(Entity):
