@@ -128,27 +128,31 @@ class ExperienceContextBuilder:
         """Bangun konteks terkini."""
         try:
             home = self._ee.build_home()
-            narrative = self._ee.build_narrative_home()
             work = self._ee.build_work()
+            pres = self._ee.build_presentation()
 
             # Status
-            status = home.health.status.value if home.health else "healthy"
+            condition = pres.system_condition if pres else "Healthy"
             status_map = {
-                "healthy": ("Healthy", "#4ae04a"),
-                "recovering": ("Recovering", "#e0c06a"),
+                "normal": ("Healthy", "#4ae04a"),
+                "progress": ("Deploying", "#6aaae0"),
+                "recovery": ("Recovering", "#e0c06a"),
                 "attention": ("Attention", "#e0c06a"),
-                "problem": ("Problem", "#e06a6a"),
+                "action": ("Action Required", "#e06a6a"),
                 "learning": ("Learning", "#6aaae0"),
             }
-            status_label, status_color = status_map.get(status, ("Healthy", "#4ae04a"))
+            condition_lower = condition.lower()
+            status_label, status_color = ("Healthy", "#4ae04a")
+            for key, val in status_map.items():
+                if key in condition_lower:
+                    status_label, status_color = val
+                    break
 
-            # Attention
-            att_count = narrative.attention_count if narrative else 0
-            att_msg = ""
-            att_reason = ""
-            if home.attention and home.attention.needs_attention:
-                att_msg = home.attention.message or ""
-                att_reason = home.attention.reason or ""
+            # Attention count dari presentation
+            att_label = pres.attention_label if pres else "Normal"
+            att_count = 1 if att_label in ("Immediate", "Soon") else 0
+            att_msg = pres.user_action_needed if pres else ""
+            att_reason = pres.current_activity if pres else ""
 
             # Last activity
             last_time = ""
