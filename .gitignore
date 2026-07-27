@@ -31,10 +31,21 @@ workspace/mission.yaml
 # Databases — runtime state, test artifacts, backup
 *.db
 *.db.backup*
+*.sqlite
+*.sqlite3
 
 # Coverage
 .coverage
 htmlcov/
+
+# Local runtime data (jangan commit!)
+workspace/*.db
+workspace/telemetry/
+
+# Screenshots, temp files (ops.py helper, dll)
+*.bat
+temp_screenshot.png
+*.log.*
 
 # Test results
 test-results.xml
