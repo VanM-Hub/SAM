@@ -1,8 +1,8 @@
 """
-Home Page — Jawaban dari QuestionEngine.
+Home Page — Jawaban dari Conversation.
 
 Home bukan lagi page yang membangun widget sendiri.
-Home cuma: question_engine.answer("What's happening?") → render.
+Home cuma: conversation.answer("What's happening?") → render.
 
 Tidak ada narasi buatan sendiri.
 """
@@ -13,19 +13,17 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer
 
-from ...experience.engine import ExperienceEngine
-from ...operations.question_engine import HumanAnswer
+from ...operations.conversation_api import Conversation
 from ..widgets import AttentionBanner
-from ..context import ExperienceContextBuilder
+from ..context import DesktopContextBuilder
 
 
 class HomePage(QWidget):
-    """Home — Mission-Centric. Cuma render jawaban QuestionEngine."""
+    """Home — Mission-Centric. Cuma render jawaban Conversation."""
 
-    def __init__(self, experience, ctx_builder):
+    def __init__(self, conversation: Conversation):
         super().__init__()
-        self.experience = experience
-        self._ctx_builder = ctx_builder
+        self.conversation = conversation
         self._init_ui()
 
     def _init_ui(self):
@@ -130,7 +128,7 @@ class HomePage(QWidget):
         self._attention.hide()
 
         # ===================================================================
-        # RECOMMENDATIONS — dari QuestionEngine
+        # RECOMMENDATIONS — dari Conversation
         # ===================================================================
         self._rec_title = QLabel("RECOMMENDATIONS")
         self._rec_title.setStyleSheet("color: #505060; font-size: 10px; letter-spacing: 1.5px; margin-top: 8px;")
@@ -142,7 +140,7 @@ class HomePage(QWidget):
         self._layout.addLayout(self._rec_layout)
 
         # ===================================================================
-        # PREDICTIONS — dari QuestionEngine
+        # PREDICTIONS — dari Conversation
         # ===================================================================
         self._pred_title = QLabel("PREDICTIONS")
         self._pred_title.setStyleSheet("color: #505060; font-size: 10px; letter-spacing: 1.5px; margin-top: 8px;")
@@ -154,7 +152,7 @@ class HomePage(QWidget):
         self._layout.addLayout(self._pred_layout)
 
         # ===================================================================
-        # RECENT CHANGES — dari QuestionEngine
+        # RECENT CHANGES — dari Conversation
         # ===================================================================
         self._stories_title = QLabel("RECENT CHANGES")
         self._stories_title.setStyleSheet("color: #505060; font-size: 10px; letter-spacing: 1.5px; margin-top: 12px;")
@@ -189,12 +187,12 @@ class HomePage(QWidget):
         )
 
     def refresh(self):
-        """Refresh Home — cukup tanya QuestionEngine."""
+        """Refresh Home — cukup tanya Conversation."""
         try:
             # ================================================================
-            # SATU PANGGILAN — semua dari QuestionEngine
+            # SATU PANGGILAN — semua dari Conversation
             # ================================================================
-            answer = self.experience.get_live_answer("What's happening?")
+            answer = self.conversation.answer("What's happening?")
             self._last_answer = answer
 
             # Icon
@@ -206,7 +204,7 @@ class HomePage(QWidget):
                 "attention": "\u26a0\ufe0f",
                 "learning": "\U0001f9e0",
             }
-            title_lower = answer.title.lower()
+            title_lower = (answer.title or "").lower()
             icon = "\u2705"
             for key, val in icon_map.items():
                 if key in title_lower:
@@ -226,12 +224,12 @@ class HomePage(QWidget):
             elif "progress" in title_lower:
                 color = "#6aaae0"
 
-            self._condition.setText(answer.title)
+            self._condition.setText(answer.title or "")
             self._condition.setStyleSheet(
                 "color: {}; font-size: 22px; font-weight: bold;".format(color)
             )
-            self._activity.setText(answer.summary)
-            self._user_action.setText(answer.user_action_needed)
+            self._activity.setText(answer.summary or "")
+            self._user_action.setText(answer.user_action_needed or "")
 
             # SAM action
             if answer.sam_action:
@@ -242,10 +240,6 @@ class HomePage(QWidget):
 
             # Detail level 2
             self._detail_level2.setText(answer.technical_details or answer.details or "")
-
-            # Context banner
-            ctx = self._ctx_builder.build()
-            self._attention.update_from_context(ctx)
 
             # Recommendations — dari HumanAnswer
             self._clear_layout(self._rec_layout)

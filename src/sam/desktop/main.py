@@ -2,8 +2,9 @@
 Desktop Operations Console — PySide6 Application.
 
 SATU produk. Satu konteks. Satu identitas.
-Setiap halaman menerima ExperienceContext yang sama.
+Setiap halaman menerima Conversation (dari sam.observe()).
 Tidak ada halaman yang query Runtime secara independen.
+TIDAK ADA ExperienceEngine di Desktop.
 """
 
 from PySide6.QtWidgets import (
@@ -15,9 +16,8 @@ from PySide6.QtCore import Qt, QTimer, QSize
 from PySide6.QtGui import QFont, QIcon, QPalette, QColor, QAction
 
 try:
-    from ...experience.engine import ExperienceEngine
-    from ...telemetry.service import TelemetryService
-    from .context import ExperienceContextBuilder, ExperienceContext
+    from ..operations.conversation_api import SAM, Conversation
+    from .context import DesktopContextBuilder, DesktopContext
     from .widgets import (
         StatusCard, AttentionBanner, RecommendationCard,
         TimelineWidget, SearchBar,
@@ -32,9 +32,8 @@ except ValueError:
     src = os.path.join(os.path.dirname(__file__), "..", "..")
     if src not in sys.path:
         sys.path.insert(0, os.path.abspath(src))
-    from sam.experience.engine import ExperienceEngine
-    from sam.telemetry.service import TelemetryService
-    from sam.desktop.context import ExperienceContextBuilder, ExperienceContext
+    from sam.operations.conversation_api import SAM, Conversation
+    from sam.desktop.context import DesktopContextBuilder, DesktopContext
     from sam.desktop.widgets import (
         StatusCard, AttentionBanner, RecommendationCard,
         TimelineWidget, SearchBar,
@@ -45,7 +44,7 @@ except ValueError:
     from sam.desktop.pages.knowledge import KnowledgePage, HistoryPage, SettingsPage
     from sam.desktop.pages.assistant import NotificationPage, AssistantPage
 
-VERSION = "3.2.1"
+VERSION = "4.0.0"
 
 
 # ============================================================================
@@ -64,7 +63,6 @@ NAV_ITEMS = [
 ]
 
 BOTTOM_NAV = [
-    # ("❓", "Help"),
     ("\U00002139", "About"),
 ]
 
@@ -181,8 +179,8 @@ class Sidebar(QWidget):
             self._parent,
             "About SAM",
             "SAM Operations Console v{}\n\n"
-            "Single product operational experience.\n"
-            "Runtime · Protection · Narrative".format(VERSION),
+            "Conversation-powered desktop.\n"
+            "SAM.observe() only.".format(VERSION),
         )
 
     def select(self, index):
@@ -282,8 +280,8 @@ class GlobalHeader(QFrame):
         self._notif_btn.setCursor(Qt.PointingHandCursor)
         layout.addWidget(self._notif_btn)
 
-    def update_from_context(self, ctx: ExperienceContext):
-        """Update dari ExperienceContext — bukan dari Runtime."""
+    def update_from_context(self, ctx: DesktopContext):
+        """Update dari DesktopContext — bukan dari Runtime."""
         # Mission
         self._mission.setText(ctx.mission_name)
 
@@ -346,7 +344,7 @@ class GlobalHeader(QFrame):
 # ============================================================================
 
 class OperationsConsole(QMainWindow):
-    """SAM Operations Console — satu produk."""
+    """SAM Operations Console — sam.observe() powered."""
 
     def __init__(self):
         super().__init__()
@@ -358,10 +356,13 @@ class OperationsConsole(QMainWindow):
             QWidget { color: #e0e0e0; }
         """)
 
-        # Services
-        self.telemetry = TelemetryService()
-        self.experience = ExperienceEngine(self.telemetry)
-        self._ctx_builder = ExperienceContextBuilder(self.experience)
+        # ================================================================
+        # SATU SUMBER — SAM.observe() → Conversation
+        # TIDAK ADA ExperienceEngine
+        # ================================================================
+        self._sam = SAM()
+        self._conversation = self._sam.observe(audience_type="administrator")
+        self._ctx_builder = DesktopContextBuilder(self._conversation)
 
         # Central widget
         central = QWidget()
@@ -391,18 +392,18 @@ class OperationsConsole(QMainWindow):
         content_layout.addWidget(self.attention_banner)
         self.attention_banner.hide()
 
-        # Pages
+        # Pages — semua terima Conversation, bukan ExperienceEngine
         self.pages = QStackedWidget()
         self.pages.setStyleSheet("background: transparent;")
 
-        self.home_page = HomePage(self.experience, self._ctx_builder)
-        self.activity_page = ActivityPage(self.experience, self._ctx_builder)
-        self.work_page = WorkPage(self.experience, self._ctx_builder)
-        self.knowledge_page = KnowledgePage(self.experience)
-        self.history_page = HistoryPage(self.experience)
-        self.settings_page = SettingsPage(self.experience)
-        self.notification_page = NotificationPage(self.experience)
-        self.assistant_page = AssistantPage(self.experience)
+        self.home_page = HomePage(self._conversation)
+        self.activity_page = ActivityPage(self._conversation)
+        self.work_page = WorkPage(self._conversation)
+        self.knowledge_page = KnowledgePage(self._conversation)
+        self.history_page = HistoryPage(self._conversation)
+        self.settings_page = SettingsPage(self._conversation)
+        self.notification_page = NotificationPage(self._conversation)
+        self.assistant_page = AssistantPage(self._conversation)
 
         self.pages.addWidget(self.home_page)          # 0
         self.pages.addWidget(self.activity_page)      # 1
@@ -462,7 +463,7 @@ class OperationsConsole(QMainWindow):
             page.refresh()
 
     def _refresh_context(self):
-        """Update konteks global — semua widget yang subscribe otomatis update."""
+        """Update konteks global — dari Conversation, bukan ExperienceEngine."""
         try:
             ctx = self._ctx_builder.build()
             self.header.update_from_context(ctx)
