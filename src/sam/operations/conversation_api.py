@@ -21,7 +21,7 @@ from .conversation import ConversationObject
 from .conversation_context import ConversationContext
 from .intent import InteractionIntent
 from .intent_resolver import IntentResolver
-from .understanding import UnderstandingEngine
+from .understanding import UnderstandingEngine as SystemAnalyzer
 from .audience import AudienceProfile, get_profile, AudienceType
 from .session import MissionSession, SessionManager
 from ..render import CLIRenderer, DesktopRenderer, JSONRenderer

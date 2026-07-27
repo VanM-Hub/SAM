@@ -75,36 +75,24 @@ class OpenClawAdapter:
     async def connect(self) -> ConnectionStatus:
         """Coba konek — scan workspace, buat folder."""
         try:
-            # Buat folder komunikasi
             self._status_dir.mkdir(parents=True, exist_ok=True)
             self._commands_dir.mkdir(parents=True, exist_ok=True)
 
-            # Cek OpenClaw workspace
             workspaces = await self._discovery.discover()
             if workspaces:
-                logger.info(
-                    "openclaw.workspace.found",
-                    count=len(workspaces),
-                )
+                logger.info("openclaw.workspace.found", count=len(workspaces))
 
             self._status = ConnectionStatus(
                 connected=True,
                 last_sync=datetime.now().isoformat(),
             )
-
             logger.info("openclaw.connected", path=str(self._status_dir))
-
         except Exception as e:
             logger.error("openclaw.connect.failed", error=str(e))
-            self._status = ConnectionStatus(
-                connected=False,
-                error=str(e),
-            )
-
+            self._status = ConnectionStatus(connected=False, error=str(e))
         return self._status
 
     async def send_status(self, report: SAMStatusReport) -> bool:
-        """Kirim status ke OpenClaw."""
         try:
             data = {
                 "timestamp": report.timestamp,
@@ -120,94 +108,64 @@ class OpenClawAdapter:
                     "uptime_minutes": report.uptime_minutes,
                 },
             }
-
-            # Write status file
             status_file = self._status_dir / "status.json"
-            with open(status_file, "w") as f:
-                json.dump(data, f, indent=2)
+            status_file.write_text(json.dumps(data, indent=2))
+            self._status.status_sent += 1
 
             # Append to history
-            history_file = self._status_dir / "history.ndjson"
-            with open(history_file, "a") as f:
-                f.write(json.dumps(data) + "\n")
+            history_file = self.workspace / OPENCLAW_DIR / HISTORY_FILE
+            history_file.parent.mkdir(parents=True, exist_ok=True)
+            with history_file.open("a") as f:
+                f.write(json.dumps({"type": "status", "data": data, "ts": report.timestamp}) + "\n")
 
-            self._status.status_sent += 1
-            self._status.last_sync = report.timestamp
-            self._status.error = ""
-
-            if self._telemetry:
-                self._telemetry.emit("openclaw.status.sent", {
-                    "status": report.status,
-                })
-
+            self._status.last_sync = datetime.now().isoformat()
             return True
-
         except Exception as e:
-            logger.error("openclaw.send.failed", error=str(e))
-            self._status.error = str(e)
+            logger.error("openclaw.send_status.failed", error=str(e))
             return False
 
     async def read_commands(self) -> list:
-        """Baca perintah dari OpenClaw."""
-        commands = []
-
         try:
             if not self._commands_dir.exists():
-                return commands
-
-            for cmd_file in sorted(self._commands_dir.glob("*.json")):
+                return []
+            commands = []
+            for f in sorted(self._commands_dir.glob("*.json"), key=lambda p: p.stat().st_mtime):
                 try:
-                    with open(cmd_file) as f:
-                        cmd = json.load(f)
+                    cmd = json.loads(f.read_text())
+                    cmd["_file"] = f.name
                     commands.append(cmd)
-                    cmd_file.unlink()  # Hapus setelah dibaca
-                except (json.JSONDecodeError, OSError) as e:
-                    logger.warning(
-                        "openclaw.command.read.failed",
-                        file=str(cmd_file),
-                        error=str(e),
-                    )
-
-            if commands:
-                self._status.commands_processed += len(commands)
-                logger.info(
-                    "openclaw.commands.processed",
-                    count=len(commands),
-                )
-
+                except Exception:
+                    pass
+            return commands
         except Exception as e:
-            logger.error("openclaw.commands.error", error=str(e))
+            logger.error("openclaw.read_commands.failed", error=str(e))
+            return []
 
-        return commands
+    async def mark_command_done(self, filename: str) -> bool:
+        try:
+            cmd_file = self._commands_dir / filename
+            if cmd_file.exists():
+                done_file = cmd_file.with_suffix(".done.json")
+                cmd_file.rename(done_file)
+                self._status.commands_processed += 1
+                return True
+            return False
+        except Exception as e:
+            logger.error("openclaw.mark_done.failed", error=str(e))
+            return False
 
-    def get_connection_status(self) -> ConnectionStatus:
+    @property
+    def state(self) -> str:
+        return "connected" if self._status.connected else "disconnected"
+
+    @property
+    def is_connected(self) -> bool:
+        return self._status.connected
+
+    @property
+    def status(self) -> ConnectionStatus:
         return self._status
 
-    async def cycle(self, experience=None):
-        """Satu cycle komunikasi: kirim status + baca perintah."""
-        if not self._status.connected:
-            await self.connect()
 
-        status = "healthy"
-        protection_level = "healthy"
-
-        if experience:
-            try:
-                home = experience.build_home()
-                status = home.health.status.value
-                protection_level = home.health.protection_level or status
-            except Exception:
-                pass
-
-        report = SAMStatusReport(
-            status=status,
-            protection_level=protection_level,
-        )
-
-        await self.send_status(report)
-        commands = await self.read_commands()
-
-        return {
-            "status_sent": True,
-            "commands_processed": len(commands),
-        }
+# Backward-compat alias
+OpenClawConnection = OpenClawAdapter

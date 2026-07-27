@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QFont
 
-from .context import ExperienceContext, HumanTimeFormatter
+from .context import HumanTimeFormatter
 
 
 # ============================================================================
@@ -53,7 +53,7 @@ class StatusCard(QFrame):
         self._detail.setWordWrap(True)
         layout.addWidget(self._detail)
 
-    def update_from_context(self, ctx: ExperienceContext):
+    def update_from_context(self, ctx):
         """Update dari ExperienceContext."""
         icon_map = {
             "Healthy": "\u2705",
@@ -150,7 +150,7 @@ class AttentionBanner(QFrame):
 
         self.hide()
 
-    def update_from_context(self, ctx: ExperienceContext):
+    def update_from_context(self, ctx):
         if ctx.needs_attention:
             self._message.setText(ctx.attention_message or "Action required.")
             self.show()
@@ -373,3 +373,4 @@ class SearchBar(QWidget):
 
     def clear(self):
         self._input.clear()
+
