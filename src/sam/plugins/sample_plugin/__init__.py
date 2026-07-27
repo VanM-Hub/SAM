@@ -1,1 +1,0 @@
-"""Sample plugin for SAM Framework."""

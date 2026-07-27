@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
 from typing import Optional, Dict, Any
@@ -60,7 +60,8 @@ class TelemetryEvent(BaseModel):
     # Durasi (jika relevan)
     duration_ms: Optional[float] = None
 
-    @validator('metadata')
+    @field_validator('metadata')
+    @classmethod
     def validate_metadata(cls, v):
         if v is None:
             return {}
@@ -77,5 +78,4 @@ class TelemetryEvent(BaseModel):
             self.message
         )
 
-    class Config:
-        frozen = True
+    model_config = {"frozen": True}

@@ -56,6 +56,8 @@ max-complexity = 15
 pythonpath = ["src"]
 testpaths = ["tests/unit"]
 addopts = "--tb=short"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "ignore::DeprecationWarning:pydantic",
     "ignore::PendingDeprecationWarning",
