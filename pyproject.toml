@@ -4,8 +4,8 @@ build-backend = "setuptools.backends._legacy:_Backend"
 
 [project]
 name = "sam-framework"
-version = "1.0.0"
-description = "Self-evolving AI Operations Framework"
+version = "2.0.0"
+description = "Self-evolving AI Operations Framework — Production Release"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
@@ -34,7 +34,10 @@ dependencies = [
 ]
 optional-dependencies = {
     "metrics" = ["psutil>=5.0"],
+    "api" = ["fastapi>=0.110.0", "uvicorn>=0.29.0"],
+    "web" = ["jinja2>=3.1.0"],
     "knowledge" = ["pyyaml>=5.0"],
+    "full" = ["psutil>=5.0", "fastapi>=0.110.0", "uvicorn>=0.29.0", "jinja2>=3.1.0"],
     "dev" = [
         "pytest>=7.0",
         "pytest-asyncio>=0.21",
