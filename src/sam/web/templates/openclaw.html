@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}OpenClaw{% endblock %}
+{% block content %}
+
+<h2 style="font-size: 22px; margin-bottom: 20px;">🔌 OpenClaw</h2>
+
+<div class="grid">
+    <div class="card">
+        <h2>Discovered Workspaces</h2>
+        {% if workspaces %}
+        <table>
+            <tr><th>Path</th><th>Version</th><th>Detected</th></tr>
+            {% for ws in workspaces %}
+            <tr>
+                <td class="text-muted">{{ ws.path }}</td>
+                <td>{{ ws.version or "—" }}</td>
+                <td>{{ "✅" if ws.detected else "❌" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <div class="empty-state">❌ No OpenClaw workspace found</div>
+        {% endif %}
+    </div>
+
+    {% if health %}
+    <div class="card">
+        <h2>Health</h2>
+        <table>
+            <tr><td>Runtime</td><td><span class="badge {{ health.runtime.value }}">{{ health.runtime.value.upper() }}</span></td></tr>
+            <tr><td>Components</td><td>{{ health.components|length }}</td></tr>
+            <tr><td>Timestamp</td><td class="text-muted">{{ health.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td></tr>
+        </table>
+
+        {% if health.components %}
+        <h3 style="margin-top: 16px;">Components</h3>
+        <table>
+            <tr><th>Name</th><th>Status</th><th>Message</th></tr>
+            {% for comp in health.components %}
+            <tr>
+                <td>{{ comp.name }}</td>
+                <td><span class="badge {{ comp.status.value }}">{{ comp.status.value.upper() }}</span></td>
+                <td class="text-muted">{{ comp.message or "—" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

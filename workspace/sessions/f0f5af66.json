@@ -1,0 +1,12 @@
+{
+  "id": "f0f5af66",
+  "workspace": "default",
+  "started_at": "2026-07-27T09:03:02.779689",
+  "last_activity": "2026-07-27T09:03:02.780655",
+  "state": "RUNNING",
+  "checkpoints": [
+    {
+      "type": "test"
+    }
+  ]
+}

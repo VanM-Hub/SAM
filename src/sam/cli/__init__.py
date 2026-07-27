@@ -1,1 +1,1 @@
-# Init file for sam.cli
+# SAM CLI Package

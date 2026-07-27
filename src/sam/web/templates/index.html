@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}SAM Dashboard{% endblock %}
+{% block content %}
+
+<div class="flex mb-4">
+    <h2 style="font-size: 22px;">Dashboard</h2>
+    <span class="badge {% if healthy %}healthy{% else %}degraded{% endif %}">{{ health }}</span>
+</div>
+
+<div class="grid">
+    <div class="stat" style="border-left-color: {% if healthy %}#4a9a6a{% else %}#9a6a4a{% endif %};">
+        <div class="label">Runtime State</div>
+        <div class="value">{{ state }}</div>
+        <div class="sub">{{ platform }}</div>
+    </div>
+    <div class="stat" style="border-left-color: #4a6a9a;">
+        <div class="label">CPU</div>
+        <div class="value">{{ "%.1f"|format(metrics.cpu_percent) if metrics else "—" }}%</div>
+        <div class="sub">{{ "%.0f"|format(metrics.memory_mb) if metrics else "—" }} MB memory</div>
+    </div>
+    <div class="stat" style="border-left-color: #6a4a9a;">
+        <div class="label">Incidents</div>
+        <div class="value">{{ incident_count }}</div>
+        <div class="sub">Pending actions: {{ pending_count }}</div>
+    </div>
+    <div class="stat" style="border-left-color: #9a6a4a;">
+        <div class="label">OpenClaw</div>
+        <div class="value">{{ "✅ Found" if openclaw_found else "❌ Not found" }}</div>
+        <div class="sub">{{ openclaw_count }} workspace(s)</div>
+    </div>
+</div>
+
+<div class="grid mt-4">
+    <div class="card">
+        <h2>Recent Incidents</h2>
+        {% if incidents %}
+        <table>
+            <tr><th>Severity</th><th>Title</th><th>Source</th></tr>
+            {% for inc in incidents %}
+            <tr>
+                <td><span class="badge {{ inc.severity.value }}">{{ inc.severity.value.upper() }}</span></td>
+                <td>{{ inc.title[:60] }}</td>
+                <td class="text-muted">{{ inc.source }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <div class="empty-state">✅ No incidents</div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Pending Actions</h2>
+        {% if pending_actions %}
+        <table>
+            <tr><th>Type</th><th>Target</th><th>Risk</th></tr>
+            {% for a in pending_actions %}
+            <tr>
+                <td>{{ a.action_type.value }}</td>
+                <td>{{ a.target }}</td>
+                <td><span class="badge {{ a.risk_level.value }}">{{ a.risk_level.value }}</span></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <div class="empty-state">⏳ No pending actions</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

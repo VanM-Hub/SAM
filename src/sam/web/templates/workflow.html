@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Workflows{% endblock %}
+{% block content %}
+
+<h2 style="font-size: 22px; margin-bottom: 20px;">📋 Workflows</h2>
+
+<div class="card">
+    <h2>Active Workflows</h2>
+    <table>
+        <tr><th>ID</th><th>Name</th><th>Status</th><th>Progress</th></tr>
+        {% for wf in workflows %}
+        <tr>
+            <td class="text-muted">{{ wf.id }}</td>
+            <td>{{ wf.name }}</td>
+            <td><span class="badge {{ wf.status }}">{{ wf.status }}</span></td>
+            <td>
+                {{ wf.progress }}%
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ wf.progress }}%;"></div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

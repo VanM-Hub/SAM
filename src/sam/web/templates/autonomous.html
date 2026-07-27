@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Autonomous{% endblock %}
+{% block content %}
+
+<h2 style="font-size: 22px; margin-bottom: 20px;">🤖 Autonomous Operations</h2>
+
+<div class="grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="stat" style="border-left-color: #4a6a9a;"><div class="label">Pending</div><div class="value">{{ pending_count }}</div></div>
+    <div class="stat" style="border-left-color: #4a9a6a;"><div class="label">Completed</div><div class="value">{{ completed_count }}</div></div>
+    <div class="stat" style="border-left-color: #3a1a1a;"><div class="label">Failed</div><div class="value" style="color: #e06a6a;">{{ failed_count }}</div></div>
+    <div class="stat" style="border-left-color: #6a4a3a;"><div class="label">Denied</div><div class="value" style="color: #e0c06a;">{{ denied_count }}</div></div>
+</div>
+
+<div class="grid mt-4">
+    <div class="card">
+        <h2>Pending Approvals</h2>
+        {% if pending %}
+        <table>
+            <tr><th>ID</th><th>Type</th><th>Target</th><th>Risk</th><th>Confidence</th></tr>
+            {% for a in pending %}
+            <tr>
+                <td class="text-muted">{{ a.id[:8] }}</td>
+                <td>{{ a.action_type.value }}</td>
+                <td>{{ a.target }}</td>
+                <td><span class="badge {{ a.risk_level.value }}">{{ a.risk_level.value }}</span></td>
+                <td>{{ "%.0f"|format(a.confidence * 100) }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <div class="empty-state">✅ No pending approvals</div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Recent History</h2>
+        {% if history %}
+        <table>
+            <tr><th>Type</th><th>Status</th><th>Target</th><th>Risk</th></tr>
+            {% for a in history[-8:]|reverse %}
+            <tr>
+                <td>{{ a.action_type.value }}</td>
+                <td><span class="badge {{ a.status.value }}">{{ a.status.value }}</span></td>
+                <td>{{ a.target }}</td>
+                <td><span class="badge {{ a.risk_level.value }}">{{ a.risk_level.value }}</span></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <div class="empty-state">No action history</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
