@@ -5,9 +5,12 @@ from .engine.knowledge import KnowledgeEngine  # noqa: F401
 from .engine.insight import InsightEngine  # noqa: F401
 from .engine.history import HistoryEngine  # noqa: F401
 from .engine.settings import SettingsEngine  # noqa: F401
+from .engine.explain import ExplainabilityEngine  # noqa: F401
+from .engine.templates import ExplanationTemplates  # noqa: F401
 
 __all__ = [
     "ContextEngine", "RuntimeContext", "StatusEngine",
     "TaskEngine", "KnowledgeEngine", "InsightEngine",
     "HistoryEngine", "SettingsEngine",
+    "ExplainabilityEngine", "ExplanationTemplates",
 ]
