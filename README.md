@@ -2,21 +2,23 @@
 
 **Self-evolving AI Operations Framework**
 
-SAM (Self-evolving AI Manager) adalah framework untuk mengelola, memonitor, dan mengoperasikan runtime AI secara otonom. Dari runtime kernel hingga web dashboard — SAM menangani seluruh siklus operasi.
+SAM (Self-evolving AI Manager) adalah framework untuk mengelola, memonitor, dan mengoperasikan runtime AI secara otonom. Dari runtime kernel hingga web dashboard dan desktop console — SAM menangani seluruh siklus operasi.
 
-## Fitur v2.0
+## Fitur v3.0
 
 | Fitur | Deskripsi |
 |---|---|
+| **Telemetry Foundation** | Event Taxonomy (36 types), Ring Buffer (1000 events), SQLite cache, JSON Schema |
+| **Operations Engine** | Context, Status, Task, Knowledge, History, Settings, Explainability engines |
+| **Desktop Console** | 8 halaman: Home, Task, Timeline, Knowledge, History, Settings, Explainability |
+| **CLI** | 22+ commands, termasuk task, history, settings, knowledge, explain |
 | **Runtime Kernel** | State machine (12 state), bootstrap, session, shutdown, recovery |
 | **Guardian Kernel** | Observe-Analyze-Decide-Act-Verify (GDP) pipeline |
-| **Hosting** | Desktop, Docker, Windows Service, systemd, Desktop Launcher |
+| **Service Layer** | Windows Service, systemd, Docker, Desktop Launcher |
 | **Observability** | Telemetry events, metrics collector, FastAPI REST API |
-| **OpenClaw Integration** | Discovery, health check, log analysis |
 | **Operational Intelligence** | Incident detection, root cause analysis, recommendations |
 | **Autonomous Operations** | Auto restart, recovery, resume, isolate, escalate, human approval |
-| **Web Dashboard** | 8 halaman: Dashboard, Runtime, Workflow, Incidents, Autonomous, OpenClaw, Knowledge, Settings |
-| **CLI** | 17 commands — status, health, session, runtime, guardian, events, logs, metrics, service, openclaw, intelligence, autonomous |
+| **Explainability** | Template-based explanations with evidence, impact, recommendations |
 
 ## Quick Start
 
@@ -25,77 +27,73 @@ SAM (Self-evolving AI Manager) adalah framework untuk mengelola, memonitor, dan 
 git clone https://github.com/VanM-Hub/SAM.git
 cd SAM
 
-# Set PYTHONPATH (PowerShell)
-$env:PYTHONPATH = ".\src"
+# Install dependencies
+pip install -r requirements.txt
+
+# Set PYTHONPATH (Windows PowerShell)
+$env:PYTHONPATH = "./src"
 $env:PYTHONIOENCODING = "utf-8"
+
+# Atau (Linux/macOS)
+# export PYTHONPATH="./src"
+# export PYTHONIOENCODING="utf-8"
 
 # Lihat semua CLI commands
 python -m sam.cli.main --help
 
-# Lihat status runtime
-python -m sam.cli.main status
+# Jalankan Desktop Console
+python -m sam.desktop.main
 
-# Start web dashboard
-python -m sam.cli.main web --port 8080
-# Buka http://127.0.0.1:8080
+# Atau gunakan CLI lightweight
+python ops.py settings list
+python ops.py history show
+python ops.py task list
 ```
 
-## CLI Commands (17)
+## CLI Commands
 
+Legacy (17 commands via `sam.cli.main`):
 ```
-status       — Tampilkan status Runtime
-health       — Tampilkan status kesehatan
-session      — Kelola session runtime
-runtime      — Runtime Container Tree
-plugins      — Daftar plugin runtime
-knowledge    — Knowledge Store
-memory       — Memory Store
-workflow     — Workflow Engine
-events       — Event stream dan history
-guardian     — Guardian Kernel
-service      — Kelola service runtime
-logs         — Telemetry logs (--follow)
-metrics      — Runtime metrics (CPU, memory, uptime)
-openclaw     — OpenClaw integration (discover, status, monitor)
-intelligence — Operational intelligence (incident, rca, recommend)
-autonomous   — Autonomous operations (status, approve, deny, history)
-web          — Web Dashboard (--host, --port)
+status, health, session, runtime, plugins, knowledge, memory,
+workflow, events, guardian, service, logs, metrics, openclaw,
+intelligence, autonomous, web
 ```
 
-## Web Dashboard
-
-```bash
-sam web --host 127.0.0.1 --port 8080
+Operations Platform (via `ops.py` — **ringan, tanpa dependensi legacy**):
 ```
-
-- **Dashboard** — Ringkasan state, health, metrics, incidents, pending actions
-- **Runtime** — Detail runtime, hosting, metrics
-- **Workflow** — Workflow list dengan progress bars
-- **Incidents** — Incident dashboard dengan severity counters
-- **Autonomous** — Pending approvals dan action history
-- **OpenClaw** — Discovered workspaces dan component health
-- **Knowledge** — Knowledge explorer dengan search
-- **Settings** — DOS dan Mission YAML (read-only)
+ops.py task list              — daftar task
+ops.py history show           — riwayat aktivitas
+ops.py settings list          — pengaturan sistem
+ops.py knowledge show         — knowledge & insight
+ops.py explain recent         — penjelasan event
+```
 
 ## Testing
 
-```powershell
-$env:PYTHONPATH = ".\src"
-$env:PYTHONIOENCODING = "utf-8"
-python -m pytest tests/unit/ tests/integration/ -v --tb=short
+```bash
+# Windows PowerShell
+$env:PYTHONPATH = "./src"
+python -m pytest tests/unit/ -v --tb=short
+
+# Linux/macOS
+PYTHONPATH="./src" python -m pytest tests/unit/ -v --tb=short
 ```
 
-287 tests, 0 regresi.
+209 tests, 0 regressions.
 
 ## Arsitektur
 
-Dokumentasi arsitektur lengkap di `docs/architecture/`:
+```
+Runtime -> Telemetry -> Operations Engine -> Experience Model -> Desktop/CLI
+                                                          |
+                                                     (Human Language)
+```
 
-- `SAM_CONSTITUTION.md` — 10 pasal, hukum tertinggi SAM
-- `SAM_ARCHITECTURE_MASTER.md` — 7 layer + Golden Rule
-- `runtime-kernel-specification-v1.md` — 19 bab spesifikasi
-- `design/operations-console.md` — 11 bab CLI
-- `adr/ADR-015-020.md` — 6 ADR terkait
+Dokumentasi arsitektur: `docs/architecture/`
+
+## Kontribusi
+
+Baca [CONTRIBUTING.md](CONTRIBUTING.md) sebelum memulai.
 
 ## Lisensi
 

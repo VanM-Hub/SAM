@@ -1,59 +1,53 @@
-[build-system]
-requires = ["setuptools>=68.0"]
-build-backend = "setuptools.backends._legacy:_Backend"
+[tool.ruff]
+# Target Python 3.8
+target-version = "py38"
 
-[project]
-name = "sam-framework"
-version = "2.0.0"
-description = "Self-evolving AI Operations Framework — Production Release"
-readme = "README.md"
-license = { text = "MIT" }
-authors = [
-    { name = "SAM Project", email = "sam@example.com" },
-]
-keywords = ["aiops", "automation", "self-healing", "autonomous", "operations"]
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: System :: Systems Administration",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-]
-requires-python = ">=3.8"
-dependencies = [
-    "structlog>=20.0",
-    "typer>=0.4",
-    "pydantic>=2.0",
-]
-optional-dependencies = {
-    "metrics" = ["psutil>=5.0"],
-    "api" = ["fastapi>=0.110.0", "uvicorn>=0.29.0"],
-    "web" = ["jinja2>=3.1.0"],
-    "knowledge" = ["pyyaml>=5.0"],
-    "full" = ["psutil>=5.0", "fastapi>=0.110.0", "uvicorn>=0.29.0", "jinja2>=3.1.0"],
-    "dev" = [
-        "pytest>=7.0",
-        "pytest-asyncio>=0.21",
-    ],
-}
+# Include
+include = ["*.py"]
 
-[project.urls]
-"Homepage" = "https://github.com/your-org/sam"
-"Documentation" = "https://github.com/your-org/sam/docs"
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"
-testpaths = ["tests", "."]
-python_files = ["test_*.py"]
-filterwarnings = [
-    "ignore::DeprecationWarning:pydantic.*",
-    "ignore::UserWarning:pydantic.*",
+# Exclude
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+    ".venv",
+    "venv",
+    "workspace",
 ]
+
+# Line length
+line-length = 100
+
+# Select rules
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "YTT",  # flake8-2020
+    "ANN",  # flake8-annotations
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+]
+
+# Ignore rules
+ignore = [
+    "ANN101",  # missing-type-self (too noisy)
+    "ANN102",  # missing-type-cls
+    "ANN401",  # dynamically-typed expressions
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401", "I"]  # ignore unused imports and isort in __init__.py
+"tests/**" = ["ANN", "N"]      # tests don't need annotations
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.mccabe]
+max-complexity = 15
