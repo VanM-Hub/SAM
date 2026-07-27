@@ -315,7 +315,7 @@ class AssistantPage(QWidget):
                     border: 1px solid #2a2a4a;
                 }
             """)
-            btn.clicked.connect(lambda checked, q=q: self._ask_suggested(q))
+            btn.clicked.connect(lambda *a, q=q: self._ask_suggested(q))
             c_layout.addWidget(btn)
 
         self._layout.addWidget(container)
