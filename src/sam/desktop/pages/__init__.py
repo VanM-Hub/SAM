@@ -3,5 +3,6 @@ from .timeline import TimelinePage  # noqa: F401
 from .tasks import TaskPage  # noqa: F401
 from .knowledge import KnowledgePage  # noqa: F401
 from .history import HistoryPage  # noqa: F401
+from .settings import SettingsPage  # noqa: F401
 
-__all__ = ["HomePage", "TimelinePage", "TaskPage", "KnowledgePage", "HistoryPage"]
+__all__ = ["HomePage", "TimelinePage", "TaskPage", "KnowledgePage", "HistoryPage", "SettingsPage"]

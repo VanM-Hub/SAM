@@ -11,6 +11,7 @@ from sam.cli import knowledge, memory, workflow, events, guardian
 from sam.cli import service, logs, metrics, openclaw, intelligence
 from sam.cli import autonomous
 from sam.cli import history as history_cli
+from sam.cli import settings as settings_cli
 from sam.cli import task as task_cli
 
 app = typer.Typer(
@@ -38,6 +39,7 @@ app.add_typer(intelligence.app, name="intelligence", help="Operational intellige
 app.add_typer(autonomous.app, name="autonomous", help="Autonomous operations (status, approve, deny, history)")
 app.add_typer(history_cli.app, name="history", help="View and search history")
 app.add_typer(task_cli.app, name="task", help="Task management (list, show, approve, deny)")
+app.add_typer(settings_cli.app, name="settings", help="View and manage settings (list, get, set)")
 
 
 @app.command()
