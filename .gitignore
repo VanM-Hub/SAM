@@ -1,5 +1,4 @@
 # .gitignore template
-# Add patterns to ignore files and directories
 .DS_Thumbs.db
 Thumbs.db
 *.log
@@ -17,25 +16,21 @@ __pycache__/
 *.user
 *.userosscache
 *.sln.docstates
+
 # Embedded repos
 ACC/
+
 # Build artifacts
 src/sam.egg-info/
-# Test DBs
-*.db.backup*
-sam_test_*.db
-test.db
-# Temp files
-*.pyc
-__pycache__/
 
-# Workspace artifacts (local runtime data)
+# Workspace artifacts (local runtime data, jangan di-track)
 workspace/sessions/
 workspace/desired-state.yaml
 workspace/mission.yaml
 
-# Test databases
+# Databases — runtime state, test artifacts, backup
 *.db
+*.db.backup*
 
 # Coverage
 .coverage
@@ -43,6 +38,3 @@ htmlcov/
 
 # Test results
 test-results.xml
-
-# SAM runtime databases
-sam*.db
