@@ -1,5 +1,14 @@
 """
-Experience Engine — menerjemahkan data dari Operations Engine ke ViewModel.
+@internal
+Experience Engine — COMPATIBILITY LAYER.
+
+JANGAN gunakan untuk fitur baru.
+Gunakan sam.observe() -> Conversation API.
+
+Existing: TelemetryService -> ExperienceEngine
+New: SAM() -> Conversation -> answer()/timeline()/etc
+
+Stability: COMPAT (akan dihapus di v5)
 """
 
 from typing import Optional, List
