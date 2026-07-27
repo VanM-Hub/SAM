@@ -13,6 +13,7 @@ from ...operations.engine.history import HistoryEngine
 from ...operations.engine.settings import SettingsEngine
 from ...operations.engine.explain import ExplainabilityEngine
 from ...operations.protection import ProtectionEngine
+from ...narrative import NarrativeBuilder, DailyBriefing, SituationBrief
 from ...openclaw.connection import OpenClawAdapter
 from ...telemetry.service import TelemetryService
 
@@ -44,6 +45,7 @@ class ExperienceEngine:
         self.protection = ProtectionEngine()
         self.openclaw = OpenClawAdapter()
         self.openclaw.bind_telemetry(telemetry)
+        self.narrative = NarrativeBuilder()
 
     # ======================================================================
     # HOME
@@ -410,6 +412,44 @@ class ExperienceEngine:
         await self.openclaw.cycle(self)
 
     # ======================================================================
+    # NARRATIVE ENGINE
+    # ======================================================================
+
+    def build_narrative_home(self) -> 'NarrativeBundle':
+        """Dapatkan narrative untuk Home page."""
+        home = self.build_home()
+        return self.narrative.build_from_home(home)
+
+    def build_narrative_activity(self) -> list:
+        """Dapatkan narrative untuk Activity page."""
+        activity = self.build_activity()
+        return self.narrative.build_from_activity(activity)
+
+    def build_narrative_work(self) -> list:
+        """Dapatkan narrative untuk Work page."""
+        work = self.build_work()
+        return self.narrative.build_from_work(work)
+
+    def build_narrative_knowledge(self) -> list:
+        """Dapatkan narrative untuk Knowledge page."""
+        knowledge = self.build_knowledge()
+        return self.narrative.build_from_knowledge(knowledge)
+
+    def build_daily_briefing(self) -> DailyBriefing:
+        """Briefing pagi."""
+        home = self.build_home()
+        activity = self.build_activity()
+        work = self.build_work()
+        return self.narrative.build_daily_briefing(home, activity, work)
+
+    def build_situation_brief(self) -> SituationBrief:
+        """Situasi saat ini."""
+        home = self.build_home()
+        work = self.build_work()
+        knowledge = self.build_knowledge()
+        return self.narrative.build_current_situation(home, work, knowledge)
+
+    # ======================================================================
     # ASSISTANT
     # ======================================================================
 
@@ -489,6 +529,69 @@ class ExperienceEngine:
             return AssistantAnswer(
                 question=question,
                 answer="No pending approvals.",
+            )
+
+        elif "briefing" in question_lower or "pagi" in question_lower or "morning" in question_lower:
+            # Daily briefing via Narrative
+            brief = self.build_daily_briefing()
+            lines = [
+                brief.greeting,
+                brief.health_summary,
+                brief.action_summary,
+            ]
+            if brief.schedule:
+                lines.append("Today's schedule:")
+                lines.extend(brief.schedule)
+            return AssistantAnswer(
+                question=question,
+                answer="\n".join(lines),
+                details=brief.yesterday_recap,
+            )
+
+        elif "situasi" in question_lower or "situation" in question_lower or "current" in question_lower:
+            # Situation via Narrative
+            sit = self.build_situation_brief()
+            lines = [
+                sit.summary,
+                sit.health_statement,
+                sit.incident_statement,
+                sit.work_statement,
+            ]
+            return AssistantAnswer(
+                question=question,
+                answer="\n".join(lines),
+            )
+
+        elif "hari ini" in question_lower or "today" in question_lower or "belajar" in question_lower or "learn" in question_lower:
+            # What happened today? + What did SAM learn?
+            brief = self.build_daily_briefing()
+            lines = [
+                brief.greeting,
+                brief.health_summary,
+                "Yesterday: " + brief.yesterday_recap,
+                brief.action_summary,
+            ]
+            return AssistantAnswer(
+                question=question,
+                answer="\n".join(lines),
+            )
+
+        elif "unfinished" in question_lower or "belum" in question_lower or "pending" in question_lower:
+            # Show unfinished work
+            work = self.build_work()
+            pending_items = [w for w in work.items if w.status == "running" or w.approval_needed]
+            if pending_items:
+                lines = ["Unfinished work:"]
+                for w in pending_items[:5]:
+                    status = "Review required" if w.approval_needed else w.status
+                    lines.append("  • {} — {}".format(w.title, status))
+                return AssistantAnswer(
+                    question=question,
+                    answer="\n".join(lines),
+                )
+            return AssistantAnswer(
+                question=question,
+                answer="All work is completed.",
             )
 
         else:
