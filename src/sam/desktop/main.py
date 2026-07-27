@@ -45,7 +45,7 @@ except ValueError:
     from sam.desktop.pages.knowledge import KnowledgePage, HistoryPage, SettingsPage
     from sam.desktop.pages.assistant import NotificationPage, AssistantPage
 
-VERSION = "3.2.0"
+VERSION = "3.2.1"
 
 
 # ============================================================================
