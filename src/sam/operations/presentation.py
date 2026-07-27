@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from typing import Optional, List
 from datetime import datetime
 
-from ..narrative.models import Narrative, NarrativeImportance, NarrativeType
+from .models import Narrative, NarrativeImportance, NarrativeType
 
 
 # ============================================================================

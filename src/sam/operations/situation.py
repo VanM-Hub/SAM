@@ -96,10 +96,12 @@ class SituationEngine:
         try:
             home = self._ee.build_home()
             work = self._ee.build_work()
-            narrative = self._ee.build_narrative_home()
+            pres = self._ee.build_presentation()
 
-            attention_count = narrative.attention_count if narrative else 0
-            action_count = narrative.action_count if narrative else 0
+            attention_label = pres.attention_label if pres else "Normal"
+            attention_count = 1 if attention_label in ("Immediate", "Soon") else 0
+            action_msg = pres.user_action_needed if pres else ""
+            action_count = 1 if action_msg and "No action" not in action_msg else 0
 
             pending_approvals = 0
             deployment_running = False
