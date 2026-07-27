@@ -1,10 +1,7 @@
 """
-Work Page v3.1 — Work Center.
+Work Page v3.1 — Narrative Work Center.
 
-Daftar pekerjaan aktif.
-Progress bar.
-Approval.
-ETA.
+Setiap pekerjaan punya cerita, bukan status update.
 """
 
 from PySide6.QtWidgets import (
@@ -12,7 +9,6 @@ from PySide6.QtWidgets import (
     QProgressBar, QPushButton, QScrollArea,
 )
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont
 
 from ...experience.engine import ExperienceEngine
 
@@ -27,7 +23,6 @@ class WorkPage(QWidget):
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
 
-        # Header
         header = QWidget()
         header.setStyleSheet("background: transparent; padding: 24px 24px 8px 24px;")
         h_layout = QVBoxLayout(header)
@@ -35,9 +30,11 @@ class WorkPage(QWidget):
         title = QLabel("Work")
         title.setStyleSheet("font-size: 22px; font-weight: bold; color: #e0e0e0;")
         h_layout.addWidget(title)
+        sub = QLabel("What SAM is working on.")
+        sub.setStyleSheet("color: #606070; font-size: 12px; margin-top: 2px;")
+        h_layout.addWidget(sub)
         root.addWidget(header)
 
-        # Scroll
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
@@ -74,19 +71,21 @@ class WorkPage(QWidget):
     def refresh(self):
         try:
             model = self.experience.build_work()
-            self._render(model)
+            narratives = self.experience.build_narrative_work()
+            self._render(model, narratives)
         except Exception:
             pass
 
-    def _render(self, model):
+    def _render(self, model, narratives):
         self._clear()
 
         if not model.items:
+            # Narrative empty state
             empty = QFrame()
             empty.setStyleSheet("""
                 QFrame {
                     background: #0a0a12;
-                    border: 1px solid #1a1a2a;
+                    border: 1px solid #1a3a1a;
                     border-radius: 10px;
                     padding: 32px;
                 }
@@ -94,32 +93,37 @@ class WorkPage(QWidget):
             e_layout = QVBoxLayout(empty)
             e_layout.setAlignment(Qt.AlignCenter)
             e_label = QLabel("\u2705  No active work")
-            e_label.setStyleSheet("color: #4ae04a; font-size: 16px;")
+            e_label.setStyleSheet("color: #4ae04a; font-size: 18px;")
             e_layout.addWidget(e_label)
-            e_sub = QLabel("All tasks are completed.")
-            e_sub.setStyleSheet("color: #606070; font-size: 12px;")
+            e_sub = QLabel("All tasks are completed. Nothing requires your attention.")
+            e_sub.setStyleSheet("color: #606070; font-size: 13px;")
             e_layout.addWidget(e_sub)
             self._layout.addWidget(empty)
+
+            # Show narratives instead
+            for n in narratives:
+                card = self._narrative_card(n)
+                self._layout.addWidget(card)
+
             self._layout.addStretch()
             return
 
         for item in model.items[:10]:
-            # Status color
-            if item.status == "failed":
-                border = "#3a1a1a"
-                badge_color = "#e06a6a"
-            elif item.status == "running":
-                border = "#1a2a3a"
-                badge_color = "#6aaae0"
-            elif item.status == "Review required":
-                border = "#3a3a1a"
-                badge_color = "#e0c06a"
-            elif item.status == "completed":
-                border = "#1a3a1a"
-                badge_color = "#4ae04a"
-            else:
-                border = "#1a1a2a"
-                badge_color = "#808090"
+            border_map = {
+                "failed": "#3a1a1a",
+                "running": "#1a2a3a",
+                "Review required": "#3a3a1a",
+                "completed": "#1a3a1a",
+            }
+            badge_map = {
+                "failed": "#e06a6a",
+                "running": "#6aaae0",
+                "Review required": "#e0c06a",
+                "completed": "#4ae04a",
+            }
+
+            border = border_map.get(item.status, "#1a1a2a")
+            badge_color = badge_map.get(item.status, "#808090")
 
             card = QFrame()
             card.setStyleSheet("""
@@ -133,10 +137,8 @@ class WorkPage(QWidget):
             card_layout = QVBoxLayout(card)
             card_layout.setSpacing(10)
 
-            # Row 1: Title + badge
+            # Title + badge
             header_row = QHBoxLayout()
-            header_row.setSpacing(8)
-
             title_label = QLabel(item.title)
             title_label.setStyleSheet("color: #e0e0e0; font-size: 16px; font-weight: bold;")
             header_row.addWidget(title_label)
@@ -153,10 +155,9 @@ class WorkPage(QWidget):
                 font-weight: 500;
             """.format(badge_color, border))
             header_row.addWidget(badge)
-
             card_layout.addLayout(header_row)
 
-            # Progress bar
+            # Progress
             if item.progress:
                 prog_bar = QProgressBar()
                 prog_bar.setValue(item.progress.percent)
@@ -181,10 +182,10 @@ class WorkPage(QWidget):
                     item.progress.estimated_remaining or "{}% complete".format(item.progress.percent),
                 )
                 prog_label = QLabel(prog_text)
-                prog_label.setStyleSheet("color: #808090; font-size: 11px;")
+                prog_label.setStyleSheet("color: #707080; font-size: 11px;")
                 card_layout.addWidget(prog_label)
 
-            # Approval
+            # Approval — narrative
             if item.approval_needed:
                 approve_frame = QFrame()
                 approve_frame.setStyleSheet("""
@@ -193,20 +194,23 @@ class WorkPage(QWidget):
                         border: 1px solid #3a3a1a;
                         border-radius: 6px;
                         padding: 8px 12px;
-                        margin-top: 4px;
                     }
                 """)
                 a_layout = QVBoxLayout(approve_frame)
                 a_layout.setSpacing(4)
 
-                req_label = QLabel("\u26a0\ufe0f  Review required")
-                req_label.setStyleSheet("color: #e0c06a; font-size: 12px; font-weight: bold;")
-                a_layout.addWidget(req_label)
+                req = QLabel("\u26a0\ufe0f  SAM is waiting for your approval.")
+                req.setStyleSheet("color: #e0c06a; font-size: 12px; font-weight: bold;")
+                a_layout.addWidget(req)
 
                 if item.approval_reason:
                     reason = QLabel("Reason: {}".format(item.approval_reason))
-                    reason.setStyleSheet("color: #808090; font-size: 11px;")
+                    reason.setStyleSheet("color: #707080; font-size: 11px;")
                     a_layout.addWidget(reason)
+
+                est = QLabel("Estimated review time: 2 minutes.")
+                est.setStyleSheet("color: #707080; font-size: 11px;")
+                a_layout.addWidget(est)
 
                 approve_btn = QPushButton("  \u2705  Approve")
                 approve_btn.setCursor(Qt.PointingHandCursor)
@@ -223,9 +227,6 @@ class WorkPage(QWidget):
                     QPushButton:hover {
                         background: #3a7a4a;
                     }
-                    QPushButton:pressed {
-                        background: #1a4a2a;
-                    }
                 """)
                 approve_btn.setFixedWidth(120)
                 a_layout.addWidget(approve_btn)
@@ -234,7 +235,39 @@ class WorkPage(QWidget):
 
             self._layout.addWidget(card)
 
+        # Narrative cards
+        for n in narratives:
+            card = self._narrative_card(n)
+            self._layout.addWidget(card)
+
         self._layout.addStretch()
+
+    def _narrative_card(self, n):
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background: #0a0a12;
+                border: 1px solid #2a2a4a;
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-top: 4px;
+            }
+        """)
+        c_layout = QVBoxLayout(card)
+        c_layout.setSpacing(2)
+
+        title = QLabel(n.title)
+        title.setStyleSheet("color: #c0c0d0; font-size: 13px; font-weight: 500;")
+        title.setWordWrap(True)
+        c_layout.addWidget(title)
+
+        if n.details:
+            d = QLabel(n.details)
+            d.setStyleSheet("color: #707080; font-size: 11px;")
+            d.setWordWrap(True)
+            c_layout.addWidget(d)
+
+        return card
 
     def _clear(self):
         while self._layout.count():

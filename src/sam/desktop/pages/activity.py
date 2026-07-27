@@ -1,9 +1,8 @@
 """
-Activity Page v3.1 — Human Timeline.
+Activity Page v3.1 — Narrative Timeline.
 
-Bukan log.
-Bukan audit.
-Timeline cerita.
+Setiap baris adalah cerita, bukan log.
+Group: Today / Yesterday / Earlier.
 """
 
 from PySide6.QtWidgets import (
@@ -11,7 +10,6 @@ from PySide6.QtWidgets import (
     QScrollArea, QPushButton, QLineEdit,
 )
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont
 
 from ...experience.engine import ExperienceEngine
 
@@ -27,7 +25,6 @@ class ActivityPage(QWidget):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
-        # Header
         header = QWidget()
         header.setStyleSheet("background: transparent; padding: 24px 24px 8px 24px;")
         h_layout = QVBoxLayout(header)
@@ -38,7 +35,10 @@ class ActivityPage(QWidget):
         title.setStyleSheet("font-size: 22px; font-weight: bold; color: #e0e0e0;")
         h_layout.addWidget(title)
 
-        # Search
+        sub = QLabel("What happened — told in moments, not in logs.")
+        sub.setStyleSheet("color: #606070; font-size: 12px; margin-top: 2px;")
+        h_layout.addWidget(sub)
+
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Filter activity...")
         self.search_input.setStyleSheet("""
@@ -55,12 +55,11 @@ class ActivityPage(QWidget):
                 border: 1px solid #2a2a4a;
             }
         """)
-        self.search_input.textChanged.connect(self._on_search)
+        self.search_input.textChanged.connect(self.refresh)
         h_layout.addWidget(self.search_input)
 
         root.addWidget(header)
 
-        # Scroll
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
@@ -97,23 +96,23 @@ class ActivityPage(QWidget):
     def refresh(self):
         try:
             model = self.experience.build_activity()
-            self._render(model)
+            narratives = self.experience.build_narrative_activity()
+            self._render(model, narratives)
         except Exception:
             pass
 
-    def _on_search(self):
-        self.refresh()
-
-    def _render(self, model):
+    def _render(self, model, narratives):
         self._clear()
 
+        query = self.search_input.text().lower()
+
         for group in model.groups[:7]:
-            # Day header with horizontal line
-            header_container = QWidget()
-            header_container.setStyleSheet("background: transparent;")
-            h_layout = QHBoxLayout(header_container)
-            h_layout.setContentsMargins(0, 16, 0, 4)
-            h_layout.setSpacing(12)
+            # Day label
+            label_w = QWidget()
+            label_w.setStyleSheet("background: transparent;")
+            l_layout = QHBoxLayout(label_w)
+            l_layout.setContentsMargins(0, 16, 0, 4)
+            l_layout.setSpacing(12)
 
             day_label = QLabel(group.label.upper())
             day_label.setStyleSheet("""
@@ -122,53 +121,85 @@ class ActivityPage(QWidget):
                 font-weight: bold;
                 letter-spacing: 1.5px;
             """)
-            h_layout.addWidget(day_label)
+            l_layout.addWidget(day_label)
 
             line = QFrame()
             line.setFrameShape(QFrame.HLine)
             line.setStyleSheet("color: #1a1a2a; margin-top: 2px;")
-            h_layout.addWidget(line, 1)
+            l_layout.addWidget(line, 1)
 
-            self._layout.addWidget(header_container)
+            self._layout.addWidget(label_w)
 
-            # Timeline entries
+            # Entry narrative cards
             for entry in group.entries[:15]:
-                entry_container = QFrame()
-                entry_container.setStyleSheet("""
+                desc = entry.description
+                if query and query not in desc.lower():
+                    continue
+
+                card = QFrame()
+                card.setStyleSheet("""
                     QFrame {
                         background: transparent;
                         border: none;
-                        padding: 4px 0;
+                        padding: 3px 0;
                     }
                     QFrame:hover {
                         background: #0d0d18;
                         border-radius: 6px;
                     }
                 """)
+                c_layout = QHBoxLayout(card)
+                c_layout.setContentsMargins(12, 3, 12, 3)
+                c_layout.setSpacing(10)
 
-                e_layout = QHBoxLayout(entry_container)
-                e_layout.setContentsMargins(12, 4, 12, 4)
-                e_layout.setSpacing(12)
-
-                # Timeline dot
+                # Dot
                 dot = QLabel("\u2022")
-                dot.setStyleSheet("color: #404060; font-size: 18px;")
+                dot.setStyleSheet("color: #404060; font-size: 16px;")
                 dot.setFixedWidth(12)
-                e_layout.addWidget(dot)
+                c_layout.addWidget(dot)
 
                 # Time
-                time_label = QLabel(entry.time)
-                time_label.setStyleSheet("color: #606080; font-size: 12px; font-weight: 500;")
-                time_label.setFixedWidth(40)
-                e_layout.addWidget(time_label)
+                time_l = QLabel(entry.time)
+                time_l.setStyleSheet("color: #505070; font-size: 12px; font-weight: 500;")
+                time_l.setFixedWidth(42)
+                c_layout.addWidget(time_l)
 
-                # Description
-                desc_label = QLabel(entry.description)
-                desc_label.setStyleSheet("color: #c0c0d0; font-size: 13px;")
-                desc_label.setWordWrap(True)
-                e_layout.addWidget(desc_label, 1)
+                # Story — narrative description
+                desc_l = QLabel(desc)
+                desc_l.setStyleSheet("color: #c0c0d0; font-size: 13px;")
+                desc_l.setWordWrap(True)
+                c_layout.addWidget(desc_l, 1)
 
-                self._layout.addWidget(entry_container)
+                self._layout.addWidget(card)
+
+            # Narrative cards after each group
+            for n in narratives:
+                card = QFrame()
+                card.setStyleSheet("""
+                    QFrame {
+                        background: #0a0a12;
+                        border: 1px solid #1a1a2a;
+                        border-radius: 8px;
+                        padding: 10px 14px;
+                        margin: 4px 0;
+                    }
+                    QFrame:hover {
+                        border: 1px solid #2a2a3a;
+                    }
+                """)
+                nc_layout = QHBoxLayout(card)
+                nc_layout.setSpacing(8)
+
+                icon = QLabel("\U0001f4cc")
+                icon.setStyleSheet("font-size: 13px;")
+                nc_layout.addWidget(icon)
+
+                text = QLabel(n.summary)
+                text.setStyleSheet("color: #a0a0b0; font-size: 12px;")
+                text.setWordWrap(True)
+                nc_layout.addWidget(text, 1)
+
+                self._layout.addWidget(card)
 
         if not model.groups:
             empty = QLabel("No activity recorded yet.")
