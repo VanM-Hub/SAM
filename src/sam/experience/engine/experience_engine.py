@@ -19,8 +19,7 @@ from ...operations.story import StoryBuilder, Story, StoryType
 from ...operations.presentation import PresentationEngine, Presentation, Decision
 from ...operations.recommendation import RecommendationEngine, Recommendation
 from ...operations.prediction import PredictionEngine, Prediction
-from ...operations.question_engine import QuestionEngine
-from ...operations.human_answer import HumanAnswer
+from ...operations.question_engine import QuestionEngine, HumanAnswer
 from ...narrative import NarrativeBuilder, DailyBriefing, SituationBrief
 from ...openclaw.connection import OpenClawAdapter
 from ...telemetry.service import TelemetryService
