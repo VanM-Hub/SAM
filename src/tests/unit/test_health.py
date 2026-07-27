@@ -53,7 +53,7 @@ async def event_bus():
 async def config_service():
     """Create a configuration service for testing."""
     import os
-    config_path = os.path.join("D:/Project AI/SAM", "openclaw.json")
+    config_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "openclaw.json")
     service = ConfigurationService(config_path)
     yield service
 

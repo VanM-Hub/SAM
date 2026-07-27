@@ -19,7 +19,8 @@ from sam.recommendations.models import RecommendationSeverity
 from sam.approval.engine import ApprovalEngine
 from sam.approval.models import ApprovalDecision
 
-SAM_ROOT = "D:/Project AI/SAM"
+import os
+SAM_ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "..")
 
 
 async def main():

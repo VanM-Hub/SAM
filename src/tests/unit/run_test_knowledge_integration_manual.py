@@ -29,7 +29,7 @@ async def test_knowledge_fact_added():
     print("Building runtime pipeline...")
 
     # Setup loader and registry
-    loader = KnowledgeLoader("D:/Project AI/SAM")
+    loader = KnowledgeLoader(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
     loader.load_all()
 
     registry = CapabilityRegistry()
