@@ -3,7 +3,7 @@
   "workspace": "./workspace",
   "hosting": "desktop",
   "state": "RUNNING",
-  "health": "UNHEALTHY",
+  "health": "UNKNOWN",
   "uptime": 0,
-  "generated_at": "2026-07-27T11:28:39.574858"
+  "generated_at": "2026-07-27T19:04:06.585414"
 }

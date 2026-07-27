@@ -5,7 +5,6 @@ CLI commands for task management.
 import typer
 from ..telemetry.service import TelemetryService
 from ..operations.engine.task import TaskEngine
-from ..experience.models.task import TaskStatus
 
 app = typer.Typer()
 
