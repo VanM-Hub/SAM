@@ -12,6 +12,7 @@ from ...operations.engine.knowledge import KnowledgeEngine
 from ...operations.engine.history import HistoryEngine
 from ...operations.engine.settings import SettingsEngine
 from ...operations.engine.explain import ExplainabilityEngine
+from ...operations.protection import ProtectionEngine
 from ...telemetry.service import TelemetryService
 
 from .models import (
@@ -39,6 +40,7 @@ class ExperienceEngine:
         self.history_engine = HistoryEngine(telemetry)
         self.settings_engine = SettingsEngine()
         self.explain_engine = ExplainabilityEngine(telemetry)
+        self.protection = ProtectionEngine()
 
     # ======================================================================
     # HOME
@@ -71,11 +73,32 @@ class ExperienceEngine:
             message = "SAM is Healthy"
             detail = "Everything is operating normally."
 
+        # Protection cycle
+        import asyncio
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # Schedule protection cycle
+                task = asyncio.ensure_future(
+                    self.protection.run_cycle(self.telemetry)
+                )
+                report = asyncio.get_event_loop().run_until_complete(task)
+                prot_level = report.level.value
+                prot_summary = report.summary
+            else:
+                prot_level = ""
+                prot_summary = ""
+        except Exception:
+            prot_level = ""
+            prot_summary = ""
+
         health = SystemHealth(
             status=status,
             message=message,
             detail=detail,
             health_score=health_score,
+            protection_level=prot_level,
+            protection_summary=prot_summary,
         )
 
         # Purpose
