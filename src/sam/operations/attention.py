@@ -56,7 +56,7 @@ SCORE_LABELS = {
 }
 
 
-class AttentionEngine:
+class AttentionAnalyzer:
     """Menentukan apa yang penting dari Experience Model.
 
     Home hanya menampilkan TOP 3.
@@ -85,8 +85,8 @@ class AttentionEngine:
 
         try:
             # 1. Situasi
-            from .situation import SituationEngine
-            sit_engine = SituationEngine(self._ee)
+            from .situation import SituationAnalyzer
+            sit_engine = SituationAnalyzer(self._ee)
             report = sit_engine.detect()
 
             sit_score = AttentionScore(report.attention_score) if report.attention_score in (100, 80, 70, 60, 50, 30, 10) else AttentionScore.NORMAL

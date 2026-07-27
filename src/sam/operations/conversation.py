@@ -17,8 +17,8 @@ from datetime import datetime
 class ConversationObject:
     """Satu-satunya representasi keadaan operasional.
 
-    Immutable. Dibangun oleh UnderstandingEngine.
-    Dibaca oleh QuestionEngine → Renderer → HumanAnswer.
+    Immutable. Dibangun oleh SystemAnalyzer.
+    Dibaca oleh Conversation API → Renderer → HumanAnswer.
 
     BUKAN DTO. Ini domain model. Semua penalaran ada di sini.
     """

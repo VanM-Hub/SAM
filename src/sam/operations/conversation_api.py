@@ -46,7 +46,7 @@ class Conversation:
     Pengguna tidak tahu ada engine, resolver, renderer di belakangnya.
     """
 
-    def __init__(self, understanding: UnderstandingEngine,
+    def __init__(self, understanding: 'SystemAnalyzer',
                  session: SessionManager,
                  audience: AudienceProfile,
                  renderers: dict):
@@ -260,7 +260,7 @@ class SAM:
 
     def __init__(self, experience_engine=None):
         self._ee = experience_engine
-        self._understanding = UnderstandingEngine(experience_engine)
+        self._understanding = SystemAnalyzer(experience_engine)
         self._session = SessionManager()
         self._renderers = {
             "cli": CLIRenderer(),

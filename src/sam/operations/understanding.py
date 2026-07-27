@@ -1,10 +1,10 @@
 """
-UnderstandingEngine — Sintesis ConversationObject dari semua sumber.
+SystemAnalyzer — Sintesis ConversationObject dari semua sumber.
 
 Input:
   Telemetry
-  SituationEngine
-  PresentationEngine
+  SituationAnalyzer
+  PresentationRenderer
   Knowledge
   Protection
   Work
@@ -23,7 +23,7 @@ from typing import Optional, List
 from .conversation import ConversationObject
 
 
-class UnderstandingEngine:
+class SystemAnalyzer:
     """Sintesis ConversationObject — keadaan operasional yang dipahami manusia.
 
     BUKAN pembuat kalimat.
