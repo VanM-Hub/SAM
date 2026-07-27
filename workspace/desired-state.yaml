@@ -1,7 +1,0 @@
-runtime_state: RUNNING
-plugins_expected: 14
-knowledge_loaded: true
-memory_healthy: true
-session_persistent: true
-min_health_score: 95.0
-guardian_mode: autonomous
