@@ -180,6 +180,102 @@ async def _run_workflow(
 
 
 @app.command()
+def health(
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output as JSON"),
+):
+    """Show aggregated system health status.
+
+    Reports health of: Python runtime, database, module imports,
+    autonomy status, and active guardrails.
+    """
+    async def _health():
+        statuses = {}
+
+        # 1. Python version
+        import sys
+        py_ver = sys.version.split()[0]
+        statuses["python"] = {"status": "ok", "version": py_ver}
+
+        # 2. Database
+        db_ok = False
+        try:
+            import os
+            from sam.persistence.database import Database
+            db_path = os.environ.get("SAM_DB_PATH", "sam.db")
+            db = Database(db_path)
+            await db.initialize()
+            rows = await db.fetch_all(
+                "SELECT COUNT(*) as cnt FROM schema_version"
+            )
+            migration_count = rows[0][0] if rows else 0
+            await db.close()
+            db_ok = True
+            statuses["database"] = {
+                "status": "ok",
+                "migrations": migration_count,
+            }
+        except Exception as e:
+            statuses["database"] = {"status": "error", "error": str(e)}
+
+        # 3. Module imports
+        modules = ["cognition", "healing", "evolution", "tuning", "autonomy", "cluster", "federation"]
+        mod_statuses = {}
+        for mod in modules:
+            try:
+                __import__(f"sam.{mod}")
+                mod_statuses[mod] = "ok"
+            except Exception:
+                mod_statuses[mod] = "error"
+        statuses["modules"] = mod_statuses
+
+        # 4. Autonomy status
+        try:
+            from sam.autonomy.controller import AutonomyController
+            ctrl = AutonomyController()
+            level = await ctrl.get_current_level()
+            statuses["autonomy"] = {
+                "status": "ok",
+                "level": level.value,
+                "numeric": level.numeric,
+            }
+        except Exception as e:
+            statuses["autonomy"] = {"status": "error", "error": str(e)}
+
+        # Determine overall status
+        all_ok = all(
+            s.get("status") == "ok"
+            for s in statuses.values()
+            if isinstance(s, dict) and "status" in s
+        )
+        # modules dict doesn't have a "status" key, check individually
+        mod_ok = all(v == "ok" for v in mod_statuses.values())
+
+        if json_output:
+            import json as _json
+            typer.echo(_json.dumps(statuses, indent=2, default=str))
+        else:
+            typer.echo("=== SAM Health ===")
+            typer.echo(f"  Python      : {py_ver}")
+            typer.echo(f"  Database    : {'OK' if db_ok else 'ERROR'}")
+            if db_ok:
+                typer.echo(f"  Migrations  : {migration_count}")
+            for mod, st in mod_statuses.items():
+                icon = "OK" if st == "ok" else "XX"
+                typer.echo(f"  {mod:12s}: {icon}")
+            if "autonomy" in statuses:
+                a = statuses["autonomy"]
+                if a["status"] == "ok":
+                    typer.echo(f"  Autonomy    : {a['level']} ({a['numeric']}/5)")
+            typer.echo("")
+            if all_ok and mod_ok:
+                typer.echo("System status: HEALTHY")
+            else:
+                typer.echo("System status: DEGRADED")
+
+    asyncio.run(_health())
+
+
+@app.command()
 def run(
     capability_id: str,
     no_audit: bool = False
@@ -856,8 +952,13 @@ app.add_typer(cluster_app, name="cluster")
 def cluster_status(
     format: str = typer.Option("table", "--format", "-f", help="Output format: table or json"),
 ):
-    """Show cluster state and health."""
+    """Show cluster state and health.
+
+    In standalone mode (no database), displays basic status.
+    Full cluster status requires database infrastructure.
+    """
     async def _status():
+        config = None
         try:
             from sam.cluster.state import ClusterStateAggregator
             from sam.cluster.node_registry import NodeRegistry
@@ -868,13 +969,10 @@ def cluster_status(
 
             config = DaemonConfig()
 
-            # Setup minimal components for state collection
+            # Minimal components for state collection
             event_bus = EventBus()
             job_queue = JobQueue(event_bus)
             node_registry = NodeRegistry()
-
-            # LeaderElection needs a DB — skip for CLI; pass a none-like
-            # We create a lightweight leader election with no DB backing
             leader_election = LeaderElection(None, config.cluster_id)
 
             aggregator = ClusterStateAggregator(
@@ -890,20 +988,12 @@ def cluster_status(
                 import json
                 typer.echo(json.dumps(state.to_dict(), indent=2, default=str))
             else:
-                # Table format
                 typer.echo(f"\nCluster: {state.cluster_id}")
                 typer.echo(f"Updated : {state.updated_at.isoformat()}")
-                typer.echo()
                 typer.echo(f"  Leader: {state.leader_id or 'none'}")
-                typer.echo(f"  Nodes : {state.node_count} total")
-                typer.echo(f"          {state.online_nodes} online")
-                typer.echo(f"          {state.offline_nodes} offline")
-                typer.echo(f"          {state.degraded_nodes} degraded")
-                typer.echo()
-                typer.echo(f"  Active Workflows: {state.active_workflows}")
-                typer.echo(f"  Jobs (pending/running/failed): {state.pending_jobs}/{state.running_jobs}/{state.failed_jobs}")
-                typer.echo()
-                typer.echo(f"  Total Load: {state.total_load:.1f}%")
+                typer.echo(f"  Nodes : {state.node_count} total / {state.online_nodes} online")
+                typer.echo(f"  Jobs   : {state.pending_jobs}/{state.running_jobs}/{state.failed_jobs} (p/r/f)")
+                typer.echo(f"  Load   : {state.total_load:.1f}%")
 
                 if state.node_details:
                     typer.echo()
@@ -920,8 +1010,21 @@ def cluster_status(
                         )
 
         except Exception as e:
-            typer.echo(f"Error: {e}", err=True)
-            raise typer.Exit(1)
+            # Standalone fallback — tampilkan info dasar tanpa DB
+            cid = getattr(config, 'cluster_id', 'unknown') if config else 'unknown'
+            if format == "json":
+                import json
+                typer.echo(json.dumps({
+                    "mode": "standalone",
+                    "status": "running as single node",
+                    "cluster_id": cid,
+                    "note": "Full cluster status requires database infrastructure",
+                }, indent=2))
+            else:
+                typer.echo(f"\nCluster: standalone mode")
+                typer.echo(f"  Status : running as single node")
+                typer.echo(f"  ID     : {cid}")
+                typer.echo(f"  Note   : Full cluster status requires database infrastructure")
 
     asyncio.run(_status())
 

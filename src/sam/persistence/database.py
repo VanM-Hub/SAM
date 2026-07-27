@@ -10,12 +10,12 @@ from typing import Any, Callable, List, Optional, TypeVar
 import structlog
 
 
-# ── Python 3.8 compat: polyfill asyncio.to_thread ────────────────
+# ── Python 3.8 polyfill (hapus setelah migrasi ke 3.12) ───────────
 T = TypeVar("T")
 
 if not hasattr(asyncio, "to_thread"):
     async def _to_thread(fn: Callable[..., T], *args: Any, **kwargs: Any) -> T:
-        """Fallback for Python < 3.9: run sync fn in default executor."""
+        """Fallback for Python < 3.9."""
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, lambda: fn(*args, **kwargs))
     asyncio.to_thread = _to_thread  # type: ignore[attr-defined]
