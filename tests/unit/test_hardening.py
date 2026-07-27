@@ -97,7 +97,7 @@ class TestErrorHandling:
         svc = TelemetryService(max_events=3)
         for i in range(10):
             svc.emit_event("test.{0}".format(i))
-        assert len(svc.events) == 3
+        assert len(svc._buffer) == 3
 
     @pytest.mark.asyncio
     async def test_incident_detector_bad_workspace(self, tmp_path):
