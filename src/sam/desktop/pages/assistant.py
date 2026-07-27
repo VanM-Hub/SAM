@@ -1,22 +1,21 @@
 """
-Notification + Assistant Pages v3.1.
+Notification + Assistant Pages v3.1 — Narrative Edition.
 
-Notification = inbox, bukan popup.
-Assistant = jawaban dari Explanation Engine, bukan LLM.
+Notification = Narrative cards.
+Assistant = Narrative-aware answers.
 """
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame,
-    QScrollArea, QPushButton, QLineEdit, QTextEdit,
+    QScrollArea, QPushButton, QLineEdit,
 )
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont
 
 from ...experience.engine import ExperienceEngine
 
 
 # ============================================================================
-# NOTIFICATION — Inbox
+# NOTIFICATION — Narrative cards
 # ============================================================================
 
 class NotificationPage(QWidget):
@@ -33,9 +32,12 @@ class NotificationPage(QWidget):
         header.setStyleSheet("background: transparent; padding: 24px 24px 8px 24px;")
         h_layout = QVBoxLayout(header)
         h_layout.setContentsMargins(0, 0, 0, 0)
-        title = QLabel("Notifications")
+        title = QLabel("Alerts")
         title.setStyleSheet("font-size: 22px; font-weight: bold; color: #e0e0e0;")
         h_layout.addWidget(title)
+        sub = QLabel("What requires your attention.")
+        sub.setStyleSheet("color: #606070; font-size: 12px; margin-top: 2px;")
+        h_layout.addWidget(sub)
         root.addWidget(header)
 
         scroll = QScrollArea()
@@ -74,65 +76,58 @@ class NotificationPage(QWidget):
     def refresh(self):
         try:
             model = self.experience.build_notifications()
-            self._render(model)
+            narratives = self.experience.narrative.build_from_notifications(model)
+            self._render(model, narratives)
         except Exception:
             pass
 
-    def _render(self, model):
+    def _render(self, model, narratives):
         self._clear()
 
-        for notif in model.items[:20]:
-            # Icon per type
-            icon_map = {
-                "approval": "\u26a0\ufe0f",
-                "recommendation": "\U0001f4a1",
-                "policy": "\U0001f6e1\ufe0f",
-                "update": "\U0001f504",
-                "recovery": "\u2705",
-            }
-            icon = icon_map.get(notif.type, "\U0001f514")
-            color = "#e0c06a" if notif.type == "approval" else "#a0a0b0"
-
+        # Narrative cards first
+        for n in narratives:
             card = QFrame()
             card.setStyleSheet("""
                 QFrame {
                     background: #0a0a12;
-                    border: 1px solid #1a1a2a;
+                    border: 1px solid #2a2a4a;
                     border-radius: 8px;
                     padding: 10px 14px;
                 }
                 QFrame:hover {
-                    border: 1px solid #2a2a3a;
+                    border: 1px solid #3a3a5a;
                 }
             """)
-            c_layout = QHBoxLayout(card)
-            c_layout.setSpacing(12)
+            c_layout = QVBoxLayout(card)
+            c_layout.setSpacing(2)
 
-            icon_w = QLabel(icon)
-            icon_w.setStyleSheet("font-size: 16px;")
-            c_layout.addWidget(icon_w)
+            icon_map = {
+                "action_required": "\u26a0\ufe0f",
+                "attention": "\U0001f4a1",
+                "information": "\U0001f514",
+                "critical": "\U0001f6a8",
+            }
+            icon = icon_map.get(n.importance.value, "\U0001f514")
 
-            # Text
-            text_w = QWidget()
-            text_layout = QVBoxLayout(text_w)
-            text_layout.setContentsMargins(0, 0, 0, 0)
-            text_layout.setSpacing(2)
+            row = QHBoxLayout()
+            i_w = QLabel(icon)
+            i_w.setStyleSheet("font-size: 14px;")
+            row.addWidget(i_w)
 
-            msg = QLabel(notif.message)
-            msg.setStyleSheet("color: {}; font-size: 13px;".format(color))
-            msg.setWordWrap(True)
-            text_layout.addWidget(msg)
+            text = QLabel(n.title)
+            text.setStyleSheet("color: #c0c0d0; font-size: 13px;")
+            text.setWordWrap(True)
+            row.addWidget(text, 1)
+            c_layout.addLayout(row)
 
-            if notif.timestamp:
-                ts = QLabel(notif.timestamp)
-                ts.setStyleSheet("color: #505060; font-size: 10px;")
-                text_layout.addWidget(ts)
+            if n.details:
+                d = QLabel(n.details)
+                d.setStyleSheet("color: #707080; font-size: 11px; padding-left: 20px;")
+                d.setWordWrap(True)
+                c_layout.addWidget(d)
 
-            c_layout.addWidget(text_w, 1)
-
-            # Action button
-            if notif.action:
-                btn = QPushButton(notif.action)
+            if n.recommended_action:
+                btn = QPushButton(n.recommended_action)
                 btn.setStyleSheet("""
                     QPushButton {
                         background: #1a1a2a;
@@ -141,6 +136,7 @@ class NotificationPage(QWidget):
                         padding: 4px 10px;
                         color: #c0c0d0;
                         font-size: 11px;
+                        max-width: 100px;
                     }
                     QPushButton:hover {
                         background: #2a2a3a;
@@ -150,8 +146,8 @@ class NotificationPage(QWidget):
 
             self._layout.addWidget(card)
 
-        if not model.items or (len(model.items) == 1 and model.items[0].type == "info"):
-            empty = QLabel("\U0001f514  No notifications")
+        if not narratives:
+            empty = QLabel("\U0001f514  No alerts")
             empty.setStyleSheet("color: #606070; font-size: 14px; padding: 24px;")
             self._layout.addWidget(empty)
 
@@ -165,7 +161,7 @@ class NotificationPage(QWidget):
 
 
 # ============================================================================
-# ASSISTANT — Tanya jawab, bukan chatbot
+# ASSISTANT — Narrative-aware
 # ============================================================================
 
 class AssistantPage(QWidget):
@@ -178,12 +174,11 @@ class AssistantPage(QWidget):
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
 
-        # Header
         header = QWidget()
         header.setStyleSheet("background: transparent; padding: 24px 24px 8px 24px;")
         h_layout = QVBoxLayout(header)
         h_layout.setContentsMargins(0, 0, 0, 0)
-        title = QLabel("Assistant")
+        title = QLabel("Ask")
         title.setStyleSheet("font-size: 22px; font-weight: bold; color: #e0e0e0;")
         h_layout.addWidget(title)
         sub = QLabel("Ask me anything about SAM.")
@@ -191,7 +186,6 @@ class AssistantPage(QWidget):
         h_layout.addWidget(sub)
         root.addWidget(header)
 
-        # Scroll area for answers
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
@@ -260,20 +254,16 @@ class AssistantPage(QWidget):
                 font-size: 13px;
                 font-weight: 500;
             }
-            QPushButton:hover {
-                background: #3a5a7a;
-            }
+            QPushButton:hover { background: #3a5a7a; }
         """)
         self.ask_btn.clicked.connect(self._ask)
         input_layout.addWidget(self.ask_btn)
 
         root.addWidget(input_bar)
 
-        # Suggested questions
         self._add_suggested()
 
     def _add_suggested(self):
-        """Show suggested questions."""
         container = QFrame()
         container.setStyleSheet("""
             QFrame {
@@ -291,15 +281,13 @@ class AssistantPage(QWidget):
         c_layout.addWidget(tip)
 
         questions = [
-            "What is happening?",
+            "Good morning briefing",
             "What happened today?",
-            "Is the system healthy?",
-            "What do you recommend?",
+            "What is the current situation?",
             "Anything needs attention?",
-            "Why is SAM waiting?",
             "Show unfinished work.",
             "What did SAM learn?",
-            "Good morning briefing",
+            "Why is SAM waiting?",
             "Are there any approvals?",
         ]
         for q in questions:
@@ -315,10 +303,7 @@ class AssistantPage(QWidget):
                     color: #6aaae0;
                     font-size: 12px;
                 }
-                QPushButton:hover {
-                    background: #121222;
-                    border: 1px solid #2a2a4a;
-                }
+                QPushButton:hover { background: #121222; border: 1px solid #2a2a4a; }
             """)
             btn.clicked.connect(lambda *a, q=q: self._ask_suggested(q))
             c_layout.addWidget(btn)
@@ -336,7 +321,6 @@ class AssistantPage(QWidget):
 
         answer = self.experience.ask(question)
 
-        # Answer card
         card = QFrame()
         card.setStyleSheet("""
             QFrame {
@@ -349,25 +333,21 @@ class AssistantPage(QWidget):
         c_layout = QVBoxLayout(card)
         c_layout.setSpacing(6)
 
-        # Question
         q_label = QLabel("You: {}".format(question))
-        q_label.setStyleSheet("color: #808090; font-size: 12px; font-style: italic;")
+        q_label.setStyleSheet("color: #707080; font-size: 12px; font-style: italic;")
         c_layout.addWidget(q_label)
 
-        # Answer
         a_label = QLabel(answer.answer)
         a_label.setStyleSheet("color: #e0e0e0; font-size: 14px;")
         a_label.setWordWrap(True)
         c_layout.addWidget(a_label)
 
-        # Details
         if answer.details:
             d_label = QLabel(answer.details)
             d_label.setStyleSheet("color: #808090; font-size: 11px; padding-left: 8px;")
             d_label.setWordWrap(True)
             c_layout.addWidget(d_label)
 
-        # Action
         if answer.action:
             btn = QPushButton(answer.action)
             btn.setStyleSheet("""
@@ -380,9 +360,7 @@ class AssistantPage(QWidget):
                     font-size: 12px;
                     max-width: 100px;
                 }
-                QPushButton:hover {
-                    background: #3a7a4a;
-                }
+                QPushButton:hover { background: #3a7a4a; }
             """)
             c_layout.addWidget(btn)
 
