@@ -23,6 +23,10 @@ from typing import Optional, List
 from .conversation import ConversationObject
 
 
+# Backward-compat alias (Engine rename: UnderstandingEngine → SystemAnalyzer)
+UnderstandingEngine = None  # resolved below
+
+
 class SystemAnalyzer:
     """Sintesis ConversationObject — keadaan operasional yang dipahami manusia.
 
@@ -226,3 +230,6 @@ class SystemAnalyzer:
                 user_action_needed="Check logs.",
                 confidence=0.1,
             )
+
+# Backward-compat alias
+UnderstandingEngine = SystemAnalyzer
