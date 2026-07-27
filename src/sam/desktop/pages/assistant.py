@@ -103,7 +103,9 @@ class NotificationPage(QWidget):
                 c_layout = QVBoxLayout(card)
                 c_layout.setSpacing(2)
                 row = QHBoxLayout()
-                score = QLabel("[{}]".format(item.score))
+                from ...operations.attention import SCORE_TO_LABEL
+                label = SCORE_TO_LABEL.get(item.score, "Normal")
+                score = QLabel("[{}]".format(label))
                 score.setStyleSheet("color: {}; font-size: 10px; font-weight: bold;".format(item.color))
                 row.addWidget(score)
                 text = QLabel(item.message or item.title)

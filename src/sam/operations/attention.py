@@ -1,8 +1,10 @@
 """
 Attention Engine — memberi bobot pada setiap event/situasi.
 
-Manusia tidak memberi bobot yang sama pada semua event.
-Attention Engine yang menentukan penting tidaknya sesuatu.
+Internal score: 100/80/50/20
+Presentation label: Immediate/Soon/Normal/Background
+
+UI tidak boleh menampilkan angka.
 """
 
 from dataclasses import dataclass, field
@@ -10,12 +12,20 @@ from enum import IntEnum
 from typing import List, Optional
 
 
+SCORE_TO_LABEL = {
+    100: "Immediate",
+    80: "Soon",
+    50: "Normal",
+    20: "Background",
+}
+
+
 class AttentionScore(IntEnum):
-    """Skala perhatian — 4 level."""
-    IMMEDIATE = 100      # Critical, harus lihat sekarang
+    """Skala perhatian — internal. UI pakai label."""
+    IMMEDIATE = 100      # Harus lihat sekarang
     IMPORTANT = 80       # Signifikan, review hari ini
     NORMAL = 50          # Biasa, tidak mendesak
-    BACKGROUND = 20      # Background, FYI saja
+    BACKGROUND = 20      # FYI saja
 
 
 @dataclass(frozen=True)
