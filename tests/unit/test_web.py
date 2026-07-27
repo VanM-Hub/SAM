@@ -28,7 +28,7 @@ class TestWebRoutes:
 
     def test_templates_directory(self):
         from pathlib import Path
-        web_templates = Path("D:/Project AI/SAM/src/sam/web/templates")
+        web_templates = Path(__file__).parent.parent.parent / "src" / "sam" / "web" / "templates"
         assert (web_templates / "base.html").exists()
         assert (web_templates / "index.html").exists()
         assert (web_templates / "runtime.html").exists()

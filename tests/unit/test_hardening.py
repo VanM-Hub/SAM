@@ -13,7 +13,7 @@ class TestMissionValidation:
     def test_valid_mission_yaml(self):
         """mission.yaml yang valid harus bisa di-load."""
         from sam.mission.loader import MissionLoader
-        loader = MissionLoader("D:/Project AI/SAM/workspace")
+        loader = MissionLoader("workspace")
         mission = loader.load()
         assert mission is not None
         assert hasattr(mission, "id")
@@ -31,7 +31,7 @@ class TestDOSValidation:
     def test_valid_dos_yaml(self):
         """desired-state.yaml yang valid harus bisa di-load."""
         from sam.dos.loader import DOSLoader
-        loader = DOSLoader("D:/Project AI/SAM/workspace")
+        loader = DOSLoader("workspace")
         dos = loader.load()
         assert dos is not None
         assert hasattr(dos, "runtime_state")
