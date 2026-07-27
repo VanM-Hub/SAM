@@ -33,7 +33,7 @@ HISTORY_FILE = "status/history.ndjson"
 
 @dataclass
 class ConnectionStatus:
-    connected: bool
+    connected: bool = False
     last_sync: str = ""
     error: str = ""
     status_sent: int = 0
