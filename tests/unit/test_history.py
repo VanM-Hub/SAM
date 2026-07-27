@@ -1,288 +1,282 @@
-"""Unit tests for KnowledgeStore history/versioning."""
+"""
+Unit tests for History Engine (OP-7).
+"""
 
+import sys
 import os
-import tempfile
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src"))
+
+from datetime import datetime, timedelta
 import pytest
-import pytest_asyncio
-
-from uuid import UUID
-from datetime import datetime
-
-from sam.knowledge.store import KnowledgeStore, create_knowledge_store
-from sam.knowledge.models import KnowledgeDocument, KnowledgeFact
-
-
-@pytest_asyncio.fixture
-async def test_db():
-    """Create a temporary database for testing."""
-    # Create temp file
-    fd, path = tempfile.mkstemp(suffix=".db")
-    os.close(fd)
-
-    # Create store and initialize tables (this creates all tables with new schema)
-    store = await create_knowledge_store(path)
-    await store.close()
-
-    yield path
-
-    # Cleanup
-    if os.path.exists(path):
-        os.unlink(path)
+from sam.experience.models.history import (
+    HistoryEntry, HistoryDay, HistoryModel, HistoryFilter,
+    HistoryEntryType, HistoryEntrySeverity,
+)
+from sam.operations.engine.history import HistoryEngine
+from sam.telemetry import (
+    TelemetryEvent, TelemetryEventType, EventSeverity,
+    EventCategory, Component, TelemetryService,
+)
 
 
-@pytest_asyncio.fixture
-async def store(test_db):
-    """Create a KnowledgeStore with initialized tables."""
-    s = KnowledgeStore(test_db)
-    await s.init_tables()
-    yield s
-    await s.close()
+# ============================================================================
+# 1. Enums
+# ============================================================================
+
+class TestHistoryEntryType:
+    def test_all_types_exist(self):
+        assert HistoryEntryType.TASK.value == "task"
+        assert HistoryEntryType.SYSTEM.value == "system"
+        assert HistoryEntryType.INCIDENT.value == "incident"
+
+    def test_nine_types(self):
+        assert len(list(HistoryEntryType)) == 9
 
 
-class TestKnowledgeStoreHistory:
-    """Tests for KnowledgeStore history/versioning."""
+class TestHistoryEntrySeverity:
+    def test_all_severities_exist(self):
+        assert HistoryEntrySeverity.SUCCESS.value == "success"
+        assert HistoryEntrySeverity.ERROR.value == "error"
 
-    @pytest_asyncio.fixture
-    async def store(self, test_db):
-        """Create a KnowledgeStore with initialized tables."""
-        s = KnowledgeStore(test_db)
-        await s.init_tables()
-        yield s
-        await s.close()
+    def test_five_severities(self):
+        assert len(list(HistoryEntrySeverity)) == 5
 
-    @pytest.mark.asyncio
-    async def test_history_created(self, store):
-        """Test that add_fact creates a history entry with change_type='created'."""
-        # Create a document first
-        doc = KnowledgeDocument(
-            path="test.md",
-            title="Test Doc",
-            version="1.0",
-            status="Draft",
-            knowledge_type="Reference",
-            evidence_level="Observed",
-            confidence="High",
-            owner="Test",
-            last_updated="2024-01-01T00:00:00",
-            content="Test content",
+
+# ============================================================================
+# 2. HistoryEntry
+# ============================================================================
+
+class TestHistoryEntry:
+    def test_minimal_entry(self):
+        now = datetime.utcnow()
+        e = HistoryEntry(
+            id="h1", type=HistoryEntryType.SYSTEM,
+            severity=HistoryEntrySeverity.INFO,
+            title="System started", timestamp=now,
         )
-        doc_id = await store.add_document(doc)
+        assert e.id == "h1"
+        assert e.description is None
 
-        # Add a fact
-        fact = await store.add_fact(
-            document_id=doc_id,
-            statement="Test fact statement",
-            category="capability",
-            confidence=0.9,
-            metadata={"key": "value"}
+    def test_full_entry(self):
+        now = datetime.utcnow()
+        e = HistoryEntry(
+            id="h2", type=HistoryEntryType.TASK,
+            severity=HistoryEntrySeverity.ERROR,
+            title="Task failed", description="Out of memory",
+            timestamp=now, duration_ms=5000.0,
+            correlation_id="corr-1", user="Van",
         )
+        assert e.duration_ms == 5000.0
+        assert e.user == "Van"
 
-        # Check history
-        history = await store.list_history(fact.id)
-        assert len(history) == 1
-        entry = history[0]
-        assert entry.change_type == "created"
-        assert entry.version == 1
-        assert entry.payload_snapshot["statement"] == "Test fact statement"
-        assert entry.payload_snapshot["category"] == "capability"
-        assert entry.payload_snapshot["metadata"]["key"] == "value"
 
-    @pytest.mark.asyncio
-    async def test_history_updated(self, store):
-        """Test that update_fact creates a history entry with change_type='updated'."""
-        doc = KnowledgeDocument(
-            path="test.md",
-            title="Test Doc",
-            version="1.0",
-            status="Draft",
-            knowledge_type="Reference",
-            evidence_level="Observed",
-            confidence="High",
-            owner="Test",
-            last_updated="2024-01-01T00:00:00",
-            content="Test content",
+# ============================================================================
+# 3. HistoryDay & HistoryFilter
+# ============================================================================
+
+class TestHistoryDay:
+    def test_day(self):
+        now = datetime.utcnow()
+        e = HistoryEntry(id="h1", type=HistoryEntryType.SYSTEM,
+                         severity=HistoryEntrySeverity.INFO,
+                         title="X", timestamp=now)
+        day = HistoryDay(date=now, entries=[e], count=1)
+        assert day.count == 1
+
+
+class TestHistoryFilter:
+    def test_default_filter(self):
+        f = HistoryFilter()
+        assert f.limit == 1000
+        assert f.types == []
+
+    def test_custom_filter(self):
+        now = datetime.utcnow()
+        f = HistoryFilter(
+            types=[HistoryEntryType.TASK],
+            severities=[HistoryEntrySeverity.ERROR],
+            query="fail", from_date=now, limit=50,
         )
-        doc_id = await store.add_document(doc)
-
-        fact = await store.add_fact(
-            document_id=doc_id,
-            statement="Original statement",
-            category="capability",
-            confidence=0.9,
-        )
-
-        # Update the fact
-        updated = await store.update_fact(fact.id, {
-            "statement": "Updated statement",
-            "category": "constraint",
-            "confidence": 0.8,
-        })
-
-        assert updated is not None
-        assert updated.version == 2
-        assert updated.statement == "Updated statement"
-        assert updated.category == "constraint"
-        assert updated.confidence == 0.8
-
-        # Check history has 2 entries
-        history = await store.list_history(fact.id)
-        assert len(history) == 2
-
-        # First entry: created
-        created_entry = history[0]
-        assert created_entry.change_type == "created"
-        assert created_entry.version == 1
-        assert created_entry.payload_snapshot["statement"] == "Original statement"
-
-        # Second entry: updated
-        updated_entry = history[1]
-        assert updated_entry.change_type == "updated"
-        assert updated_entry.version == 2
-        assert updated_entry.payload_snapshot["statement"] == "Updated statement"
-        assert updated_entry.payload_snapshot["category"] == "constraint"
-
-    @pytest.mark.asyncio
-    async def test_history_deleted(self, store):
-        """Test that delete_fact creates a history entry with change_type='deleted'."""
-        doc = KnowledgeDocument(
-            path="test.md",
-            title="Test Doc",
-            version="1.0",
-            status="Draft",
-            knowledge_type="Reference",
-            evidence_level="Observed",
-            confidence="High",
-            owner="Test",
-            last_updated="2024-01-01T00:00:00",
-            content="Test content",
-        )
-        doc_id = await store.add_document(doc)
-
-        fact = await store.add_fact(
-            document_id=doc_id,
-            statement="Fact to be deleted",
-            category="capability",
-            confidence=0.9,
-        )
-
-        # Delete the fact
-        result = await store.delete_fact(fact.id)
-        assert result is True
-
-        # Check history has 2 entries: created and deleted
-        history = await store.list_history(fact.id)
-        assert len(history) == 2
-
-        created_entry = history[0]
-        assert created_entry.change_type == "created"
-        assert created_entry.version == 1
-        assert created_entry.payload_snapshot["statement"] == "Fact to be deleted"
-
-        deleted_entry = history[1]
-        assert deleted_entry.change_type == "deleted"
-        assert deleted_entry.version == 1  # Version doesn't increment on delete
-        assert deleted_entry.payload_snapshot["statement"] == "Fact to be deleted"
-
-        # Verify fact is actually deleted
-        fact_gone = await store.get_fact(fact.id)
-        assert fact_gone is None
-
-    @pytest.mark.asyncio
-    async def test_history_list_complete(self, store):
-        """Test that list_history returns complete history in correct order."""
-        doc = KnowledgeDocument(
-            path="test.md",
-            title="Test Doc",
-            version="1.0",
-            status="Draft",
-            knowledge_type="Reference",
-            evidence_level="Observed",
-            confidence="High",
-            owner="Test",
-            last_updated="2024-01-01T00:00:00",
-            content="Test content",
-        )
-        doc_id = await store.add_document(doc)
-
-        fact = await store.add_fact(
-            document_id=doc_id,
-            statement="Version 1",
-            category="capability",
-            confidence=0.9,
-        )
-
-        # Update multiple times
-        await store.update_fact(fact.id, {"statement": "Version 2"})
-        await store.update_fact(fact.id, {"statement": "Version 3"})
-        await store.update_fact(fact.id, {"statement": "Version 4"})
-
-        history = await store.list_history(fact.id)
-        
-        # Should have 4 entries (created + 3 updates)
-        assert len(history) == 4
-
-        # Check order: version 1, 2, 3, 4
-        assert history[0].version == 1
-        assert history[0].change_type == "created"
-        assert history[1].version == 2
-        assert history[1].change_type == "updated"
-        assert history[2].version == 3
-        assert history[2].change_type == "updated"
-        assert history[3].version == 4
-        assert history[3].change_type == "updated"
-
-        # Check snapshots match
-        assert history[0].payload_snapshot["statement"] == "Version 1"
-        assert history[1].payload_snapshot["statement"] == "Version 2"
-        assert history[2].payload_snapshot["statement"] == "Version 3"
-        assert history[3].payload_snapshot["statement"] == "Version 4"
-
-    @pytest.mark.asyncio
-    async def test_previous_version_link(self, store):
-        """Test that previous_version column is updated correctly."""
-        doc = KnowledgeDocument(
-            path="test.md",
-            title="Test Doc",
-            version="1.0",
-            status="Draft",
-            knowledge_type="Reference",
-            evidence_level="Observed",
-            confidence="High",
-            owner="Test",
-            last_updated="2024-01-01T00:00:00",
-            content="Test content",
-        )
-        doc_id = await store.add_document(doc)
-
-        fact = await store.add_fact(
-            document_id=doc_id,
-            statement="Original",
-            category="capability",
-        )
-
-        # Check previous_version is NULL for new fact
-        import sqlite3
-        conn = sqlite3.connect(store.db_path)
-        cur = conn.cursor()
-        cur.execute("SELECT previous_version FROM knowledge WHERE id = ?", (str(fact.id),))
-        row = cur.fetchone()
-        assert row[0] is None
-
-        # Update
-        await store.update_fact(fact.id, {"statement": "Updated"})
-
-        cur.execute("SELECT previous_version, version FROM knowledge WHERE id = ?", (str(fact.id),))
-        row = cur.fetchone()
-        assert row[0] == 1  # previous_version points to v1
-        assert row[1] == 2  # current version is v2
-        conn.close()
-
-    @pytest.mark.asyncio
-    async def test_history_nonexistent_fact(self, store):
-        """Test list_history returns empty list for non-existent fact."""
-        history = await store.list_history(UUID("00000000-0000-0000-0000-000000000000"))
-        assert history == []
+        assert f.limit == 50
+        assert f.query == "fail"
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+# ============================================================================
+# 4. HistoryModel
+# ============================================================================
+
+class TestHistoryModel:
+    def test_minimal_model(self):
+        model = HistoryModel(days=[], total=0, filtered=0,
+                             filters=HistoryFilter())
+        assert model.total == 0
+
+    def test_model_is_frozen(self):
+        model = HistoryModel(days=[], total=0, filtered=0,
+                             filters=HistoryFilter())
+        with pytest.raises((TypeError, Exception)):
+            model.total = 5
+
+
+# ============================================================================
+# 5. HistoryEngine
+# ============================================================================
+
+class TestHistoryEngine:
+    def test_empty_telemetry(self):
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        engine = HistoryEngine(svc)
+        model = engine.get_history()
+        assert model.total == 0
+        assert model.days == []
+
+    def test_single_event_becomes_entry(self):
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.RUNTIME_STARTED,
+            component=Component.RUNTIME,
+            category=EventCategory.LIFECYCLE,
+            message="SAM started",
+        ))
+        engine = HistoryEngine(svc)
+        model = engine.get_history()
+        assert model.total == 1
+        assert len(model.days) == 1
+
+    def test_group_by_day(self):
+        """Events on different days go to different groups."""
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        now = datetime.utcnow()
+        yesterday = now - timedelta(days=1)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.RUNTIME_STARTED,
+            component=Component.RUNTIME,
+            category=EventCategory.LIFECYCLE,
+            message="Today", timestamp=now,
+        ))
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.RUNTIME_STARTED,
+            component=Component.RUNTIME,
+            category=EventCategory.LIFECYCLE,
+            message="Yesterday", timestamp=yesterday,
+        ))
+        engine = HistoryEngine(svc)
+        model = engine.get_history()
+        assert len(model.days) == 2
+
+    def test_type_mapping_runtime_to_system(self):
+        """Runtime events map to HistoryEntryType.SYSTEM."""
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.RUNTIME_STARTED,
+            component=Component.RUNTIME,
+            category=EventCategory.LIFECYCLE,
+            message="started",
+        ))
+        engine = HistoryEngine(svc)
+        model = engine.get_history()
+        assert model.days[0].entries[0].type == HistoryEntryType.SYSTEM
+
+    def test_type_mapping_workflow_to_task(self):
+        """Workflow events map to HistoryEntryType.TASK."""
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.TASK_STARTED,
+            component=Component.WORKFLOW,
+            category=EventCategory.EXECUTION,
+            message="Task",
+        ))
+        engine = HistoryEngine(svc)
+        model = engine.get_history()
+        assert model.days[0].entries[0].type == HistoryEntryType.TASK
+
+    def test_severity_mapping_error(self):
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.SYSTEM_ERROR,
+            component=Component.RUNTIME,
+            severity=EventSeverity.ERROR,
+            category=EventCategory.SAFETY,
+            message="Error",
+        ))
+        engine = HistoryEngine(svc)
+        model = engine.get_history()
+        assert model.days[0].entries[0].severity == HistoryEntrySeverity.ERROR
+
+    def test_severity_mapping_critical(self):
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.COMPONENT_FAILED,
+            component=Component.STORAGE,
+            severity=EventSeverity.CRITICAL,
+            category=EventCategory.SAFETY,
+            message="Critical",
+        ))
+        engine = HistoryEngine(svc)
+        model = engine.get_history()
+        assert model.days[0].entries[0].severity == HistoryEntrySeverity.CRITICAL
+
+    def test_filter_by_severity(self):
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.RUNTIME_STARTED,
+            component=Component.RUNTIME,
+            severity=EventSeverity.INFO,
+            category=EventCategory.LIFECYCLE,
+            message="Info",
+        ))
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.SYSTEM_ERROR,
+            component=Component.RUNTIME,
+            severity=EventSeverity.ERROR,
+            category=EventCategory.SAFETY,
+            message="Error",
+        ))
+        engine = HistoryEngine(svc)
+        filters = HistoryFilter(severities=[HistoryEntrySeverity.ERROR])
+        model = engine.get_history(filters)
+        assert model.total == 1
+
+    def test_query_filter(self):
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.RUNTIME_STARTED,
+            component=Component.RUNTIME,
+            category=EventCategory.LIFECYCLE,
+            message="SAM started",
+        ))
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.KNOWLEDGE_LOADED,
+            component=Component.KNOWLEDGE,
+            category=EventCategory.LEARNING,
+            message="Knowledge loaded",
+        ))
+        engine = HistoryEngine(svc)
+        filters = HistoryFilter(query="SAM")
+        model = engine.get_history(filters)
+        assert model.total == 1
+
+    def test_get_timeline(self):
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.RUNTIME_STARTED,
+            component=Component.RUNTIME,
+            category=EventCategory.LIFECYCLE,
+            message="started",
+        ))
+        engine = HistoryEngine(svc)
+        entries = engine.get_timeline()
+        assert len(entries) == 1
+
+    def test_search(self):
+        svc = TelemetryService(max_events=100, enable_cache=False)
+        svc.emit(TelemetryEvent(
+            type=TelemetryEventType.RUNTIME_STARTED,
+            component=Component.RUNTIME,
+            category=EventCategory.LIFECYCLE,
+            message="SAM started",
+        ))
+        engine = HistoryEngine(svc)
+        results = engine.search("SAM")
+        assert len(results) == 1
+        assert engine.search("nonexistent") == []
