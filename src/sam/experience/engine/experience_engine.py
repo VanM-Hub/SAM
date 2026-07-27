@@ -13,6 +13,9 @@ from ...operations.engine.history import HistoryEngine
 from ...operations.engine.settings import SettingsEngine
 from ...operations.engine.explain import ExplainabilityEngine
 from ...operations.protection import ProtectionEngine
+from ...operations.situation import SituationEngine, SituationReport, Situation
+from ...operations.attention import AttentionEngine, AttentionItem, AttentionScore
+from ...operations.story import ActivityStoryBuilder, ActivityStory, StoryType
 from ...narrative import NarrativeBuilder, DailyBriefing, SituationBrief
 from ...openclaw.connection import OpenClawAdapter
 from ...telemetry.service import TelemetryService
@@ -46,6 +49,9 @@ class ExperienceEngine:
         self.openclaw = OpenClawAdapter()
         self.openclaw.bind_telemetry(telemetry)
         self.narrative = NarrativeBuilder()
+        self.situation = SituationEngine(self)
+        self.attention = AttentionEngine(self)
+        self.story_builder = ActivityStoryBuilder()
 
     # ======================================================================
     # HOME
@@ -450,6 +456,27 @@ class ExperienceEngine:
         return self.narrative.build_current_situation(home, work, knowledge)
 
     # ======================================================================
+    # HUMAN EXPERIENCE ENGINE
+    # ======================================================================
+
+    def detect_situation(self) -> SituationReport:
+        """Deteksi situasi terkini — 7 situasi."""
+        return self.situation.detect()
+
+    def get_attention_top(self, limit: int = 3) -> list:
+        """Top N item paling penting."""
+        return self.attention.get_top_items(limit)
+
+    def get_all_attention(self) -> list:
+        """Semua item dengan skor perhatian."""
+        return self.attention.get_all_scored()
+
+    def build_activity_stories(self) -> list:
+        """Event → Cerita."""
+        activity = self.build_activity()
+        return self.story_builder.build_stories(activity)
+
+    # ======================================================================
     # ASSISTANT
     # ======================================================================
 
@@ -484,22 +511,25 @@ class ExperienceEngine:
             )
 
         elif "kenapa" in question_lower or "why" in question_lower:
-            # Mengapa?
-            recent_explain = self.explain_engine.explain_recent(limit=1)
-            if recent_explain:
-                e = recent_explain[0]
-                return AssistantAnswer(
-                    question=question,
-                    answer=e.why[:200],
-                    details="Impact: {}. Recommendation: {}".format(
-                        e.impact.description if e.impact else "N/A",
-                        e.recommendation.description if e.recommendation else "N/A",
-                    ) if e.impact or e.recommendation else None,
-                    action=e.recommendation.action if e.recommendation else None,
-                )
+            # Mengapa? — Format: Reason → Evidence → Decision → Impact → Recommendation
+            sit = self.situation.detect()
+            lines = []
+            lines.append("SAM {} because:".format(sit.label.lower().rstrip('.')))
+            lines.append("")
+            lines.append("  Reason:")
+            lines.append("    {}".format(sit.focus_message))
+            if sit.focus_detail:
+                lines.append("  Evidence:")
+                lines.append("    {}".format(sit.focus_detail))
+            lines.append("  Decision:")
+            lines.append("    {}".format(sit.action_message))
+            if sit.detail_level2:
+                lines.append("  Impact:")
+                for line in sit.detail_level2.split("\n")[:3]:
+                    lines.append("    {}".format(line))
             return AssistantAnswer(
                 question=question,
-                answer="There are no recent events that need explanation.",
+                answer="\n".join(lines),
             )
 
         elif "rekomendasi" in question_lower or "recommend" in question_lower or "saran" in question_lower:
