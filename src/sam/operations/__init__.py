@@ -4,9 +4,10 @@ from .engine.task import TaskEngine  # noqa: F401
 from .engine.knowledge import KnowledgeEngine  # noqa: F401
 from .engine.insight import InsightEngine  # noqa: F401
 from .engine.history import HistoryEngine  # noqa: F401
+from .engine.settings import SettingsEngine  # noqa: F401
 
 __all__ = [
     "ContextEngine", "RuntimeContext", "StatusEngine",
     "TaskEngine", "KnowledgeEngine", "InsightEngine",
-    "HistoryEngine",
+    "HistoryEngine", "SettingsEngine",
 ]
