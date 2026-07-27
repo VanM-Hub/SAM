@@ -85,8 +85,9 @@ class KnowledgePage(QWidget):
         self._clear()
 
         if not model.items:
-            empty = QLabel("SAM is still learning. No knowledge yet.")
+            empty = QLabel("SAM has not learned anything yet. As SAM operates, it will collect patterns, incidents and lessons.")
             empty.setStyleSheet("color: #606070; font-size: 14px; padding: 24px;")
+            empty.setWordWrap(True)
             self._layout.addWidget(empty)
             self._layout.addStretch()
             return
@@ -226,8 +227,9 @@ class HistoryPage(QWidget):
         self._clear()
 
         if not model.stories:
-            empty = QLabel("No history recorded yet.")
+            empty = QLabel("No history yet. Once SAM completes operations, activity summaries will appear here.")
             empty.setStyleSheet("color: #606070; font-size: 14px; padding: 24px;")
+            empty.setWordWrap(True)
             self._layout.addWidget(empty)
             self._layout.addStretch()
             return
