@@ -15,7 +15,10 @@ from ...operations.engine.explain import ExplainabilityEngine
 from ...operations.protection import ProtectionEngine
 from ...operations.situation import SituationEngine, SituationReport, Situation
 from ...operations.attention import AttentionEngine, AttentionItem, AttentionScore
-from ...operations.story import ActivityStoryBuilder, ActivityStory, StoryType
+from ...operations.story import StoryBuilder, Story, StoryType
+from ...operations.presentation import PresentationEngine, Presentation, Decision
+from ...operations.recommendation import RecommendationEngine, Recommendation
+from ...operations.prediction import PredictionEngine, Prediction
 from ...narrative import NarrativeBuilder, DailyBriefing, SituationBrief
 from ...openclaw.connection import OpenClawAdapter
 from ...telemetry.service import TelemetryService
@@ -51,7 +54,10 @@ class ExperienceEngine:
         self.narrative = NarrativeBuilder()
         self.situation = SituationEngine(self)
         self.attention = AttentionEngine(self)
-        self.story_builder = ActivityStoryBuilder()
+        self.story_builder = StoryBuilder()
+        self.presentation = PresentationEngine()
+        self.recommendation_engine = RecommendationEngine(self)
+        self.prediction_engine = PredictionEngine(self)
 
     # ======================================================================
     # HOME
@@ -475,6 +481,36 @@ class ExperienceEngine:
         """Event → Cerita."""
         activity = self.build_activity()
         return self.story_builder.build_stories(activity)
+
+    # ======================================================================
+    # PRESENTATION / RECOMMENDATION / PREDICTION
+    # ======================================================================
+
+    def build_presentation(self, decision: Optional[Decision] = None) -> Presentation:
+        """Bangun Presentation untuk Home."""
+        sit = self.situation.detect()
+        return self.presentation.build(
+            situation_str=sit.situation.value,
+            attention_score=sit.attention_score,
+            decision=decision,
+            progress_percent=sit.progress_percent,
+            estimated_time=sit.estimated_time,
+            detail_level2=sit.detail_level2,
+        )
+
+    def get_recommendations(self, limit: int = 5) -> list:
+        """'What should happen next?'"""
+        sit = self.situation.detect()
+        return self.recommendation_engine.get_recommendations(
+            situation=sit.situation.value, limit=limit,
+        )
+
+    def get_predictions(self, limit: int = 3) -> list:
+        """'What happens if nothing is done?'"""
+        sit = self.situation.detect()
+        return self.prediction_engine.get_predictions(
+            situation=sit.situation.value, limit=limit,
+        )
 
     # ======================================================================
     # ASSISTANT
