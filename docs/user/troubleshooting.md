@@ -20,7 +20,7 @@
 
 **Solusi:**
 ```bash
-cd D:\Project AI\SAM
+# Dari direktori root SAM:
 pip install -e .
 # atau
 set PYTHONPATH=%cd%\src
