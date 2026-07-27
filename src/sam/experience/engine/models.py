@@ -30,6 +30,8 @@ class SystemHealth:
     message: str  # "SAM is Healthy"
     detail: str   # "Everything is operating normally."
     health_score: float = 100.0
+    protection_level: str = ""
+    protection_summary: str = ""
 
 
 @dataclass(frozen=True)
