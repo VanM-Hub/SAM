@@ -18,9 +18,8 @@ try:
     from .pages.home import HomePage
     from .pages.activity import ActivityPage
     from .pages.work import WorkPage
-    from .pages.knowledge import KnowledgePage
-    from .pages.knowledge import HistoryPage
-    from .pages.knowledge import SettingsPage
+    from .pages.knowledge import KnowledgePage, HistoryPage, SettingsPage
+    from .pages.assistant import NotificationPage, AssistantPage
 except ValueError:
     # Ketika dipanggil langsung
     import sys, os
@@ -32,9 +31,8 @@ except ValueError:
     from sam.desktop.pages.home import HomePage
     from sam.desktop.pages.activity import ActivityPage
     from sam.desktop.pages.work import WorkPage
-    from sam.desktop.pages.knowledge import KnowledgePage
-    from sam.desktop.pages.knowledge import HistoryPage
-    from sam.desktop.pages.knowledge import SettingsPage
+    from sam.desktop.pages.knowledge import KnowledgePage, HistoryPage, SettingsPage
+    from sam.desktop.pages.assistant import NotificationPage, AssistantPage
 
 
 # ============================================================================
