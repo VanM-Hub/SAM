@@ -48,6 +48,8 @@ NAV_ITEMS = [
     ("\U0001f4a1", "Knowledge", 3),
     ("\U0001f4dc", "History", 4),
     ("\u2699\ufe0f", "Settings", 5),
+    ("\U0001f514", "Alerts", 6),
+    ("\U0001f9e0", "Ask", 7),
 ]
 
 SIDEBAR_STYLE = """
@@ -186,13 +188,17 @@ class OperationsConsole(QMainWindow):
         self.knowledge_page = KnowledgePage(self.experience)
         self.history_page = HistoryPage(self.experience)
         self.settings_page = SettingsPage(self.experience)
+        self.notification_page = NotificationPage(self.experience)
+        self.assistant_page = AssistantPage(self.experience)
 
-        self.pages.addWidget(self.home_page)
-        self.pages.addWidget(self.activity_page)
-        self.pages.addWidget(self.work_page)
-        self.pages.addWidget(self.knowledge_page)
-        self.pages.addWidget(self.history_page)
-        self.pages.addWidget(self.settings_page)
+        self.pages.addWidget(self.home_page)          # 0
+        self.pages.addWidget(self.activity_page)      # 1
+        self.pages.addWidget(self.work_page)          # 2
+        self.pages.addWidget(self.knowledge_page)     # 3
+        self.pages.addWidget(self.history_page)       # 4
+        self.pages.addWidget(self.settings_page)      # 5
+        self.pages.addWidget(self.notification_page)  # 6
+        self.pages.addWidget(self.assistant_page)     # 7
 
         content_layout.addWidget(self.pages)
         main_layout.addWidget(content_container, 1)
