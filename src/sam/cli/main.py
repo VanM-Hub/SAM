@@ -10,6 +10,7 @@ from sam.cli import status, health, session, runtime, plugins
 from sam.cli import knowledge, memory, workflow, events, guardian
 from sam.cli import service, logs, metrics, openclaw, intelligence
 from sam.cli import autonomous
+from sam.cli import task as task_cli
 
 app = typer.Typer(
     name="sam",
@@ -34,6 +35,7 @@ app.add_typer(metrics.app, name="metrics", help="Tampilkan metrics runtime")
 app.add_typer(openclaw.app, name="openclaw", help="OpenClaw integration (discover, status, monitor)")
 app.add_typer(intelligence.app, name="intelligence", help="Operational intelligence (incident, rca, recommend)")
 app.add_typer(autonomous.app, name="autonomous", help="Autonomous operations (status, approve, deny, history)")
+app.add_typer(task_cli.app, name="task", help="Task management (list, show, approve, deny)")
 
 
 @app.command()
