@@ -7,87 +7,71 @@ Terintegrasi dengan Runtime Coordinator dan TelemetryService.
 
 import asyncio
 import structlog
+from dataclasses import dataclass
 from datetime import datetime
-from .models import RuntimeMetrics
+from typing import Optional
 
 logger = structlog.get_logger()
 
 
+@dataclass
+class RuntimeMetrics:
+    cpu_percent: float = 0.0
+    memory_percent: float = 0.0
+    uptime_seconds: float = 0.0
+    active_sessions: int = 0
+    event_count: int = 0
+    last_error: Optional[str] = None
+
+
 class MetricsCollector:
-    """Metrics Collector — kumpulkan metrics runtime setiap interval.
-
-    Args:
-        coordinator: RuntimeCoordinator instance (memiliki .telemetry dan .start_time).
-        interval: Interval koleksi dalam detik (default 10).
-    """
-
-    def __init__(self, coordinator, interval: int = 10):
-        self.coordinator = coordinator
+    def __init__(self, interval: float = 5.0):
         self.interval = interval
         self._running = False
+        self._metrics = RuntimeMetrics()
 
-    async def start(self) -> None:
-        """Mulai loop koleksi metrics periodik."""
+    async def start(self):
         self._running = True
-        logger.info("metrics_collector_started", interval=self.interval)
-
+        logger.info("metrics.collector.started", interval=self.interval)
         while self._running:
-            try:
-                metrics = await self.collect()
-                if hasattr(self.coordinator, "telemetry") and self.coordinator.telemetry:
-                    self.coordinator.telemetry.record_metrics(metrics)
-            except Exception as e:
-                logger.error("metrics_collection_failed", error=str(e))
+            await self._collect()
             await asyncio.sleep(self.interval)
 
-    async def stop(self) -> None:
-        """Hentikan koleksi metrics."""
+    async def stop(self):
         self._running = False
-        logger.info("metrics_collector_stopped")
+        logger.info("metrics.collector.stopped")
 
-    async def collect(self) -> RuntimeMetrics:
-        """Kumpulkan metrics Runtime saat ini.
+    async def _collect(self):
+        import psutil
 
-        Returns:
-            RuntimeMetrics snapshot dengan data real-time.
-        """
-        cpu = await self._get_cpu()
-        memory = await self._get_memory()
-        uptime = await self._get_uptime()
+        cpu = psutil.cpu_percent(interval=0.1)
+        mem = psutil.virtual_memory().percent
+        uptime = self._read_uptime()
 
-        return RuntimeMetrics(
+        self._metrics = RuntimeMetrics(
             cpu_percent=cpu,
-            memory_mb=memory,
+            memory_percent=mem,
             uptime_seconds=uptime,
-            workflow_count=2,   # simulasi — akan diganti dengan real counter
-            plugin_count=14,    # simulasi — akan diganti dengan real counter
-            health_score=100.0,  # placeholder
+            active_sessions=self._metrics.active_sessions,
+            event_count=self._metrics.event_count,
+            last_error=self._metrics.last_error,
         )
 
-    async def _get_cpu(self) -> float:
-        """Ambil CPU utilisation via psutil.
-
-        Falls back ke 0.0 jika psutil tidak terinstall.
-        """
+    def _read_uptime(self) -> float:
         try:
             import psutil
-            return psutil.cpu_percent(interval=0.1)
-        except ImportError:
+            return psutil.boot_time()
+        except Exception:
             return 0.0
 
-    async def _get_memory(self) -> float:
-        """Ambil memory usage dalam MB.
+    @property
+    def metrics(self) -> RuntimeMetrics:
+        return self._metrics
 
-        Falls back ke 0.0 jika psutil tidak terinstall.
-        """
-        try:
-            import psutil
-            return psutil.virtual_memory().used / (1024 * 1024)
-        except ImportError:
-            return 0.0
-
-    async def _get_uptime(self) -> float:
-        """Ambil uptime coordinator dalam detik."""
-        if hasattr(self.coordinator, "start_time") and self.coordinator.start_time:
-            return (datetime.utcnow() - self.coordinator.start_time).total_seconds()
-        return 0.0
+    def get_summary(self) -> str:
+        m = self._metrics
+        return (
+            f"CPU: {m.cpu_percent:.1f}% | "
+            f"Memory: {m.memory_percent:.1f}% | "
+            f"Uptime: {m.uptime_seconds:.0f}s"
+        )
