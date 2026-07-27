@@ -1,7 +1,8 @@
 import sqlite3
 import json
 
-DB='D:/Project AI/SAM/sam.db'
+import os
+DB = os.path.join(os.getcwd(), 'sam.db')
 conn = sqlite3.connect(DB)
 conn.row_factory = sqlite3.Row
 cur = conn.cursor()

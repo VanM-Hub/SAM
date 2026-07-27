@@ -1,4 +1,5 @@
 import asyncio
+import os
 from sam.runtime.registry import CapabilityRegistry
 from sam.runtime.runtime import CapabilityRuntime
 from sam.knowledge.loader import KnowledgeLoader
@@ -6,7 +7,7 @@ from sam.runtime.discovery import CapabilityDiscovery
 
 
 async def test():
-    loader = KnowledgeLoader("D:/Project AI/SAM")
+    loader = KnowledgeLoader(os.getcwd())
     loader.load_all()
     registry = CapabilityRegistry()
     discovery = CapabilityDiscovery(registry=registry, loader=loader)
