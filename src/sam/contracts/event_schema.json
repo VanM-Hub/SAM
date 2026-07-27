@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TelemetryEvent",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 8 },
+    "type": { "type": "string", "enum": [
+      "runtime.started", "runtime.stopped", "runtime.crashed",
+      "runtime.recovering", "runtime.ready",
+      "task.created", "task.started", "task.progress", "task.completed",
+      "task.failed", "task.cancelled",
+      "knowledge.loaded", "knowledge.updated", "knowledge.searched",
+      "knowledge.found", "knowledge.not_found",
+      "memory.retrieved", "memory.stored", "memory.cleared",
+      "plugin.installed", "plugin.enabled", "plugin.disabled",
+      "plugin.uninstalled", "plugin.failed",
+      "mission.changed", "mission.health",
+      "guardian.alert", "guardian.action", "recommendation.created",
+      "component.healthy", "component.degraded", "component.failed",
+      "component.recovered",
+      "operator.action", "operator.approval", "operator.denial",
+      "system.boot", "system.shutdown", "system.error"
+    ]},
+    "component": { "type": "string", "enum": [
+      "runtime", "guardian", "knowledge", "memory", "workflow",
+      "planner", "execution", "safety", "mission", "policy",
+      "plugin", "storage", "cluster", "hosting", "telemetry",
+      "operations", "desktop", "api", "language"
+    ]},
+    "severity": { "type": "string", "enum": ["trace", "debug", "info", "warning", "error", "critical"] },
+    "category": { "type": "string", "enum": [
+      "lifecycle", "execution", "learning", "safety", "recovery",
+      "approval", "knowledge", "resource", "communication", "operator"
+    ]},
+    "message": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "metadata": { "type": "object" },
+    "correlation_id": { "type": "string" },
+    "session_id": { "type": "string" },
+    "workflow_id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "duration_ms": { "type": "number", "minimum": 0 }
+  },
+  "required": ["id", "type", "component", "severity", "category", "message", "timestamp"]
+}

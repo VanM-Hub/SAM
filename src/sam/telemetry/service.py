@@ -1,118 +1,94 @@
-"""
-Telemetry Service — Phase 1
-
-Structured event ingestion, metrics recording, dan query.
-"""
-
+import asyncio
 import structlog
-from typing import List, Optional, Generator, Dict, Any
-from collections import deque
-from .models import TelemetryEvent, TelemetrySeverity, RuntimeMetrics
+from typing import Optional, List, Dict, Any, Callable, AsyncGenerator
+from datetime import datetime
+
+from .event import TelemetryEvent, EventSeverity, EventCategory
+from .event_type import TelemetryEventType
+from .component import Component
+from .ring_buffer import RingBuffer
+from .filters import Filter
+from .storage import TelemetryStorage
 
 logger = structlog.get_logger()
 
 
 class TelemetryService:
-    """Telemetry Service — event store, query, dan streaming."""
+    """Single source of truth for all SAM observability."""
 
-    def __init__(self, max_events: int = 10000):
-        self.events: deque = deque(maxlen=max_events)
-        self.metrics_history: List[RuntimeMetrics] = []
-        self._latest_metrics: Optional[RuntimeMetrics] = None
+    def __init__(self, max_events: int = 1000, enable_cache: bool = True):
+        self._buffer = RingBuffer(max_events)
+        self._subscribers: List[Callable[[TelemetryEvent], None]] = []
+        self._storage = TelemetryStorage() if enable_cache else None
+        self._closed = False
 
     def emit(self, event: TelemetryEvent) -> None:
-        """Catat event ke telemetry store."""
-        self.events.append(event)
-        # Python 3.8 compat — dict() instead of .dict()
-        event_dict = {
-            "event_id": event.event_id,
-            "event_name": event.event_name,
-            "severity": event.severity.value,
+        """Emit an event. This is the ONLY way to output operational data."""
+        if self._closed:
+            logger.warning("telemetry_closed", event_type=event.type.value)
+            return
+
+        # Store in ring buffer
+        self._buffer.push(event)
+
+        # Store in cache if enabled
+        if self._storage:
+            self._storage.save(event)
+
+        # Notify subscribers
+        for callback in self._subscribers:
+            try:
+                callback(event)
+            except Exception as e:
+                logger.error("subscriber_failed", error=str(e))
+
+        logger.debug("event_emitted", type=event.type.value, component=event.component.value)
+
+    def subscribe(self, callback: Callable[[TelemetryEvent], None]) -> None:
+        """Subscribe to all events."""
+        if self._closed:
+            raise RuntimeError("Telemetry service is closed")
+        self._subscribers.append(callback)
+
+    def unsubscribe(self, callback: Callable[[TelemetryEvent], None]) -> None:
+        """Unsubscribe from events."""
+        if callback in self._subscribers:
+            self._subscribers.remove(callback)
+
+    def query(self, filters: Optional[Dict] = None) -> List[TelemetryEvent]:
+        """Query events from ring buffer with filters."""
+        events = self._buffer.get_all()
+
+        if filters:
+            events = Filter.apply(events, filters)
+
+        return events
+
+    def get_recent(self, limit: int = 50) -> List[TelemetryEvent]:
+        """Get recent events."""
+        return self._buffer.get_recent(limit)
+
+    async def follow(self) -> AsyncGenerator[TelemetryEvent, None]:
+        """Stream events in real-time (for SSE)."""
+        while not self._closed:
+            latest = self._buffer.get_latest()
+            if latest is not None:
+                yield latest
+            await asyncio.sleep(0.1)
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Get telemetry statistics."""
+        return {
+            "total_events": len(self._buffer),
+            "max_events": self._buffer.max_size,
+            "subscribers": len(self._subscribers),
+            "cache_enabled": self._storage is not None,
+            "cache_size": self._storage.count() if self._storage else 0,
         }
-        logger.info("telemetry_event", **event_dict)
 
-    def emit_event(
-        self,
-        event_name: str,
-        severity: TelemetrySeverity = TelemetrySeverity.INFO,
-        component: str = "runtime",
-        runtime_state: Optional[str] = None,
-        correlation_id: Optional[str] = None,
-        session_id: Optional[str] = None,
-        payload: Dict[str, Any] = None,
-    ) -> TelemetryEvent:
-        """Convenience method untuk emit event langsung."""
-        event = TelemetryEvent(
-            event_name=event_name,
-            severity=severity,
-            component=component,
-            runtime_state=runtime_state,
-            correlation_id=correlation_id,
-            session_id=session_id,
-            payload=payload or {},
-        )
-        self.emit(event)
-        return event
-
-    def get_events(
-        self,
-        limit: int = 100,
-        severity: Optional[TelemetrySeverity] = None,
-    ) -> List[TelemetryEvent]:
-        """Ambil event, difilter severity dan dibatasi."""
-        if severity:
-            filtered = [e for e in self.events if e.severity == severity]
-        else:
-            filtered = list(self.events)
-        return filtered[-limit:] if limit else filtered
-
-    def follow(self) -> Generator[TelemetryEvent, None, None]:
-        """Generator untuk live streaming event.
-
-        Yields existing events, kemudian siap untuk live streaming
-        (akan di-handle di CLI dengan polling loop).
-        """
-        # Yield existing events
-        for event in self.events:
-            yield event
-        # Live stream akan di-handle di CLI dengan polling
-
-    def record_metrics(self, metrics: RuntimeMetrics) -> None:
-        """Rekam snapshot metrics."""
-        self.metrics_history.append(metrics)
-        self._latest_metrics = metrics
-        logger.info("metrics_recorded", cpu=metrics.cpu_percent, mem=metrics.memory_mb)
-
-    def get_metrics(self) -> Optional[RuntimeMetrics]:
-        """Ambil metrics terbaru."""
-        return self._latest_metrics
-
-    def emit_openclaw_event(
-        self,
-        event_name: str,
-        severity: TelemetrySeverity = TelemetrySeverity.INFO,
-        payload: Dict[str, Any] = None,
-        workspace_path: str = "",
-    ) -> TelemetryEvent:
-        """Emit event spesifik OpenClaw ke telemetry."""
-        event = TelemetryEvent(
-            event_name=event_name,
-            severity=severity,
-            component="openclaw",
-            payload={
-                "workspace": workspace_path,
-                **(payload or {}),
-            },
-        )
-        self.emit(event)
-        return event
-
-    def get_metrics_history(self, limit: int = 100) -> List[RuntimeMetrics]:
-        """Ambil riwayat metrics."""
-        return self.metrics_history[-limit:] if limit else self.metrics_history
-
-    def clear(self) -> None:
-        """Bersihkan semua event dan metrics."""
-        self.events.clear()
-        self.metrics_history.clear()
-        self._latest_metrics = None
+    def close(self) -> None:
+        """Close the telemetry service."""
+        self._closed = True
+        if self._storage:
+            self._storage.close()
+        logger.info("telemetry_closed")
