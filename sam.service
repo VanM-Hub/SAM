@@ -1,0 +1,17 @@
+[Unit]
+Description=SAM — AI Operations Guardian Runtime
+After=network.target
+
+[Service]
+Type=simple
+User=sam
+WorkingDirectory=/opt/sam
+ExecStart=/usr/bin/python3 -m sam.launcher.desktop
+ExecStop=/usr/bin/python3 -m sam.cli.main service stop
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

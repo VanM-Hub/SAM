@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+
+<h2 style="font-size: 22px; margin-bottom: 20px;">⚙️ Settings</h2>
+
+<div class="grid">
+    <div class="card">
+        <h2>Desired Operational State (DOS)</h2>
+        {% if dos %}
+        <pre>{{ dos }}</pre>
+        {% else %}
+        <div class="empty-state">No DOS file found</div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Mission</h2>
+        {% if mission %}
+        <pre>{{ mission }}</pre>
+        {% else %}
+        <div class="empty-state">No Mission file found</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <p class="text-muted">Settings are read-only in this version. Use CLI to modify.</p>
+</div>
+
+{% endblock %}

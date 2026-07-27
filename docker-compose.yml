@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  sam:
+    build: .
+    container_name: sam-runtime
+    volumes:
+      - sam-workspace:/opt/sam/workspace
+      - ./workspace/desired-state.yaml:/opt/sam/workspace/desired-state.yaml:ro
+      - ./workspace/mission.yaml:/opt/sam/workspace/mission.yaml:ro
+    ports:
+      - "8080:8080"  # Health endpoint (future)
+    restart: unless-stopped
+    environment:
+      - SAM_WORKSPACE=/opt/sam/workspace
+      - SAM_PROFILE=production
+
+volumes:
+  sam-workspace:

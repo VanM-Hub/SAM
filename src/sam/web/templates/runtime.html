@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Runtime{% endblock %}
+{% block content %}
+
+<h2 style="font-size: 22px; margin-bottom: 20px;">🖥️ Runtime</h2>
+
+<div class="grid">
+    <div class="card">
+        <h2>Status</h2>
+        <table>
+            <tr><td>State</td><td><span class="badge {% if state in ('RUNNING', 'READY') %}healthy{% else %}degraded{% endif %}">{{ state }}</span></td></tr>
+            <tr><td>Hosting</td><td>{{ hosting }}</td></tr>
+            <tr><td>Workspace</td><td class="text-muted">{{ workspace }}</td></tr>
+            <tr><td>Autonomous</td><td>{{ "✅ Enabled" if autonomous else "❌ Disabled" }}</td></tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Metrics</h2>
+        {% if metrics %}
+        <table>
+            <tr><td>CPU Usage</td><td>{{ "%.1f"|format(metrics.cpu_percent) }}%</td></tr>
+            <tr><td>Memory</td><td>{{ "%.0f"|format(metrics.memory_mb) }} MB</td></tr>
+            <tr><td>Uptime</td><td>{{ "%.0f"|format(metrics.uptime_seconds) }}s</td></tr>
+            <tr><td>Workflows</td><td>{{ metrics.workflow_count }}</td></tr>
+            <tr><td>Plugins</td><td>{{ metrics.plugin_count }}</td></tr>
+            <tr><td>Health Score</td><td>{{ "%.1f"|format(metrics.health_score) }}</td></tr>
+        </table>
+        {% else %}
+        <div class="empty-state">No metrics collected yet</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

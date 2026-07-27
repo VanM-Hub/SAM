@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Knowledge{% endblock %}
+{% block content %}
+
+<h2 style="font-size: 22px; margin-bottom: 20px;">🧠 Knowledge Explorer</h2>
+
+<div class="card">
+    <form action="/knowledge" method="get" class="flex">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search knowledge..." class="input" style="width: 300px;">
+        <button type="submit" class="btn">Search</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Entries</h2>
+    {% if knowledge %}
+    <table>
+        <tr><th>ID</th><th>Fact</th><th>Confidence</th></tr>
+        {% for item in knowledge %}
+        <tr>
+            <td class="text-muted">{{ item.id }}</td>
+            <td>{{ item.fact }}</td>
+            <td>{{ "%.0f"|format(item.confidence * 100) }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <div class="empty-state">No knowledge entries found</div>
+    {% endif %}
+</div>
+
+{% endblock %}
