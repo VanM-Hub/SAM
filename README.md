@@ -21,11 +21,13 @@ SAM (Self-evolving AI Manager) adalah framework untuk mengelola, memonitor, dan 
 ## Quick Start
 
 ```bash
-# Clone atau masuk ke direktori SAM
-cd D:\Project AI\SAM
+# Clone repo
+git clone https://github.com/VanM-Hub/SAM.git
+cd SAM
 
-# Set environment
-$env:PYTHONPATH = "D:\Project AI\SAM\src"
+# Set PYTHONPATH (PowerShell)
+$env:PYTHONPATH = ".\src"
+$env:PYTHONIOENCODING = "utf-8"
 
 # Lihat semua CLI commands
 python -m sam.cli.main --help
@@ -41,28 +43,28 @@ python -m sam.cli.main web --port 8080
 ## CLI Commands (17)
 
 ```
-status      — Tampilkan status Runtime
-health      — Tampilkan status kesehatan
-session     — Kelola session runtime
-runtime     — Runtime Container Tree
-plugins     — Daftar plugin runtime
-knowledge   — Knowledge Store
-memory      — Memory Store
-workflow    — Workflow Engine
-events      — Event stream dan history
-guardian    — Guardian Kernel
-service     — Kelola service runtime
-logs        — Telemetry logs (--follow)
-metrics     — Runtime metrics (CPU, memory, uptime)
-openclaw    — OpenClaw integration (discover, status, monitor)
+status       — Tampilkan status Runtime
+health       — Tampilkan status kesehatan
+session      — Kelola session runtime
+runtime      — Runtime Container Tree
+plugins      — Daftar plugin runtime
+knowledge    — Knowledge Store
+memory       — Memory Store
+workflow     — Workflow Engine
+events       — Event stream dan history
+guardian     — Guardian Kernel
+service      — Kelola service runtime
+logs         — Telemetry logs (--follow)
+metrics      — Runtime metrics (CPU, memory, uptime)
+openclaw     — OpenClaw integration (discover, status, monitor)
 intelligence — Operational intelligence (incident, rca, recommend)
-autonomous  — Autonomous operations (status, approve, deny, history)
-web         — Web Dashboard (--host, --port)
+autonomous   — Autonomous operations (status, approve, deny, history)
+web          — Web Dashboard (--host, --port)
 ```
 
 ## Web Dashboard
 
-```
+```bash
 sam web --host 127.0.0.1 --port 8080
 ```
 
@@ -78,8 +80,9 @@ sam web --host 127.0.0.1 --port 8080
 ## Testing
 
 ```powershell
-$env:PYTHONPATH = "D:\Project AI\SAM\src"
-python -m pytest tests/unit/ tests/integration/ --ignore=tests/test_autonomy.py --ignore=tests/test_cluster_intelligence.py --ignore=tests/test_plugin_integration.py -v
+$env:PYTHONPATH = ".\src"
+$env:PYTHONIOENCODING = "utf-8"
+python -m pytest tests/unit/ tests/integration/ -v --tb=short
 ```
 
 287 tests, 0 regresi.
