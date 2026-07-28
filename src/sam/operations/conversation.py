@@ -9,7 +9,7 @@ Sumber kebenaran untuk: Desktop, CLI, API, Voice, Email, Slack, LLM.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Any
 from datetime import datetime
 
 
@@ -80,6 +80,24 @@ class ConversationObject:
     technical_details: str = ""
     attention_label: str = "Normal"     # "Immediate" | "Soon" | "Normal" | "Background"
     attention_score: int = 20
+
+    # ====================================================================
+    # RCA — Root Cause Analysis (OP-72)
+    # ====================================================================
+    root_cause: Optional[dict] = None  # dict serialisasi RootCauseReport
+
+    # ====================================================================
+    # Decision Layer (Sprint 3)
+    # ====================================================================
+    decisions: List[str] = field(default_factory=list)        # proposal texts
+    decision_details: Optional[dict] = None                    # serialized DecisionPackage
+    impact_details: Optional[dict] = None                      # serialized ImpactPackage
+    alternatives_details: Optional[dict] = None                # serialized AlternativesPackage
+
+    # Action Center counts
+    approval_pending_count: int = 0
+    approval_approved_count: int = 0
+    approval_rejected_count: int = 0
 
     # ====================================================================
     # Metadata
