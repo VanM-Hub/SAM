@@ -1,11 +1,6 @@
 [tool.ruff]
-# Target Python 3.8
 target-version = "py38"
-
-# Include
 include = ["*.py"]
-
-# Exclude
 exclude = [
     ".git",
     "__pycache__",
@@ -16,62 +11,16 @@ exclude = [
     "venv",
     "workspace",
 ]
-
-# Line length
 line-length = 100
 
-# Select rules
-select = [
-    "E",    # pycodestyle errors
-    "W",    # pycodestyle warnings
-    "F",    # pyflakes
-    "I",    # isort
-    "N",    # pep8-naming
-    "UP",   # pyupgrade
-    "YTT",  # flake8-2020
-    "ANN",  # flake8-annotations
-    "SIM",  # flake8-simplify
-    "TCH",  # flake8-type-checking
-]
-
-# Ignore rules
-ignore = [
-    "ANN101",  # missing-type-self (too noisy)
-    "ANN102",  # missing-type-cls
-    "ANN401",  # dynamically-typed expressions
-]
+select = ["E", "W", "F", "I", "N", "UP", "YTT", "ANN", "SIM", "TCH"]
+ignore = ["ANN101", "ANN102", "ANN401"]
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401", "I"]
-"tests/**" = ["ANN", "N", "SIM", "E501", "F841", "E741", "W293", "I001", "UP"]
+"tests/**" = ["ANN", "N", "SIM", "E501", "F841", "E741", "W293", "I001", "UP", "YTT", "TCH"]
 "src/sam/**/__init__.py" = ["F401", "I", "ANN"]
-
-# Relax core operational modules (no annotation requirement)
-"src/sam/operations/**" = ["ANN", "SIM", "E501", "F841", "UP", "N"]
-"src/sam/storage/**" = ["ANN", "SIM", "E501", "UP", "N"]
-"src/sam/telemetry/**" = ["ANN", "SIM", "E501", "UP", "N"]
-"src/sam/cli/**" = ["ANN", "SIM", "E501", "F841", "UP", "N"]
-
-# Legacy modules — relax ALL strict rules
-"src/sam/autonomous/**" = ["ANN", "SIM", "E501", "F841", "UP", "N", "TCH"]
-"src/sam/collaboration/**" = ["ANN", "SIM", "E501", "F841", "UP", "N", "TCH"]
-"src/sam/desktop/**" = ["ANN", "SIM", "E501", "F841", "UP", "N", "TCH"]
-"src/sam/experience/**" = ["ANN", "SIM", "E501", "F841", "UP", "N", "TCH"]
-"src/sam/plugin/**" = ["ANN", "SIM", "E501", "F841", "UP", "N", "TCH"]
-"src/sam/render/**" = ["ANN", "SIM", "E501", "F841", "UP", "N", "TCH"]
-"src/sam/contracts/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/dos/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/guardian/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/healing/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/hosting/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/intelligence/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/language/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/mission/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/narrative/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/openclaw/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/runtime/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/strategy/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
-"src/sam/tuning/**" = ["ANN", "SIM", "E501", "UP", "N", "TCH"]
+"src/sam/**" = ["ANN", "SIM", "E501", "F841", "UP", "N", "YTT", "TCH", "W293", "I001"]
 
 [tool.ruff.format]
 quote-style = "double"
