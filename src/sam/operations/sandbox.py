@@ -118,8 +118,14 @@ class ExecutionSandbox:
         # Simulate
         if operation_type == SandboxOperationType.FILE_WRITE:
             content = parameters.get("content", "")
-            safe_path = os.path.join(self._base_path, "files",
-                                     target.lstrip("/").lstrip("\\").replace(":", "").replace("\\", "_").replace("/", "_"))
+            # Safe path: resolve target relative to allowed files dir
+            base_dir = os.path.realpath(os.path.join(self._base_path, "files"))
+            raw_path = target.lstrip("/").lstrip("\\").replace(":", "").replace("\\", "_").replace("/", "_")
+            safe_path = os.path.realpath(os.path.join(base_dir, raw_path))
+            # Enforce containment
+            if not safe_path.startswith(base_dir + os.sep) and safe_path != base_dir:
+                safe_path = os.path.join(base_dir, raw_path)
+                raise ValueError(f"Path escape attempt blocked: {target}")
             with open(safe_path, "w") as f:
                 f.write(content)
             return "Simulated write: {} -> {}".format(target, safe_path)
@@ -170,11 +176,24 @@ class ExecutionSandbox:
         self._allowed_commands.append(command)
 
     def _is_path_allowed(self, target: str) -> bool:
-        """Cek apakah path diizinkan."""
+        """Cek apakah path diizinkan — realpath-normalized, parent-traversal-safe."""
+        norm_target = os.path.realpath(os.path.normpath(target))
+        if not os.path.exists(norm_target):
+            # Maybe a new file; resolve without checking existence
+            dir_part = os.path.dirname(norm_target)
+            if not os.path.exists(dir_part):
+                dir_part = os.path.realpath(os.path.normpath(dir_part))
+            for allowed in self._allowed_paths:
+                real_allowed = os.path.realpath(allowed)
+                if norm_target.startswith(real_allowed + os.sep) or norm_target == real_allowed:
+                    return True
+                # Also check the original directory
+                if dir_part.startswith(real_allowed + os.sep) or dir_part == real_allowed:
+                    return True
+            return False
         for allowed in self._allowed_paths:
-            if target.startswith(allowed):
-                return True
-            if allowed in target:
+            real_allowed = os.path.realpath(allowed)
+            if norm_target == real_allowed or norm_target.startswith(real_allowed + os.sep):
                 return True
         return False
 

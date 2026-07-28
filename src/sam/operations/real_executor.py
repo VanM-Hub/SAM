@@ -14,6 +14,38 @@ import os
 from .executor import ExecutorState, ExecutionResult
 from .sandbox import ExecutionSandbox, SandboxOperationType
 from .audit import AuditEventType, get_audit_trail
+from .approval import ApprovalStatus
+from .approval_v2 import get_approval_manager
+
+
+def _require_execution_approval(plan, action_type: str = "executor") -> bool:
+    """Verifikasi approval plan sebelum execute.
+
+    Jika plan.approval_id tidak ada, ini bypass — log warning.
+    Allows execution under backward-compat (sandbox only simulates anyway).
+    """
+    approval_id = getattr(plan, 'approval_id', None) or getattr(plan, 'id', None)
+    if approval_id:
+        try:
+            mgr = get_approval_manager()
+            appr = mgr.get_approval(approval_id)
+            if appr and appr.status == ApprovalStatus.APPROVED:
+                return True
+            get_audit_trail().record(
+                AuditEventType.AUDIT_LOG, str(approval_id), action_type + "_executor",
+                f"Execution BLOCKED: approval {approval_id} status is not APPROVED",
+                actor=action_type.capitalize() + "Executor"
+            )
+            return False
+        except Exception:
+            pass
+    # No approval_id found — warn but allow (backward compat with sandbox)
+    get_audit_trail().record(
+        AuditEventType.AUDIT_LOG, getattr(plan, 'plan_id', 'unknown'), action_type + "_executor",
+        f"Execution without explicit approval token ({action_type})",
+        actor=action_type.capitalize() + "Executor"
+    )
+    return True
 
 
 @dataclass
@@ -51,6 +83,22 @@ class FilesystemExecutor:
         action_logs = []
         completed = 0
         failed = 0
+
+        if not _require_execution_approval(plan, "filesystem"):
+            state = ExecutorState.FAILED
+            self.state = state
+            audit.record(
+                AuditEventType.EXECUTION_FAILED,
+                plan.plan_id, "filesystem_executor",
+                "Execution BLOCKED: no valid approval",
+                actor="FilesystemExecutor",
+            )
+            return ExecutionResult(
+                plan_id=plan.plan_id, state=state,
+                started_at=t0.isoformat(), completed_at=datetime.now().isoformat(),
+                duration_ms=0, actions_completed=0, actions_failed=0,
+                action_results=[],
+            )
 
         for i, action in enumerate(plan.actions):
             title = getattr(action, 'title', 'Action {}'.format(i))
@@ -130,6 +178,11 @@ class CommandExecutor:
         t0 = datetime.now()
         action_logs, completed, failed = [], 0, 0
 
+        if not _require_execution_approval(plan, "command"):
+            return ExecutionResult(plan_id=plan.plan_id, state=ExecutorState.FAILED,
+                started_at=t0.isoformat(), completed_at=datetime.now().isoformat(),
+                duration_ms=0, actions_completed=0, actions_failed=0, action_results=[])
+
         for i, action in enumerate(plan.actions):
             title = getattr(action, 'title', 'Action {}'.format(i))
             try:
@@ -202,6 +255,11 @@ class ProcessExecutor:
         audit, t0 = get_audit_trail(), datetime.now()
         action_logs, completed, failed = [], 0, 0
 
+        if not _require_execution_approval(plan, "process"):
+            return ExecutionResult(plan_id=plan.plan_id, state=ExecutorState.FAILED,
+                started_at=t0.isoformat(), completed_at=datetime.now().isoformat(),
+                duration_ms=0, actions_completed=0, actions_failed=0, action_results=[])
+
         for i, action in enumerate(plan.actions):
             title = getattr(action, 'title', 'Action {}'.format(i))
             try:
@@ -267,6 +325,11 @@ class WorkspaceExecutor:
         self.state = ExecutorState.EXECUTING
         audit, t0 = get_audit_trail(), datetime.now()
         action_logs, completed, failed = [], 0, 0
+
+        if not _require_execution_approval(plan, "workspace"):
+            return ExecutionResult(plan_id=plan.plan_id, state=ExecutorState.FAILED,
+                started_at=t0.isoformat(), completed_at=datetime.now().isoformat(),
+                duration_ms=0, actions_completed=0, actions_failed=0, action_results=[])
 
         for i, action in enumerate(plan.actions):
             title = getattr(action, 'title', 'Action {}'.format(i))
