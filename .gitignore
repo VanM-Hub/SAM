@@ -62,3 +62,9 @@ test-results.xml
 
 # Runtime data (jangan commit!)
 approvals.json
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+workspace/
