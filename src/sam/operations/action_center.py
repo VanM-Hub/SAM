@@ -5,6 +5,8 @@ No renderer, no logic. Plain data transport object ready for CLI, GUI, or conver
 All fields are optional so partial data is never an error.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime

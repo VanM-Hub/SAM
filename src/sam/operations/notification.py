@@ -5,6 +5,8 @@ All notification types are defined as enum-like string constants.
 Models only — no desktop notification, no renderer.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime
