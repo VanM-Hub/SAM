@@ -469,6 +469,7 @@ class SystemAnalyzer:
                 situation_severity="critical",
                 facts=["Error: {}".format(str(e))],
                 user_action_needed="Check logs.",
+                user_actions=["Check system logs."],
                 confidence=0.1,
             )
 
