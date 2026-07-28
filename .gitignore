@@ -49,3 +49,6 @@ temp_screenshot.png
 
 # Test results
 test-results.xml
+
+# Runtime data (jangan commit!)
+approvals.json
