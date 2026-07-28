@@ -5,6 +5,8 @@ No renderer. Complete snapshot of mission/health/trust state.
 Ready for any frontend (CLI, GUI, Conversation).
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime
@@ -143,3 +145,4 @@ class MissionDashboardBuilder:
     def _populate_recent_activity(self, dto: MissionDashboardDTO) -> None:
         """Read from decision_repo, approval_repo, audit_repo."""
         pass
+

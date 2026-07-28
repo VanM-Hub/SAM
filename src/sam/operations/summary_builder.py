@@ -5,6 +5,8 @@ All data comes from existing domain objects. No LLM, no templates.
 Fully deterministic, safe for conversation output.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime
