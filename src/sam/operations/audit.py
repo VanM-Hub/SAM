@@ -144,7 +144,16 @@ class AuditTrail:
         return len(self._entries)
 
     def clear(self):
-        """Hapus semua — hanya untuk testing."""
+        """Hapus semua — hanya untuk testing.
+
+        Deprecated: Audit tidak boleh mutable untuk production.
+        Gunakan SQLite AuditRepository untuk persist audit.
+        """
+        import warnings
+        warnings.warn(
+            "AuditTrail.clear() is deprecated. Use SQLite AuditRepository for production audit.",
+            DeprecationWarning, stacklevel=2
+        )
         self._entries = []
         self._counter = 0
 
