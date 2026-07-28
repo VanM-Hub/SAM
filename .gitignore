@@ -34,6 +34,16 @@ workspace/mission.yaml
 *.sqlite
 *.sqlite3
 
+# Runtime databases (jangan commit)
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# But migrations dir is tracked via ! override
+!data/migrations/
+
+data/migrations/*.sql
+
 # Coverage
 .coverage
 htmlcov/
