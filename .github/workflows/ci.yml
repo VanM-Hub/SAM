@@ -45,8 +45,7 @@ jobs:
                        --cov=src/sam/operations \
                        --cov=src/sam/experience \
                        --cov-report=term-missing \
-                       --cov-fail-under=5 \
-                       -W ignore::coverage.CoverageWarning
+                       --cov-fail-under=5
 
       - name: Upload coverage
         if: always()
