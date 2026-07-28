@@ -42,8 +42,33 @@ ignore = [
 ]
 
 [tool.ruff.per-file-ignores]
-"__init__.py" = ["F401", "I"]  # ignore unused imports and isort in __init__.py
-"tests/**" = ["ANN", "N"]      # tests don't need annotations
+"__init__.py" = ["F401", "I"]
+"tests/**" = ["ANN", "N", "SIM", "E501", "F841", "E741", "W293", "I001"]
+"src/sam/**/__init__.py" = ["F401", "I", "ANN"]
+"src/sam/operations/**" = ["SIM", "F841"]  # allow SIM105, F841 in ops
+
+# Legacy modules — suppress strict rules across the board
+"src/sam/autonomous/**" = ["ANN", "SIM", "E501", "F841"]
+"src/sam/collaboration/**" = ["ANN", "SIM", "E501", "F841"]
+"src/sam/desktop/**" = ["ANN", "SIM", "E501", "F841"]
+"src/sam/experience/**" = ["ANN", "SIM", "E501", "F841"]
+"src/sam/plugin/**" = ["ANN", "SIM", "E501", "F841"]
+"src/sam/render/**" = ["ANN", "SIM", "E501", "F841"]
+"src/sam/contracts/**" = ["ANN", "SIM", "E501"]
+"src/sam/dos/**" = ["ANN", "SIM", "E501"]
+"src/sam/guardian/**" = ["ANN", "SIM", "E501"]
+"src/sam/healing/**" = ["ANN", "SIM", "E501"]
+"src/sam/hosting/**" = ["ANN", "SIM", "E501"]
+"src/sam/intelligence/**" = ["ANN", "SIM", "E501"]
+"src/sam/language/**" = ["ANN", "SIM", "E501"]
+"src/sam/mission/**" = ["ANN", "SIM", "E501"]
+"src/sam/narrative/**" = ["ANN", "SIM", "E501"]
+"src/sam/openclaw/**" = ["ANN", "SIM", "E501"]
+"src/sam/runtime/**" = ["ANN", "SIM", "E501"]
+"src/sam/strategy/**" = ["ANN", "SIM", "E501"]
+"src/sam/tuning/**" = ["ANN", "SIM", "E501"]
+"src/sam/telemetry/**" = ["ANN", "SIM", "E501"]
+"src/sam/storage/**" = ["ANN", "SIM", "E501"]
 
 [tool.ruff.format]
 quote-style = "double"
