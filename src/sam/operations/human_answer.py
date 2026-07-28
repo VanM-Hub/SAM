@@ -35,6 +35,7 @@ class HumanAnswer:
     sections: List[tuple] = field(default_factory=list)   # (heading, content)
     cards: List[tuple] = field(default_factory=list)       # (icon, title, detail)
     actions: List[str] = field(default_factory=list)
+    predictions: List[str] = field(default_factory=list)
     severity: str = "info"       # "info" | "success" | "warning" | "error" | "critical"
     priority: int = 3            # 1-5
     icon: str = ""
