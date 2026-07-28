@@ -1,682 +1,733 @@
 """
-OP-258 — Conversation Brain Upgrade.
+OP-258 — Brain Conversation Bridge V2.
 
-Upgraded conversation bridge that can answer:
-  - What is the biggest problem right now?
-  - What is today's priority?
-  - Why was this proposal created?
-  - What evidence supports this?
-  - What is the impact if ignored?
+Extends BrainConversationBridge with new query types:
+  - health, trends, changes, risks, recommendations
+  - dependencies, optimization, confidence, learning
 
-Uses the brain pipeline output (findings, recommendations, proposals,
-correlated findings, priority scores, packages, health).
-
-All answers are DTO-based, deterministic, no AI.
+Does NOT create storage — only queries existing repositories
+(Audit, Timeline, Learning, Replay, Trust).
+Conversation-first: all output is DTO-only.
 """
 
 from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from enum import Enum
+from typing import Any, Dict, List, Optional, Callable
 
 
-# ── Data ───────────────────────────────────────────────────────────
+class QueryType(Enum):
+    """Supported brain query types."""
 
-
-@dataclass
-class ConversationContext:
-    """
-    Full context for the conversation bridge.
-
-    Populated by BrainPipeline.run() and/or manual update.
-    """
-
-    findings: List[Dict[str, Any]] = field(default_factory=list)
-    recommendations: List[Dict[str, Any]] = field(default_factory=list)
-    proposals: List[Dict[str, Any]] = field(default_factory=list)
-    correlated_findings: List[Dict[str, Any]] = field(default_factory=list)
-    priority_scores: List[Dict[str, Any]] = field(default_factory=list)
-    packages: List[Dict[str, Any]] = field(default_factory=list)
-    health: Optional[Dict[str, Any]] = None
-    observation: Dict[str, Any] = field(default_factory=dict)
-    triggered_rules: List[Dict[str, Any]] = field(default_factory=list)
-    multi_source: Dict[str, Any] = field(default_factory=dict)
-
-    def snapshot(self) -> Dict[str, Any]:
-        """Create immutable snapshot of current context."""
-        return {
-            "findings_count": len(self.findings),
-            "recommendations_count": len(self.recommendations),
-            "proposals_count": len(self.proposals),
-            "correlated_findings_count": len(self.correlated_findings),
-            "packages_count": len(self.packages),
-            "health_score": (self.health or {}).get("score", 1.0),
-            "health_status": (self.health or {}).get("status", "healthy"),
-            "timestamp": time.time(),
-        }
+    HEALTH = "health"
+    TRENDS = "trends"
+    CHANGES = "changes"
+    RISKS = "risks"
+    RECOMMENDATIONS = "recommendations"
+    DEPENDENCIES = "dependencies"
+    OPTIMIZATION = "optimization"
+    CONFIDENCE = "confidence"
+    LEARNING = "learning"
+    APPROVAL_PRIORITY = "approval_priority"
+    RECURRING = "recurring"
+    EXPLAIN = "explain"
 
 
 @dataclass
 class BrainQuery:
-    """A query to the conversation bridge."""
+    """A query to the brain layer."""
 
-    text: str
-    query_type: str = "general"  # classified from text
-    context: Optional[Dict[str, Any]] = None
+    query_type: QueryType
+    parameters: Dict[str, Any] = field(default_factory=dict)
+    limit: int = 10
+    include_evidence: bool = False
+
+    def __repr__(self) -> str:
+        return f"BrainQuery(type={self.query_type.value}, limit={self.limit})"
 
 
 @dataclass
 class BrainAnswer:
-    """Structured answer from the conversation bridge."""
+    """Answer from the brain layer to a conversation query."""
 
+    query_type: str
     answer: str
-    data: Dict[str, Any] = field(default_factory=dict)
-    query_type: str = "general"
+    timestamp: float
     confidence: float = 1.0
-    generated_at: float = 0.0
+    details: List[Dict[str, Any]] = field(default_factory=list)
+    sources: List[str] = field(default_factory=list)
+    error: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "answer": self.answer,
-            "data": self.data,
-            "confidence": self.confidence,
-        }
+    @property
+    def has_answer(self) -> bool:
+        return self.answer != "" and self.error is None
 
 
-# ── Query classifiers ──────────────────────────────────────────────
+@dataclass
+class ConversationContext:
+    """Context for a brain conversation."""
 
-_KEYWORD_MAP: Dict[str, str] = {
-    # Biggest problem
-    "biggest problem": "biggest_problem",
-    "biggest issue": "biggest_problem",
-    "worst": "biggest_problem",
-    "most critical": "biggest_problem",
-    # Priority
-    "priority": "priority",
-    "priorities": "priority",
-    "most important": "priority",
-    # Why
-    "why": "why",
-    "reason": "why",
-    "rationale": "why",
-    # Evidence
-    "evidence": "evidence",
-    "proof": "evidence",
-    "supporting": "evidence",
-    "data": "evidence",
-    # Impact
-    "impact": "impact",
-    "consequence": "impact",
-    "what if": "impact",
-    "ignore": "impact",
-    "skip": "impact",
-    # Status / summary
-    "status": "status",
-    "summary": "status",
-    "overview": "status",
-    "how is": "status",
-    # Recommendations
-    "recommend": "recommendation",
-    "suggest": "recommendation",
-    "what should": "recommendation",
-    # Proposals
-    "proposal": "proposal",
-    "pending": "pending",
-    "waiting": "pending",
-    # Health
-    "health": "health",
-    "score": "health",
-    "all good": "health",
-    "fine": "health",
-    # Issues
-    "issue": "issues",
-    "problem": "issues",
-    "wrong": "issues",
-    "anomaly": "issues",
-    "alert": "issues",
+    turn_count: int = 0
+    last_queries: List[BrainQuery] = field(default_factory=list)
+    last_answers: List[BrainAnswer] = field(default_factory=list)
+
+    def add_turn(self, query: BrainQuery, answer: BrainAnswer) -> None:
+        self.turn_count += 1
+        self.last_queries.append(query)
+        self.last_answers.append(answer)
+        # Keep last 20
+        if len(self.last_queries) > 20:
+            self.last_queries.pop(0)
+            self.last_answers.pop(0)
+
+    def last_query(self) -> Optional[BrainQuery]:
+        return self.last_queries[-1] if self.last_queries else None
+
+    def last_answer(self) -> Optional[BrainAnswer]:
+        return self.last_answers[-1] if self.last_answers else None
+
+
+# ── Query handlers ────────────────────────────────────────────────────
+
+QueryHandler = Callable[[BrainQuery], BrainAnswer]
+
+
+def _handle_health(query: BrainQuery) -> BrainAnswer:
+    """Return platform health summary."""
+    try:
+        from .health import evaluate_health
+        health = evaluate_health()
+
+        lines = [
+            f"Overall health: {health.overall_score:.0f}/100 ({health.overall_status})",
+        ]
+        red_dims = health.red_dimensions
+        yellow_dims = health.yellow_dimensions
+
+        if red_dims:
+            lines.append(f"  ❌ RED: {', '.join(red_dims)}")
+        if yellow_dims:
+            lines.append(f"  ⚠️  YELLOW: {', '.join(yellow_dims)}")
+
+        if not red_dims and not yellow_dims:
+            lines.append("  ✅ All dimensions healthy")
+
+        details = [
+            {
+                "dimension": d.dimension,
+                "score": d.score,
+                "status": d.status,
+                "message": d.message,
+            }
+            for d in health.dimensions
+        ]
+
+        return BrainAnswer(
+            query_type="health",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.95,
+            details=details,
+            sources=["OperationalHealthEngine"],
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="health",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+def _handle_trends(query: BrainQuery) -> BrainAnswer:
+    """Return operational trends."""
+    try:
+        from sam.operations.timeline_query import get_recent_events
+        limit = query.limit
+        events = get_recent_events(limit=limit + 20)  # buffer
+
+        if not events:
+            return BrainAnswer(
+                query_type="trends",
+                answer="No recent trends detected.",
+                timestamp=time.time(),
+                confidence=0.8,
+                sources=["TimelineQuery"],
+            )
+
+        lines = [f"Recent trends (last {len(events)} events):"]
+        for ev in events[:limit]:
+            ev_type = getattr(ev, "event_type", getattr(ev, "type", "unknown"))
+            ts = getattr(ev, "timestamp", "")
+            lines.append(f"  • [{ts}] {ev_type}")
+
+        return BrainAnswer(
+            query_type="trends",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.85,
+            sources=["TimelineQuery"],
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="trends",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+def _handle_changes(query: BrainQuery) -> BrainAnswer:
+    """Return what changed recently."""
+    try:
+        from sam.operations.audit import get_recent_audit_entries
+        entries = get_recent_audit_entries(limit=query.limit)
+
+        if not entries:
+            return BrainAnswer(
+                query_type="changes",
+                answer="No recent changes detected.",
+                timestamp=time.time(),
+                confidence=0.8,
+                sources=["AuditRepository"],
+            )
+
+        lines = ["Recent changes:"]
+        for entry in entries:
+            action = getattr(entry, "action", getattr(entry, "event", "unknown"))
+            ts = getattr(entry, "timestamp", "")
+            user = getattr(entry, "actor", getattr(entry, "user", "system"))
+            lines.append(f"  • [{ts}] {action} by {user}")
+
+        return BrainAnswer(
+            query_type="changes",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.9,
+            sources=["AuditRepository"],
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="changes",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+def _handle_risks(query: BrainQuery) -> BrainAnswer:
+    """Return highest risks."""
+    try:
+        from .priority import PriorityEngine, PriorityCategory
+        from .analyzer import OperationalAnalyzer
+
+        # Use previous findings from analyzer if available
+        analyzer = OperationalAnalyzer()
+        last = analyzer.last_findings
+        if not last:
+            return BrainAnswer(
+                query_type="risks",
+                answer="No findings available to assess risks.",
+                timestamp=time.time(),
+                confidence=0.7,
+            )
+
+        engine = PriorityEngine()
+        scores = engine.prioritize(last)
+
+        critical = [s for s in scores if s.category == PriorityCategory.CRITICAL]
+        high = [s for s in scores if s.category == PriorityCategory.HIGH]
+
+        lines = []
+        if critical:
+            lines.append(f"CRITICAL risks ({len(critical)}):")
+            for s in critical[:query.limit]:
+                lines.append(f"  • {s.finding_id}: {s.score:.0f}/100")
+        if high:
+            lines.append(f"HIGH risks ({len(high)}):")
+            for s in high[:query.limit]:
+                lines.append(f"  • {s.finding_id}: {s.score:.0f}/100")
+        if not critical and not high:
+            lines.append("No critical or high risks detected.")
+
+        return BrainAnswer(
+            query_type="risks",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.85,
+            sources=["PriorityEngine", "OperationalAnalyzer"],
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="risks",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+def _handle_recommendations(query: BrainQuery) -> BrainAnswer:
+    """Return current recommendations."""
+    try:
+        from .recommendation import RecommendationBuilder
+        from .analyzer import OperationalAnalyzer
+
+        analyzer = OperationalAnalyzer()
+        last = analyzer.last_findings
+        if not last:
+            return BrainAnswer(
+                query_type="recommendations",
+                answer="No findings available for recommendations.",
+                timestamp=time.time(),
+                confidence=0.7,
+            )
+
+        builder = RecommendationBuilder()
+        recs = builder.build(last)
+
+        if not recs:
+            return BrainAnswer(
+                query_type="recommendations",
+                answer="No actionable recommendations at this time.",
+                timestamp=time.time(),
+                confidence=0.9,
+            )
+
+        lines = [f"Recommendations ({len(recs)}):"]
+        for rec in recs[:query.limit]:
+            lines.append(f"  • [{rec.priority}] {rec.title}")
+            if query.include_evidence:
+                for step in rec.suggested_steps:
+                    lines.append(f"    - {step}")
+
+        return BrainAnswer(
+            query_type="recommendations",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.85,
+            sources=["RecommendationBuilder"],
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="recommendations",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+def _handle_approval_priority(query: BrainQuery) -> BrainAnswer:
+    """Return what should be approved first."""
+    try:
+        from .proposal_queue import ProposalQueue
+        q = ProposalQueue()
+        ready = q.list_ready()
+        if not ready:
+            return BrainAnswer(
+                query_type="approval_priority",
+                answer="No proposals waiting for approval.",
+                timestamp=time.time(),
+                confidence=0.9,
+                sources=["ProposalQueue"],
+            )
+
+        lines = ["Proposals sorted by priority:"]
+        for item in ready[:query.limit]:
+            lines.append(
+                f"  • {item.priority_score:.0f}/100 — {item.title} "
+                f"[{item.proposal_id[:8]}]"
+            )
+
+        return BrainAnswer(
+            query_type="approval_priority",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.9,
+            sources=["ProposalQueue"],
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="approval_priority",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+def _handle_recurring(query: BrainQuery) -> BrainAnswer:
+    """Return recurring problems."""
+    try:
+        from .pattern_miner import PatternMiner
+        miner = PatternMiner()
+        patterns = miner.last_patterns if hasattr(miner, 'last_patterns') else []
+
+        if not patterns:
+            return BrainAnswer(
+                query_type="recurring",
+                answer="No recurring problems detected.",
+                timestamp=time.time(),
+                confidence=0.8,
+                sources=["PatternMiner"],
+            )
+
+        lines = ["Recurring patterns:"]
+        for p in patterns[:query.limit]:
+            freq = getattr(p, "frequency", getattr(p, "count", "?"))
+            lines.append(f"  • {getattr(p, 'description', str(p))} (freq: {freq})")
+
+        return BrainAnswer(
+            query_type="recurring",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.8,
+            sources=["PatternMiner"],
+        )
+    except Exception:
+        return BrainAnswer(
+            query_type="recurring",
+            answer="No recurring problem detection available.",
+            timestamp=time.time(),
+            confidence=0.5,
+        )
+
+
+def _handle_learning(query: BrainQuery) -> BrainAnswer:
+    """Return learning summary."""
+    try:
+        from .learning_pipeline import LearningPipeline
+        pipe = LearningPipeline()
+        snapshots = pipe.snapshot_count if hasattr(pipe, 'snapshot_count') else 0
+        insights = (list(pipe.list_insights()) if hasattr(pipe, 'list_insights')
+                    else pipe.last_result.insights if hasattr(pipe, 'last_result')
+                    and hasattr(pipe.last_result, 'insights') else [])
+
+        lines = [f"Learning snapshots: {snapshots}"]
+        if insights:
+            lines.append("Recent insights:")
+            for ins in list(insights)[:query.limit]:
+                lines.append(f"  • {ins}")
+
+        return BrainAnswer(
+            query_type="learning",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.8,
+            sources=["LearningPipeline"],
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="learning",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+def _handle_explain(query: BrainQuery) -> BrainAnswer:
+    """Explain a specific finding or recommendation."""
+    target = query.parameters.get("target", "")
+    if not target:
+        return BrainAnswer(
+            query_type="explain",
+            answer="Please specify what to explain (e.g., target='mission_failure').",
+            timestamp=time.time(),
+            confidence=1.0,
+        )
+
+    try:
+        from .analyzer import OperationalAnalyzer
+        from .recommendation import RecommendationBuilder
+
+        analyzer = OperationalAnalyzer()
+        last = analyzer.last_findings
+
+        for f in last:
+            if f.finding_id == target:
+                lines = [
+                    f"Finding: {f.title} ({f.severity.value})",
+                    f"  Description: {f.description}",
+                    f"  Confidence: {f.confidence:.0%}",
+                    f"  Affected: {', '.join(f.affected_resources)}",
+                    "  Evidence:",
+                ]
+                for ev in f.evidence:
+                    lines.append(f"    - {ev}")
+                if f.recommended_actions:
+                    lines.append("  Recommended actions:")
+                    for a in f.recommended_actions:
+                        lines.append(f"    - {a}")
+
+                return BrainAnswer(
+                    query_type="explain",
+                    answer="\n".join(lines),
+                    timestamp=time.time(),
+                    confidence=f.confidence,
+                    sources=["OperationalAnalyzer"],
+                )
+
+        return BrainAnswer(
+            query_type="explain",
+            answer=f"No finding found with id '{target}'.",
+            timestamp=time.time(),
+            confidence=0.9,
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="explain",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+def _handle_dependencies(query: BrainQuery) -> BrainAnswer:
+    """Return dependency chain for a component."""
+    target = query.parameters.get("target", "")
+    if not target:
+        return BrainAnswer(
+            query_type="dependencies",
+            answer="Please specify a component (e.g., target='brain_pipeline').",
+            timestamp=time.time(),
+            confidence=1.0,
+        )
+
+    dep_map = {
+        "brain_pipeline": [
+            "ObservationEngine", "RuleEngine", "OperationalAnalyzer",
+            "CorrelationEngine", "PriorityEngine", "RecommendationBuilder",
+            "ProposalService",
+        ],
+        "observation": ["ObservationEngine", "MultiSourceObserver"],
+        "queue": ["ProposalQueue", "QueueProvider", "ApprovalService"],
+        "health": ["OperationalHealthEngine", "ObservationEngine", "RuleEngine"],
+    }
+
+    deps = dep_map.get(target, ["Unknown component"])
+    lines = [f"Dependencies for '{target}':"]
+    for d in deps:
+        lines.append(f"  • {d}")
+
+    return BrainAnswer(
+        query_type="dependencies",
+        answer="\n".join(lines),
+        timestamp=time.time(),
+        confidence=0.9,
+        sources=["Architecture knowledge"],
+    )
+
+
+def _handle_optimization(query: BrainQuery) -> BrainAnswer:
+    """Return optimization opportunities."""
+    try:
+        from .optimizer import RecommendationOptimizer
+        opt = RecommendationOptimizer()
+        reports = opt.reports if hasattr(opt, 'reports') else []
+
+        if not reports:
+            return BrainAnswer(
+                query_type="optimization",
+                answer="No optimization opportunities identified yet.",
+                timestamp=time.time(),
+                confidence=0.7,
+                sources=["RecommendationOptimizer"],
+            )
+
+        lines = ["Optimization opportunities:"]
+        for r in list(reports)[:query.limit]:
+            lines.append(f"  • {getattr(r, 'summary', str(r))}")
+
+        return BrainAnswer(
+            query_type="optimization",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.8,
+            sources=["RecommendationOptimizer"],
+        )
+    except Exception:
+        return BrainAnswer(
+            query_type="optimization",
+            answer="Optimization analysis not yet available.",
+            timestamp=time.time(),
+            confidence=0.5,
+        )
+
+
+def _handle_confidence(query: BrainQuery) -> BrainAnswer:
+    """Return confidence history."""
+    try:
+        from sam.operations.trust import get_trust_summary
+        from .success_estimator import SuccessEstimator
+
+        trust = get_trust_summary()
+
+        est = SuccessEstimator()
+        estimates = est.history if hasattr(est, 'history') else []
+
+        lines = ["Confidence & Trust Summary:"]
+        lines.append(f"  Trust scores: {trust}")
+        if estimates:
+            avg_conf = sum(
+                getattr(e, 'confidence', 0) for e in estimates[-10:]
+            ) / min(len(estimates), 10)
+            lines.append(f"  Recent avg confidence: {avg_conf:.1%}")
+
+        return BrainAnswer(
+            query_type="confidence",
+            answer="\n".join(lines),
+            timestamp=time.time(),
+            confidence=0.85,
+            sources=["TrustRepository", "SuccessEstimator"],
+        )
+    except Exception as e:
+        return BrainAnswer(
+            query_type="confidence",
+            answer="",
+            timestamp=time.time(),
+            error=str(e),
+        )
+
+
+# ── Handler registry ──────────────────────────────────────────────────
+
+_HANDLERS: Dict[QueryType, QueryHandler] = {
+    QueryType.HEALTH: _handle_health,
+    QueryType.TRENDS: _handle_trends,
+    QueryType.CHANGES: _handle_changes,
+    QueryType.RISKS: _handle_risks,
+    QueryType.RECOMMENDATIONS: _handle_recommendations,
+    QueryType.DEPENDENCIES: _handle_dependencies,
+    QueryType.OPTIMIZATION: _handle_optimization,
+    QueryType.CONFIDENCE: _handle_confidence,
+    QueryType.LEARNING: _handle_learning,
+    QueryType.APPROVAL_PRIORITY: _handle_approval_priority,
+    QueryType.RECURRING: _handle_recurring,
+    QueryType.EXPLAIN: _handle_explain,
 }
 
 
-def classify_query(text: str) -> str:
-    """Classify a question into a query type."""
-    lower = text.lower().strip()
-    for keyword, qtype in _KEYWORD_MAP.items():
-        if keyword in lower:
-            return qtype
-    # Check starts with common patterns
-    if lower.startswith("what") and "recommend" in lower:
-        return "recommendation"
-    if lower.startswith("are there") or lower.startswith("any"):
-        return "issues"
-    return "general"
-
-
-# ── Bridge ─────────────────────────────────────────────────────────
-
-
 class BrainConversationBridgeV2:
-    """
-    Upgraded conversation bridge with context-aware answers.
+    """Bridge between Conversation layer and Brain layer (V2).
 
-    Answers questions about:
-      - biggest problems
-      - priorities
-      - proposal rationale
-      - evidence
-      - impact analysis
-      - health status
-      - pending items
-      - recommendations
+    Supports 12 query types. All queries through DTOs.
+    Does NOT create storage — only queries existing repos.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._context = ConversationContext()
-        self._last_answer: Optional[BrainAnswer] = None
-
-    # ── State management ───────────────────────────────────────────
 
     @property
     def context(self) -> ConversationContext:
         return self._context
 
-    def update_context(self, **kwargs) -> None:
-        """Update context fields."""
-        for key, value in kwargs.items():
-            if hasattr(self._context, key):
-                setattr(self._context, key, value)
+    def ask(self, query: BrainQuery) -> BrainAnswer:
+        """Ask the brain a question.
 
-    def update_from_pipeline(self, pipeline_result: Any) -> None:
-        """Update context from a pipeline result object."""
-        if hasattr(pipeline_result, "findings"):
-            self._context.findings = pipeline_result.findings
-        if hasattr(pipeline_result, "recommendations"):
-            self._context.recommendations = pipeline_result.recommendations
-        if hasattr(pipeline_result, "proposals"):
-            self._context.proposals = pipeline_result.proposals
-        if hasattr(pipeline_result, "dashboard"):
-            d = pipeline_result.dashboard
-            if hasattr(d, "health_score"):
-                self._context.health = {"score": d.health_score, "status": d.health_state}
-            if hasattr(d, "observation_summary"):
-                self._context.observation = d.observation_summary
-
-    def context_snapshot(self) -> Dict[str, Any]:
-        return self._context.snapshot()
-
-    # ── Query ──────────────────────────────────────────────────────
-
-    def ask(self, query: str) -> BrainAnswer:
-        """Process a natural-language query and return a structured answer."""
-        qtype = classify_query(query)
-        answer = self._dispatch(qtype, query)
-        return answer
-
-    def ask_with_context(self, query: str, context: Dict[str, Any]) -> BrainAnswer:
-        """Process query with additional context overlay."""
-        for key, value in context.items():
-            if hasattr(self._context, key):
-                setattr(self._context, key, value)
-        return self.ask(query)
-
-    # ── Dispatch ───────────────────────────────────────────────────
-
-    def _dispatch(self, qtype: str, query: str) -> BrainAnswer:
-        handler = getattr(self, f"_answer_{qtype}", self._answer_general)
-        try:
-            answer = handler(query)
-        except Exception as e:
+        Routes to the appropriate handler based on query type.
+        """
+        handler = _HANDLERS.get(query.query_type)
+        if handler is None:
             answer = BrainAnswer(
-                answer=f"Error processing query: {e}",
-                query_type=qtype,
-                confidence=0.0,
-                generated_at=time.time(),
+                query_type=query.query_type.value,
+                answer="",
+                timestamp=time.time(),
+                error=f"Unknown query type: {query.query_type}",
             )
-        answer.query_type = qtype
-        answer.generated_at = time.time()
-        self._last_answer = answer
+        else:
+            try:
+                answer = handler(query)
+            except Exception as e:
+                answer = BrainAnswer(
+                    query_type=query.query_type.value,
+                    answer="",
+                    timestamp=time.time(),
+                    error=str(e),
+                )
+
+        self._context.add_turn(query, answer)
         return answer
 
-    # ── Answer handlers ────────────────────────────────────────────
+    def ask_health(self) -> BrainAnswer:
+        return self.ask(BrainQuery(query_type=QueryType.HEALTH))
 
-    def _answer_biggest_problem(self, query: str) -> BrainAnswer:
-        """Find the single highest-severity issue."""
-        ctx = self._context
+    def ask_trends(self, limit: int = 10) -> BrainAnswer:
+        return self.ask(BrainQuery(query_type=QueryType.TRENDS, limit=limit))
 
-        # Check correlated findings first
-        if ctx.correlated_findings:
-            worst = max(
-                ctx.correlated_findings,
-                key=lambda f: {"info": 0, "warning": 1, "critical": 2}.get(
-                    f.get("severity", "info"), 0
-                ),
-            )
-            return BrainAnswer(
-                answer=(
-                    f"**{worst.get('title', 'Unknown issue')}**\n"
-                    f"{worst.get('description', '')}\n"
-                    f"Severity: {worst.get('severity', 'info')} | "
-                    f"Confidence: {worst.get('confidence', 0.5):.0%}"
-                ),
-                data={"biggest_problem": worst},
-            )
+    def ask_changes(self, limit: int = 10) -> BrainAnswer:
+        return self.ask(BrainQuery(query_type=QueryType.CHANGES, limit=limit))
 
-        # Fall back to findings
-        findings = ctx.findings
-        if not findings:
-            return BrainAnswer(
-                answer="No problems detected. System appears stable.",
-                data={},
-            )
+    def ask_risks(self, limit: int = 10) -> BrainAnswer:
+        return self.ask(BrainQuery(query_type=QueryType.RISKS, limit=limit))
 
-        worst = max(
-            findings,
-            key=lambda f: {"info": 0, "warning": 1, "critical": 2}.get(
-                f.get("severity", "info"), 0
-            ),
-        )
-        return BrainAnswer(
-            answer=(
-                f"**{worst.get('title', 'Issue')}**\n"
-                f"Severity: {worst.get('severity', 'info')} | "
-                f"Confidence: {worst.get('confidence', 0.5):.0%}\n"
-                f"{worst.get('description', '')}"
-            ),
-            data={"biggest_problem": worst},
-        )
+    def ask_recommendations(
+        self,
+        limit: int = 10,
+        with_evidence: bool = False,
+    ) -> BrainAnswer:
+        return self.ask(BrainQuery(
+            query_type=QueryType.RECOMMENDATIONS,
+            limit=limit,
+            include_evidence=with_evidence,
+        ))
 
-    def _answer_priority(self, query: str) -> BrainAnswer:
-        """List current priorities."""
-        ctx = self._context
+    def ask_explain(self, target: str) -> BrainAnswer:
+        return self.ask(BrainQuery(
+            query_type=QueryType.EXPLAIN,
+            parameters={"target": target},
+        ))
 
-        if ctx.priority_scores:
-            top = sorted(ctx.priority_scores, key=lambda x: x.get("score", 0), reverse=True)[:3]
-            lines = []
-            for i, p in enumerate(top, 1):
-                lines.append(
-                    f"{i}. **{p.get('item_id', 'Unknown')}** — "
-                    f"Score: {p.get('score', 0):.2f} ({p.get('label', 'low')})"
-                )
-            # Find matching titles
-            title_map = {}
-            for rec in ctx.recommendations:
-                rid = rec.get("id", rec.get("recommendation_id", ""))
-                title_map[rid] = rec.get("title", rid)
-            detail_lines = []
-            for p in top:
-                pid = p.get("item_id", "")
-                title = title_map.get(pid, pid)
-                detail_lines.append(f"  • {title} — urgency {p.get('urgency', 0):.2f}, "
-                                    f"impact {p.get('impact', 0):.2f}")
-            answer_lines = lines + [""] + detail_lines
-            return BrainAnswer(
-                answer="\n".join(answer_lines),
-                data={"top_priorities": top},
-            )
-
-        if ctx.recommendations:
-            crit = [r for r in ctx.recommendations
-                    if r.get("priority") == "critical"]
-            high = [r for r in ctx.recommendations
-                    if r.get("priority") == "high"]
-            return BrainAnswer(
-                answer=(
-                    f"Priorities: {len(crit)} critical, {len(high)} high, "
-                    f"{len(ctx.recommendations)} total recommendations."
-                ),
-                data={"critical_count": len(crit), "high_count": len(high)},
-            )
-
-        return BrainAnswer(
-            answer="No priorities set. No active recommendations.",
-            data={},
-        )
-
-    def _answer_why(self, query: str) -> BrainAnswer:
-        """Explain why a proposal or recommendation was created."""
-        ctx = self._context
-
-        # Try to find what the user is asking about
-        lower = query.lower()
-        proposals = ctx.proposals
-        recs = ctx.recommendations
-
-        # Search for a specific title or ID in the query
-        candidates = []
-        for item in proposals + recs:
-            title = item.get("title", "")
-            item_id = item.get("id", item.get("proposal_id", item.get("recommendation_id", "")))
-            desc = item.get("description", "")
-            evidence = item.get("evidence", item.get("supporting_data", []))
-            if title.lower() in lower or item_id.lower() in lower:
-                candidates.append((item, title, item_id, desc, evidence))
-
-        if candidates:
-            item, title, item_id, desc, evidence = candidates[0]
-            evidence_summary = self._summarize_evidence(evidence[-3:])  # last 3
-            return BrainAnswer(
-                answer=(
-                    f"**Why {title}?**\n"
-                    f"{desc}\n\n"
-                    f"Evidence:\n{evidence_summary}"
-                ),
-                data={
-                    "item_id": item_id,
-                    "title": title,
-                    "description": desc,
-                    "evidence": evidence,
-                },
-            )
-
-        # General: show why each proposal exists
-        if proposals:
-            lines = []
-            for p in proposals:
-                title = p.get("title", "Proposal")
-                reason = p.get("description", "No description")[:100]
-                lines.append(f"  • **{title}**: {reason}")
-            return BrainAnswer(
-                answer=f"Active proposals:\n" + "\n".join(lines),
-                data={"proposals": proposals},
-            )
-
-        return BrainAnswer(
-            answer="No proposals to explain.",
-            data={},
-        )
-
-    def _answer_evidence(self, query: str) -> BrainAnswer:
-        """Show evidence supporting findings or proposals."""
-        ctx = self._context
-        all_evidence = []
-
-        for f in ctx.findings:
-            for e in f.get("evidence", []):
-                all_evidence.append({
-                    **e,
-                    "_source": f.get("finding_id", f.get("title", "unknown")),
-                    "_type": "finding",
-                })
-        for r in ctx.recommendations:
-            for e in r.get("evidence", []):
-                all_evidence.append({
-                    **e,
-                    "_source": r.get("title", r.get("recommendation_id", "unknown")),
-                    "_type": "recommendation",
-                })
-
-        if not all_evidence:
-            return BrainAnswer(
-                answer="No evidence available.",
-                data={"evidence": []},
-            )
-
-        # Filter by query if keyword given
-        lower = query.lower()
-        filtered = all_evidence
-        keywords = [kw for kw in ["approval", "mission", "trust", "queue",
-                                   "lock", "anomaly", "failure", "notification"]
-                    if kw in lower]
-        if keywords:
-            filtered = [e for e in all_evidence
-                        if any(kw in str(e).lower() for kw in keywords)]
-
-        # Group by source
-        by_source: Dict[str, List[Dict]] = {}
-        for e in filtered:
-            src = e.get("_source", "unknown")
-            if src not in by_source:
-                by_source[src] = []
-            by_source[src].append(e)
-
-        lines = [f"**Evidence** ({len(filtered)} items)"]
-        for src, items in list(by_source.items())[:5]:
-            lines.append(f"\n  From: {src}")
-            for item in items[:3]:
-                value = item.get("value", item.get("field", item.get("message", "")))
-                etype = item.get("type", "data")
-                lines.append(f"    [{etype}] {value}")
-
-        return BrainAnswer(
-            answer="\n".join(lines),
-            data={"evidence": filtered, "sources": list(by_source.keys())},
-        )
-
-    def _answer_impact(self, query: str) -> BrainAnswer:
-        """Describe impact of ignoring recommendations."""
-        ctx = self._context
-        if not ctx.recommendations:
-            return BrainAnswer(
-                answer="No active recommendations to evaluate impact.",
-                data={},
-            )
-
-        # Find highest priority recs and describe impact
-        top = sorted(
-            ctx.recommendations,
-            key=lambda r: {"critical": 4, "high": 3, "medium": 2, "low": 1}.get(
-                r.get("priority", "low"), 0
-            ),
-            reverse=True,
-        )[:3]
-
-        lines = ["**Impact if ignored**"]
-        for r in top:
-            title = r.get("title", "Issue")
-            priority = r.get("priority", "low")
-            conf = r.get("confidence", 0.5)
-            affected = r.get("affected_resources", r.get("affected_sources", ["system"]))
-            resources = ", ".join(affected[:3])
-            impact_desc = r.get("estimated_impact", "Unknown impact")
-            lines.append(
-                f"\n• **{title}** ({priority}, {conf:.0%} confidence)\n"
-                f"  Resources: {resources}\n"
-                f"  Impact: {impact_desc}"
-            )
-
-        return BrainAnswer(
-            answer="\n".join(lines),
-            data={"top_impacts": top},
-        )
-
-    def _answer_status(self, query: str) -> BrainAnswer:
-        """Overall system status summary."""
-        ctx = self._context
-        health = ctx.health or {}
-        health_score = health.get("score", 1.0)
-        health_status = health.get("status", "healthy")
-
-        findings_count = len(ctx.findings)
-        recs_count = len(ctx.recommendations)
-        proposals_count = len(ctx.proposals)
-        correlated_count = len(ctx.correlated_findings)
-        packages_count = len(ctx.packages)
-
-        obs = ctx.observation
-        active_missions = obs.get("active_missions", obs.get("active", 0))
-        pending_approvals = obs.get("pending_approvals", obs.get("pending", 0))
-        anomalies = obs.get("anomalies", 0)
-
-        return BrainAnswer(
-            answer=(
-                f"**System Status** — Health: {health_score:.2f} ({health_status})\n\n"
-                f"• Findings: {findings_count}  |  Recommendations: {recs_count}\n"
-                f"• Proposals: {proposals_count}  |  Correlated: {correlated_count}\n"
-                f"• Packages: {packages_count}\n"
-                f"• Active missions: {active_missions}  |  Pending approvals: {pending_approvals}\n"
-                f"• Anomalies: {anomalies}"
-            ),
-            data=ctx.snapshot(),
-        )
-
-    def _answer_recommendation(self, query: str) -> BrainAnswer:
-        """List recommendations."""
-        ctx = self._context
-        if not ctx.recommendations:
-            return BrainAnswer(
-                answer="No recommendations at this time.",
-                data={},
-            )
-
-        lines = [f"**Recommendations** ({len(ctx.recommendations)} total)"]
-        for r in ctx.recommendations:
-            title = r.get("title", r.get("recommendation_id", "Unknown"))
-            priority = r.get("priority", "low")
-            confidence = r.get("confidence", 0.5)
-            steps = r.get("suggested_steps", [])
-            steps_str = ", ".join(steps[:3]) if steps else ""
-            lines.append(f"  • **{title}** ({priority}, {confidence:.0%})")
-            if steps_str:
-                lines.append(f"    Steps: {steps_str}")
-
-        return BrainAnswer(
-            answer="\n".join(lines),
-            data={"recommendations": ctx.recommendations},
-        )
-
-    def _answer_proposal(self, query: str) -> BrainAnswer:
-        """List proposals."""
-        ctx = self._context
-        if not ctx.proposals:
-            return BrainAnswer(
-                answer="No proposals active.",
-                data={},
-            )
-        lines = [f"**Proposals** ({len(ctx.proposals)} total)"]
-        for p in ctx.proposals:
-            title = p.get("title", p.get("proposal_id", "Unknown"))
-            state = p.get("state", p.get("status", "draft"))
-            lines.append(f"  • **{title}** — {state}")
-        return BrainAnswer(
-            answer="\n".join(lines),
-            data={"proposals": ctx.proposals},
-        )
-
-    def _answer_pending(self, query: str) -> BrainAnswer:
-        """List pending items (waiting approval)."""
-        ctx = self._context
-        pending = [p for p in ctx.proposals
-                   if p.get("state", p.get("status", "")) == "waiting_approval"]
-        if not pending:
-            return BrainAnswer(
-                answer="No pending approvals.",
-                data={},
-            )
-        lines = [f"**Pending Approval** ({len(pending)} items)"]
-        for p in pending:
-            title = p.get("title", p.get("proposal_id", "Unknown"))
-            lines.append(f"  • {title}")
-        return BrainAnswer(
-            answer="\n".join(lines),
-            data={"pending": pending},
-        )
-
-    def _answer_health(self, query: str) -> BrainAnswer:
-        """Report health status."""
-        ctx = self._context
-        health = ctx.health or {}
-        score = health.get("score", 1.0)
-        status = health.get("status", "healthy")
-        dims = health.get("dimensions", {})
-
-        if dims:
-            dim_lines = []
-            for name, dh in sorted(dims.items()):
-                if isinstance(dh, dict):
-                    ds = dh.get("score", 1.0)
-                    dst = dh.get("status", "healthy")
-                else:
-                    ds = getattr(dh, "score", 1.0)
-                    dst = getattr(dh, "status", "healthy")
-                dim_lines.append(f"  • {name}: {ds:.2f} ({dst})")
-            dim_str = "\n" + "\n".join(dim_lines)
-        else:
-            dim_str = ""
-
-        trend = health.get("trend", "stable")
-
-        return BrainAnswer(
-            answer=(
-                f"**Operational Health**: {score:.2f} ({status}) — {trend}"
-                f"{dim_str}"
-            ),
-            data={
-                "health_score": score,
-                "health_status": status,
-                "trend": trend,
-                "dimensions": dims,
-            },
-        )
-
-    def _answer_issues(self, query: str) -> BrainAnswer:
-        """List all current issues (critical + warning)."""
-        ctx = self._context
-        issues = [
-            f for f in ctx.findings
-            if f.get("severity") in ("critical", "warning")
-        ]
-        if not issues:
-            return BrainAnswer(
-                answer="No issues detected. System is clear.",
-                data={},
-            )
-
-        crit = [f for f in issues if f.get("severity") == "critical"]
-        warn = [f for f in issues if f.get("severity") == "warning"]
-
-        lines = [f"**Issues**: {len(crit)} critical, {len(warn)} warning"]
-        for f in crit[:5]:
-            lines.append(f"  🔴 **{f.get('title', 'Issue')}** — {f.get('description', '')[:100]}")
-        for f in warn[:5]:
-            lines.append(f"  🟡 **{f.get('title', 'Issue')}** — {f.get('description', '')[:100]}")
-
-        return BrainAnswer(
-            answer="\n".join(lines),
-            data={"critical": crit, "warning": warn},
-        )
-
-    def _answer_general(self, query: str) -> BrainAnswer:
-        """Fallback: show available query types."""
-        return BrainAnswer(
-            answer=(
-                "I can answer questions about:\n"
-                "  • **biggest problem** — what's the most critical issue?\n"
-                "  • **priorities** — what needs attention now?\n"
-                "  • **why** — why was a proposal created?\n"
-                "  • **evidence** — what evidence supports recommendations?\n"
-                "  • **impact** — what happens if ignored?\n"
-                "  • **status** — overall system status\n"
-                "  • **health** — operational health score\n"
-                "  • **recommendations** — active recommendations\n"
-                "  • **proposals** — active proposals\n"
-                "  • **pending** — items waiting approval\n"
-                "  • **issues** — current warnings and problems\n\n"
-                "Try: 'What's the biggest problem?' or 'What is today's priority?'"
-            ),
-            data={"available_queries": list(_KEYWORD_MAP.values())},
-        )
-
-    # ── Helpers ────────────────────────────────────────────────────
-
-    def _summarize_evidence(self, evidence: List[Dict]) -> str:
-        if not evidence:
-            return "No evidence."
-        lines = []
-        for e in evidence:
-            val = e.get("value", e.get("field", e.get("message", str(e))))
-            etype = e.get("type", "data")
-            lines.append(f"    [{etype}] {val}")
-        return "\n".join(lines)
+    def reset_context(self) -> None:
+        self._context = ConversationContext()
 
 
-# ── Convenience ────────────────────────────────────────────────────
+# ── Convenience functions ─────────────────────────────────────────────
 
 
-def ask_brain_v2(query: str, context: Optional[ConversationContext] = None) -> BrainAnswer:
-    """One-shot: ask a question with optional context."""
+def classify_query(text: str) -> QueryType:
+    """Simple query classification based on text keywords.
+
+    Falls back to HEALTH if no clear match.
+    """
+    lower = text.lower()
+    if any(kw in lower for kw in ["risk", "danger", "threat", "critical"]):
+        return QueryType.RISKS
+    if any(kw in lower for kw in ["health", "status", "ok?"]):
+        return QueryType.HEALTH
+    if any(kw in lower for kw in ["trend", "pattern", "recurring"]):
+        return QueryType.TRENDS
+    if any(kw in lower for kw in ["change", "what happened", "recent"]):
+        return QueryType.CHANGES
+    if any(kw in lower for kw in ["recommend", "suggest", "what should"]):
+        return QueryType.RECOMMENDATIONS
+    if any(kw in lower for kw in ["explain", "why", "how"]):
+        return QueryType.EXPLAIN
+    if any(kw in lower for kw in ["approve", "priority", "first"]):
+        return QueryType.APPROVAL_PRIORITY
+    if any(kw in lower for kw in ["learn", "insight", "knowledge"]):
+        return QueryType.LEARNING
+    if any(kw in lower for kw in ["optimize", "improve", "better"]):
+        return QueryType.OPTIMIZATION
+    if any(kw in lower for kw in ["depend", "chain", "relies"]):
+        return QueryType.DEPENDENCIES
+    if any(kw in lower for kw in ["confidence", "trust", "sure"]):
+        return QueryType.CONFIDENCE
+    if any(kw in lower for kw in ["problem", "error", "fail", "broken"]):
+        return QueryType.RECURRING
+    return QueryType.HEALTH
+
+
+def ask_brain_v2(
+    query_text: str,
+    limit: int = 10,
+) -> BrainAnswer:
+    """One-shot: ask brain from natural text.
+
+    Classifies text -> routes to appropriate handler.
+    """
+    qtype = classify_query(query_text)
     bridge = BrainConversationBridgeV2()
-    if context:
-        bridge.update_context(findings=context.findings,
-                              recommendations=context.recommendations,
-                              proposals=context.proposals)
-    return bridge.ask(query)
+    return bridge.ask(BrainQuery(
+        query_type=qtype,
+        limit=limit,
+    ))

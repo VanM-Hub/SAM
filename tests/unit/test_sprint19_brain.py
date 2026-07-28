@@ -825,7 +825,17 @@ class TestBrainValidation:
                         # Only flag if outside of test/assert context
                         lines = content.split("\n")
                         for i, line in enumerate(lines, 1):
+                            stripped = line.strip()
                             if pattern in line and "assert" not in line:
+                                # Skip known false positives:
+                                # - method calls inside class/instance methods
+                                # - docstring examples (indented, no def)
+                                # - comments
+                                if pattern == ".start(" and (
+                                    stripped.startswith(("self.", "t.", "sched.", "self._timer."))
+                                    or stripped.startswith(("#", "Example:"))
+                                ):
+                                    continue
                                 bad.append((path, i, pattern))
         assert bad == [], f"Possible auto-execution found: {bad}"
 

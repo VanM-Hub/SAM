@@ -1,312 +1,350 @@
 """
 OP-256 — Proposal Queue.
 
-Manages the lifecycle of proposals:
-  draft → ready → waiting_approval → approved | rejected | expired
+Priority queue for MissionProposals waiting for approval.
+Queue is in front of Approval: Proposal -> Queue -> Approval -> Mission.
 
-States:
-  - draft: being prepared, not yet visible
-  - ready: prepared and visible, pending submission
-  - waiting_approval: submitted, awaiting operator decision
-  - approved: operator approved → ready for execution
-  - rejected: operator rejected
-  - expired: timed out before decision
-
-Transitions:
-  draft -> ready (finalize)
-  ready -> waiting_approval (submit)
-  waiting_approval -> approved (approve)
-  waiting_approval -> rejected (reject)
-  waiting_approval -> expired (timeout)
-  approved -> completed (mission created)
-  rejected -> archived
-  expired -> archived
+Proposals expire if not approved within TTL.
+Expired proposals are NOT deleted — preserved for audit.
+Supports Draft -> Ready -> Waiting -> Approved/Rejected/Expired lifecycle.
 """
 
 from __future__ import annotations
 
 import time
-import uuid
+import heapq
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 
 
-# ── Types ──────────────────────────────────────────────────────────
+class ProposalState(Enum):
+    """Lifecycle states of a queued proposal."""
 
-
-class ProposalState(str, Enum):
     DRAFT = "draft"
     READY = "ready"
-    WAITING_APPROVAL = "waiting_approval"
+    WAITING = "waiting"  # submitted to approval
     APPROVED = "approved"
     REJECTED = "rejected"
     EXPIRED = "expired"
-    COMPLETED = "completed"
-    ARCHIVED = "archived"
 
 
-VALID_TRANSITIONS: Dict[ProposalState, Set[ProposalState]] = {
-    ProposalState.DRAFT: {ProposalState.READY},
-    ProposalState.READY: {ProposalState.WAITING_APPROVAL},
-    ProposalState.WAITING_APPROVAL: {ProposalState.APPROVED,
-                                      ProposalState.REJECTED,
-                                      ProposalState.EXPIRED},
-    ProposalState.APPROVED: {ProposalState.COMPLETED},
-    ProposalState.REJECTED: {ProposalState.ARCHIVED},
-    ProposalState.EXPIRED: {ProposalState.ARCHIVED},
-    ProposalState.COMPLETED: set(),
-    ProposalState.ARCHIVED: set(),
+_VALID_TRANSITIONS: Dict[ProposalState, set] = {
+    ProposalState.DRAFT: {ProposalState.READY, ProposalState.EXPIRED},
+    ProposalState.READY: {ProposalState.WAITING, ProposalState.DRAFT, ProposalState.EXPIRED},
+    ProposalState.WAITING: {ProposalState.APPROVED, ProposalState.REJECTED, ProposalState.EXPIRED},
+    ProposalState.APPROVED: set(),
+    ProposalState.REJECTED: set(),
+    ProposalState.EXPIRED: set(),
 }
-
-
-@dataclass
-class QueueItem:
-    """A proposal in the queue."""
-
-    proposal_id: str
-    state: ProposalState
-    title: str
-    description: str
-    created_at: float
-    updated_at: float
-    ttl_seconds: Optional[float] = None  # auto-expire after this many seconds
-    evidence: List[Dict[str, Any]] = field(default_factory=list)
-    package_id: Optional[str] = None
-    reason: Optional[str] = None  # approval/rejection reason
-    priority_score: float = 0.5
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-    @property
-    def is_terminal(self) -> bool:
-        return self.state in (
-            ProposalState.COMPLETED,
-            ProposalState.ARCHIVED,
-        )
-
-    @property
-    def is_pending(self) -> bool:
-        return self.state in (
-            ProposalState.DRAFT,
-            ProposalState.READY,
-            ProposalState.WAITING_APPROVAL,
-        )
-
-    @property
-    def age_seconds(self) -> float:
-        return time.time() - self.created_at
-
-
-# ── Errors ─────────────────────────────────────────────────────────
 
 
 class InvalidTransitionError(Exception):
     """Raised when an invalid state transition is attempted."""
 
-    def __init__(self, item_id: str, from_state: ProposalState, to_state: ProposalState):
+    def __init__(
+        self,
+        item_id: str,
+        from_state: ProposalState,
+        to_state: ProposalState,
+    ) -> None:
         super().__init__(
-            f"Cannot transition {item_id} from {from_state.value} to {to_state.value}"
+            f"Cannot transition {item_id} from "
+            f"{from_state.value} to {to_state.value}"
         )
-        self.item_id = item_id
-        self.from_state = from_state
-        self.to_state = to_state
 
 
-# ── Queue ──────────────────────────────────────────────────────────
+@dataclass
+class QueueItem:
+    """An item in the proposal queue."""
+
+    proposal_id: str
+    title: str
+    priority_score: float
+    state: ProposalState
+    created_at: float
+    ttl_seconds: float = 86400.0  # default 24h
+    updated_at: float = 0.0
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def is_expired(self) -> bool:
+        """Check if this item has exceeded its TTL."""
+        return (time.time() - self.created_at) > self.ttl_seconds
+
+    @property
+    def age_seconds(self) -> float:
+        return time.time() - self.created_at
+
+    def __repr__(self) -> str:
+        return (
+            f"QueueItem({self.proposal_id[:8]}...: "
+            f"priority={self.priority_score:.0f}, "
+            f"state={self.state.value})"
+        )
+
+    # ── Heap ordering (lower priority_score = higher priority) ─────
+
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, QueueItem):
+            return NotImplemented
+        # Primary: priority score (higher = more urgent)
+        if abs(self.priority_score - other.priority_score) > 0.01:
+            return self.priority_score > other.priority_score
+        # Secondary: older first
+        return self.created_at < other.created_at
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, QueueItem):
+            return NotImplemented
+        return self.proposal_id == other.proposal_id
+
+    def __hash__(self) -> int:
+        return hash(self.proposal_id)
 
 
 class ProposalQueue:
-    """
-    Manages the full lifecycle of proposals.
+    """Priority queue for proposals waiting for approval.
 
-    Thread-safe via simple lock for critical sections.
+    Ordering: Highest priority_score first, then oldest first.
+    Supports expiration, state machine, and audit trail.
     """
 
-    def __init__(self, default_ttl: Optional[float] = 3600.0):  # 1 hour
+    def __init__(self) -> None:
         self._items: Dict[str, QueueItem] = {}
-        self._default_ttl = default_ttl
-        self._on_transition: Dict[str, List[Callable]] = {}
+        self._heap: List[QueueItem] = []
+        self._history: List[QueueItem] = []
 
-    # ── Public API ─────────────────────────────────────────────────
+    # ── Properties ─────────────────────────────────────────────────
 
     @property
-    def count(self) -> int:
+    def size(self) -> int:
+        """Number of active items (not approved/rejected/expired)."""
         return len(self._items)
 
-    def add(self, title: str, description: str = "",
-            evidence: Optional[List[Dict[str, Any]]] = None,
-            priority_score: float = 0.5,
-            ttl_seconds: Optional[float] = None,
-            metadata: Optional[Dict[str, Any]] = None,
-            proposal_id: Optional[str] = None) -> QueueItem:
-        """Add a new proposal in DRAFT state."""
-        pid = proposal_id or f"prop_{uuid.uuid4().hex[:12]}"
+    @property
+    def waiting_count(self) -> int:
+        """Number of items in WAITING state."""
+        return sum(
+            1 for i in self._items.values()
+            if i.state == ProposalState.WAITING
+        )
+
+    @property
+    def ready_count(self) -> int:
+        return sum(
+            1 for i in self._items.values()
+            if i.state == ProposalState.READY
+        )
+
+    @property
+    def draft_count(self) -> int:
+        return sum(
+            1 for i in self._items.values()
+            if i.state == ProposalState.DRAFT
+        )
+
+    # ── CRUD ───────────────────────────────────────────────────────
+
+    def push(
+        self,
+        proposal_id: str,
+        title: str,
+        priority_score: float,
+        ttl_seconds: float = 86400.0,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> QueueItem:
+        """Add a new proposal to the queue as DRAFT."""
         item = QueueItem(
-            proposal_id=pid,
-            state=ProposalState.DRAFT,
+            proposal_id=proposal_id,
             title=title,
-            description=description,
+            priority_score=priority_score,
+            state=ProposalState.DRAFT,
             created_at=time.time(),
             updated_at=time.time(),
-            ttl_seconds=ttl_seconds or self._default_ttl,
-            evidence=evidence or [],
-            priority_score=priority_score,
+            ttl_seconds=ttl_seconds,
             metadata=metadata or {},
         )
-        self._items[pid] = item
+        self._items[proposal_id] = item
+        heapq.heappush(self._heap, item)
         return item
 
     def get(self, proposal_id: str) -> Optional[QueueItem]:
         return self._items.get(proposal_id)
 
     def remove(self, proposal_id: str) -> bool:
-        return self._items.pop(proposal_id, None) is not None
+        """Remove an item from active queue (moves to history)."""
+        item = self._items.pop(proposal_id, None)
+        if item is None:
+            return False
+        self._history.append(item)
+        return True
 
-    def transition(self, proposal_id: str, to_state: ProposalState,
-                   reason: Optional[str] = None) -> QueueItem:
-        """
-        Transition a proposal to a new state.
+    # ── State transitions ──────────────────────────────────────────
 
-        Raises InvalidTransitionError if disallowed.
-        """
+    def _transition(
+        self,
+        proposal_id: str,
+        target: ProposalState,
+    ) -> QueueItem:
+        """Apply state transition with validation."""
         item = self._items.get(proposal_id)
         if item is None:
-            raise ValueError(f"Proposal not found: {proposal_id}")
+            raise ValueError(f"Unknown proposal: {proposal_id}")
 
-        if to_state not in VALID_TRANSITIONS.get(item.state, set()):
-            raise InvalidTransitionError(proposal_id, item.state, to_state)
+        if target not in _VALID_TRANSITIONS.get(item.state, set()):
+            raise InvalidTransitionError(proposal_id, item.state, target)
 
-        item.state = to_state
-        item.updated_at = time.time()
-        if reason:
-            item.reason = reason
+        # Mutate (we own the dict, safe to use object.__setattr__)
+        object.__setattr__(item, "state", target)
+        object.__setattr__(item, "updated_at", time.time())
 
-        self._fire_callbacks(proposal_id, item.state)
+        # If terminal state, move to history
+        if target in (
+            ProposalState.APPROVED,
+            ProposalState.REJECTED,
+            ProposalState.EXPIRED,
+        ):
+            self._items.pop(proposal_id, None)
+            self._history.append(item)
+
         return item
 
-    def finalize(self, proposal_id: str) -> QueueItem:
-        """DRAFT -> READY."""
-        return self.transition(proposal_id, ProposalState.READY)
+    def mark_ready(self, proposal_id: str) -> QueueItem:
+        """Move from DRAFT -> READY."""
+        return self._transition(proposal_id, ProposalState.READY)
 
-    def submit(self, proposal_id: str) -> QueueItem:
-        """READY -> WAITING_APPROVAL."""
-        return self.transition(proposal_id, ProposalState.WAITING_APPROVAL)
+    def mark_waiting(self, proposal_id: str) -> QueueItem:
+        """Move from READY -> WAITING.
 
-    def approve(self, proposal_id: str, reason: Optional[str] = None) -> QueueItem:
-        """WAITING_APPROVAL -> APPROVED."""
-        return self.transition(proposal_id, ProposalState.APPROVED, reason)
+        Forwards to approval system.
+        """
+        item = self._transition(proposal_id, ProposalState.WAITING)
+        self._forward_to_approval(item)
+        return item
 
-    def reject(self, proposal_id: str, reason: Optional[str] = None) -> QueueItem:
-        """WAITING_APPROVAL -> REJECTED."""
-        return self.transition(proposal_id, ProposalState.REJECTED, reason)
+    def approve(self, proposal_id: str) -> QueueItem:
+        """Mark as APPROVED."""
+        return self._transition(proposal_id, ProposalState.APPROVED)
 
-    def complete(self, proposal_id: str) -> QueueItem:
-        """APPROVED -> COMPLETED."""
-        return self.transition(proposal_id, ProposalState.COMPLETED)
+    def reject(self, proposal_id: str) -> QueueItem:
+        """Mark as REJECTED."""
+        return self._transition(proposal_id, ProposalState.REJECTED)
 
-    def archive(self, proposal_id: str) -> QueueItem:
-        """REJECTED/EXPIRED -> ARCHIVED."""
-        item = self._items.get(proposal_id)
-        if item and item.state in (ProposalState.REJECTED, ProposalState.EXPIRED):
-            return self.transition(proposal_id, ProposalState.ARCHIVED)
-        raise ValueError(f"Cannot archive {proposal_id}: state must be rejected or expired")
+    def expire(self, proposal_id: str) -> QueueItem:
+        """Mark as EXPIRED."""
+        return self._transition(proposal_id, ProposalState.EXPIRED)
 
-    # ── Query ──────────────────────────────────────────────────────
+    # ── Queue operations ───────────────────────────────────────────
 
-    def list_by_state(self, *states: ProposalState) -> List[QueueItem]:
-        """List all items in given states."""
-        return [item for item in self._items.values()
-                if item.state in states]
+    def pop_ready(self) -> Optional[QueueItem]:
+        """Pop the highest-priority READY item for approval."""
+        # Rebuild heap to ensure consistency
+        self._rebuild()
+        while self._heap:
+            item = self._heap[0]
+            if item.proposal_id not in self._items:
+                heapq.heappop(self._heap)
+                continue
+            if item.state != ProposalState.READY:
+                heapq.heappop(self._heap)
+                continue
+            heapq.heappop(self._heap)
+            return self.mark_waiting(item.proposal_id)
+        return None
 
-    def list_pending(self) -> List[QueueItem]:
-        """DRAFT + READY + WAITING_APPROVAL."""
-        return self.list_by_state(
-            ProposalState.DRAFT,
-            ProposalState.READY,
-            ProposalState.WAITING_APPROVAL,
-        )
-
-    def list_waiting(self) -> List[QueueItem]:
-        """Items awaiting operator decision."""
-        return self.list_by_state(ProposalState.WAITING_APPROVAL)
+    def peek(self) -> Optional[QueueItem]:
+        """View highest-priority item without popping."""
+        self._rebuild()
+        while self._heap:
+            item = self._heap[0]
+            if item.proposal_id not in self._items:
+                heapq.heappop(self._heap)
+                continue
+            return item
+        return None
 
     def list_ready(self) -> List[QueueItem]:
-        """Items in READY state (prepared but not submitted)."""
-        return self.list_by_state(ProposalState.READY)
+        """List all READY items sorted by priority."""
+        return sorted(
+            [i for i in self._items.values() if i.state == ProposalState.READY],
+            key=lambda i: (-i.priority_score, i.created_at),
+        )
 
-    def list_approved(self) -> List[QueueItem]:
-        return self.list_by_state(ProposalState.APPROVED)
+    def list_active(self) -> List[QueueItem]:
+        """List all active items sorted by priority."""
+        return sorted(
+            self._items.values(),
+            key=lambda i: (-i.priority_score, i.created_at),
+        )
 
-    def list_by_package(self, package_id: str) -> List[QueueItem]:
-        return [item for item in self._items.values()
-                if item.package_id == package_id]
+    def list_history(
+        self,
+        limit: int = 50,
+    ) -> List[QueueItem]:
+        """List historical (terminal) items, newest first."""
+        return sorted(
+            self._history,
+            key=lambda i: i.updated_at,
+            reverse=True,
+        )[:limit]
 
-    def get_pending_count(self) -> int:
-        return len(self.list_pending())
-
-    def get_waiting_count(self) -> int:
-        return len(self.list_waiting())
-
-    # ── Maintenance ────────────────────────────────────────────────
+    # ── Expiration ─────────────────────────────────────────────────
 
     def expire_stale(self) -> int:
-        """
-        Expire proposals in WAITING_APPROVAL that exceed their TTL.
+        """Expire all items past their TTL.
+
         Returns count of expired items.
         """
         now = time.time()
-        expired = 0
+        expired_count = 0
         for item in list(self._items.values()):
-            if item.state != ProposalState.WAITING_APPROVAL:
-                continue
-            if item.ttl_seconds is None:
-                continue
-            age = now - item.updated_at
-            if age > item.ttl_seconds:
+            if (now - item.created_at) > item.ttl_seconds:
                 try:
-                    self.transition(item.proposal_id, ProposalState.EXPIRED,
-                                    reason="TTL expired")
-                    expired += 1
-                except InvalidTransitionError:
-                    pass
-        return expired
+                    self.expire(item.proposal_id)
+                    expired_count += 1
+                except (InvalidTransitionError, ValueError):
+                    continue
+        return expired_count
 
-    def cleanup_archived(self, max_age: float = 86400.0) -> int:
-        """Remove archived items older than max_age seconds."""
-        now = time.time()
-        to_remove = []
-        for item in self._items.values():
-            if item.state != ProposalState.ARCHIVED:
-                continue
-            if now - item.updated_at > max_age:
-                to_remove.append(item.proposal_id)
-        for pid in to_remove:
-            self.remove(pid)
-        return len(to_remove)
+    # ── Internal ───────────────────────────────────────────────────
 
-    # ── Events / Callbacks ─────────────────────────────────────────
+    def _rebuild(self) -> None:
+        """Rebuild heap from active items."""
+        self._heap = [i for i in self._heap if i.proposal_id in self._items]
+        heapq.heapify(self._heap)
 
-    def on_transition(self, state: ProposalState,
-                      callback: Callable[[str, ProposalState], None]) -> None:
-        """Register a callback for state transitions to a specific state."""
-        key = state.value
-        if key not in self._on_transition:
-            self._on_transition[key] = []
-        self._on_transition[key].append(callback)
+    @staticmethod
+    def _forward_to_approval(item: QueueItem) -> None:
+        """Forward a waiting proposal to the approval system."""
+        try:
+            from sam.operations.approval import queue_approval
+            queue_approval(
+                item_type="brain_proposal",
+                item_id=item.proposal_id,
+                item_summary=item.title,
+                requires_approval=True,
+            )
+        except Exception:
+            pass  # graceful fallback
 
-    def _fire_callbacks(self, proposal_id: str, state: ProposalState) -> None:
-        key = state.value
-        for cb in self._on_transition.get(key, []):
-            try:
-                cb(proposal_id, state)
-            except Exception:
-                pass
+    def __repr__(self) -> str:
+        return (
+            f"ProposalQueue(size={self.size}, "
+            f"ready={self.ready_count}, "
+            f"waiting={self.waiting_count})"
+        )
 
 
-# ── Convenience ────────────────────────────────────────────────────
+# ── Convenience ───────────────────────────────────────────────────────
 
 
-def create_draft(title: str, **kwargs) -> QueueItem:
-    """One-shot: create a draft proposal."""
-    queue = ProposalQueue()
-    return queue.add(title=title, **kwargs)
+def create_draft(
+    proposal_id: str,
+    title: str,
+    priority_score: float,
+    queue: Optional[ProposalQueue] = None,
+) -> QueueItem:
+    """Create a draft proposal in the queue."""
+    q = queue or ProposalQueue()
+    return q.push(proposal_id, title, priority_score)

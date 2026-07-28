@@ -1,284 +1,210 @@
 """
 OP-253 — Correlation Engine.
 
-Connect related findings into correlated findings.
+Correlates OperationalFindings from the Analyzer into CorrelationGroups
+using rule-based logic. Findings are related if they share evidence,
+resources, or follow known patterns.
 
-Built-in correlations:
-  - approval_backlog + trust_degradation (approval macet → trust turun)
-  - mission_failure + replay_degradation (mission gagal + replay buruk)
-  - lock_contention + queue_stall (lock conflict + scheduler queue macet)
-  - anomaly_cluster + high_telemetry (banyak anomaly + traffic tinggi)
-  - notification_alert + failed_missions (notifikasi error + mission gagal)
-  - low_trust + high_telemetry (trust turun + aktivitas mencurigakan)
-
-Each correlation produces a single CorrelatedFinding with:
-  - source finding IDs
-  - combined severity (max of sources)
-  - combined evidence
-  - generated title + description
+Pure transformation — no side effects.
+Only rule-based — no statistics, AI, or ML.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-
-# ── Data ───────────────────────────────────────────────────────────
+from .analyzer import OperationalFinding
 
 
 @dataclass
 class CorrelationDef:
-    """Definition of a correlation between two or more finding types."""
+    """Definition of a correlation rule."""
 
     correlation_id: str
-    title: str
+    name: str
     description: str
-    source_types: Tuple[str, ...]
-    combine_fn: str = "or"  # how to combine: "or" | "and"
+    required_finding_ids: List[str]  # all must be present
+    min_confidence: float = 0.0
+
+    def matches(self, finding_ids: set) -> bool:
+        return set(self.required_finding_ids).issubset(finding_ids)
 
 
 @dataclass
 class CorrelatedFinding:
-    """
-    A finding produced by correlating two or more source findings.
-
-    Linked back to source finding IDs for traceability.
-    """
+    """A group of related findings."""
 
     correlation_id: str
-    source_finding_ids: List[str]
-    title: str
+    name: str
     description: str
-    severity: str  # "info" | "warning" | "critical"
     confidence: float
-    evidence: List[Dict[str, Any]]
-    affected_sources: List[str]
-    recommended_actions: List[str]
+    explanation: str
+    related_findings: List[OperationalFinding]
+    shared_evidence: List[Dict[str, Any]]
+
+    @property
+    def severity(self) -> str:
+        """Highest severity among related findings."""
+        severities = {f.severity.value for f in self.related_findings}
+        if "critical" in severities:
+            return "critical"
+        if "warning" in severities:
+            return "warning"
+        return "info"
+
+    def __repr__(self) -> str:
+        return (
+            f"CorrelatedFinding({self.correlation_id}: "
+            f"{self.name}, {len(self.related_findings)} findings, "
+            f"conf={self.confidence:.2f})"
+        )
 
 
-# ── Engine ─────────────────────────────────────────────────────────
+# ── Built-in correlation rules ────────────────────────────────────────
+
+_BUILTIN_CORRELATIONS: List[CorrelationDef] = [
+    CorrelationDef(
+        correlation_id="governance_issue",
+        name="Potential Governance Issue",
+        description="Approval backlog combined with trust degradation suggests governance risk",
+        required_finding_ids=["approval_backlog", "trust_degradation"],
+        min_confidence=0.6,
+    ),
+    CorrelationDef(
+        correlation_id="systemic_failure",
+        name="Systemic Failure Pattern",
+        description="Multiple mission failures with anomalies suggest systemic issue",
+        required_finding_ids=["mission_failure", "anomaly_cluster"],
+        min_confidence=0.7,
+    ),
+    CorrelationDef(
+        correlation_id="operational_gridlock",
+        name="Operational Gridlock",
+        description="Queue stalled with lock contention and approval backlog blocks progress",
+        required_finding_ids=["queue_stall", "lock_contention", "approval_backlog"],
+        min_confidence=0.5,
+    ),
+    CorrelationDef(
+        correlation_id="approval_cascade",
+        name="Approval Cascade Risk",
+        description="Notification alerts with pending approvals suggest cascading delays",
+        required_finding_ids=["notification_alert", "approval_backlog"],
+        min_confidence=0.5,
+    ),
+    CorrelationDef(
+        correlation_id="trust_crisis",
+        name="Trust Crisis Risk",
+        description="Multiple failures with degraded trust signal a trust crisis",
+        required_finding_ids=["trust_degradation", "mission_failure"],
+        min_confidence=0.6,
+    ),
+    CorrelationDef(
+        correlation_id="idle_with_alerts",
+        name="Idle System with Alerts",
+        description="System idle but errors persist — may need maintenance",
+        required_finding_ids=["system_idle", "notification_alert"],
+        min_confidence=0.4,
+    ),
+]
 
 
 class CorrelationEngine:
+    """Correlates findings into groups using rule-based matching.
+
+    Rules require specific finding IDs to all be present.
+    CorrelationGroups include shared evidence and explanations.
     """
-    Detects correlations between findings.
 
-    Uses a registry of CorrelationDef to detect patterns.
-    """
-
-    def __init__(self):
-        self._correlations: Dict[str, CorrelationDef] = {}
-        self._last_correlated: List[CorrelatedFinding] = []
-        self._register_defaults()
-
-    # ── Public API ─────────────────────────────────────────────────
+    def __init__(self) -> None:
+        self._correlations: List[CorrelationDef] = list(_BUILTIN_CORRELATIONS)
+        self._last_groups: List[CorrelatedFinding] = []
 
     @property
-    def last_correlated(self) -> List[CorrelatedFinding]:
-        return self._last_correlated
-
-    @property
-    def correlation_count(self) -> int:
-        return len(self._correlations)
+    def correlations(self) -> List[CorrelationDef]:
+        return list(self._correlations)
 
     def add_correlation(self, corr: CorrelationDef) -> None:
-        self._correlations[corr.correlation_id] = corr
+        """Register a custom correlation rule."""
+        self._correlations.append(corr)
 
-    def remove_correlation(self, correlation_id: str) -> bool:
-        return self._correlations.pop(correlation_id, None) is not None
-
-    def find_correlations(
-        self, finding_ids: Dict[str, Dict[str, Any]]
-    ) -> List[CorrelatedFinding]:
-        """
-        Given a dict of {finding_id: finding_data}, find correlated findings.
-
-        finding_data should have keys: severity, confidence, evidence, title, etc.
-        """
-        results: List[CorrelatedFinding] = []
-
-        for corr_id, corr_def in self._correlations.items():
-            matched = self._match(corr_def, finding_ids)
-            if matched:
-                correlated = self._build_correlated(corr_def, matched)
-                results.append(correlated)
-
-        self._last_correlated = results
-        return results
-
-    def find_from_finding_list(
-        self, findings: List[Dict[str, Any]]
-    ) -> List[CorrelatedFinding]:
-        """
-        Convenience: accept list of finding dicts instead of dict-of-dicts.
-        """
-        finding_ids = {}
-        for f in findings:
-            fid = f.get("finding_id", f.get("id", "unknown"))
-            finding_ids[fid] = f
-        return self.find_correlations(finding_ids)
-
-    # ── Internal ───────────────────────────────────────────────────
-
-    def _register_defaults(self) -> None:
-        """Register built-in correlations."""
-        defaults = [
-            CorrelationDef(
-                correlation_id="approval_trust_cascade",
-                title="Approval Backlog + Trust Degradation",
-                description=(
-                    "Pending approvals are high while trust scores are dropping. "
-                    "This cascade suggests the approval bottleneck is eroding "
-                    "system trust in mission_controller."
-                ),
-                source_types=("approval_backlog", "trust_degradation"),
-            ),
-            CorrelationDef(
-                correlation_id="mission_replay_failure_chain",
-                title="Mission Failure + Replay Degradation",
-                description=(
-                    "Mission failures coincide with poor replay success rates. "
-                    "Failed missions may not be recoverable via replay."
-                ),
-                source_types=("mission_failure", "replay_degradation"),
-            ),
-            CorrelationDef(
-                correlation_id="lock_queue_deadlock",
-                title="Lock Contention + Queue Stall",
-                description=(
-                    "Lock contention and scheduler queue stall detected together. "
-                    "Possible deadlock or resource starvation scenario."
-                ),
-                source_types=("lock_contention", "queue_stall"),
-            ),
-            CorrelationDef(
-                correlation_id="anomaly_traffic_burst",
-                title="Anomaly Cluster + High Telemetry",
-                description=(
-                    "Multiple anomalies coinciding with elevated event rate. "
-                    "System may be under stress or attack pattern."
-                ),
-                source_types=("anomaly_cluster", "high_telemetry"),
-            ),
-            CorrelationDef(
-                correlation_id="failure_notification_storm",
-                title="Notification Alert + Mission Failures",
-                description=(
-                    "Error-level notifications paired with failed missions. "
-                    "Indicates systemic issue rather than isolated failures."
-                ),
-                source_types=("notification_alert", "mission_failure"),
-            ),
-            CorrelationDef(
-                correlation_id="trust_telemetry_anomaly",
-                title="Low Trust + High Telemetry",
-                description=(
-                    "Trust is dropping while telemetry rates spike. "
-                    "Suspicious activity or system degradation pattern."
-                ),
-                source_types=("trust_degradation", "high_telemetry"),
-            ),
-        ]
-        for corr in defaults:
-            self._correlations[corr.correlation_id] = corr
-
-    def _match(
-        self, corr_def: CorrelationDef, finding_ids: Dict[str, Dict[str, Any]]
-    ) -> Optional[List[Tuple[str, Dict[str, Any]]]]:
-        matched: List[Tuple[str, Dict[str, Any]]] = []
-        for stype in corr_def.source_types:
-            if stype in finding_ids:
-                matched.append((stype, finding_ids[stype]))
-
-        if corr_def.combine_fn == "and":
-            return matched if len(matched) == len(corr_def.source_types) else None
-        else:
-            # "or" — at least one
-            return matched if matched else None
-
-    def _build_correlated(
+    def correlate(
         self,
-        corr_def: CorrelationDef,
-        matches: List[Tuple[str, Dict[str, Any]]],
-    ) -> CorrelatedFinding:
-        severities = {"info": 0, "warning": 1, "critical": 2}
-        rev = {0: "info", 1: "warning", 2: "critical"}
+        findings: List[OperationalFinding],
+    ) -> List[CorrelatedFinding]:
+        """Run all correlation rules against findings.
 
-        max_sev = max(
-            (severities.get(m[1].get("severity", "info"), 0) for m in matches),
-            default=0,
-        )
-        # Combined confidence: weighted average, capped
-        total_conf = sum(
-            m[1].get("confidence", 0.5) for m in matches
-        )
-        avg_conf = round(total_conf / len(matches), 2) if matches else 0.5
+        Returns list of CorrelatedFinding (empty if no correlations).
+        """
+        finding_map = {f.finding_id: f for f in findings}
+        finding_ids = set(finding_map.keys())
+        groups: List[CorrelatedFinding] = []
 
-        # Combined evidence
-        evidence: List[Dict[str, Any]] = []
-        for stype, fdata in matches:
-            src_evidence = fdata.get("evidence", [])
-            for e in src_evidence:
-                evidence.append({
-                    **e,
-                    "_source_finding": stype,
-                })
+        for corr in self._correlations:
+            if not corr.matches(finding_ids):
+                continue
 
-        # Affected sources
-        sources: List[str] = []
-        for stype, fdata in matches:
-            for r in fdata.get("affected_resources", []):
-                if r not in sources:
-                    sources.append(r)
+            matched = [
+                finding_map[fid]
+                for fid in corr.required_finding_ids
+                if fid in finding_map
+            ]
+            if not matched:
+                continue
 
-        # Recommended actions
-        actions: List[str] = []
-        for stype, fdata in matches:
-            for a in fdata.get("recommended_actions", []):
-                if a not in actions:
-                    actions.append(a)
+            # Shared evidence = union of all evidence from matched findings
+            shared_evidence: List[Dict[str, Any]] = []
+            seen: set = set()
+            for f in matched:
+                for ev in f.evidence:
+                    key = str(ev)
+                    if key not in seen:
+                        seen.add(key)
+                        shared_evidence.append(ev)
 
-        finding_ids_list = [m[0] for m in matches]
+            # Confidence = average of matched findings
+            avg_confidence = sum(f.confidence for f in matched) / len(matched)
 
-        return CorrelatedFinding(
-            correlation_id=corr_def.correlation_id,
-            source_finding_ids=finding_ids_list,
-            title=corr_def.title,
-            description=corr_def.description,
-            severity=rev.get(max_sev, "info"),
-            confidence=avg_conf,
-            evidence=evidence,
-            affected_sources=sources,
-            recommended_actions=actions,
-        )
+            # Build human-readable explanation
+            finding_names = [f.title for f in matched]
+            explanation = (
+                f"{corr.description}. "
+                f"Triggered by: {' + '.join(finding_names)}."
+            )
+
+            groups.append(CorrelatedFinding(
+                correlation_id=corr.correlation_id,
+                name=corr.name,
+                description=corr.description,
+                confidence=round(min(avg_confidence, 1.0), 2),
+                explanation=explanation,
+                related_findings=matched,
+                shared_evidence=shared_evidence,
+            ))
+
+        self._last_groups = groups
+        return groups
+
+    @property
+    def last_groups(self) -> List[CorrelatedFinding]:
+        return list(self._last_groups)
 
 
-# ── Convenience ────────────────────────────────────────────────────
-
-
-def correlate_findings(
-    findings: List[Dict[str, Any]]
-) -> List[CorrelatedFinding]:
-    """One-shot: correlate a list of finding dicts."""
-    engine = CorrelationEngine()
-    return engine.find_from_finding_list(findings)
+# ── Helper ────────────────────────────────────────────────────────────
 
 
 def build_finding_dict(
-    finding_id: str,
-    severity: str = "info",
-    confidence: float = 0.5,
-    evidence: Optional[List[Dict[str, Any]]] = None,
-    affected_resources: Optional[List[str]] = None,
-    recommended_actions: Optional[List[str]] = None,
-) -> Dict[str, Any]:
-    """Build a finding dict compatible with correlate_findings."""
-    return {
-        "finding_id": finding_id,
-        "severity": severity,
-        "confidence": confidence,
-        "evidence": evidence or [],
-        "affected_resources": affected_resources or [],
-        "recommended_actions": recommended_actions or [],
-    }
+    findings: List[OperationalFinding],
+) -> Dict[str, OperationalFinding]:
+    """Build a finding_id -> finding lookup dict."""
+    return {f.finding_id: f for f in findings}
+
+
+# ── Convenience ───────────────────────────────────────────────────────
+
+
+def correlate_findings(
+    findings: List[OperationalFinding],
+) -> List[CorrelatedFinding]:
+    """One-shot convenience."""
+    return CorrelationEngine().correlate(findings)

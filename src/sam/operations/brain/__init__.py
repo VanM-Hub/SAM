@@ -51,6 +51,7 @@ from .correlation import (
 from .priority import (
     PriorityEngine,
     PriorityScore,
+    PriorityCategory,
     PriorityConfig,
     prioritize,
     build_rec_for_priority,
@@ -79,6 +80,7 @@ from .conversation_v2 import (
     ConversationContext,
     BrainQuery,
     BrainAnswer,
+    QueryType,
     ask_brain_v2,
     classify_query,
 )
@@ -180,6 +182,7 @@ __all__ = [
     "build_finding_dict",
     "PriorityEngine",
     "PriorityScore",
+    "PriorityCategory",
     "PriorityConfig",
     "prioritize",
     "build_rec_for_priority",
@@ -200,6 +203,7 @@ __all__ = [
     "ConversationContext",
     "BrainQuery",
     "BrainAnswer",
+    "QueryType",
     "ask_brain_v2",
     "classify_query",
     "ProactivePipeline",

@@ -1,259 +1,263 @@
 """
 OP-254 — Priority Engine.
 
-Rank recommendations by combining:
-  - urgency (how time-sensitive)
-  - impact (how bad if ignored)
-  - confidence (how sure we are)
-  - risk (how risky to ignore)
-  - age (how long this has been pending)
-  - dependency (how many other issues depend on this)
+Assigns priority scores (0–100) and categories (CRITICAL–INFO)
+to OperationalFindings based on severity, impact, confidence,
+trust, age, dependency, resource count, and trend.
 
-Output: PriorityScore — a weighted composite score.
+Pure transformation — no side effects.
 """
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+from .analyzer import OperationalFinding, Severity
 
 
-# ── Data ───────────────────────────────────────────────────────────
+class PriorityCategory(Enum):
+    """Priority categories derived from score."""
 
-
-@dataclass
-class PriorityScore:
-    """
-    Composite priority score for a recommendation.
-
-    score: 0.0 (lowest) to 1.0 (highest priority).
-    Each factor contributes 0.0-1.0 independently.
-    """
-
-    item_id: str
-    score: float
-    urgency: float  # 0.0-1.0
-    impact: float  # 0.0-1.0
-    confidence: float  # 0.0-1.0
-    risk: float  # 0.0-1.0
-    age: float  # 0.0-1.0
-    dependency: float  # 0.0-1.0
-
-    factors: Dict[str, float] = field(default_factory=dict)
-
-    @property
-    def label(self) -> str:
-        if self.score >= 0.8:
-            return "critical"
-        elif self.score >= 0.6:
-            return "high"
-        elif self.score >= 0.4:
-            return "medium"
-        elif self.score >= 0.2:
-            return "low"
-        return "trivial"
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    INFO = "info"
 
 
 @dataclass
 class PriorityConfig:
-    """
-    Weight configuration for priority scoring.
+    """Scoring weights and thresholds."""
 
-    All weights sum to 1.0 by default.
-    """
-
-    urgency_weight: float = 0.25
-    impact_weight: float = 0.25
+    severity_weight: float = 0.35
+    impact_weight: float = 0.20
     confidence_weight: float = 0.15
-    risk_weight: float = 0.15
-    age_weight: float = 0.10
-    dependency_weight: float = 0.10
+    trust_weight: float = 0.10
+    age_weight: float = 0.05
+    dependency_weight: float = 0.05
+    resource_weight: float = 0.05
+    trend_weight: float = 0.05
+
+    # Severity base scores
+    critical_base: float = 90.0
+    warning_base: float = 60.0
+    info_base: float = 30.0
+
+    # Category thresholds
+    critical_threshold: float = 80.0
+    high_threshold: float = 60.0
+    medium_threshold: float = 40.0
+    low_threshold: float = 20.0
 
 
-# ── Engine ─────────────────────────────────────────────────────────
+_DEFAULT_CONFIG = PriorityConfig()
+
+
+@dataclass
+class PriorityScore:
+    """Calculated priority for a finding."""
+
+    finding_id: str
+    score: float  # 0–100
+    category: PriorityCategory
+    components: Dict[str, float] = field(default_factory=dict)
+
+    @property
+    def category_value(self) -> str:
+        return self.category.value
+
+    @property
+    def is_actionable(self) -> bool:
+        return self.category in (
+            PriorityCategory.CRITICAL,
+            PriorityCategory.HIGH,
+            PriorityCategory.MEDIUM,
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"PriorityScore({self.finding_id}: "
+            f"{self.score:.0f}/{self.category_value})"
+        )
+
+
+def _severity_base(severity: Severity, config: PriorityConfig) -> float:
+    mapping = {
+        Severity.CRITICAL: config.critical_base,
+        Severity.WARNING: config.warning_base,
+        Severity.INFO: config.info_base,
+    }
+    return mapping.get(severity, config.info_base)
+
+
+def _estimate_impact_score(finding: OperationalFinding) -> float:
+    """Estimate impact score (0–100) from finding context."""
+    high_impact_ids = {
+        "mission_failure",
+        "trust_degradation",
+        "anomaly_cluster",
+    }
+    medium_impact_ids = {
+        "queue_stall",
+        "notification_alert",
+    }
+    if finding.finding_id in high_impact_ids:
+        return 80.0
+    if finding.finding_id in medium_impact_ids:
+        return 50.0
+    return 20.0
+
+
+def _estimate_resource_score(finding: OperationalFinding) -> float:
+    """More affected resources = higher score."""
+    count = len(finding.affected_resources)
+    if count >= 4:
+        return 80.0
+    if count >= 2:
+        return 50.0
+    return 20.0
+
+
+def _estimate_trend_score(finding: OperationalFinding) -> float:
+    """Simple trend: recurring findings get higher score."""
+    # Currently static — future versions can track historical frequency
+    return 50.0
+
+
+def _estimate_dependency_score(finding: OperationalFinding) -> float:
+    """Some findings block others."""
+    blocking_ids = {
+        "mission_failure",
+        "trust_degradation",
+        "lock_contention",
+        "queue_stall",
+    }
+    return 70.0 if finding.finding_id in blocking_ids else 30.0
 
 
 class PriorityEngine:
-    """
-    Ranks recommendations by priority.
+    """Assigns priority to findings.
 
-    Input: list of recommendation dicts (or objects with .priority, .confidence, etc.)
-    Output: sorted list of PriorityScore.
-
-    Each recommendation dict should have:
-      - id (str)
-      - priority (str) — "low", "medium", "high", "critical"
-      - confidence (float 0-1)
-      - age_seconds (float, optional) — how long since created
-      - dependencies (list, optional) — other rec IDs that depend on this
-      - affected_count (int, optional) — number of resources affected
-      - title (str, optional)
+    Combines multiple weighted factors into a score 0–100.
+    Maps score to category CRITICAL / HIGH / MEDIUM / LOW / INFO.
     """
 
-    def __init__(self, config: Optional[PriorityConfig] = None):
-        self._config = config or PriorityConfig()
-        self._last_scores: List[PriorityScore] = []
-
-    # ── Public API ─────────────────────────────────────────────────
+    def __init__(
+        self,
+        config: Optional[PriorityConfig] = None,
+    ) -> None:
+        self._config = config or _DEFAULT_CONFIG
+        self._last_scores: Dict[str, PriorityScore] = {}
 
     @property
     def config(self) -> PriorityConfig:
         return self._config
 
-    @config.setter
-    def config(self, cfg: PriorityConfig) -> None:
-        self._config = cfg
+    def prioritize(
+        self,
+        findings: List[OperationalFinding],
+    ) -> List[PriorityScore]:
+        """Assign priority to each finding.
 
-    @property
-    def last_scores(self) -> List[PriorityScore]:
-        return self._last_scores
-
-    def rank(self, recommendations: List[Dict[str, Any]]) -> List[PriorityScore]:
-        """
-        Rank recommendations by priority.
-
-        Returns sorted list (highest priority first).
+        Returns scores sorted descending (highest priority first).
         """
         scores: List[PriorityScore] = []
-        max_age = self._find_max_age(recommendations)
 
-        for rec in recommendations:
-            score = self._score_one(rec, max_age)
-            scores.append(score)
+        for f in findings:
+            components: Dict[str, float] = {}
 
-        scores.sort(key=lambda x: x.score, reverse=True)
-        self._last_scores = scores
+            # Severity
+            sev_score = _severity_base(f.severity, self._config)
+            components["severity"] = round(sev_score * self._config.severity_weight, 2)
+
+            # Impact
+            imp_score = _estimate_impact_score(f)
+            components["impact"] = round(imp_score * self._config.impact_weight, 2)
+
+            # Confidence
+            conf_score = f.confidence * 100.0
+            components["confidence"] = round(conf_score * self._config.confidence_weight, 2)
+
+            # Trust
+            trust_score = 50.0  # neutral default
+            for ev in f.evidence:
+                if "trust" in str(ev).lower():
+                    trust_score = 30.0  # degraded trust
+                    break
+            components["trust"] = round(trust_score * self._config.trust_weight, 2)
+
+            # Age (newer = higher priority)
+            import time
+            age_seconds = time.time() - f.timestamp
+            age_score = max(0.0, 100.0 - min(age_seconds / 60.0, 100.0))
+            components["age"] = round(age_score * self._config.age_weight, 2)
+
+            # Dependency
+            dep_score = _estimate_dependency_score(f)
+            components["dependency"] = round(dep_score * self._config.dependency_weight, 2)
+
+            # Resource count
+            res_score = _estimate_resource_score(f)
+            components["resource_count"] = round(res_score * self._config.resource_weight, 2)
+
+            # Trend
+            trend_score = _estimate_trend_score(f)
+            components["trend"] = round(trend_score * self._config.trend_weight, 2)
+
+            # Total score
+            total = round(sum(components.values()), 1)
+
+            # Category
+            if total >= self._config.critical_threshold:
+                cat = PriorityCategory.CRITICAL
+            elif total >= self._config.high_threshold:
+                cat = PriorityCategory.HIGH
+            elif total >= self._config.medium_threshold:
+                cat = PriorityCategory.MEDIUM
+            elif total >= self._config.low_threshold:
+                cat = PriorityCategory.LOW
+            else:
+                cat = PriorityCategory.INFO
+
+            scores.append(PriorityScore(
+                finding_id=f.finding_id,
+                score=total,
+                category=cat,
+                components=components,
+            ))
+
+        # Sort descending by score
+        scores.sort(key=lambda s: s.score, reverse=True)
+        self._last_scores = {s.finding_id: s for s in scores}
         return scores
 
-    def get_highest(self, recommendations: List[Dict[str, Any]]) -> Optional[PriorityScore]:
-        """Get the single highest priority item."""
-        scores = self.rank(recommendations)
-        return scores[0] if scores else None
-
-    def get_top_n(self, recommendations: List[Dict[str, Any]], n: int = 3) -> List[PriorityScore]:
-        """Get top N items."""
-        return self.rank(recommendations)[:n]
-
-    def get_critical(self, recommendations: List[Dict[str, Any]]) -> List[PriorityScore]:
-        """Get items with score >= 0.8."""
-        return [s for s in self.rank(recommendations) if s.score >= 0.8]
-
-    def get_high(self, recommendations: List[Dict[str, Any]]) -> List[PriorityScore]:
-        """Get items with score >= 0.6."""
-        return [s for s in self.rank(recommendations) if s.score >= 0.6]
-
-    # ── Internal ───────────────────────────────────────────────────
-
-    def _score_one(self, rec: Dict[str, Any], max_age: float) -> PriorityScore:
-        item_id = rec.get("id", rec.get("recommendation_id", "unknown"))
-
-        # Urgency: from priority label
-        urgency = self._urgency_from_priority(rec.get("priority", "low"))
-
-        # Impact: from affected count (if available), else from priority
-        affected = rec.get("affected_count", 0)
-        impact = min(1.0, affected / 10.0) if affected else (
-            0.9 if rec.get("priority") == "critical" else
-            0.7 if rec.get("priority") == "high" else
-            0.5 if rec.get("priority") == "medium" else 0.3
-        )
-
-        # Confidence: direct
-        confidence = min(1.0, max(0.0, rec.get("confidence", 0.5)))
-
-        # Risk: from severity in title/description, else from priority
-        risk = self._risk_from_rec(rec)
-
-        # Age: normalize against max
-        age = rec.get("age_seconds", 0.0)
-        age_factor = min(1.0, age / max_age) if max_age > 0 else 0.0
-
-        # Dependency: count of dependents
-        deps = rec.get("dependencies", [])
-        dependency = min(1.0, len(deps) / 5.0) if deps else 0.0
-
-        # Weighted composite
-        w = self._config
-        score = (
-            w.urgency_weight * urgency
-            + w.impact_weight * impact
-            + w.confidence_weight * confidence
-            + w.risk_weight * risk
-            + w.age_weight * age_factor
-            + w.dependency_weight * dependency
-        )
-
-        factors = {
-            "urgency": urgency,
-            "impact": impact,
-            "confidence": confidence,
-            "risk": risk,
-            "age": age_factor,
-            "dependency": dependency,
-        }
-
-        return PriorityScore(
-            item_id=item_id,
-            score=round(score, 4),
-            urgency=round(urgency, 4),
-            impact=round(impact, 4),
-            confidence=round(confidence, 4),
-            risk=round(risk, 4),
-            age=round(age_factor, 4),
-            dependency=round(dependency, 4),
-            factors=factors,
-        )
-
-    def _urgency_from_priority(self, priority: str) -> float:
-        mapping = {
-            "critical": 1.0,
-            "high": 0.8,
-            "medium": 0.5,
-            "low": 0.2,
-            "trivial": 0.0,
-        }
-        return mapping.get(priority, 0.2)
-
-    def _risk_from_rec(self, rec: Dict[str, Any]) -> float:
-        title = (rec.get("title", "") or "").lower()
-        desc = (rec.get("description", "") or "").lower()
-        combined = title + " " + desc
-
-        risk_keywords = ["failure", "crash", "loss", "deadlock", "stall",
-                         "blocked", "timeout", "overflow", "corrupt"]
-        found = sum(1 for kw in risk_keywords if kw in combined)
-        return min(1.0, found * 0.25)
-
-    def _find_max_age(self, recommendations: List[Dict[str, Any]]) -> float:
-        ages = [r.get("age_seconds", 0.0) for r in recommendations]
-        return max(ages) if ages else 1.0
+    def get_score(self, finding_id: str) -> Optional[PriorityScore]:
+        return self._last_scores.get(finding_id)
 
 
-# ── Convenience ────────────────────────────────────────────────────
+# ── Convenience ───────────────────────────────────────────────────────
 
 
-def prioritize(recommendations: List[Dict[str, Any]]) -> List[PriorityScore]:
-    """One-shot: rank and return sorted PriorityScore list."""
-    engine = PriorityEngine()
-    return engine.rank(recommendations)
+def prioritize(
+    findings: List[OperationalFinding],
+) -> List[PriorityScore]:
+    """One-shot: prioritize findings."""
+    return PriorityEngine().prioritize(findings)
 
 
 def build_rec_for_priority(
-    rec_id: str,
-    priority: str = "medium",
-    confidence: float = 0.5,
-    age_seconds: float = 0.0,
-    affected_count: int = 1,
-    dependencies: Optional[List[str]] = None,
-) -> Dict[str, Any]:
-    """Build a recommendation dict compatible with prioritize()."""
-    return {
-        "id": rec_id,
-        "recommendation_id": rec_id,
-        "priority": priority,
-        "confidence": confidence,
-        "age_seconds": age_seconds,
-        "affected_count": affected_count,
-        "dependencies": dependencies or [],
-    }
+    finding: OperationalFinding,
+    score: PriorityScore,
+) -> str:
+    """Build a recommended action label based on priority."""
+    if score.category == PriorityCategory.CRITICAL:
+        return "Immediate escalation recommended"
+    if score.category == PriorityCategory.HIGH:
+        return "Prioritize for next action"
+    if score.category == PriorityCategory.MEDIUM:
+        return "Schedule for review"
+    if score.category == PriorityCategory.LOW:
+        return "Monitor and revisit"
+    return "Informational — no action required"
