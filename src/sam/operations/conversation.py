@@ -46,9 +46,13 @@ class ConversationObject:
     sam_confidence: float = 0.0
 
     # ====================================================================
-    # Facts — apa yang diketahui pasti
+    # Facts — inferred knowledge (what SAM knows for certain)
     # ====================================================================
     facts: List[str] = field(default_factory=list)
+
+    # ====================================================================
+    # Evidence — raw machine observations, before inference
+    # ====================================================================
     evidence: List[str] = field(default_factory=list)
 
     # ====================================================================
@@ -64,9 +68,14 @@ class ConversationObject:
     predictions: List[str] = field(default_factory=list)
 
     # ====================================================================
-    # Recommendations
+    # Recommendations — what SAM suggests (not yet decided)
     # ====================================================================
     recommendations: List[str] = field(default_factory=list)
+
+    # ====================================================================
+    # Decisions — what SAM has already decided
+    # ====================================================================
+    decisions: List[str] = field(default_factory=list)
 
     # ====================================================================
     # Activity History — perubahan terakhir
