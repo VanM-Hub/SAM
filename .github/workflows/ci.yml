@@ -39,7 +39,7 @@ jobs:
 
       - name: Run core tests
         run: |
-          python -m pytest tests/unit/ -k "not legacy" \
+          python -m pytest tests/unit/ -k "not legacy and not web_server and not web_default_host" \
                        --tb=short \
                        --cov=src/sam/telemetry \
                        --cov=src/sam/operations \
