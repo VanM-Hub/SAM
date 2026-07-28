@@ -488,6 +488,11 @@ class OperationsConsole(QMainWindow):
 # Entry Point
 # ============================================================================
 
+def desktop_entry():
+    """Entry point for `sam-desktop` console_scripts."""
+    run()
+
+
 def run():
     import sys as _sys
     app = QApplication.instance() or QApplication(_sys.argv)

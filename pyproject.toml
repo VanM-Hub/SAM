@@ -1,3 +1,82 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sam-ops"
+version = "4.12.0"
+description = "SAM — Operating System for AI Operations"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "VanM", email = "vanmalaka@gmail.com"},
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "structlog>=21.0",
+    "pydantic>=1.10,<3",
+]
+
+[project.optional-dependencies]
+console = [
+    "rich>=12.0",
+    "typer>=0.9",
+    "pyyaml>=6.0",
+]
+desktop = [
+    "PySide6>=6.5",
+]
+server = [
+    "fastapi>=0.100",
+    "uvicorn>=0.20",
+    "httpx>=0.24",
+    "jinja2>=3.0",
+    "aiosqlite>=0.19",
+]
+all = [
+    "sam-ops[console,desktop,server]",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pytest-asyncio>=0.21",
+    "ruff>=0.3",
+    "build>=1.0",
+    "wheel>=0.40",
+    "setuptools>=64",
+]
+
+[project.urls]
+Homepage = "https://github.com/VanM-Hub/SAM"
+Repository = "https://github.com/VanM-Hub/SAM"
+Documentation = "https://github.com/VanM-Hub/SAM#readme"
+
+[project.scripts]
+sam = "sam.cli.main:main"
+sam-console = "sam.cli.main:main"
+sam-desktop = "sam.desktop.main:desktop_entry"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["sam*"]
+exclude = []
+
+[tool.setuptools.package-data]
+"sam.contracts" = ["*.json"]
+"sam.data" = ["*.sql", "*.json"]
+
 [tool.ruff]
 target-version = "py38"
 include = ["*.py"]
@@ -10,6 +89,9 @@ exclude = [
     ".venv",
     "venv",
     "workspace",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".pytest_cache",
 ]
 line-length = 100
 
