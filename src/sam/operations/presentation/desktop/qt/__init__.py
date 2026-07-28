@@ -29,6 +29,25 @@ from .notification_panel import NotificationPanel
 from .log_viewer_widget import LogViewerWidget
 from .command_palette import CommandPalette
 
+# Sprint 19 — Operational Workbench
+from .export_center import ExportCenter, ExportPreviewDialog
+from .workspace_profiles import (
+    WorkspaceProfiles, WorkspaceProfile, ProfileRegion,
+    ProfileSelectorDialog,
+)
+from .dock_persistence import DockPersistence
+from .embedded_terminal import EmbeddedTerminal
+from .toolbar_actions import (
+    ToolbarActions, ToolbarActionDef, ActionId,
+)
+from .timeline_explorer import TimelineExplorer
+from .mission_inspector import MissionInspector
+from .approval_dialog import ApprovalDialog, ApprovalCenter
+from .operator_prod import (
+    ProductivityManager, ProductivityPanel,
+    RecentCommand, FavoriteCommand, Bookmark,
+)
+
 __all__ = [
     # App
     "QtApplication",
@@ -55,4 +74,33 @@ __all__ = [
     "NotificationPanel",
     "LogViewerWidget",
     "CommandPalette",
+
+    # Sprint 19 — Export
+    "ExportCenter", "ExportPreviewDialog",
+
+    # Sprint 19 — Profiles
+    "WorkspaceProfiles", "WorkspaceProfile", "ProfileRegion",
+    "ProfileSelectorDialog",
+
+    # Sprint 19 — Persistence
+    "DockPersistence",
+
+    # Sprint 19 — Terminal
+    "EmbeddedTerminal",
+
+    # Sprint 19 — Toolbar
+    "ToolbarActions", "ToolbarActionDef", "ActionId",
+
+    # Sprint 19 — Timeline
+    "TimelineExplorer",
+
+    # Sprint 19 — Mission Inspector
+    "MissionInspector",
+
+    # Sprint 19 — Approval
+    "ApprovalDialog", "ApprovalCenter",
+
+    # Sprint 19 — Productivity
+    "ProductivityManager", "ProductivityPanel",
+    "RecentCommand", "FavoriteCommand", "Bookmark",
 ]
