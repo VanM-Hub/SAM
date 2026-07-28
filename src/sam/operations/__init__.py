@@ -8,3 +8,5 @@ Public API hanya:
 
 Stability: STABLE_API
 """
+
+from . import brain  # noqa: F401 — Sprint 19 Operational Brain Foundation
