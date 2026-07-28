@@ -88,9 +88,13 @@ class DashboardComposer:
         app_titles: list[str] = []
         if action_dto:
             pending_app = action_dto.total_pending
+            # Collect titles from all actionable buckets
+            all_items = list(action_dto.pending_approvals)
+            all_items.extend(action_dto.pending_missions)
+            all_items.extend(action_dto.waiting_human)
             app_titles = [
                 f"{item.title} ({item.status})"
-                for item in action_dto.items
+                for item in all_items
                 if item.status == "pending"
             ][:10]
 
