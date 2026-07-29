@@ -144,9 +144,9 @@ Sprint 19 menutup **Distributed Runtime** — pilar terakhir arsitektur SAM untu
 
 ## Next Steps — Sprint 20
 
-Rekomendasi untuk Sprint 20 (Review Aster):
+Rekomendasi untuk Sprint 20 (Review Chief Architect):
 - **HTTP Health Endpoint** — endpoint `/health` dengan uvicorn/aiohttp untuk monitoring eksternal
 - **End-to-End Cluster Integration Test** — simulasi multi-node (2+ node) dengan leader election, distribution, scheduling
 - **Cluster Dashboard** — web UI sederhana menampilkan cluster state real-time
 - **Alerting Rules** — auto-notification saat node offline, leader vacuum, load spike
-- **Plugin Runtime Wildcard** — jika Aster menyetujui arsitektur plugin runtime
+- **Plugin Runtime Wildcard** — jika Chief Architect menyetujui arsitektur plugin runtime

@@ -83,7 +83,7 @@ Sprint 24 membangun fondasi **Cognitive Runtime** SAM — tiga fase yang memungk
 
 ## Siap untuk
 
-1. **Review Aster** — Arsitektur cognitive runtime
+1. **Review Chief Architect** — Arsitektur cognitive runtime
 2. **Sprint 25** — Integrasi cognitive runtime dengan workflow engine (Goal-driven execution, autonomy-gated action dispatch, healing action → workflow execution)
 
 ---

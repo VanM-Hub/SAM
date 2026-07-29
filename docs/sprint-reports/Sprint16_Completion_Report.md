@@ -217,4 +217,4 @@ ServiceManager ──────────┤
 ---
 
 *Laporan dibuat oleh ZARA — 2026-07-24 22:29 WITA*
-*Siap untuk review Aster sebelum Sprint 17 Planning.*
+*Siap untuk review Chief Architect sebelum Sprint 17 Planning.*

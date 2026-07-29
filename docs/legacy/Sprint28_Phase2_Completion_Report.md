@@ -136,7 +136,7 @@ git add -A && git commit -m "feat(sprint28/phase2): Self-Healing Loop + Evolutio
 - 52 new tests, all passing, 0 regressions"
 ```
 
-### Catatan untuk Review Aster
+### Catatan untuk Review Chief Architect
 
 1. **Learn phase design:** STRATEGY_SHIFT proposal dibuat dengan status PENDING. Van memilih Option B (no auto-approve). Manual review via CLI.
 2. **Governance simplified:** Severity-based rules (≥5 auto-allow, ≤2 auto-with-warning). Bisa diperketat di release berikutnya.
