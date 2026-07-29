@@ -1,8 +1,0 @@
-{
-  "workspace": "./workspace",
-  "runtime": {
-    "timeout": 30,
-    "debug": false
-  },
-  "providers": ["nvidia", "openai"]
-}
