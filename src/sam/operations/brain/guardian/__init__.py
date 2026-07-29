@@ -72,6 +72,56 @@ from .dashboard_v2 import (
 )
 from .routing_v2 import GuardianRoutingV2Integration, RoutingV2Result
 
+# Sprint 29 (Governance)
+from .governance import (
+    GuardianGovernanceEngine,
+    GovernanceResult,
+    GovernanceDecision,
+    GovernanceEvidence,
+    GovernanceStatus,
+    GovernanceStage,
+)
+from .execution_readiness import (
+    ExecutionReadinessEvaluator,
+    ExecutionReadiness,
+    ReadinessCheck,
+    ReadinessLevel,
+)
+from .risk import (
+    GuardianRiskAssessment,
+    RiskAssessment,
+    RiskDimension,
+    RiskLevel,
+)
+from .explanation import (
+    GuardianDecisionExplanation,
+    GovernanceExplanation,
+    ExplanationSection,
+)
+from .coordination import (
+    GuardianCoordinationRuntime,
+    CoordinationResult,
+)
+from .conversation_governance import (
+    GovernanceConversationBridge,
+    GovernanceConversationResponse,
+)
+from .dashboard_v3 import (
+    GuardianDashboardV3Service,
+    GovernanceCard,
+    RiskCard,
+    ReadinessCard,
+    PolicyCard,
+    GuardianSummaryCard,
+    BlockedMissionsCard,
+    PendingApprovalCard,
+    OperationalStatusCard,
+)
+from .runtime_v3 import (
+    GuardianRuntimeV3Integration,
+    V3IntegrationResult,
+)
+
 __all__ = [
     # Sprint 26
     "GuardianCoordinator",
@@ -163,5 +213,38 @@ __all__ = [
     "GuardianRiskCard",
     "GuardianSummaryCard",
     "GuardianRoutingV2Integration",
+    # Sprint 29
+    "GuardianGovernanceEngine",
+    "GovernanceResult",
+    "GovernanceDecision",
+    "GovernanceEvidence",
+    "GovernanceStatus",
+    "GovernanceStage",
+    "ExecutionReadinessEvaluator",
+    "ExecutionReadiness",
+    "ReadinessCheck",
+    "ReadinessLevel",
+    "GuardianRiskAssessment",
+    "RiskAssessment",
+    "RiskDimension",
+    "RiskLevel",
+    "GuardianDecisionExplanation",
+    "GovernanceExplanation",
+    "ExplanationSection",
+    "GuardianCoordinationRuntime",
+    "CoordinationResult",
+    "GovernanceConversationBridge",
+    "GovernanceConversationResponse",
+    "GuardianDashboardV3Service",
+    "GovernanceCard",
+    "RiskCard",
+    "ReadinessCard",
+    "PolicyCard",
+    "GuardianSummaryCard",
+    "BlockedMissionsCard",
+    "PendingApprovalCard",
+    "OperationalStatusCard",
+    "GuardianRuntimeV3Integration",
+    "V3IntegrationResult",
     "RoutingV2Result",
 ]
