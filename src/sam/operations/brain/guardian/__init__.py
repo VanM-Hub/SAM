@@ -1,7 +1,10 @@
 """
 Guardian Runtime — __init__.py
 
-Export publik semua modul guardian, termasuk Sprint 27 (Supervisory).
+Export publik semua modul guardian:
+  Sprint 26 (Base Guardian)
+  Sprint 27 (Supervisory)
+  Sprint 28 (Runtime V2 Integration)
 """
 
 # Base Guardian (Sprint 26)
@@ -44,6 +47,30 @@ from .dashboard_guardian import (
     GuardianSupervisoryStatusCard,
 )
 from .runtime_supervisory import GuardianSupervisoryRuntimeIntegration, SupervisoryPipelineResult
+
+# Runtime V2 Integration (Sprint 28)
+from .runtime_v2 import GuardianRuntimeV2, RuntimeV2Result, StageResult
+from .snapshot import (
+    GuardianSnapshotEngine, GuardianSnapshot, GuardianSection,
+    GuardianMetrics, GuardianHealthSnapshot,
+)
+from .history import GuardianHistoryService, GuardianEvent, GuardianTimeline
+from .trend import GuardianTrendAnalyzer, GuardianTrend
+from .summary import (
+    GuardianSummaryBuilder, GuardianSummary, GuardianSummarySection,
+    GuardianFinding, GuardianRisk, GuardianPriority,
+)
+from .conversation_v2 import GuardianConversationV2, GuardianV2Response
+from .dashboard_v2 import (
+    GuardianDashboardV2Service,
+    GuardianHealthCard,
+    GuardianPolicyCard,
+    GuardianTrendCard,
+    GuardianRecommendationCard,
+    GuardianRiskCard,
+    GuardianSummaryCard,
+)
+from .routing_v2 import GuardianRoutingV2Integration, RoutingV2Result
 
 __all__ = [
     # Sprint 26
@@ -106,4 +133,35 @@ __all__ = [
     "GuardianSupervisoryStatusCard",
     "GuardianSupervisoryRuntimeIntegration",
     "SupervisoryPipelineResult",
+    # Sprint 28
+    "GuardianRuntimeV2",
+    "RuntimeV2Result",
+    "StageResult",
+    "GuardianSnapshotEngine",
+    "GuardianSnapshot",
+    "GuardianSection",
+    "GuardianMetrics",
+    "GuardianHealthSnapshot",
+    "GuardianHistoryService",
+    "GuardianEvent",
+    "GuardianTimeline",
+    "GuardianTrendAnalyzer",
+    "GuardianTrend",
+    "GuardianSummaryBuilder",
+    "GuardianSummary",
+    "GuardianSummarySection",
+    "GuardianFinding",
+    "GuardianRisk",
+    "GuardianPriority",
+    "GuardianConversationV2",
+    "GuardianV2Response",
+    "GuardianDashboardV2Service",
+    "GuardianHealthCard",
+    "GuardianPolicyCard",
+    "GuardianTrendCard",
+    "GuardianRecommendationCard",
+    "GuardianRiskCard",
+    "GuardianSummaryCard",
+    "GuardianRoutingV2Integration",
+    "RoutingV2Result",
 ]
