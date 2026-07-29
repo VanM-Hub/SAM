@@ -68,3 +68,12 @@ build/
 dist/
 *.egg-info/
 workspace/
+
+# Database files (local only)
+*.db
+test-results.xml
+
+temp_screenshot.png
+
+.coverage
+htmlcov/
