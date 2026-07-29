@@ -64,9 +64,11 @@ Repository = "https://github.com/VanM-Hub/SAM"
 Documentation = "https://github.com/VanM-Hub/SAM#readme"
 
 [project.scripts]
-sam = "sam.cli.main:main"
-sam-console = "sam.cli.main:main"
-sam-desktop = "sam.desktop.main:desktop_entry"
+sam = "sam.launcher.cli_entry:sam_main"
+sam-console = "sam.launcher.cli_entry:console_main"
+sam-desktop = "sam.launcher.cli_entry:desktop_main"
+sam-headless = "sam.launcher.cli_entry:headless_main"
+sam-diagnostic = "sam.launcher.cli_entry:diagnostic_main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
