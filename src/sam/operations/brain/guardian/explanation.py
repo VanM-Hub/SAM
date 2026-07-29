@@ -114,7 +114,8 @@ class GuardianDecisionExplanation:
         # ── Section: Why ──
         why_lines: list = []
         if governance_status == "approved":
-            why_lines.append(f"Semua stage governance lolos (score: {governance_score:.2f})")
+            _gs = governance_score if governance_score is not None else 1.0
+            why_lines.append(f"Semua stage governance lolos (score: {_gs:.2f})")
         elif governance_status == "rejected":
             if not policy_passed:
                 why_lines.append("Policy violation: policy tidak lolos")
@@ -140,7 +141,8 @@ class GuardianDecisionExplanation:
         if evidence_items:
             ev_lines.extend(evidence_items)
         if decision_approved:
-            ev_lines.append(f"Decision confidence: {decision_confidence:.2f}")
+            _dc = decision_confidence if decision_confidence is not None else 0.0
+            ev_lines.append(f"Decision confidence: {_dc:.2f}")
         if approval_complete:
             ev_lines.append(f"Approval: {approval_granted}/{approval_required} granted")
         else:
@@ -154,7 +156,8 @@ class GuardianDecisionExplanation:
 
         # ── Section: Risks ──
         risk_lines: list = []
-        risk_lines.append(f"Risk level: {risk_level} (score: {risk_score:.2f})")
+        _rs = risk_score if risk_score is not None else 0.0
+        risk_lines.append(f"Risk level: {risk_level} (score: {_rs:.2f})")
         if risk_dimensions:
             for dim in risk_dimensions:
                 risk_lines.append(f"  - {dim}")
