@@ -106,4 +106,6 @@ Setiap perubahan pada API publik harus disertai update dokumentasi.
 
 ## License
 
-MIT — dengan kontribusi, Anda setuju bahwa kontribusi Anda dilisensikan di bawah lisensi yang sama.
+Apache-2.0 — dengan kontribusi, Anda setuju bahwa kontribusi Anda dilisensikan di bawah lisensi yang sama.
+
+Lihat file LICENSE untuk detail lengkap.
