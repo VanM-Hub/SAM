@@ -3,9 +3,9 @@
 **Project:** SAM (Self-Aware Machine)  
 **Sprint:** 10 — Workflow Orchestration & Service Runtime  
 **Date:** 2026-07-23  
-**Lead Engineer:** Axel  
+**Lead Engineer:** Lead Engineer  
 **Lead Assistant:** ZARA  
-**Chief Architect:** Aster  
+**Chief Architect:** Chief Architect  
 **Project Manager:** Van
 
 ---
@@ -170,7 +170,7 @@ src/sam/health/collector.py            # ASCII indicators fix
 
 ## Rekomendasi untuk Sprint 11 — Plugin Runtime
 
-Berdasarkan arahan **Aster (Chief Architect)**, Sprint 11 fokus pada **Plugin Runtime**:
+Berdasarkan arahan **Chief Architect (Chief Architect)**, Sprint 11 fokus pada **Plugin Runtime**:
 
 ### 1. Plugin Discovery & Loading
 - `PluginRegistry` — discover plugins dari entry points (`sam.plugins`) atau directory.
@@ -206,8 +206,8 @@ Berdasarkan arahan **Aster (Chief Architect)**, Sprint 11 fokus pada **Plugin Ru
 | Role | Name | Status |
 |------|------|--------|
 | **Project Manager** | Van | ✅ Approved |
-| **Chief Architect** | Aster | ✅ Reviewed |
-| **Lead Engineer** | Axel | ✅ Delivered |
+| **Chief Architect** | Chief Architect | ✅ Reviewed |
+| **Lead Engineer** | Lead Engineer | ✅ Delivered |
 | **Lead Assistant** | ZARA | ✅ Documented |
 
 ---

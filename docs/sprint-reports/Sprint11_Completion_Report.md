@@ -2,8 +2,8 @@
 
 **Tanggal:** 2026-07-23  
 **Status:** ✅ SELESAI  
-**Reviewer:** Aster (Chief Architect)  
-**Lead Engineer:** Axel ⚙️  
+**Reviewer:** Chief Architect (Chief Architect)  
+**Lead Engineer:** Lead Engineer ⚙️  
 **Lead Assistant:** ZARA 🦋
 
 ---
@@ -119,7 +119,7 @@ Audit events: 6 captured
 
 ## Rekomendasi untuk Sprint 12
 
-Sesuai roadmap Aster → **Sprint 12: Knowledge Runtime**
+Sesuai roadmap Chief Architect → **Sprint 12: Knowledge Runtime**
 
 - `KnowledgeLoader` enhancements (incremental load, watch mode)
 - `KnowledgeQuery` / semantic search integration
@@ -158,8 +158,8 @@ D:\Project AI\SAM\
 | Role | Nama | Tanda Tangan | Tanggal |
 |------|------|--------------|---------|
 | Project Manager | Van |  | 2026-07-23 |
-| Chief Architect | Aster |  |  |
-| Lead Engineer | Axel |  | 2026-07-23 |
+| Chief Architect | Chief Architect |  |  |
+| Lead Engineer | Lead Engineer |  | 2026-07-23 |
 | Lead Assistant | ZARA |  | 2026-07-23 |
 
 ---

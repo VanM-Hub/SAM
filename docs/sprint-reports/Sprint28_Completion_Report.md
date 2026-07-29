@@ -3,7 +3,7 @@
 **Tanggal:** 2026-07-25
 **Branch:** `feature/sprint13-plugin-runtime`
 **Status:** ✅ SELESAI — 3 fase, 140 test baru, 0 regresi
-**Laporan ini:** Gambaran besar seluruh Sprint 28 untuk review Aster.
+**Laporan ini:** Gambaran besar seluruh Sprint 28 untuk review Chief Architect.
 
 ---
 
@@ -165,7 +165,7 @@ Berdasarkan arsitektur yang sudah dibangun di Sprint 28, berikut arah yang bisa 
 4. **Human-in-the-Loop Dashboard** — UI/web interface untuk review proposals, approve/reject tuning, dan monitoring operational confidence.
 5. **Self-Improving Workflows** — Gunakan ReflectionManager + InstitutionalMemory untuk meningkatkan kualitas workflow templates secara otomatis berdasarkan riwayat eksekusi.
 
-Prioritas rekomendasi: **#1 Cross-Cluster Intelligence** atau **#2 Operational Daemon & Autopilot** (tergantung visi Aster untuk SAM deployment scale).
+Prioritas rekomendasi: **#1 Cross-Cluster Intelligence** atau **#2 Operational Daemon & Autopilot** (tergantung visi Chief Architect untuk SAM deployment scale).
 
 ---
 

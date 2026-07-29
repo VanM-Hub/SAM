@@ -4,7 +4,7 @@
 **Sprint:** 8 — Implementasi Nyata  
 **Status:** ✅ **SELESAI**  
 **Tanggal:** 2026-07-22  
-**Lead Engineer:** Axel  
+**Lead Engineer:** Lead Engineer  
 **Lead Assistant:** ZARA
 
 ## 1. Ringkasan Eksekutif
@@ -254,4 +254,4 @@ Sprint 8 mencapai seluruh tujuan utamanya. Runtime SAM sekarang memiliki pipelin
 
 **Status keseluruhan Sprint 8: ✅ SELESAI**
 
-Laporan ini siap dipresentasikan kepada Aster untuk review arsitektur akhir sebelum penetapan scope Sprint 9.
+Laporan ini siap dipresentasikan kepada Chief Architect untuk review arsitektur akhir sebelum penetapan scope Sprint 9.

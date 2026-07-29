@@ -3,7 +3,7 @@
 **Version:** 1.0  
 **Status:** Ratified  
 **Date:** 2026-07-27  
-**Authority:** Chief Architect (Aster)
+**Authority:** Chief Architect (Chief Architect)
 
 ---
 
@@ -106,4 +106,4 @@ Konstitusi ini hanya dapat diubah melalui:
 
 ---
 
-*SAM Constitution v1.0 — Ratified by Aster, Chief Architect*
+*SAM Constitution v1.0 — Ratified by Chief Architect, Chief Architect*

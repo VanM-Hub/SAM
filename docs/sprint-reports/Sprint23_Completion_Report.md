@@ -122,8 +122,8 @@ ExecutionGraphEngine
 
 ---
 
-## Next Steps for Aster's Review
+## Next Steps for Chief Architect's Review
 
 1. **Fase 3 code review** — verify revision/evolution models and engine integration
 2. **Migration validation** — fix pre-existing `010_add_knowledge_fts.sql` column bug (out of scope but blocking clean CI)
-3. **Sprint 24 planning** — Plugin Runtime (as previously directed by Aster) or Observability/Monitoring layer
+3. **Sprint 24 planning** — Plugin Runtime (as previously directed by Chief Architect) or Observability/Monitoring layer

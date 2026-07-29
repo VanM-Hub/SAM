@@ -112,7 +112,7 @@
 
 ### RC2 Validation (Current — Mulai 2026-07-25)
 
-**Perintah dari Aster:** Cross-platform testing + Failure injection
+**Perintah dari Chief Architect:** Cross-platform testing + Failure injection
 
 | Task | Status | Catatan |
 |---|---|---|

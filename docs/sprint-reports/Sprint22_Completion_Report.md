@@ -108,4 +108,4 @@ Sprint 23 direkomendasikan fokus pada:
 2. **Monitoring & Observability** — telemetry, metrics endpoints, structured logging audit
 3. **Error Recovery** — retry diagnostics, compensation chain logs, dead-letter handling
 
-Atau sesuai arahan Aster untuk prioritas selanjutnya.
+Atau sesuai arahan Chief Architect untuk prioritas selanjutnya.
