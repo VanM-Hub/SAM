@@ -97,4 +97,4 @@ Baca [CONTRIBUTING.md](CONTRIBUTING.md) sebelum memulai.
 
 ## Lisensi
 
-MIT — lihat file LICENSE.
+Apache-2.0 — lihat file LICENSE.
