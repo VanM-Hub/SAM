@@ -58,21 +58,24 @@ from .handoff import HandoffEngine
 from .queue import DecisionQueue
 from .conversation_handoff import LiveConversationHandoffBridge
 from .dashboard_handoff import LiveDashboardHandoffBridge as LiveDashboardHandoffBridgeCls
+from .builder import JustificationBuilder
+from .conversation_justification import LiveConversationJustificationBridge
+from .dashboard_justification import LiveDashboardJustificationBridge as LiveDashboardJustificationBridgeCls
 
 
 class GuardianLiveRuntime:
     """
     Synchronous live runtime for the Guardian.
 
-    Full Pipeline (v5.6.0):
+    Full Pipeline (v5.7.0):
         Event → Dispatch → Synchronization
-        → Transition Intelligence → Situation Intelligence
-        → Operational Assessment → Operational Intent
-        → Decision Handoff → Guardian → Reasoning
-        → Learning → Execution Preview → Dashboard → Conversation
+        → Transition → Situation → Assessment
+        → Intent → Decision Handoff → Decision Justification
+        → Guardian → Reasoning → Learning
+        → Execution Preview → Dashboard → Conversation
 
-    DecisionInput is DTO only. Does NOT call Decision Runtime.
-    Does NOT create missions, submit approvals, or execute.
+    DecisionInput and Justification are DTO only.
+    Does NOT call Decision Runtime, create missions, or execute.
     """
 
     def __init__(
@@ -132,6 +135,12 @@ class GuardianLiveRuntime:
         self._decision_queue = DecisionQueue()
         self._conversation_handoff = LiveConversationHandoffBridge(self)
         self._dashboard_handoff = LiveDashboardHandoffBridgeCls(self)
+
+        # Sprint 50 — Decision Justification
+        self._justification_builder = JustificationBuilder()
+        self._justification_history: 'List[DecisionJustification]' = []
+        self._conversation_justification = LiveConversationJustificationBridge(self)
+        self._dashboard_justification = LiveDashboardJustificationBridgeCls(self)
 
         self._is_running: bool = False
         if runtime_id:
@@ -397,6 +406,28 @@ class GuardianLiveRuntime:
         """Get the dashboard handoff bridge."""
         return self._dashboard_handoff
 
+    # --- Sprint 50 — Decision Justification ---
+
+    @property
+    def justification_builder(self) -> 'JustificationBuilder':
+        """Get the justification builder."""
+        return self._justification_builder
+
+    @property
+    def justification_history(self) -> 'List[DecisionJustification]':
+        """Get the justification history."""
+        return list(self._justification_history)
+
+    @property
+    def conversation_justification(self) -> 'LiveConversationJustificationBridge':
+        """Get the conversation justification bridge."""
+        return self._conversation_justification
+
+    @property
+    def dashboard_justification(self) -> 'LiveDashboardJustificationBridgeCls':
+        """Get the dashboard justification bridge."""
+        return self._dashboard_justification
+
     # --- History ---
 
     def record_dispatch(
@@ -473,6 +504,7 @@ class GuardianLiveRuntime:
             "decision_queue_count": self._decision_queue.count,
             "decision_eligible": self._decision_queue.eligible_count,
             "decision_blocked": self._decision_queue.blocked_count,
+            "justification_count": len(self._justification_history),
         }
 
     # --- Pipeline Execution ---
@@ -615,6 +647,20 @@ class GuardianLiveRuntime:
                             })
                         transition_result["handoffs"] = handoff_result
 
+                        # 3h. Decision Justification (NEW v5.7.0)
+                        justification_result = []
+                        for idx, intent_obj in enumerate(self._intent_history[-len(intent_result):]):
+                            if idx < len(self._decision_queue.history()):
+                                di = self._decision_queue.history()[-(idx+1)]
+                                just = self._justification_builder.build(di, intent_obj)
+                                self._justification_history.append(just)
+                                justification_result.append({
+                                    "justification_id": just.justification_id,
+                                    "sections": len(just.sections),
+                                    "summary": just.summary,
+                                })
+                        transition_result["justifications"] = justification_result
+
                 # 4. Reasoning
                 reasoning_result = self._reasoning.trigger(event)
                 # 5. Learning
@@ -643,4 +689,5 @@ class GuardianLiveRuntime:
             "situation_count": self._situation_history.count,
             "intent_count": len(self._intent_history),
             "handoff_count": self._decision_queue.count,
+            "justification_count": len(self._justification_history),
         }
