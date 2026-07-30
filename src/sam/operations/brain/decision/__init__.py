@@ -67,3 +67,10 @@ from .approval_requirements import ApprovalRequirementsEngine,ApprovalRequiremen
 from .approval_summary import ApprovalSummaryBuilder
 from .conversation_approval import DecisionConversationApprovalBridge
 from .dashboard_approval import DecisionDashboardApprovalBridge
+from .approval_envelope import ApprovalRequestEnvelope,ApprovalReference,ApprovalPayload,ApprovalEnvelopeStatistics,ApprovalEnvelopeSnapshot
+from .approval_mapper import ApprovalMapper
+from .approval_adapter import ApprovalAdapter,ApprovalAdapterResult
+from .approval_bridge import ApprovalBridge
+from .approval_status import ApprovalStatusMirrorStore,ApprovalStatusMirror,ApprovalState,ApprovalStateSummary,ApprovalStateStatistics
+from .conversation_adapter import DecisionConversationAdapterBridge
+from .dashboard_adapter import DecisionDashboardAdapterBridge
