@@ -1,4 +1,4 @@
-"""SAM Activation Runtime — Phase VIII. v8.4.0"""
+"""SAM Activation Runtime — Phase VIII. v8.5.0"""
 from sam.activation.activation_context import ActivationContext
 from sam.activation.activation_request import ActivationRequest
 from sam.activation.activation_candidate import ActivationCandidate
@@ -25,16 +25,23 @@ from sam.activation.activation_monitor import ActivationMonitor, MonitorEvent
 from sam.activation.activation_history import ActivationHistory, HistoryEntry
 from sam.activation.activation_snapshot import ActivationSnapshotState
 from sam.activation.activation_health import ActivationHealthChecker, ActivationHealthReport
+from sam.activation.activation_runtime import ActivationRuntimeEngine, RuntimeStatus
+from sam.activation.activation_pipeline import ActivationPipeline
+from sam.activation.activation_coordinator import ActivationCoordinator
+from sam.activation.activation_runtime_report import RuntimeReport, RuntimeReportBuilder
+from sam.activation.activation_runtime_status import ActivationRuntimeStatus, ActivationRuntimeStatusBuilder
 from sam.activation.conversation_activation import ConversationActivation
 from sam.activation.conversation_validation import ConversationValidation
 from sam.activation.conversation_strategy import ConversationStrategy
 from sam.activation.conversation_package import ConversationPackage
 from sam.activation.conversation_monitor import ConversationMonitor
+from sam.activation.conversation_runtime import ConversationRuntime
 from sam.activation.dashboard_activation import DashboardActivation, ActivationCard
 from sam.activation.dashboard_validation import DashboardValidation, ValidationCard
 from sam.activation.dashboard_strategy import DashboardStrategy, StrategyCard
 from sam.activation.dashboard_package import DashboardPackage, PackageCard
 from sam.activation.dashboard_monitor import DashboardMonitor, MonitorCard
+from sam.activation.dashboard_runtime import DashboardRuntime, RuntimeCard
 from sam.activation.runtime import ActivationRuntime
 
 __all__ = [
@@ -59,12 +66,18 @@ __all__ = [
     "ActivationHistory", "HistoryEntry",
     "ActivationSnapshotState",
     "ActivationHealthChecker", "ActivationHealthReport",
+    "ActivationRuntimeEngine", "RuntimeStatus",
+    "ActivationPipeline",
+    "ActivationCoordinator",
+    "RuntimeReport", "RuntimeReportBuilder",
+    "ActivationRuntimeStatus", "ActivationRuntimeStatusBuilder",
     "ConversationActivation", "ConversationValidation", "ConversationStrategy",
-    "ConversationPackage", "ConversationMonitor",
+    "ConversationPackage", "ConversationMonitor", "ConversationRuntime",
     "DashboardActivation", "ActivationCard",
     "DashboardValidation", "ValidationCard",
     "DashboardStrategy", "StrategyCard",
     "DashboardPackage", "PackageCard",
     "DashboardMonitor", "MonitorCard",
+    "DashboardRuntime", "RuntimeCard",
     "ActivationRuntime",
 ]
