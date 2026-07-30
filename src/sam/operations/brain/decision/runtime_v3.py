@@ -35,6 +35,9 @@ from .submission_builder import SubmissionBuilder
 from .submission_queue import SubmissionQueuePlanner, SubmissionQueue
 from .conversation_submission import DecisionConversationSubmissionBridge
 from .dashboard_submission import DecisionDashboardSubmissionBridge
+from .approval_gateway import ApprovalGateway
+from .conversation_gateway import DecisionConversationGatewayBridge
+from .dashboard_gateway import DecisionDashboardGatewayBridge
 
 
 class DecisionRuntimeV3:
@@ -63,6 +66,7 @@ class DecisionRuntimeV3:
         self._submission_builder = SubmissionBuilder()
         self._queue_planner = SubmissionQueuePlanner()
         self._submission_queue = None
+        self._gateway = ApprovalGateway()
 
         self._conversation = DecisionConversationPackageBridge(self)
         self._dashboard = DecisionDashboardPackageBridge(self)
@@ -76,6 +80,8 @@ class DecisionRuntimeV3:
         self._dashboard_adapter = DecisionDashboardAdapterBridge(self)
         self._conversation_submission = DecisionConversationSubmissionBridge(self)
         self._dashboard_submission = DecisionDashboardSubmissionBridge(self)
+        self._conversation_gateway = DecisionConversationGatewayBridge(self)
+        self._dashboard_gateway = DecisionDashboardGatewayBridge(self)
 
         self._latest_incoming: Optional[IncomingDecisionPackage] = None
         self._latest_normalized: Optional[IncomingDecisionPackage] = None
@@ -120,6 +126,10 @@ class DecisionRuntimeV3:
     def conversation_submission(self): return self._conversation_submission
     @property
     def dashboard_submission(self): return self._dashboard_submission
+    @property
+    def conversation_gateway(self): return self._conversation_gateway
+    @property
+    def dashboard_gateway(self): return self._dashboard_gateway
 
     def consume(self, package_dict: Dict[str, Any]) -> Dict[str, Any]:
         incoming = self._consumer.consume(package_dict)
@@ -172,6 +182,9 @@ class DecisionRuntimeV3:
                 if submission_plan.ready: self._submission_ready_count += 1
                 self._submission_queue = self._queue_planner.plan([submission_plan])
 
+                # Approval Gateway (NEW v5.15.0)
+                gateway_result = self._gateway.process(submission_plan)
+
         return {
             "package_id": incoming.package_id, "received": True,
             "valid": validation.valid, "validation_score": validation.score,
@@ -192,6 +205,7 @@ class DecisionRuntimeV3:
             "bridge_count": self._bridge.bridge_count if self._bridge else 0,
             "submission_count": self._submission_count,
             "submission_ready": self._submission_ready_count,
+            "gateway_count": self._gateway.gateway_count if self._gateway else 0,
             "has_latest": self._latest_incoming is not None,
             "has_evaluation": self._latest_evaluation is not None,
             "has_plan": self._latest_plan is not None,

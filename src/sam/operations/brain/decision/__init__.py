@@ -81,3 +81,10 @@ from .submission_queue import SubmissionQueuePlanner,SubmissionQueue
 from .submission_summary import SubmissionSummaryBuilder
 from .conversation_submission import DecisionConversationSubmissionBridge
 from .dashboard_submission import DecisionDashboardSubmissionBridge
+from .gateway_request import ApprovalGatewayRequest,GatewayReference,GatewayMetadata,GatewayStatistics,GatewaySnapshot
+from .approval_gateway import ApprovalGateway,ApprovalGatewayResult
+from .gateway_router import GatewayRouter
+from .gateway_validator import GatewayValidator
+from .gateway_registry import GatewayRegistry
+from .conversation_gateway import DecisionConversationGatewayBridge
+from .dashboard_gateway import DecisionDashboardGatewayBridge
