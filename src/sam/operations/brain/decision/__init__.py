@@ -88,3 +88,10 @@ from .gateway_validator import GatewayValidator
 from .gateway_registry import GatewayRegistry
 from .conversation_gateway import DecisionConversationGatewayBridge
 from .dashboard_gateway import DecisionDashboardGatewayBridge
+from .approval_session import ApprovalSession,ApprovalSessionState,ApprovalSessionReference,ApprovalSessionMetadata,ApprovalSessionStatistics,ApprovalSessionSnapshot
+from .session_builder import SessionBuilder
+from .session_validator import SessionValidator,SessionValidationResult
+from .session_registry import SessionRegistry
+from .session_history import SessionHistory,SessionHistoryRecord
+from .conversation_session import DecisionConversationSessionBridge
+from .dashboard_session import DecisionDashboardSessionBridge
