@@ -48,21 +48,27 @@ from .dashboard_situation import LiveDashboardSituationBridge as LiveDashboardSi
 from .assessment_builder import AssessmentBuilder
 from .conversation_assessment import LiveConversationAssessmentBridge
 from .dashboard_assessment import LiveDashboardAssessmentBridge as LiveDashboardAssessmentBridgeCls
+from .intent_builder import IntentBuilder
+from .intent_policy import IntentPolicyEngine
+from .intent_ranker import IntentRanker
+from .intent_validator import IntentValidator
+from .conversation_intent import LiveConversationIntentBridge
+from .dashboard_intent import LiveDashboardIntentBridge as LiveDashboardIntentBridgeCls
 
 
 class GuardianLiveRuntime:
     """
     Synchronous live runtime for the Guardian.
 
-    Full Pipeline (v5.4.0):
+    Full Pipeline (v5.5.0):
         Event → Dispatch → Synchronization
         → Transition Intelligence → Situation Intelligence
-        → Operational Assessment → Guardian
-        → Reasoning → Learning → Execution Preview
-        → Dashboard → Conversation
+        → Operational Assessment → Operational Intent
+        → Guardian → Reasoning → Learning
+        → Execution Preview → Dashboard → Conversation
 
     Does NOT replace the existing Guardian Runtime.
-    All calls synchronous, DTO-only, preview only.
+    Intent is DTO only — does NOT execute, create missions, or call Decision Runtime.
     """
 
     def __init__(
@@ -107,6 +113,15 @@ class GuardianLiveRuntime:
         self._assessment_history: 'List[GuardianAssessment]' = []
         self._conversation_assessment = LiveConversationAssessmentBridge(self)
         self._dashboard_assessment = LiveDashboardAssessmentBridgeCls(self)
+
+        # Sprint 48 — Operational Intent
+        self._intent_builder = IntentBuilder()
+        self._intent_policy = IntentPolicyEngine()
+        self._intent_ranker = IntentRanker()
+        self._intent_validator = IntentValidator()
+        self._intent_history: 'List[GuardianIntent]' = []
+        self._conversation_intent = LiveConversationIntentBridge(self)
+        self._dashboard_intent = LiveDashboardIntentBridgeCls(self)
 
         self._is_running: bool = False
         if runtime_id:
@@ -313,6 +328,43 @@ class GuardianLiveRuntime:
         """Get the dashboard assessment bridge."""
         return self._dashboard_assessment
 
+    # --- Sprint 48 — Operational Intent ---
+
+    @property
+    def intent_builder(self) -> 'IntentBuilder':
+        """Get the intent builder."""
+        return self._intent_builder
+
+    @property
+    def intent_policy(self) -> 'IntentPolicyEngine':
+        """Get the intent policy engine."""
+        return self._intent_policy
+
+    @property
+    def intent_ranker(self) -> 'IntentRanker':
+        """Get the intent ranker."""
+        return self._intent_ranker
+
+    @property
+    def intent_validator(self) -> 'IntentValidator':
+        """Get the intent validator."""
+        return self._intent_validator
+
+    @property
+    def intent_history(self) -> 'List[GuardianIntent]':
+        """Get the intent history."""
+        return list(self._intent_history)
+
+    @property
+    def conversation_intent(self) -> 'LiveConversationIntentBridge':
+        """Get the conversation intent bridge."""
+        return self._conversation_intent
+
+    @property
+    def dashboard_intent(self) -> 'LiveDashboardIntentBridgeCls':
+        """Get the dashboard intent bridge."""
+        return self._dashboard_intent
+
     # --- History ---
 
     def record_dispatch(
@@ -380,6 +432,11 @@ class GuardianLiveRuntime:
             "current_priority": (
                 self._assessment_history[-1].priority.name
                 if self._assessment_history else None
+            ),
+            "intent_count": len(self._intent_history),
+            "current_intent": (
+                self._intent_history[-1].intent_type.name
+                if self._intent_history else None
             ),
         }
 
@@ -493,6 +550,23 @@ class GuardianLiveRuntime:
                             })
                         transition_result["assessments"] = assessment_result
 
+                        # 3f. Operational Intent (NEW v5.5.0)
+                        intent_result = []
+                        for a_obj in [self._assessment_builder.build_from_situation(sit, transitions) for sit in situations]:
+                            intent = self._intent_builder.build_from_assessment(a_obj)
+                            policy_result = self._intent_policy.apply_policy(intent)
+                            validation = self._intent_validator.validate(intent, self._intent_history)
+                            self._intent_history.append(intent)
+                            intent_result.append({
+                                "intent_id": intent.intent_id,
+                                "type": intent.intent_type.name,
+                                "priority": intent.priority.name,
+                                "policy": intent.policy_name,
+                                "policy_action": policy_result["result"],
+                                "valid": validation.valid,
+                            })
+                        transition_result["intents"] = intent_result
+
                 # 4. Reasoning
                 reasoning_result = self._reasoning.trigger(event)
                 # 5. Learning
@@ -519,4 +593,5 @@ class GuardianLiveRuntime:
             "snapshot_count": self._snapshot_manager.count,
             "transition_count": self._timeline.count,
             "situation_count": self._situation_history.count,
+            "intent_count": len(self._intent_history),
         }
