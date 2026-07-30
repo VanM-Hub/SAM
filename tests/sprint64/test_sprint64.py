@@ -125,11 +125,11 @@ def test_runtime_status():
 # --- Conversation / Dashboard ---
 def test_conversation():
     rt = ApprovalRuntimeV1()
-    assert rt.conversation.query_count == 10
+    assert rt.conversation_intake.query_count == 10
 
 def test_dashboard():
     rt = ApprovalRuntimeV1()
-    assert rt.dashboard.card_count == 6
+    assert rt.dashboard_intake.card_count == 6
 
 # --- Forbidden imports ---
 def test_forbidden():
