@@ -4,10 +4,10 @@ SAM Guardian Live Runtime Foundation.
 Synchronous event-driven runtime for Guardian internal communication.
 All DTOs are frozen. No async, no threading, no network.
 
-v5.7.0 — Added Decision Justification:
-    justification.py, builder.py, evidence_chain.py,
-    rule_trace.py, consistency.py, conversation_justification.py,
-    dashboard_justification.py
+v5.8.0 — Added Decision Package:
+    decision_package.py, package_builder.py, package_validator.py,
+    package_serializer.py, package_registry.py,
+    conversation_package.py, dashboard_package.py
 """
 
 # Sprint 43
@@ -78,6 +78,14 @@ from .rule_trace import RuleTrace,RuleStep,RuleTracer
 from .consistency import ConsistencyResult,ConsistencyVerifier
 from .conversation_justification import LiveConversationJustificationBridge
 from .dashboard_justification import LiveDashboardJustificationBridge as LDJB,EvidenceChainCard,RuleTraceCard,ConsistencyCard,LatestJustificationCard,CoverageCard,JustificationHistoryCard
+# Sprint 51
+from .decision_package import DecisionPackage,PackageMetadata,PackageStatistics,PackageSnapshot,PackageVersion,PackageSummary
+from .package_builder import PackageBuilder
+from .package_validator import PackageValidator,PackageValidationResult
+from .package_serializer import PackageSerializer
+from .package_registry import PackageRegistry
+from .conversation_package import LiveConversationPackageBridge
+from .dashboard_package import LiveDashboardPackageBridge as LDPB,DecisionPackageCard as DPCard,ValidationCard,CoverageCard as CovCard,MetadataCard,HistoryCard,StatisticsCard
 
 __all__ = [
     "GuardianEvent","GuardianEventType","GuardianEventPriority","GuardianEventSource","GuardianEventMetadata","GuardianEventSnapshot",
@@ -106,4 +114,7 @@ __all__ = [
     "JustificationBuilder","EvidenceChain","EvidenceChainBuilder","RuleTrace","RuleStep","RuleTracer",
     "ConsistencyResult","ConsistencyVerifier",
     "LiveConversationJustificationBridge","LDJB","EvidenceChainCard","RuleTraceCard","ConsistencyCard","LatestJustificationCard","CoverageCard","JustificationHistoryCard",
+    "DecisionPackage","PackageMetadata","PackageStatistics","PackageSnapshot","PackageVersion","PackageSummary",
+    "PackageBuilder","PackageValidator","PackageValidationResult","PackageSerializer","PackageRegistry",
+    "LiveConversationPackageBridge","LDPB","DPCard","ValidationCard","CovCard","MetadataCard","HistoryCard","StatisticsCard",
 ]
