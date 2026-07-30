@@ -1,7 +1,7 @@
 # SAM Framework
 
 **The Autonomous Guardian Operating System for AI** 🔰  
-*Versi: v10.0.0 — Phase X (Runtime Kernel)*
+*Versi: v10.0.1 — Phase X (Runtime Kernel)*
 
 > **⚠️ Peringatan:** README ini masih dalam proses update. CABANG `main` hanya menampilkan fase awal. Development aktif ada di branch `sprint-*`. Lihat [Pipeline](#pipeline) di bawah untuk peta pengembangan.
 
