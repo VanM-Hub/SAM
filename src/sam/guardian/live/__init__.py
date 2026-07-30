@@ -4,10 +4,10 @@ SAM Guardian Live Runtime Foundation.
 Synchronous event-driven runtime for Guardian internal communication.
 All DTOs are frozen. No async, no threading, no network.
 
-v5.6.0 — Added Decision Handoff:
-    decision_input.py, handoff.py, mapping.py,
-    eligibility.py, queue.py, conversation_handoff.py,
-    dashboard_handoff.py
+v5.7.0 — Added Decision Justification:
+    justification.py, builder.py, evidence_chain.py,
+    rule_trace.py, consistency.py, conversation_justification.py,
+    dashboard_justification.py
 """
 
 # Sprint 43
@@ -70,6 +70,14 @@ from .eligibility import EligibilityEngine,EligibilityResult
 from .queue import DecisionQueue
 from .conversation_handoff import LiveConversationHandoffBridge
 from .dashboard_handoff import LiveDashboardHandoffBridge as LDHB,DecisionQueueCard,EligibleItemsCard,BlockedItemsCard,QueueStatisticsCard,LatestHandoffCard,QueueHealthCard
+# Sprint 50
+from .justification import DecisionJustification,JustificationSection,EvidenceReference,RuleReference,JustificationSummary,JustificationSnapshot
+from .builder import JustificationBuilder
+from .evidence_chain import EvidenceChain,EvidenceChainBuilder
+from .rule_trace import RuleTrace,RuleStep,RuleTracer
+from .consistency import ConsistencyResult,ConsistencyVerifier
+from .conversation_justification import LiveConversationJustificationBridge
+from .dashboard_justification import LiveDashboardJustificationBridge as LDJB,EvidenceChainCard,RuleTraceCard,ConsistencyCard,LatestJustificationCard,CoverageCard,JustificationHistoryCard
 
 __all__ = [
     "GuardianEvent","GuardianEventType","GuardianEventPriority","GuardianEventSource","GuardianEventMetadata","GuardianEventSnapshot",
@@ -94,4 +102,8 @@ __all__ = [
     "DecisionInput","DecisionCandidate","DecisionReason","DecisionMetadata","DecisionStatistics","DecisionSnapshot","EligibilityStatus",
     "HandoffEngine","IntentMapper","EligibilityEngine","EligibilityResult","DecisionQueue",
     "LiveConversationHandoffBridge","LDHB","DecisionQueueCard","EligibleItemsCard","BlockedItemsCard","QueueStatisticsCard","LatestHandoffCard","QueueHealthCard",
+    "DecisionJustification","JustificationSection","EvidenceReference","RuleReference","JustificationSummary","JustificationSnapshot",
+    "JustificationBuilder","EvidenceChain","EvidenceChainBuilder","RuleTrace","RuleStep","RuleTracer",
+    "ConsistencyResult","ConsistencyVerifier",
+    "LiveConversationJustificationBridge","LDJB","EvidenceChainCard","RuleTraceCard","ConsistencyCard","LatestJustificationCard","CoverageCard","JustificationHistoryCard",
 ]
