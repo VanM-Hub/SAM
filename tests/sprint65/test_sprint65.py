@@ -136,7 +136,7 @@ def test_runtime_workflow_counts():
 # --- Conversation ---
 def test_conversation_workflow_query_count():
     rt = ApprovalRuntimeV1()
-    assert rt.get_conversation("workflow").query_count == 10
+    assert rt.conversation_workflow.query_count == 10
 
 def test_conversation_active():
     rt = ApprovalRuntimeV1()
@@ -160,7 +160,7 @@ def test_conversation_phase_summary():
 # --- Dashboard ---
 def test_dashboard_workflow_card_count():
     rt = ApprovalRuntimeV1()
-    assert rt.get_dashboard("workflow").card_count == 6
+    assert rt.dashboard_workflow.card_count == 6
 
 def test_dashboard_engine_card():
     rt = ApprovalRuntimeV1()
