@@ -1,5 +1,14 @@
 # Changelog
 
+## v10.0.1 (2026-07-30) - Repository Stabilization
+
+### Fixed
+- H1: CI Recovery - clean workflow, valid YAML, pip cache, 3 python versions
+- H2: Test structure - 42 __init__.py added to sprint folders
+- H3: Fixture cleanup - modular conftest.py hierarchy (root/unit/integration/e2e/legacy)
+- H4: Documentation refresh - ROADMAP, SPRINT_TRACKER, version-history, manifest
+- H5: Repository hygiene - gitignore cleanup
+
 ## v10.0.0 (2026-07-30) — Runtime Kernel
 
 Phase X selesai. Runtime Kernel adalah lapisan koordinasi antar-subsystem yang bersifat preview-only dan read-only.
