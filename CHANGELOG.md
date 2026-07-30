@@ -1,54 +1,132 @@
 # Changelog
 
-## v2.0.0 (2026-07-27) — Production Release 🎉
+## v10.0.0 (2026-07-30) — Runtime Kernel
 
-SAM v2.0.0 adalah rilis produksi pertama yang mencakup 7 fase pengembangan.
+Phase X selesai. Runtime Kernel adalah lapisan koordinasi antar-subsystem yang bersifat preview-only dan read-only.
 
 ### Added
-- **Runtime Kernel** — 12-state state machine, bootstrap pipeline (10 step), session CRUD (JSON), graceful shutdown (6 step), crash recovery dengan checkpoint
-- **Guardian Kernel** — Observer, Analyzer, Decision, Policy, Action, Verification engine + 10-stage GDP pipeline
-- **Hosting Layer** — DesktopAdapter, DockerAdapter, Windows Service (pywin32), systemd unit generator, Dockerfile + docker-compose.yml
-- **Telemetry & Metrics** — TelemetryEvent, RuntimeMetrics, TelemetryService (10000 event buffer), MetricsCollector (periodic CPU/memory/uptime), FastAPI REST API (4 endpoints)
-- **Operations Console CLI** — 17 commands: status, health, session, runtime, plugins, knowledge, memory, workflow, events, guardian, service, logs, metrics, openclaw, intelligence, autonomous, web
-- **OpenClaw Integration** — Discovery (known locations, AppData, env, glob), health collector (4 components + real health.json parsing), log analyzer (5 severity patterns, 4 log locations)
-- **Operational Intelligence** — IncidentDetector (log errors + health components), RootCauseAnalyzer (8 pattern rules + knowledge lookup), Recommender (4 step templates, risk-based), KnowledgeLookup (6 built-in entries)
-- **Autonomous Operations** — ActionExecutor (safety pipeline), SafetyPolicy (risk matrix, auto-approve, blocked actions), ApprovalManager (30-min expiry, approve/deny), AutoRecovery (4 strategies), PluginIsolation (8 plugins)
-- **Web Dashboard** — FastAPI + Jinja2 + HTMX (dark theme, 8 pages, sidebar nav)
-- **Contracts** — Mission, DOS, Runtime contracts (Pydantic v2)
-- **Graceful Degradation** — Mission/DOS loaders return defaults on missing/invalid files
+- **Runtime Context** — IdentityBuilder, EnvironmentEngine, ProfileEngine, ConfigurationEngine
+- **Runtime Registry** — RuntimeCatalog, Locator, DescriptorEngine, ManifestEngine
+- **Runtime State** — StateMachineEngine (FSM 7 states, 8 transitions), SnapshotEngine, StateHistory, StateValidator
+- **Runtime Lifecycle** — LifecycleManager (startup 6 phases, shutdown 4 tasks, restart), StartupManager, ShutdownManager, RestartManager
+- **Runtime Bridge/Adapter** — AdapterRegistry, BridgeRouter, TransformEngine (upper/lower/prefix), ProtocolMapper
+- **Runtime Health** — HealthChecker, HealthEngine (thresholds: info/warning/critical), ResourceMonitor, HealthAggregator
+- **Runtime Security** — SecurityManager (policy-based ACL), AccessController, AuditLogger, VerdictEngine (allow/deny)
+- **Runtime Scheduler** — SchedulerEngine (plan/slot allocation), TaskScheduler (pending/running/complete), WindowScheduler, PriorityAllocator
+- **Runtime Event Bus** — EventBus (publish/subscribe), EventDispatcher, EventLogger, EventFilter (type/source/recent)
+- **Runtime Coordinator** — CoordinationEngine (plan/task), SyncCoordinator, Orchestrator
+- **Runtime Telemetry** — TelemetryCollector, MetricsAggregator (avg/min/max), TelemetryReporter
+- **Kernel Final Assembly** — FinalInspector (11 component check), KernelReporter, FinalVerdict
+- **12 Conversation Bridges** — masing-masing subsystem dengan 6-8 queries
+- **12 Dashboard Bridges** — 60 ExecutionCards (5 per subsystem, frozen dataclass)
+- **91 file sumber** di `src/sam/runtime_kernel/`
+- **1,719 tests** di sprint validation (sprint 100-111)
 
 ### Architecture
-- 6 ADR (015–020): Hosting Independence, State Machine, Session Persistence, Graceful Shutdown, Crash Recovery, Lifecycle Events
-- SAM Constitution — 10 pasal hukum tertinggi
-- Golden Rule: Mission > Safety > Autonomy > Runtime > All
-
-### Test Coverage
-- **287 tests** (unit + integration), 1 skipped
-- **0 regressions**
-- Coverage ≥80% pada semua modul Phase 0-1
-
-### Performance
-- Coordinator init: ~464ms
-- Import time: ~49ms (top-level), ~994ms (CLI full)
-- Model serialization: ~0.5ms/call
-- Full test suite: ~13s
+- Semua DTO immutable (frozen dataclass)
+- 0 forbidden imports (no asyncio, threading, subprocess, network, filesystem mutation)
+- Synchronous, deterministic, rule-based
+- Pipeline: Boot -> Context -> Registry -> State -> Lifecycle -> Bridge -> Health -> Security -> Scheduler -> Event Bus -> Coordinator -> Telemetry -> Final Assembly
 
 ---
 
-## v1.0.0 (2026-07-27) — GA Release
+## v9.11.0 (2026-07-29) — Execution Runtime Final
 
-Rilis awal SAM Framework dengan kemampuan:
-- Self-Evolution Engine
-- Cognitive Runtime
-- Cross-Cluster Intelligence
-- Knowledge Federation
-- Autonomous Runtime & Safety
-- Production Readiness (10 komponen)
-- Release tag: `v1.0.0`
-- Commit: `aeb20d5`
-- Architecture frozen (public API, CLI, DB schema)
+### Added
+- Execution Runtime v1 (preview-only): ExecutionRequest, ExecutionBuilder, ExecutionValidator, ExecutionStrategy
+- ResourcePlan, DependencyGraph, Timeline, AlertEngine, BudgetEngine, RiskEngine, QualityEngine
+- SimulationEngine, AssemblyEngine
+- 12 sprint validasi (sprint 88-99), ~1,600 tests
 
-Sebelum v1.0 GA, terdapat 3 rilis kandidat:
-- **v1.0.0-rc3** — Sprint 33: production readiness
-- **v1.0.0-rc2** — Sprint 29–32: autonomous, federation, cognitive
-- **v1.0.0-rc1** — Sprint 28: self-evolution engine
+---
+
+## v8.5.0 (2026-07-28) — Activation Runtime Final
+
+### Added
+- Activation Pipeline lengkap: ActivationRequest -> ActivationCandidate -> ActivationDraft -> ActivationPackage
+- ActivationContext, ActivationConstraints, ActivationPriority, ActivationWindow
+- ActivationHealth, ActivationMonitor, ActivationMetrics, ActivationReadiness
+- PackageBuilder, PackageExport, PackageRegistry, PackageValidator
+- Conversation bridges dan dashboard bridges untuk activation
+- 6 sprint (82-87), ~48 file sumber
+
+---
+
+## v7.0.0 (2026-07-28) — Operational Brain Integration
+
+### Added
+- Operational Brain: OperationalBuilder, OperationalCandidate, OperationalPlanner, OperationalScheduler
+- HealthAggregator, ReadinessChecker, OperationalMonitor, OperationalMetrics
+- DependencyResolver, OperationalPlanExporter
+- Conversation bridges dan dashboard bridges
+
+---
+
+## v6.0.0 (2026-07-27) — Decision Runtime
+
+### Added
+- Decision Runtime: Evaluation, Planning, Approval, Adapter, Submission, Gateway, Session, Lifecycle, Activation
+- CertificationEngine, FinalizationEngine, LifecycleEngine
+- ApprovalEngine (multi-level, policy-based, workflow-based)
+- SessionBuilder, SessionRegistry, SessionValidator
+- Conversation bridges untuk semua engine
+
+---
+
+## v5.0.0 (2026-07-27) — Guardian Live Intelligence
+
+### Added
+- Guardian Live Runtime: dispatcher, reasoning bridge, learning bridge, execution preview
+- Situation Intelligence, Transition Intelligence, Runtime Sync
+- Priority assessment, risk assessment, event correlation
+- Dashboard bridges (6 cards) dan conversation bridges (10 queries)
+
+---
+
+## v4.0.0 (2026-07-27) — Guardian Runtime
+
+### Added
+- Event-driven synchronous runtime
+- Guardian: observe, analyze, decide, act, verify (GDP pipeline)
+- Learning foundation: knowledge base, experience repository, pattern evolution
+- Execution pipeline: dispatch, connector, execution engine, adapter, provider
+- Plugin ecosystem, extension SDK
+
+---
+
+## v3.0.0 (2026-07-26) — Guardian Intelligence
+
+### Added
+- Guardian intelligence: operational assessment, operational intent, decision handoff
+- Decision justification, decision packaging, decision consumption
+- Observation, policies, event engine
+
+---
+
+## v2.0.0 (2026-07-25) — Production Release
+
+### Added
+- Runtime Kernel (12-state state machine, bootstrap, session, shutdown, recovery)
+- Guardian Kernel (Observer, Analyzer, Decision, Policy, Action, Verification)
+- Hosting Layer (Desktop, Docker, Windows Service, systemd)
+- Telemetry & Metrics (TelemetryEvent, RuntimeMetrics, 10000 event buffer)
+- Operations Console CLI (17 commands)
+- OpenClaw Integration (discovery, health, log analyzer)
+- Operational Intelligence (incident detection, RCA, recommendations)
+- Autonomous Operations (action executor, safety policy, approval manager)
+- Web Dashboard (FastAPI + Jinja2 + HTMX, 8 pages)
+- Graceful Degradation
+- 287 tests
+
+### Architecture
+- 6 ADR (015-020): Hosting Independence, State Machine, Session Persistence, Graceful Shutdown, Crash Recovery, Lifecycle Events
+- SAM Constitution: 10 pasal hukum tertinggi
+- Golden Rule: Mission > Safety > Autonomy > Runtime > All
+
+---
+
+## v1.0.0 (2026-07-24) — Initial
+
+### Added
+- Foundation: agent state, telemetry, contracts
+- Sprint 1-7, v0.0.1 -> v0.1.0
