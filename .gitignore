@@ -31,7 +31,6 @@ ACC/
 *.tmp
 *.temp
 temp_screenshot.png
-*.bat
 
 # Coverage
 .coverage
@@ -42,15 +41,12 @@ test-results.xml
 workspace/
 approvals.json
 
-# Database — jangan commit! Semua file .db, .sqlite, .sqlite3
+# Database — jangan commit!
 *.db
-*.db.backup*
+*.db-*
 *.sqlite
 *.sqlite3
-data/*.db
-data/*.db-wal
-data/*.db-shm
 
-# TAPI migrations dir di-track via ! override
+# Migrations dir tetap di-track
 !data/migrations/
-data/migrations/*.sql
+!data/migrations/*.sql
