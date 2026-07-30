@@ -28,3 +28,11 @@ from sam.runtime_kernel.state_snapshot import SnapshotEngine
 from sam.runtime_kernel.state_history import StateHistory
 from sam.runtime_kernel.state_validator import StateValidator
 from sam.runtime_kernel.conversation_state import ConversationState, DashboardState
+from sam.runtime_kernel.runtime_lifecycle import (
+    LifecyclePhase, StartupPlan, ShutdownPlan, RestartPlan,
+)
+from sam.runtime_kernel.lifecycle_manager import LifecycleManager
+from sam.runtime_kernel.startup_manager import StartupManager
+from sam.runtime_kernel.shutdown_manager import ShutdownManager
+from sam.runtime_kernel.restart_manager import RestartManager
+from sam.runtime_kernel.conversation_lifecycle import ConversationLifecycle, DashboardLifecycle
