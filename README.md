@@ -4,22 +4,39 @@
 
 SAM (Self-evolving AI Manager) adalah platform guardian otonom yang mengamati, melindungi, dan memulihkan sistem AI. Dari runtime kernel hingga event-driven live runtime, web dashboard, dan desktop console — SAM menangani seluruh siklus operasi.
 
-## Fitur v9.11.0 — Execution Runtime (NEW)
+## Fitur v10.0.0 — Runtime Kernel (NEW)
 
 | Fitur | Deskripsi |
 |---|---|
-| **Execution Runtime (NEW)** | Menerima Activation Package Ready → menghasilkan Execution Plan Ready. 12 sprint (88–99), ~1,600 tests, 35+ files. Preview-only, deterministic, synchronous. |
-| **Execution Assembly** | AssemblyEngine merakit 7 komponen: Plan, Resources, Dependencies, Timeline, Alerts, Risk, Quality → Execution Plan Ready. |
-| **Execution Resources** | ResourceAllocator, ResourcePlan, ConversationResources, DashboardResources (allocation, limits, availability, summary). |
-| **Execution Dependencies** | DependencyGraphBuilder, DependencyValidator, ExecutionOrderResolver (topological sort, cycle detection). |
-| **Execution Timeline** | TimelineBuilder, TimelineEvent, ExecutionWindow, Milestone, TimelineSnapshot. |
-| **Execution Alerts** | AlertEngine dengan 5 operator (gt/lt/gte/lte/eq), rule registration, acknowledge, summary. |
-| **Execution Simulation** | SimulationEngine dengan step tracking, result aggregation, multiple scenarios. |
-| **Execution Budget/Cost** | BudgetEngine, CostEstimate, BudgetReport dengan over-budget detection. |
-| **Execution Risk** | RiskEngine dengan factor-based scoring (effort, dependencies, priority), 4 risk levels. |
-| **Execution Quality** | QualityEngine dengan 3 metrics (effort variance, dependency coverage, type diversity), QualityGate. |
-| **15 Conversation Bridges** | Masing-masing 8 queries per subsystem. |
-| **15 Dashboard Bridges** | Masing-masing 5 ExecutionCard per subsystem (75 total cards). |
+| **Runtime Kernel (NEW)** | Foundation koordinasi antar-subsystem. 12 sprint (100–111), 1,719 tests, 91 source files, 60 ExecutionCards. Semua DTO frozen, 0 forbidden imports. |
+| **Runtime Context** | Identity, Environment, Profile, Configuration engine. IdentityBuilder, EnvironmentEngine, ProfileEngine, ConfigurationEngine. |
+| **Runtime Registry** | Catalog, Locator, Descriptor, Manifest engine. RuntimeCatalog, RuntimeLocator, DescriptorEngine, ManifestEngine. |
+| **Runtime State** | StateMachineEngine (FSM 7 states, 8 transitions), SnapshotEngine, StateHistory, StateValidator. |
+| **Runtime Lifecycle** | LifecycleManager (startup 6 phases, shutdown 4 tasks, restart). StartupManager, ShutdownManager, RestartManager. |
+| **Runtime Bridge/Adapter** | AdapterRegistry, BridgeRouter, TransformEngine (upper/lower/prefix), ProtocolMapper (interop check). |
+| **Runtime Health** | HealthChecker, HealthEngine (threshold: info/warning/critical), ResourceMonitor, HealthAggregator. |
+| **Runtime Security** | SecurityManager (policy-based ACL), AccessController, AuditLogger, VerdictEngine (allow/deny). |
+| **Runtime Scheduler** | SchedulerEngine (plan/slot allocation), TaskScheduler (pending/running/complete), WindowScheduler, PriorityAllocator. |
+| **Runtime Event Bus** | EventBus (publish/subscribe), EventDispatcher, EventLogger, EventFilter (type/source/recent). |
+| **Runtime Coordinator** | CoordinationEngine (plan/task), SyncCoordinator, Orchestrator. |
+| **Runtime Telemetry** | TelemetryCollector, MetricsAggregator (avg/min/max), TelemetryReporter. |
+| **Kernel Final Assembly** | FinalInspector (11 component check), KernelReporter, FinalVerdict. All 11 components healthy, ready for integration. |
+| **12 Conversation Bridges** | Masing-masing 6–8 queries per subsystem. |
+| **12 Dashboard Bridges** | Masing-masing 5 ExecutionCard per subsystem (60 total cards). |
+
+## Pipeline SAM v10.0.0
+
+```
+Activation Package Ready (Phase VIII)
+       ↓
+Execution Runtime (Phase IX) → Execution Plan Ready
+       ↓
+Runtime Kernel (Phase X) → Foundation untuk integrasi
+  ├── Context → Registry → State → Lifecycle → Bridge
+  ├── Health → Security → Scheduler → Event Bus
+  ├── Coordinator → Telemetry → Final Assembly
+  └── 12 Conversation Bridges + 12 Dashboard Bridges (60 cards)
+```
 
 ## Pipeline Upgrade (Phase IX)
 
