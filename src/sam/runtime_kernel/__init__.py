@@ -91,3 +91,9 @@ from sam.runtime_kernel.telemetry_collector import TelemetryCollector
 from sam.runtime_kernel.metrics_aggregator import MetricsAggregator
 from sam.runtime_kernel.telemetry_reporter import TelemetryReporter
 from sam.runtime_kernel.conversation_telemetry import ConversationTelemetry, DashboardTelemetry
+from sam.runtime_kernel.kernel_final import (
+    KernelFinalReport, ComponentHealth, KernelSummary, FinalVerdict,
+)
+from sam.runtime_kernel.final_inspector import FinalInspector
+from sam.runtime_kernel.kernel_reporter import KernelReporter
+from sam.runtime_kernel.conversation_final import ConversationFinal, DashboardFinal
