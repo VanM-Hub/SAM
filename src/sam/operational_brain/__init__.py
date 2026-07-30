@@ -1,4 +1,4 @@
-"""Operational Brain — SAM Operational Brain Runtime v7.1.0
+"""Operational Brain — SAM Operational Brain Runtime v7.2.0
 
 Subsystem untuk mengorkestrasi operasi SAM tanpa melakukan eksekusi.
 Foundation (v7.0.0) → Planning (v7.1.0) → Scheduling (v7.2.0) → Plan (v7.3.0).
@@ -17,10 +17,23 @@ from sam.operational_brain.operational_planner import (
     OperationalPlanner,
 )
 from sam.operational_brain.operational_planning import OperationalPlanning
+from sam.operational_brain.operational_scheduler import (
+    ScheduledItem,
+    Schedule,
+    OperationalScheduler,
+)
+from sam.operational_brain.dependency_resolver import (
+    DependencyNode,
+    DependencyGraph,
+    CycleError,
+    DependencyResolver,
+)
 from sam.operational_brain.conversation_operational import OperationalConversation
 from sam.operational_brain.conversation_planning import ConversationPlanning
+from sam.operational_brain.conversation_scheduling import ConversationScheduling
 from sam.operational_brain.dashboard_operational import OperationalDashboardCard, OperationalDashboard
 from sam.operational_brain.dashboard_planning import PlanningCard, DashboardPlanning
+from sam.operational_brain.dashboard_scheduling import SchedulingCard, DashboardScheduling
 
 __all__ = [
     "OperationalContext",
@@ -31,8 +44,12 @@ __all__ = [
     "PriorityTier", "PlanEntry", "PlanSummary",
     "OperationalPrioritizer", "OperationalPlanner",
     "OperationalPlanning",
+    "ScheduledItem", "Schedule", "OperationalScheduler",
+    "DependencyNode", "DependencyGraph", "CycleError", "DependencyResolver",
     "OperationalConversation",
     "ConversationPlanning",
+    "ConversationScheduling",
     "OperationalDashboardCard", "OperationalDashboard",
     "PlanningCard", "DashboardPlanning",
+    "SchedulingCard", "DashboardScheduling",
 ]
