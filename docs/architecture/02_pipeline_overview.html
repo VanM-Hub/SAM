@@ -1,0 +1,210 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SAM — Pipeline Overview</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f8fafc; --fg: #172033; --muted: #5b6475; --line: #64748b; --neutral: #e2e8f0; --input: #bfdbfe; --process: #c7d2fe; --storage: #99f6e4; --external: #fde68a; --risk: #fecaca; --bridge: #ddd6fe; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f172a; --fg: #e5e7eb; --muted: #a3adbd; --line: #94a3b8; --neutral: #334155; --input: #1d4ed8; --process: #4338ca; --storage: #0f766e; --external: #92400e; --risk: #991b1b; --bridge: #5b21b6; }
+  }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.4 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  main { max-width:1100px; margin:32px auto; padding:0 20px; }
+  svg { width:100%; height:auto; display:block; }
+  .title { font-size:20px; font-weight:650; fill:var(--fg); }
+  .label { font-size:12px; font-weight:600; fill:var(--fg); }
+  .small { font-size:10px; fill:var(--muted); }
+  .node { stroke:var(--line); stroke-width:1; rx:6; ry:6; }
+  .neutral { fill:var(--neutral); } .input { fill:var(--input); } .process { fill:var(--process); } .storage { fill:var(--storage); } .external { fill:var(--external); } .risk { fill:var(--risk); } .bridge { fill:var(--bridge); }
+  .edge { stroke:var(--line); stroke-width:1.5; fill:none; }
+  .zone { fill:none; stroke:var(--line); stroke-width:1; stroke-dasharray:6 5; opacity:0.8; rx:10; ry:10; }
+</style>
+<main>
+<svg viewBox="0 0 1000 680">
+  <text x="500" y="30" text-anchor="middle" class="title">SAM Pipeline Overview</text>
+  <text x="500" y="48" text-anchor="middle" class="small">End-to-end data flow through all 7 runtimes</text>
+
+  <!-- Pipeline: Guardian -> Decision -> Approval -> Activation -> Execution -> Kernel -->
+
+  <!-- Zone for each subsystem -->
+  <rect x="30" y="65" width="130" height="460" class="zone" />
+  <text x="95" y="80" text-anchor="middle" class="small" fill="var(--muted)">Guardian</text>
+
+  <rect x="175" y="65" width="130" height="460" class="zone" />
+  <text x="240" y="80" text-anchor="middle" class="small" fill="var(--muted)">Decision</text>
+
+  <rect x="320" y="65" width="130" height="460" class="zone" />
+  <text x="385" y="80" text-anchor="middle" class="small" fill="var(--muted)">Approval</text>
+
+  <rect x="465" y="65" width="130" height="460" class="zone" />
+  <text x="530" y="80" text-anchor="middle" class="small" fill="var(--muted)">Activation</text>
+
+  <rect x="610" y="65" width="130" height="460" class="zone" />
+  <text x="675" y="80" text-anchor="middle" class="small" fill="var(--muted)">Execution</text>
+
+  <rect x="755" y="65" width="130" height="460" class="zone" />
+  <text x="820" y="80" text-anchor="middle" class="small" fill="var(--muted)">OP Brain</text>
+
+  <rect x="895" y="65" width="90" height="460" class="zone" />
+  <text x="940" y="80" text-anchor="middle" class="small" fill="var(--muted)">Kernel</text>
+
+  <!-- Guardian stages -->
+  <rect x="38" y="100" width="114" height="35" class="node input" />
+  <text x="95" y="122" text-anchor="middle" class="label">Event</text>
+  <line x1="95" y1="135" x2="95" y2="150" class="edge" marker-end="url(#arrow)" />
+  <rect x="38" y="150" width="114" height="35" class="node process" />
+  <text x="95" y="172" text-anchor="middle" class="label">State + Sync</text>
+  <line x1="95" y1="185" x2="95" y2="200" class="edge" marker-end="url(#arrow)" />
+  <rect x="38" y="200" width="114" height="35" class="node process" />
+  <text x="95" y="222" text-anchor="middle" class="label">Transition</text>
+  <line x1="95" y1="235" x2="95" y2="250" class="edge" marker-end="url(#arrow)" />
+  <rect x="38" y="250" width="114" height="35" class="node process" />
+  <text x="95" y="272" text-anchor="middle" class="label">Situation</text>
+  <line x1="95" y1="285" x2="95" y2="300" class="edge" marker-end="url(#arrow)" />
+  <rect x="38" y="300" width="114" height="35" class="node process" />
+  <text x="95" y="322" text-anchor="middle" class="label">Assessment</text>
+  <line x1="95" y1="335" x2="95" y2="350" class="edge" marker-end="url(#arrow)" />
+  <rect x="38" y="350" width="114" height="35" class="node process" />
+  <text x="95" y="372" text-anchor="middle" class="label">Intent</text>
+  <line x1="95" y1="385" x2="95" y2="400" class="edge" marker-end="url(#arrow)" />
+  <rect x="38" y="400" width="114" height="40" class="node risk" />
+  <text x="95" y="418" text-anchor="middle" class="label">Handoff</text>
+  <text x="95" y="432" text-anchor="middle" class="small">DecisionInput</text>
+
+  <!-- Arrow Guardian -> Decision -->
+  <line x1="160" y1="430" x2="175" y2="430" class="edge edge-bold" marker-end="url(#arrow)" />
+
+  <!-- Decision stages -->
+  <rect x="183" y="100" width="114" height="35" class="node process" />
+  <text x="240" y="122" text-anchor="middle" class="label">Evaluation</text>
+  <line x1="240" y1="135" x2="240" y2="150" class="edge" marker-end="url(#arrow)" />
+  <rect x="183" y="150" width="114" height="35" class="node process" />
+  <text x="240" y="172" text-anchor="middle" class="label">Planning</text>
+  <line x1="240" y1="185" x2="240" y2="200" class="edge" marker-end="url(#arrow)" />
+  <rect x="183" y="200" width="114" height="35" class="node process" />
+  <text x="240" y="222" text-anchor="middle" class="label">Gateway</text>
+  <line x1="240" y1="235" x2="240" y2="250" class="edge" marker-end="url(#arrow)" />
+  <rect x="183" y="250" width="114" height="35" class="node process" />
+  <text x="240" y="272" text-anchor="middle" class="label">Session</text>
+  <line x1="240" y1="285" x2="240" y2="300" class="edge" marker-end="url(#arrow)" />
+  <rect x="183" y="300" width="114" height="35" class="node process" />
+  <text x="240" y="322" text-anchor="middle" class="label">Approval</text>
+  <line x1="240" y1="335" x2="240" y2="350" class="edge" marker-end="url(#arrow)" />
+  <rect x="183" y="350" width="114" height="35" class="node process" />
+  <text x="240" y="372" text-anchor="middle" class="label">Certification</text>
+  <line x1="240" y1="385" x2="240" y2="400" class="edge" marker-end="url(#arrow)" />
+  <rect x="183" y="400" width="114" height="40" class="node risk" />
+  <text x="240" y="418" text-anchor="middle" class="label">Finalization</text>
+  <text x="240" y="432" text-anchor="middle" class="small">CertVerdict</text>
+
+  <!-- Arrow Decision -> Approval -->
+  <line x1="297" y1="430" x2="320" y2="430" class="edge edge-bold" marker-end="url(#arrow)" />
+
+  <!-- Approval -->
+  <rect x="328" y="100" width="114" height="35" class="node process" />
+  <text x="385" y="122" text-anchor="middle" class="label">Intake</text>
+  <line x1="385" y1="135" x2="385" y2="150" class="edge" marker-end="url(#arrow)" />
+  <rect x="328" y="150" width="114" height="35" class="node process" />
+  <text x="385" y="172" text-anchor="middle" class="label">Policy</text>
+  <line x1="385" y1="185" x2="385" y2="200" class="edge" marker-end="url(#arrow)" />
+  <rect x="328" y="200" width="114" height="35" class="node process" />
+  <text x="385" y="222" text-anchor="middle" class="label">Workflow</text>
+  <line x1="385" y1="235" x2="385" y2="250" class="edge" marker-end="url(#arrow)" />
+  <rect x="328" y="250" width="114" height="35" class="node process" />
+  <text x="385" y="272" text-anchor="middle" class="label">Multilevel</text>
+  <line x1="385" y1="285" x2="385" y2="300" class="edge" marker-end="url(#arrow)" />
+  <rect x="328" y="300" width="114" height="35" class="node process" />
+  <text x="385" y="322" text-anchor="middle" class="label">History</text>
+  <line x1="385" y1="335" x2="385" y2="400" class="edge" />
+  <rect x="328" y="400" width="114" height="40" class="node risk" />
+  <text x="385" y="418" text-anchor="middle" class="label">Dashboard</text>
+  <text x="385" y="432" text-anchor="middle" class="small">Cards</text>
+
+  <!-- Arrow Approval -> Activation -->
+  <line x1="442" y1="430" x2="465" y2="430" class="edge edge-bold" marker-end="url(#arrow)" />
+
+  <!-- Activation -->
+  <rect x="473" y="100" width="114" height="35" class="node process" />
+  <text x="530" y="122" text-anchor="middle" class="label">Request</text>
+  <line x1="530" y1="135" x2="530" y2="150" class="edge" marker-end="url(#arrow)" />
+  <rect x="473" y="150" width="114" height="35" class="node process" />
+  <text x="530" y="172" text-anchor="middle" class="label">Builder</text>
+  <line x1="530" y1="185" x2="530" y2="200" class="edge" marker-end="url(#arrow)" />
+  <rect x="473" y="200" width="114" height="35" class="node process" />
+  <text x="530" y="222" text-anchor="middle" class="label">Draft</text>
+  <line x1="530" y1="235" x2="530" y2="250" class="edge" marker-end="url(#arrow)" />
+  <rect x="473" y="250" width="114" height="35" class="node process" />
+  <text x="530" y="272" text-anchor="middle" class="label">Package</text>
+  <line x1="530" y1="285" x2="530" y2="300" class="edge" marker-end="url(#arrow)" />
+  <rect x="473" y="300" width="114" height="35" class="node process" />
+  <text x="530" y="322" text-anchor="middle" class="label">Validate</text>
+  <line x1="530" y1="335" x2="530" y2="400" class="edge" />
+  <rect x="473" y="400" width="114" height="40" class="node risk" />
+  <text x="530" y="418" text-anchor="middle" class="label">Export</text>
+  <text x="530" y="432" text-anchor="middle" class="small">ActivationPackage</text>
+
+  <!-- Arrow Activation -> Execution -->
+  <line x1="587" y1="430" x2="610" y2="430" class="edge edge-bold" marker-end="url(#arrow)" />
+
+  <!-- Execution -->
+  <rect x="618" y="95" width="114" height="30" class="node process" />
+  <text x="675" y="116" text-anchor="middle" class="label">Strategy</text>
+  <line x1="675" y1="125" x2="675" y2="140" class="edge" marker-end="url(#arrow)" />
+  <rect x="618" y="140" width="114" height="30" class="node process" />
+  <text x="675" y="161" text-anchor="middle" class="label">Resource</text>
+  <line x1="675" y1="170" x2="675" y2="185" class="edge" marker-end="url(#arrow)" />
+  <rect x="618" y="185" width="114" height="30" class="node process" />
+  <text x="675" y="206" text-anchor="middle" class="label">Dependency</text>
+  <line x1="675" y1="215" x2="675" y2="230" class="edge" marker-end="url(#arrow)" />
+  <rect x="618" y="230" width="114" height="30" class="node process" />
+  <text x="675" y="251" text-anchor="middle" class="label">Timeline</text>
+  <line x1="675" y1="260" x2="675" y2="275" class="edge" marker-end="url(#arrow)" />
+  <rect x="618" y="275" width="114" height="30" class="node process" />
+  <text x="675" y="296" text-anchor="middle" class="label">Budget/Risk</text>
+  <line x1="675" y1="305" x2="675" y2="320" class="edge" marker-end="url(#arrow)" />
+  <rect x="618" y="320" width="114" height="30" class="node process" />
+  <text x="675" y="341" text-anchor="middle" class="label">Quality</text>
+  <line x1="675" y1="350" x2="675" y2="365" class="edge" marker-end="url(#arrow)" />
+  <rect x="618" y="365" width="114" height="30" class="node process" />
+  <text x="675" y="386" text-anchor="middle" class="label">Simulation</text>
+  <line x1="675" y1="395" x2="675" y2="410" class="edge" marker-end="url(#arrow)" />
+  <rect x="618" y="410" width="114" height="35" class="node risk" />
+  <text x="675" y="430" text-anchor="middle" class="label">Assembly</text>
+  <text x="675" y="442" text-anchor="middle" class="small">ExecutionAssembly</text>
+
+  <!-- OP Brain (vertical) -->
+  <rect x="763" y="95" width="114" height="35" class="node storage" />
+  <text x="820" y="117" text-anchor="middle" class="label">Health</text>
+  <line x1="820" y1="130" x2="820" y2="145" class="edge" marker-end="url(#arrow)" />
+  <rect x="763" y="145" width="114" height="35" class="node storage" />
+  <text x="820" y="167" text-anchor="middle" class="label">Readiness</text>
+  <line x1="820" y1="180" x2="820" y2="195" class="edge" marker-end="url(#arrow)" />
+  <rect x="763" y="195" width="114" height="35" class="node storage" />
+  <text x="820" y="217" text-anchor="middle" class="label">Planning</text>
+  <line x1="820" y1="230" x2="820" y2="245" class="edge" marker-end="url(#arrow)" />
+  <rect x="763" y="245" width="114" height="35" class="node storage" />
+  <text x="820" y="267" text-anchor="middle" class="label">Scheduling</text>
+  <line x1="820" y1="280" x2="820" y2="295" class="edge" marker-end="url(#arrow)" />
+  <rect x="763" y="295" width="114" height="35" class="node storage" />
+  <text x="820" y="317" text-anchor="middle" class="label">Monitor</text>
+  <line x1="820" y1="330" x2="820" y2="345" class="edge" marker-end="url(#arrow)" />
+  <rect x="763" y="345" width="114" height="35" class="node storage" />
+  <text x="820" y="367" text-anchor="middle" class="label">Export</text>
+
+  <!-- Kernel (top right) -->
+  <rect x="903" y="200" width="80" height="180" class="node risk" />
+  <text x="943" y="265" text-anchor="middle" class="label">Runtime</text>
+  <text x="943" y="285" text-anchor="middle" class="label">Kernel</text>
+  <text x="943" y="305" text-anchor="middle" class="small">Coordinator</text>
+  <text x="943" y="320" text-anchor="middle" class="small">Health</text>
+  <text x="943" y="335" text-anchor="middle" class="small">Security</text>
+  <text x="943" y="350" text-anchor="middle" class="small">Event Bus</text>
+
+  <!-- Output indicators -->
+  <rect x="300" y="540" width="400" height="40" class="node risk" />
+  <text x="500" y="565" text-anchor="middle" class="label">Output: Certified ActivationPackage → ExecutionAssembly</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10" fill="var(--line)" /></marker>
+  </defs>
+</svg>
+</main>

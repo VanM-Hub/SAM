@@ -1,0 +1,1046 @@
+# DTO Catalog
+
+Auto-generated. Found 1010 frozen dataclass DTOs.
+
+## `activation` — 34 DTOs
+
+- **`ActivationAlternative`** — `activation/activation_alternative.py`
+- **`ActivationCandidate`** — `activation/activation_candidate.py`
+- **`ActivationCard`** — `activation/dashboard_activation.py`
+- **`ActivationContext`** — `activation/activation_context.py` (1 methods)
+- **`ActivationDraft`** — `activation/activation_draft.py`
+- **`ActivationHealthReport`** — `activation/activation_health.py`
+- **`ActivationMetrics`** — `activation/activation_metrics.py`
+- **`ActivationPackage`** — `activation/activation_package.py`
+- **`ActivationReport`** — `activation/activation_report.py`
+- **`ActivationRequest`** — `activation/activation_request.py`
+- **`ActivationRule`** — `activation/activation_rules.py`
+- **`ActivationRuntimeStatus`** — `activation/activation_runtime_status.py`
+- **`ActivationSequence`** — `activation/activation_sequence.py`
+- **`ActivationSnapshot`** — `activation/activation_registry.py`
+- **`ActivationSnapshotState`** — `activation/activation_snapshot.py`
+- **`ActivationStep`** — `activation/activation_sequence.py`
+- **`ActivationStrategy`** — `activation/activation_strategy.py`
+- **`ActivationWindow`** — `activation/activation_window.py`
+- **`ConstraintResult`** — `activation/activation_constraints.py`
+- **`HistoryEntry`** — `activation/activation_history.py`
+- **`MonitorCard`** — `activation/dashboard_monitor.py`
+- **`MonitorEvent`** — `activation/activation_monitor.py`
+- **`PackageCard`** — `activation/dashboard_package.py`
+- **`PackageExport`** — `activation/package_export.py`
+- **`PackageValidation`** — `activation/package_validator.py`
+- **`PriorityAssignment`** — `activation/activation_priority.py`
+- **`ReadinessCheck`** — `activation/activation_readiness.py`
+- **`RuntimeCard`** — `activation/dashboard_runtime.py`
+- **`RuntimeReport`** — `activation/activation_runtime_report.py`
+- **`RuntimeStatus`** — `activation/activation_runtime.py`
+- **`StrategyCard`** — `activation/dashboard_strategy.py`
+- **`ValidationCard`** — `activation/dashboard_validation.py`
+- **`ValidationError`** — `activation/activation_validator.py`
+- **`ValidationReport`** — `activation/activation_validator.py`
+
+## `approval` — 47 DTOs
+
+- **`ActiveWorkflowsCard`** — `approval/dashboard_workflow.py` (1 methods)
+- **`AnalyticsCard`** — `approval/dashboard_analytics.py` (1 methods)
+- **`AnalyticsMetric`** — `approval/analytics.py` (1 methods)
+- **`AnalyticsReport`** — `approval/analytics.py` (1 methods)
+- **`ApprovalHistory`** — `approval/history.py` (1 methods)
+- **`ApprovalIntakeRecord`** — `approval/intake_record.py` (1 methods)
+- **`ApprovalIntakeSummary`** — `approval/intake_summary.py` (1 methods)
+- **`ApprovalLevel`** — `approval/multilevel.py` (1 methods)
+- **`ApprovalPolicy`** — `approval/policy.py` (1 methods)
+- **`ApprovalRuntimeResult`** — `approval/runtime_v1.py` (1 methods)
+- **`ApprovalWorkflow`** — `approval/workflow.py` (1 methods)
+- **`AuditCard`** — `approval/dashboard_audit.py` (1 methods)
+- **`AuditEntry`** — `approval/audit.py` (1 methods)
+- **`AuditLog`** — `approval/audit.py` (1 methods)
+- **`CompletedWorkflowsCard`** — `approval/dashboard_workflow.py` (1 methods)
+- **`ConsoleCommand`** — `approval/console.py` (1 methods)
+- **`ConsoleResponse`** — `approval/console.py` (1 methods)
+- **`DashboardLayout`** — `approval/dashboard.py` (1 methods)
+- **`DashboardWidget`** — `approval/dashboard.py` (1 methods)
+- **`DelegationCard`** — `approval/dashboard_delegation.py` (1 methods)
+- **`DelegationRegistryState`** — `approval/delegation.py` (1 methods)
+- **`DelegationRule`** — `approval/delegation.py` (1 methods)
+- **`DistributionCard`** — `approval/dashboard_policy.py` (1 methods)
+- **`EngineCard`** — `approval/dashboard_policy.py` (1 methods)
+- **`EngineCard`** — `approval/dashboard_workflow.py` (1 methods)
+- **`HistoryCard`** — `approval/dashboard_history.py` (1 methods)
+- **`HistoryEntry`** — `approval/history.py` (1 methods)
+- **`IntakeCard`** — `approval/dashboard_intake.py` (1 methods)
+- **`IntakeMetadata`** — `approval/intake_record.py` (1 methods)
+- **`LevelCard`** — `approval/dashboard_multilevel.py` (1 methods)
+- **`LevelStatus`** — `approval/multilevel.py` (1 methods)
+- **`MultiLevelApproval`** — `approval/multilevel.py` (1 methods)
+- **`NormalizedApprovalRecord`** — `approval/intake_normalizer.py` (1 methods)
+- **`PhaseDistributionCard`** — `approval/dashboard_workflow.py` (1 methods)
+- **`PolicyCard`** — `approval/dashboard_policy.py` (1 methods)
+- **`PolicyCondition`** — `approval/policy.py` (1 methods)
+- **`PolicyEvaluationResult`** — `approval/policy.py` (1 methods)
+- **`ReadinessCard`** — `approval/dashboard_intake.py` (1 methods)
+- **`RegistryCard`** — `approval/dashboard_intake.py` (1 methods)
+- **`StatsCard`** — `approval/dashboard_multilevel.py` (1 methods)
+- **`SummaryCard`** — `approval/dashboard_intake.py` (1 methods)
+- **`SummaryCard`** — `approval/dashboard_workflow.py` (1 methods)
+- **`ValidationCard`** — `approval/dashboard_intake.py` (1 methods)
+- **`ValidationResult`** — `approval/intake_validator.py` (1 methods)
+- **`WarningsCard`** — `approval/dashboard_intake.py` (1 methods)
+- **`WorkflowCard`** — `approval/dashboard_workflow.py` (1 methods)
+- **`WorkflowTransition`** — `approval/workflow.py` (1 methods)
+
+## `execution` — 207 DTOs
+
+- **`AdapterCapability`** — `execution/adapters/adapter_protocol.py`
+- **`AdapterCard`** — `execution/adapters/dashboard_adapter.py`
+- **`AdapterContext`** — `execution/adapters/adapter_protocol.py`
+- **`AdapterDashboard`** — `execution/adapters/dashboard_adapter.py`
+- **`AdapterHealth`** — `execution/adapters/adapter_protocol.py`
+- **`AdapterMetadata`** — `execution/adapters/adapter_protocol.py`
+- **`AdapterPipelineResult`** — `execution/adapters/integration_adapter.py`
+- **`AdapterQueryResult`** — `execution/adapters/conversation_adapter.py`
+- **`AdapterResult`** — `execution/adapters/adapter_protocol.py`
+- **`AdapterStatistics`** — `execution/adapters/adapter_registry.py`
+- **`AdapterValidationIssue`** — `execution/adapters/adapter_validator.py`
+- **`AdapterValidationReport`** — `execution/adapters/adapter_validator.py` (1 methods)
+- **`Alert`** — `execution/runtime/alerts.py`
+- **`AlertHistory`** — `execution/runtime/alerts.py`
+- **`AlertRule`** — `execution/runtime/alerts.py`
+- **`AlertSummary`** — `execution/runtime/alerts.py`
+- **`ApprovalCard`** — `execution/dashboard_execution.py`
+- **`ApprovalItem`** — `execution/approval_execution.py`
+- **`ApprovalRequest`** — `execution/approval_execution.py`
+- **`ApprovalResult`** — `execution/approval_execution.py`
+- **`AssemblyComponent`** — `execution/runtime/assembly.py`
+- **`AssemblySummary`** — `execution/runtime/assembly.py`
+- **`AuditCard`** — `execution/dispatch/dashboard_dispatch.py`
+- **`Budget`** — `execution/runtime/budget.py`
+- **`BudgetReport`** — `execution/runtime/budget.py`
+- **`BudgetSummary`** — `execution/runtime/budget.py`
+- **`Capability`** — `execution/connectors/connector_capability.py` (1 methods)
+- **`CapabilityCard`** — `execution/dashboard_execution.py`
+- **`CapabilityCard3`** — `execution/providers/dashboard_provider.py`
+- **`CapabilityCardDTO`** — `execution/connectors/dashboard_connector.py`
+- **`CapabilityCardDTO2`** — `execution/adapters/dashboard_adapter.py`
+- **`CapabilityLookup`** — `execution/connector_registry.py`
+- **`CapabilityReport`** — `execution/connectors/connector_capability.py` (1 methods)
+- **`CapabilitySet`** — `execution/connectors/connector_capability.py` (6 methods)
+- **`ConnectorCapability`** — `execution/connector_protocol.py`
+- **`ConnectorCard`** — `execution/dashboard_execution.py`
+- **`ConnectorContext`** — `execution/connectors/connector_runtime.py`
+- **`ConnectorDashboard`** — `execution/connectors/dashboard_connector.py`
+- **`ConnectorDispatchCard`** — `execution/dispatch/dashboard_dispatch.py`
+- **`ConnectorHealth`** — `execution/connectors/connector_runtime.py`
+- **`ConnectorHealthSnapshot`** — `execution/connectors/connector_health.py`
+- **`ConnectorHealthStatus`** — `execution/connectors/connector_health.py`
+- **`ConnectorInfo`** — `execution/connector_protocol.py`
+- **`ConnectorPipelineResult`** — `execution/connectors/integration_connector.py`
+- **`ConnectorPolicy`** — `execution/connectors/connector_policy.py`
+- **`ConnectorQueryResult`** — `execution/connectors/conversation_connector.py`
+- **`ConnectorRuntimeSnapshot`** — `execution/connectors/connector_runtime.py`
+- **`ConnectorSession`** — `execution/connectors/connector_runtime.py`
+- **`ConnectorSummaryCard`** — `execution/connectors/dashboard_connector.py`
+- **`CostEstimate`** — `execution/runtime/budget.py`
+- **`DependencyEdge`** — `execution/execution_planner.py`
+- **`DependencyGraph`** — `execution/runtime/dependency_graph.py`
+- **`DependencyNode`** — `execution/runtime/dependency_graph.py`
+- **`DependencySummary`** — `execution/runtime/dependency_graph.py`
+- **`DependencyValidation`** — `execution/runtime/dependency_graph.py`
+- **`DispatchAuditEntry`** — `execution/dispatch/dispatch_audit.py`
+- **`DispatchAuditSummary`** — `execution/dispatch/dispatch_audit.py`
+- **`DispatchBatch`** — `execution/dispatch/dispatch_request.py`
+- **`DispatchBatchQueue`** — `execution/dispatch/dispatch_queue.py`
+- **`DispatchCard`** — `execution/dispatch/dashboard_dispatch.py`
+- **`DispatchContext`** — `execution/dispatch/dispatcher.py`
+- **`DispatchDashboard`** — `execution/dispatch/dashboard_dispatch.py`
+- **`DispatchIssue`** — `execution/dispatch/dispatch_validator.py`
+- **`DispatchMetadata`** — `execution/dispatch/dispatch_request.py`
+- **`DispatchPipelineResult`** — `execution/dispatch/integration_dispatch.py`
+- **`DispatchPriority`** — `execution/dispatch/dispatch_request.py` (4 methods)
+- **`DispatchQueryResult`** — `execution/dispatch/conversation_dispatch.py`
+- **`DispatchReport`** — `execution/dispatch/dispatcher.py`
+- **`DispatchRequest`** — `execution/dispatch/dispatch_request.py` (2 methods)
+- **`DispatchSession`** — `execution/dispatch/dispatcher.py`
+- **`DispatchStatus`** — `execution/dispatch/dispatch_request.py` (10 methods)
+- **`DispatchSummary`** — `execution/dispatch/dispatch_request.py`
+- **`DispatchTarget`** — `execution/dispatch/dispatch_request.py`
+- **`DispatchTask`** — `execution/dispatch/dispatch_request.py`
+- **`DispatchValidationReport`** — `execution/dispatch/dispatch_validator.py` (1 methods)
+- **`EnginePipelineResult`** — `execution/engine/integration_execution_v2.py`
+- **`EnvelopeCard`** — `execution/adapters/dashboard_adapter.py`
+- **`ExecutionAssembly`** — `execution/runtime/assembly.py`
+- **`ExecutionCandidate`** — `execution/runtime/execution_candidate.py`
+- **`ExecutionCard`** — `execution/dashboard_execution.py`
+- **`ExecutionCard`** — `execution/runtime/dashboard_execution.py`
+- **`ExecutionContext`** — `execution/runtime/execution_context.py`
+- **`ExecutionDashboard`** — `execution/dashboard_execution.py`
+- **`ExecutionDashboardV2`** — `execution/engine/dashboard_execution_v2.py`
+- **`ExecutionDraft`** — `execution/runtime/execution_draft.py`
+- **`ExecutionEnvelope`** — `execution/adapters/execution_envelope.py` (1 methods)
+- **`ExecutionEnvelopeItem`** — `execution/adapters/execution_envelope.py`
+- **`ExecutionEnvelopeMetadata`** — `execution/adapters/execution_envelope.py`
+- **`ExecutionEnvelopeStatus`** — `execution/adapters/execution_envelope.py` (9 methods)
+- **`ExecutionEnvelopeSummary`** — `execution/adapters/execution_envelope.py`
+- **`ExecutionOrder`** — `execution/runtime/dependency_graph.py`
+- **`ExecutionPackage`** — `execution/engine/execution_builder.py`
+- **`ExecutionPackageCard`** — `execution/engine/dashboard_execution_v2.py`
+- **`ExecutionParameter`** — `execution/execution_request.py`
+- **`ExecutionPipelineResult`** — `execution/integration_execution.py`
+- **`ExecutionPlan`** — `execution/execution_request.py` (2 methods)
+- **`ExecutionPlan`** — `execution/runtime/execution_plan.py`
+- **`ExecutionQueryResult`** — `execution/conversation_execution.py`
+- **`ExecutionQueryResultV2`** — `execution/engine/conversation_execution_v2.py`
+- **`ExecutionQueue`** — `execution/engine/execution_scheduler.py`
+- **`ExecutionReport`** — `execution/runtime/execution_validator.py`
+- **`ExecutionRequest`** — `execution/execution_request.py` (3 methods)
+- **`ExecutionRequest`** — `execution/runtime/execution_request.py`
+- **`ExecutionResult`** — `execution/execution_request.py`
+- **`ExecutionRisk`** — `execution/execution_request.py`
+- **`ExecutionSequence`** — `execution/runtime/execution_strategy.py`
+- **`ExecutionSnapshot`** — `execution/runtime/execution_registry.py`
+- **`ExecutionStage`** — `execution/engine/execution_scheduler.py`
+- **`ExecutionStatus`** — `execution/execution_request.py` (12 methods)
+- **`ExecutionTarget`** — `execution/execution_request.py`
+- **`ExecutionTask`** — `execution/engine/execution_task.py` (2 methods)
+- **`ExecutionValidationError`** — `execution/runtime/execution_validator.py`
+- **`ExecutionValidationReport`** — `execution/runtime/execution_validator.py`
+- **`ExecutionWindow`** — `execution/runtime/timeline.py`
+- **`HealthCard`** — `execution/dashboard_execution.py`
+- **`HealthCardDTO`** — `execution/connectors/dashboard_connector.py`
+- **`HealthCardDTO2`** — `execution/adapters/dashboard_adapter.py`
+- **`HealthReport`** — `execution/connectors/connector_health.py`
+- **`HealthRuleResult`** — `execution/connectors/connector_health.py`
+- **`HealthStatus`** — `execution/runtime/monitor.py`
+- **`Milestone`** — `execution/runtime/timeline.py`
+- **`MonitorEvent`** — `execution/runtime/monitor.py`
+- **`MonitorMetrics`** — `execution/runtime/monitor.py`
+- **`MonitorSnapshot`** — `execution/runtime/monitor.py`
+- **`PolicyCardDTO`** — `execution/connectors/dashboard_connector.py`
+- **`PolicyDecision`** — `execution/connectors/connector_policy.py` (2 methods)
+- **`PolicyViolation`** — `execution/connectors/connector_policy.py`
+- **`PreviewCard3`** — `execution/providers/dashboard_provider.py`
+- **`PreviewCardDTO`** — `execution/connectors/dashboard_connector.py`
+- **`PreviewCardDTO2`** — `execution/adapters/dashboard_adapter.py`
+- **`PreviewOperation`** — `execution/adapters/adapter_preview.py`
+- **`PreviewResult`** — `execution/adapters/adapter_preview.py`
+- **`PreviewSummary`** — `execution/adapters/adapter_preview.py`
+- **`PriorityAssignment`** — `execution/runtime/execution_strategy.py`
+- **`ProviderCapability`** — `execution/providers/provider_protocol.py`
+- **`ProviderCard`** — `execution/providers/dashboard_provider.py`
+- **`ProviderDashboard`** — `execution/providers/dashboard_provider.py`
+- **`ProviderDescriptor`** — `execution/providers/provider_protocol.py`
+- **`ProviderHealthCard`** — `execution/providers/dashboard_provider.py`
+- **`ProviderMetadata`** — `execution/providers/provider_protocol.py`
+- **`ProviderPipelineResult`** — `execution/providers/integration_provider.py`
+- **`ProviderQueryResult`** — `execution/providers/conversation_provider.py`
+- **`ProviderRequest`** — `execution/providers/provider_protocol.py`
+- **`ProviderResponse`** — `execution/providers/provider_protocol.py`
+- **`ProviderSelection`** — `execution/providers/provider_router.py`
+- **`ProviderStatistics`** — `execution/providers/provider_registry.py`
+- **`ProviderStatus`** — `execution/providers/provider_protocol.py` (7 methods)
+- **`ProviderValidationIssue`** — `execution/providers/provider_validator.py`
+- **`ProviderValidationReport`** — `execution/providers/provider_validator.py` (1 methods)
+- **`QualityAssessment`** — `execution/runtime/quality.py`
+- **`QualityGate`** — `execution/runtime/quality.py`
+- **`QualityMetric`** — `execution/runtime/quality.py`
+- **`QualitySummary`** — `execution/runtime/quality.py`
+- **`QueueCard`** — `execution/dashboard_execution.py`
+- **`QueueCardDTO`** — `execution/dispatch/dashboard_dispatch.py`
+- **`QueueStatistics`** — `execution/dispatch/dispatch_queue.py`
+- **`QueuedDispatch`** — `execution/dispatch/dispatch_queue.py`
+- **`ReadinessReport`** — `execution/runtime/assembly.py`
+- **`RegisteredAdapter`** — `execution/adapters/adapter_registry.py`
+- **`RegisteredProvider`** — `execution/providers/provider_registry.py`
+- **`RegistryEntry`** — `execution/connector_registry.py`
+- **`ResourceAllocation`** — `execution/runtime/resource_plan.py`
+- **`ResourceAvailability`** — `execution/runtime/resource_plan.py`
+- **`ResourceLimits`** — `execution/runtime/resource_plan.py`
+- **`ResourcePlan`** — `execution/runtime/resource_plan.py`
+- **`ResourceSummary`** — `execution/runtime/resource_plan.py`
+- **`RiskAssessment`** — `execution/runtime/risk.py`
+- **`RiskCard`** — `execution/engine/dashboard_execution_v2.py`
+- **`RiskFactor`** — `execution/runtime/risk.py`
+- **`RiskReport`** — `execution/runtime/risk.py`
+- **`RiskSummary`** — `execution/runtime/risk.py`
+- **`RollbackCard`** — `execution/engine/dashboard_execution_v2.py`
+- **`RollbackPlan`** — `execution/engine/rollback_planner.py`
+- **`RollbackStep`** — `execution/engine/rollback_planner.py`
+- **`RollbackSummary`** — `execution/engine/rollback_planner.py`
+- **`RouteDecision`** — `execution/providers/provider_router.py`
+- **`RoutingCard`** — `execution/providers/dashboard_provider.py`
+- **`RoutingRule`** — `execution/providers/provider_router.py`
+- **`RoutingSummary`** — `execution/providers/provider_router.py`
+- **`ScheduleCard`** — `execution/engine/dashboard_execution_v2.py`
+- **`ScheduleSummary`** — `execution/engine/execution_scheduler.py`
+- **`ScheduleWindow`** — `execution/runtime/execution_strategy.py`
+- **`SequenceStep`** — `execution/runtime/execution_strategy.py`
+- **`SimulationConfig`** — `execution/runtime/simulation.py`
+- **`SimulationResult`** — `execution/runtime/simulation.py`
+- **`SimulationStep`** — `execution/runtime/simulation.py`
+- **`SimulationSummary`** — `execution/runtime/simulation.py`
+- **`StatisticsCard`** — `execution/dispatch/dashboard_dispatch.py`
+- **`StatisticsCard3`** — `execution/providers/dashboard_provider.py`
+- **`StrategyResult`** — `execution/runtime/execution_strategy.py`
+- **`TaskCard`** — `execution/engine/dashboard_execution_v2.py`
+- **`TaskCondition`** — `execution/engine/execution_task.py`
+- **`TaskDependency`** — `execution/engine/execution_task.py`
+- **`TaskGroup`** — `execution/engine/execution_task.py` (1 methods)
+- **`TaskMetadata`** — `execution/engine/execution_task.py`
+- **`TaskResult`** — `execution/engine/execution_task.py`
+- **`TaskRisk`** — `execution/engine/execution_task.py`
+- **`TaskStatus`** — `execution/engine/execution_task.py` (10 methods)
+- **`Timeline`** — `execution/runtime/timeline.py`
+- **`TimelineEvent`** — `execution/runtime/timeline.py`
+- **`TimelineSnapshot`** — `execution/runtime/timeline.py`
+- **`ValidationCard`** — `execution/engine/dashboard_execution_v2.py`
+- **`ValidationCardDTO`** — `execution/dispatch/dashboard_dispatch.py`
+- **`ValidationCardDTO2`** — `execution/adapters/dashboard_adapter.py`
+- **`ValidationIssue`** — `execution/engine/execution_validator.py`
+- **`ValidationReport`** — `execution/engine/execution_validator.py` (2 methods)
+- **`ValidationSeverity`** — `execution/engine/execution_validator.py` (4 methods)
+
+## `guardian` — 102 DTOs
+
+- **`AssessmentHistoryCard`** — `guardian/live/dashboard_assessment.py` (1 methods)
+- **`AssessmentOverviewCard`** — `guardian/live/dashboard_assessment.py` (1 methods)
+- **`AssessmentSnapshot`** — `guardian/live/assessment.py` (1 methods)
+- **`AssessmentStatistics`** — `guardian/live/assessment.py` (1 methods)
+- **`AssessmentSummary`** — `guardian/live/assessment.py` (1 methods)
+- **`BlockedItemsCard`** — `guardian/live/dashboard_handoff.py` (1 methods)
+- **`ConfidenceCard`** — `guardian/live/dashboard_assessment.py` (1 methods)
+- **`ConsistencyCard`** — `guardian/live/dashboard_justification.py` (1 methods)
+- **`ConsistencyCard`** — `guardian/live/dashboard_sync.py` (1 methods)
+- **`ConsistencyResult`** — `guardian/live/consistency.py` (1 methods)
+- **`CoverageCard`** — `guardian/live/dashboard_justification.py` (1 methods)
+- **`CoverageCard`** — `guardian/live/dashboard_package.py` (1 methods)
+- **`CriticalEventsCard`** — `guardian/live/dashboard_transition.py` (1 methods)
+- **`CurrentIntentCard`** — `guardian/live/dashboard_intent.py` (1 methods)
+- **`CurrentSituationCard`** — `guardian/live/dashboard_situation.py` (1 methods)
+- **`DecisionCandidate`** — `guardian/live/decision_input.py` (1 methods)
+- **`DecisionInput`** — `guardian/live/decision_input.py` (1 methods)
+- **`DecisionJustification`** — `guardian/live/justification.py` (1 methods)
+- **`DecisionMetadata`** — `guardian/live/decision_input.py` (1 methods)
+- **`DecisionPackage`** — `guardian/live/decision_package.py` (1 methods)
+- **`DecisionPackageCard`** — `guardian/live/dashboard_package.py` (1 methods)
+- **`DecisionQueueCard`** — `guardian/live/dashboard_handoff.py` (1 methods)
+- **`DecisionReason`** — `guardian/live/decision_input.py` (1 methods)
+- **`DecisionSnapshot`** — `guardian/live/decision_input.py` (1 methods)
+- **`DecisionStatistics`** — `guardian/live/decision_input.py` (1 methods)
+- **`DispatchStatusCard`** — `guardian/live/dashboard.py` (1 methods)
+- **`EligibilityResult`** — `guardian/live/eligibility.py`
+- **`EligibleItemsCard`** — `guardian/live/dashboard_handoff.py` (1 methods)
+- **`EventRecord`** — `guardian/live/history.py`
+- **`EvidenceChain`** — `guardian/live/evidence_chain.py` (1 methods)
+- **`EvidenceChainCard`** — `guardian/live/dashboard_justification.py` (1 methods)
+- **`EvidenceReference`** — `guardian/live/justification.py` (1 methods)
+- **`GuardianActivityCard`** — `guardian/live/dashboard.py` (1 methods)
+- **`GuardianAssessment`** — `guardian/live/assessment.py` (1 methods)
+- **`GuardianEvent`** — `guardian/live/event.py` (3 methods)
+- **`GuardianEventMetadata`** — `guardian/live/event.py` (1 methods)
+- **`GuardianEventSnapshot`** — `guardian/live/event.py` (1 methods)
+- **`GuardianIntent`** — `guardian/live/intent.py` (1 methods)
+- **`GuardianSituation`** — `guardian/live/situation.py` (1 methods)
+- **`HistoryCard`** — `guardian/live/dashboard_package.py` (1 methods)
+- **`ImpactCard`** — `guardian/live/dashboard_transition.py` (1 methods)
+- **`IntentHistoryCard`** — `guardian/live/dashboard_intent.py` (1 methods)
+- **`IntentPoliciesCard`** — `guardian/live/dashboard_intent.py` (1 methods)
+- **`IntentPriorityCard`** — `guardian/live/dashboard_intent.py` (1 methods)
+- **`IntentQueueCard`** — `guardian/live/dashboard_intent.py` (1 methods)
+- **`IntentSnapshot`** — `guardian/live/intent.py` (1 methods)
+- **`IntentStatistics`** — `guardian/live/intent.py` (1 methods)
+- **`IntentSummary`** — `guardian/live/intent.py` (1 methods)
+- **`IntentValidationCard`** — `guardian/live/dashboard_intent.py` (1 methods)
+- **`JustificationHistoryCard`** — `guardian/live/dashboard_justification.py` (1 methods)
+- **`JustificationSection`** — `guardian/live/justification.py` (1 methods)
+- **`JustificationSnapshot`** — `guardian/live/justification.py` (1 methods)
+- **`JustificationSummary`** — `guardian/live/justification.py` (1 methods)
+- **`LatestHandoffCard`** — `guardian/live/dashboard_handoff.py` (1 methods)
+- **`LatestJustificationCard`** — `guardian/live/dashboard_justification.py` (1 methods)
+- **`LiveRuntimeCard`** — `guardian/live/dashboard.py` (1 methods)
+- **`MetadataCard`** — `guardian/live/dashboard_package.py` (1 methods)
+- **`PackageMetadata`** — `guardian/live/decision_package.py` (1 methods)
+- **`PackageSnapshot`** — `guardian/live/decision_package.py` (1 methods)
+- **`PackageStatistics`** — `guardian/live/decision_package.py` (1 methods)
+- **`PackageSummary`** — `guardian/live/decision_package.py` (1 methods)
+- **`PackageValidationResult`** — `guardian/live/package_validator.py` (1 methods)
+- **`PriorityMatrixCard`** — `guardian/live/dashboard_assessment.py` (1 methods)
+- **`QueueHealthCard`** — `guardian/live/dashboard_handoff.py` (1 methods)
+- **`QueueStatisticsCard`** — `guardian/live/dashboard_handoff.py` (1 methods)
+- **`RecentChangesCard`** — `guardian/live/dashboard_transition.py` (1 methods)
+- **`RecentEventsCard`** — `guardian/live/dashboard.py` (1 methods)
+- **`RiskMatrixCard`** — `guardian/live/dashboard_assessment.py` (1 methods)
+- **`RuleReference`** — `guardian/live/justification.py` (1 methods)
+- **`RuleStep`** — `guardian/live/rule_trace.py` (1 methods)
+- **`RuleTrace`** — `guardian/live/rule_trace.py` (1 methods)
+- **`RuleTraceCard`** — `guardian/live/dashboard_justification.py` (1 methods)
+- **`RuntimeDistributionCard`** — `guardian/live/dashboard_situation.py` (1 methods)
+- **`RuntimeEvolutionCard`** — `guardian/live/dashboard_transition.py` (1 methods)
+- **`RuntimeHealthCard`** — `guardian/live/dashboard.py` (1 methods)
+- **`RuntimeRegistryCard`** — `guardian/live/dashboard_sync.py` (1 methods)
+- **`RuntimeRiskCard`** — `guardian/live/dashboard_assessment.py` (1 methods)
+- **`RuntimeSnapshot`** — `guardian/live/state.py` (1 methods)
+- **`RuntimeState`** — `guardian/live/state.py` (1 methods)
+- **`RuntimeStatistics`** — `guardian/live/state.py` (2 methods)
+- **`RuntimeTransition`** — `guardian/live/transition.py` (1 methods)
+- **`SituationCandidate`** — `guardian/live/situation.py` (1 methods)
+- **`SituationHistoryCard`** — `guardian/live/dashboard_situation.py` (1 methods)
+- **`SituationSeverityCard`** — `guardian/live/dashboard_situation.py` (1 methods)
+- **`SituationSnapshot`** — `guardian/live/situation.py` (1 methods)
+- **`SituationStatistics`** — `guardian/live/situation.py` (1 methods)
+- **`SituationStatisticsCard`** — `guardian/live/dashboard_situation.py` (1 methods)
+- **`SituationSummary`** — `guardian/live/situation.py` (1 methods)
+- **`SituationTimelineCard`** — `guardian/live/dashboard_situation.py` (1 methods)
+- **`SnapshotCard`** — `guardian/live/dashboard_sync.py` (1 methods)
+- **`StatisticsCard`** — `guardian/live/dashboard_package.py` (1 methods)
+- **`SubscribersCard`** — `guardian/live/dashboard.py` (1 methods)
+- **`SyncHealthCard`** — `guardian/live/dashboard_sync.py` (1 methods)
+- **`SynchronizationCard`** — `guardian/live/dashboard_sync.py` (1 methods)
+- **`TimelineCard`** — `guardian/live/dashboard_transition.py` (1 methods)
+- **`TransitionHistory`** — `guardian/live/transition.py` (1 methods)
+- **`TransitionStatistics`** — `guardian/live/transition.py` (1 methods)
+- **`TransitionStatisticsCard`** — `guardian/live/dashboard_transition.py` (1 methods)
+- **`TransitionSummary`** — `guardian/live/transition.py` (1 methods)
+- **`ValidationCard`** — `guardian/live/dashboard_package.py` (1 methods)
+- **`ValidationResult`** — `guardian/live/intent.py` (1 methods)
+- **`VersionMatrixCard`** — `guardian/live/dashboard_sync.py` (1 methods)
+
+## `integration` — 20 DTOs
+
+- **`CapabilityCard`** — `integration/dashboard.py`
+- **`HealthCard`** — `integration/dashboard.py`
+- **`IntegrationCapability`** — `integration/contracts.py`
+- **`IntegrationDashboard`** — `integration/dashboard.py`
+- **`IntegrationDescriptor`** — `integration/contracts.py`
+- **`IntegrationHealth`** — `integration/contracts.py`
+- **`IntegrationPipelineResult`** — `integration/runtime.py`
+- **`IntegrationPlan`** — `integration/planner.py`
+- **`IntegrationPreview`** — `integration/contracts.py`
+- **`IntegrationQueryResult`** — `integration/conversation.py`
+- **`IntegrationRequest`** — `integration/contracts.py`
+- **`IntegrationResponse`** — `integration/contracts.py`
+- **`IntegrationStep`** — `integration/planner.py`
+- **`PlanCard`** — `integration/dashboard.py`
+- **`PolicyCard`** — `integration/dashboard.py`
+- **`PolicyResult`** — `integration/policy.py` (2 methods)
+- **`ProviderCard`** — `integration/dashboard.py`
+- **`RegistryEntry`** — `integration/registry.py`
+- **`RegistryStatistics`** — `integration/registry.py`
+- **`SummaryCard`** — `integration/dashboard.py`
+
+## `launcher` — 21 DTOs
+
+- **`DashboardConfigInfo`** — `launcher/launcher_dashboard.py`
+- **`DashboardDiagnostic`** — `launcher/launcher_dashboard.py`
+- **`DashboardDiagnosticsInfo`** — `launcher/launcher_dashboard.py`
+- **`DashboardEnvironmentInfo`** — `launcher/launcher_dashboard.py`
+- **`DashboardGuardianInfo`** — `launcher/launcher_dashboard.py`
+- **`DashboardHostInfo`** — `launcher/launcher_dashboard.py`
+- **`DashboardPluginsInfo`** — `launcher/launcher_dashboard.py`
+- **`DashboardStartupInfo`** — `launcher/launcher_dashboard.py`
+- **`DashboardVersionInfo`** — `launcher/launcher_dashboard.py`
+- **`HostLaunchResult`** — `launcher/host_launcher.py` (1 methods)
+- **`LauncherDashboard`** — `launcher/launcher_dashboard.py` (1 methods)
+- **`OrchestratorReport`** — `launcher/runtime_bootstrap.py` (1 methods)
+- **`OrchestratorStep`** — `launcher/runtime_bootstrap.py`
+- **`PipelineResult`** — `launcher/startup_pipeline.py` (1 methods)
+- **`RecoveryResult`** — `launcher/recovery_startup.py` (1 methods)
+- **`RecoveryStep`** — `launcher/recovery_startup.py` (1 methods)
+- **`RuntimeDescriptor`** — `launcher/runtime_registry.py` (1 methods)
+- **`StageResult`** — `launcher/startup_report.py` (1 methods)
+- **`StartupIssue`** — `launcher/startup_report.py` (1 methods)
+- **`StartupReport`** — `launcher/startup_report.py` (2 methods)
+- **`StartupSummary`** — `launcher/startup_report.py` (1 methods)
+
+## `operational_brain` — 22 DTOs
+
+- **`CycleSnapshot`** — `operational_brain/operational_monitor.py`
+- **`DependencyGraph`** — `operational_brain/dependency_resolver.py`
+- **`DependencyNode`** — `operational_brain/dependency_resolver.py`
+- **`HealthReport`** — `operational_brain/health_aggregator.py`
+- **`OperationalCandidate`** — `operational_brain/operational_candidate.py`
+- **`OperationalContext`** — `operational_brain/operational_context.py` (1 methods)
+- **`OperationalDashboardCard`** — `operational_brain/dashboard_operational.py`
+- **`OperationalGoal`** — `operational_brain/operational_goal.py`
+- **`OperationalMetrics`** — `operational_brain/operational_metrics.py`
+- **`OperationalPlan`** — `operational_brain/operational_plan_exporter.py`
+- **`OperationalSnapshot`** — `operational_brain/operational_registry.py`
+- **`PlanDocument`** — `operational_brain/operational_plan_exporter.py`
+- **`PlanEntry`** — `operational_brain/operational_planner.py`
+- **`PlanExportCard`** — `operational_brain/dashboard_plan_export.py`
+- **`PlanSummary`** — `operational_brain/operational_planner.py`
+- **`PlanningCard`** — `operational_brain/dashboard_planning.py`
+- **`ReadinessCard`** — `operational_brain/dashboard_readiness.py`
+- **`ReadinessCheck`** — `operational_brain/readiness_checker.py`
+- **`ReadinessReport`** — `operational_brain/readiness_checker.py`
+- **`Schedule`** — `operational_brain/operational_scheduler.py`
+- **`ScheduledItem`** — `operational_brain/operational_scheduler.py`
+- **`SchedulingCard`** — `operational_brain/dashboard_scheduling.py`
+
+## `operations` — 452 DTOs
+
+- **`Action`** — `operations/action.py` (2 methods)
+- **`ActivationCard`** — `operations/brain/decision/dashboard_activation.py` (1 methods)
+- **`ActivationHistoryRecord`** — `operations/brain/decision/activation_history.py` (1 methods)
+- **`ActivationMetadata`** — `operations/brain/decision/approval_activation.py` (1 methods)
+- **`ActivationSnapshot`** — `operations/brain/decision/approval_activation.py` (1 methods)
+- **`ActivationStatistics`** — `operations/brain/decision/approval_activation.py` (1 methods)
+- **`ActivationValidationResult`** — `operations/brain/decision/activation_validator.py` (1 methods)
+- **`ActiveApprovalSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`AlternativeCard`** — `operations/brain/decision/dashboard.py` (1 methods)
+- **`AlternativesCard`** — `operations/brain/decision/dashboard_planning.py` (1 methods)
+- **`AppConfig`** — `operations/presentation/console/app.py` (1 methods)
+- **`ApprovalAction`** — `operations/presentation/console/approval_workspace.py`
+- **`ApprovalActivation`** — `operations/brain/decision/approval_activation.py` (1 methods)
+- **`ApprovalAdapterCard`** — `operations/brain/decision/dashboard_adapter.py` (1 methods)
+- **`ApprovalAdapterResult`** — `operations/brain/decision/approval_adapter.py` (1 methods)
+- **`ApprovalCandidate`** — `operations/brain/decision/approval_preparation.py` (1 methods)
+- **`ApprovalCard`** — `operations/brain/decision/dashboard.py` (1 methods)
+- **`ApprovalCertification`** — `operations/brain/decision/approval_certification.py` (1 methods)
+- **`ApprovalDispatcher`** — `operations/presentation/console/approval_workspace.py` (3 methods)
+- **`ApprovalEnvelopeSnapshot`** — `operations/brain/decision/approval_envelope.py` (1 methods)
+- **`ApprovalEnvelopeStatistics`** — `operations/brain/decision/approval_envelope.py` (1 methods)
+- **`ApprovalGatewayRequest`** — `operations/brain/decision/gateway_request.py` (1 methods)
+- **`ApprovalGatewayResult`** — `operations/brain/decision/approval_gateway.py` (1 methods)
+- **`ApprovalItem`** — `operations/presentation/console/approval_workspace.py`
+- **`ApprovalLifecycle`** — `operations/brain/decision/approval_lifecycle.py` (1 methods)
+- **`ApprovalMetadata`** — `operations/brain/decision/approval_preparation.py` (1 methods)
+- **`ApprovalPackageCard`** — `operations/brain/decision/dashboard_approval.py` (1 methods)
+- **`ApprovalPayload`** — `operations/brain/decision/approval_envelope.py` (1 methods)
+- **`ApprovalPreparation`** — `operations/brain/decision/approval_preparation.py` (1 methods)
+- **`ApprovalReference`** — `operations/brain/decision/approval_envelope.py` (1 methods)
+- **`ApprovalRequestDTO`** — `operations/brain/decision/approval.py` (1 methods)
+- **`ApprovalRequestEnvelope`** — `operations/brain/decision/approval_envelope.py` (1 methods)
+- **`ApprovalRequirement`** — `operations/brain/decision/approval_preparation.py` (1 methods)
+- **`ApprovalRequirementSet`** — `operations/brain/decision/approval_requirements.py` (1 methods)
+- **`ApprovalSession`** — `operations/brain/decision/approval_session.py` (1 methods)
+- **`ApprovalSessionMetadata`** — `operations/brain/decision/approval_session.py` (1 methods)
+- **`ApprovalSessionReference`** — `operations/brain/decision/approval_session.py` (1 methods)
+- **`ApprovalSessionSnapshot`** — `operations/brain/decision/approval_session.py` (1 methods)
+- **`ApprovalSessionStatistics`** — `operations/brain/decision/approval_session.py` (1 methods)
+- **`ApprovalSnapshot`** — `operations/brain/decision/approval_preparation.py` (1 methods)
+- **`ApprovalStateStatistics`** — `operations/brain/decision/approval_status.py` (1 methods)
+- **`ApprovalStateSummary`** — `operations/brain/decision/approval_status.py` (1 methods)
+- **`ApprovalStatistics`** — `operations/brain/decision/approval_preparation.py` (1 methods)
+- **`ApprovalStatusMirror`** — `operations/brain/decision/approval_status.py` (1 methods)
+- **`ApprovalSubmissionPlan`** — `operations/brain/decision/submission_plan.py` (1 methods)
+- **`ApprovalValidationResult`** — `operations/brain/decision/approval_validator.py` (1 methods)
+- **`ApprovalWidget`** — `operations/presentation/widgets.py`
+- **`ApprovalWidgetCollection`** — `operations/presentation/widgets.py`
+- **`ApprovalWorkspace`** — `operations/presentation/console/approval_workspace.py` (2 methods)
+- **`ApprovalWorkspaceFactory`** — `operations/presentation/console/approval_workspace.py` (3 methods)
+- **`ApproveMission`** — `operations/presentation/interaction.py`
+- **`ApproverLoad`** — `operations/orchestrator/workload.py` (1 methods)
+- **`AskEvidenceQuestion`** — `operations/brain/reasoning/conversation.py` (1 methods)
+- **`AskHealthQuestion`** — `operations/brain/reasoning/conversation.py` (1 methods)
+- **`AskMissionQuestion`** — `operations/brain/reasoning/conversation.py` (1 methods)
+- **`AskOperationalQuestion`** — `operations/brain/reasoning/conversation.py` (1 methods)
+- **`AskRecommendationQuestion`** — `operations/brain/reasoning/conversation.py` (1 methods)
+- **`AttentionItem`** — `operations/attention.py`
+- **`AuditEntry`** — `operations/audit.py` (2 methods)
+- **`AuditEntry`** — `operations/brain/guardian/audit.py` (1 methods)
+- **`BlockedMissionsCard`** — `operations/brain/guardian/dashboard_v3.py` (1 methods)
+- **`BlockersCard`** — `operations/brain/decision/dashboard_activation.py` (1 methods)
+- **`BodyView`** — `operations/presentation/console_view.py`
+- **`BrainDashboardDTO`** — `operations/brain/reasoning/context_builder.py` (1 methods)
+- **`BrainStatus`** — `operations/brain/guardian/supervisor.py`
+- **`Breadcrumb`** — `operations/presentation/navigation.py` (6 methods)
+- **`CancelMission`** — `operations/presentation/interaction.py`
+- **`CertificationCard`** — `operations/brain/decision/dashboard_certification.py` (1 methods)
+- **`CertificationHistoryRecord`** — `operations/brain/decision/certification_history.py` (1 methods)
+- **`CertificationRequirement`** — `operations/brain/decision/approval_certification.py` (1 methods)
+- **`CertificationSnapshot`** — `operations/brain/decision/approval_certification.py` (1 methods)
+- **`CertificationStatistics`** — `operations/brain/decision/approval_certification.py` (1 methods)
+- **`CertificationValidationResult`** — `operations/brain/decision/certification_validator.py` (1 methods)
+- **`ClaimVerdict`** — `operations/reasoning/guard.py` (1 methods)
+- **`ColorScheme`** — `operations/presentation/desktop/theme.py`
+- **`CommandEntry`** — `operations/presentation/console/command_registry.py`
+- **`CommandExecuted`** — `operations/presentation/console/event_bus.py`
+- **`CompactTheme`** extends Theme — `operations/presentation/theme.py` (1 methods)
+- **`CompletionCard`** — `operations/brain/decision/dashboard_finalization.py` (1 methods)
+- **`ConfidenceCard`** — `operations/brain/decision/dashboard_evaluation.py` (1 methods)
+- **`Conflict`** — `operations/orchestrator/conflict_detector.py` (1 methods)
+- **`ConflictReport`** — `operations/orchestrator/conflict_detector.py` (3 methods)
+- **`ConflictSummary`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`ConsoleConfig`** — `operations/presentation/console/config.py` (5 methods)
+- **`ConsoleDashboard`** — `operations/presentation/dashboard_composer.py`
+- **`ConsoleView`** — `operations/presentation/console_view.py` (1 methods)
+- **`ConstraintsCard`** — `operations/brain/decision/dashboard_planning.py` (1 methods)
+- **`ConversationDecisionResponse`** — `operations/brain/decision/conversation.py` (1 methods)
+- **`ConversationObject`** — `operations/conversation.py`
+- **`CoordinationResult`** — `operations/brain/guardian/coordination.py` (2 methods)
+- **`DarkTheme`** extends Theme — `operations/presentation/theme.py` (1 methods)
+- **`DashboardComposer`** — `operations/presentation/dashboard_composer.py` (1 methods)
+- **`DecisionAlternative`** — `operations/brain/decision/alternatives.py` (1 methods)
+- **`DecisionAlternative`** — `operations/brain/decision/planning.py` (1 methods)
+- **`DecisionCard`** — `operations/brain/decision/dashboard_activation.py` (1 methods)
+- **`DecisionContext`** — `operations/brain/decision/context.py` (1 methods)
+- **`DecisionContext`** — `operations/brain/decision/package_context.py` (1 methods)
+- **`DecisionContextCard`** — `operations/brain/decision/dashboard_package.py` (1 methods)
+- **`DecisionDashboard`** — `operations/brain/decision/dashboard.py` (1 methods)
+- **`DecisionEvaluation`** — `operations/brain/decision/evaluation.py` (1 methods)
+- **`DecisionEvaluation`** — `operations/brain/decision/evaluator.py` (1 methods)
+- **`DecisionPackage`** — `operations/brain/decision/package.py` (1 methods)
+- **`DecisionPackageValidationResult`** — `operations/brain/decision/package_validator.py` (1 methods)
+- **`DecisionPlan`** — `operations/brain/decision/planning.py` (1 methods)
+- **`DecisionPlanCard`** — `operations/brain/decision/dashboard_planning.py` (1 methods)
+- **`DecisionRecord`** — `operations/brain/decision/session.py` (1 methods)
+- **`DecisionRejected`** — `operations/brain/guardian/gate.py` (1 methods)
+- **`DecisionRiskCard`** — `operations/brain/decision/dashboard.py` (1 methods)
+- **`DecisionSnapshot`** — `operations/brain/decision/session.py` (1 methods)
+- **`DecisionStatus`** — `operations/brain/guardian/supervisor.py`
+- **`DecisionSummaryCard`** — `operations/brain/decision/dashboard.py` (1 methods)
+- **`DependenciesCard`** — `operations/brain/decision/dashboard_submission.py` (1 methods)
+- **`DependencyGraphDTO`** — `operations/orchestrator/dependency_graph.py`
+- **`DependencyGraphSummary`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`DesktopConfig`** — `operations/presentation/desktop/application.py` (1 methods)
+- **`DesktopLayout`** — `operations/presentation/desktop/layout.py` (6 methods)
+- **`DesktopNavigation`** — `operations/presentation/desktop/navigation.py` (9 methods)
+- **`DesktopScreen`** — `operations/presentation/desktop/navigation.py`
+- **`DesktopSessionState`** — `operations/presentation/desktop/session.py`
+- **`DesktopTheme`** — `operations/presentation/desktop/theme.py`
+- **`DesktopWindow`** — `operations/presentation/desktop/main_window.py` (4 methods)
+- **`EnvelopeCard`** — `operations/brain/decision/dashboard_adapter.py` (1 methods)
+- **`ErrorOccurred`** — `operations/presentation/console/event_bus.py`
+- **`EscalationPlan`** — `operations/orchestrator/escalation.py` (2 methods)
+- **`EscalationQueueSummary`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`EscalationStep`** — `operations/orchestrator/escalation.py` (1 methods)
+- **`EvaluationCard`** — `operations/brain/decision/dashboard_evaluation.py` (1 methods)
+- **`EvaluationReason`** — `operations/brain/decision/evaluation.py` (1 methods)
+- **`EvaluationResult`** — `operations/brain/decision/evaluation.py` (1 methods)
+- **`EvaluationSnapshot`** — `operations/brain/decision/evaluation.py` (1 methods)
+- **`EvaluationStatistics`** — `operations/brain/decision/evaluation.py` (1 methods)
+- **`EvaluationSummary`** — `operations/brain/decision/evaluation.py` (1 methods)
+- **`Evidence`** — `operations/verification.py` (2 methods)
+- **`EvidenceCard`** — `operations/brain/decision/dashboard.py` (1 methods)
+- **`EvidenceCard`** — `operations/brain/decision/dashboard_certification.py` (1 methods)
+- **`EvidenceItem`** — `operations/brain/decision/evaluator.py` (1 methods)
+- **`EvidenceItem`** — `operations/reasoning/evidence.py` (1 methods)
+- **`EvidenceSet`** — `operations/brain/decision/evaluator.py` (1 methods)
+- **`EvidenceSet`** — `operations/reasoning/evidence.py` (1 methods)
+- **`EvolutionCandidate`** — `operations/brain/learning/pattern_evolution.py`
+- **`EvolutionSummary`** — `operations/brain/learning/pattern_evolution.py`
+- **`ExecuteRecommendation`** — `operations/presentation/interaction.py`
+- **`ExecutionReadiness`** — `operations/brain/guardian/execution_readiness.py` (5 methods)
+- **`ExperienceCard`** — `operations/brain/learning/dashboard_learning.py`
+- **`ExperienceRecord`** — `operations/brain/learning/experience_repository.py` (1 methods)
+- **`ExperienceSummary`** — `operations/brain/learning/experience_repository.py`
+- **`ExplanationSection`** — `operations/brain/guardian/explanation.py` (1 methods)
+- **`FilterState`** — `operations/presentation/console/dashboard_runtime.py` (2 methods)
+- **`FinalDecisionMetadata`** — `operations/brain/decision/finalization.py` (1 methods)
+- **`FinalDecisionRecord`** — `operations/brain/decision/finalization.py` (1 methods)
+- **`FinalDecisionSnapshot`** — `operations/brain/decision/finalization.py` (1 methods)
+- **`FinalDecisionStatistics`** — `operations/brain/decision/finalization.py` (1 methods)
+- **`FinalDecisionSummary`** — `operations/brain/decision/finalization.py` (1 methods)
+- **`FinalRecordCard`** — `operations/brain/decision/dashboard_finalization.py` (1 methods)
+- **`FinalizationHistoryRecord`** — `operations/brain/decision/finalization_history.py` (1 methods)
+- **`FinalizationValidationResult`** — `operations/brain/decision/finalization_validator.py` (1 methods)
+- **`FindingsSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`FontScheme`** — `operations/presentation/desktop/theme.py`
+- **`FontToken`** — `operations/presentation/desktop/theme.py`
+- **`FooterView`** — `operations/presentation/console_view.py`
+- **`GateResult`** — `operations/brain/guardian/gate.py` (1 methods)
+- **`GatewayCard`** — `operations/brain/decision/dashboard_gateway.py` (1 methods)
+- **`GatewayMetadata`** — `operations/brain/decision/gateway_request.py` (1 methods)
+- **`GatewayReference`** — `operations/brain/decision/gateway_request.py` (1 methods)
+- **`GatewaySnapshot`** — `operations/brain/decision/gateway_request.py` (1 methods)
+- **`GatewayStatistics`** — `operations/brain/decision/gateway_request.py` (1 methods)
+- **`GovernanceCard`** — `operations/brain/guardian/dashboard_v3.py` (1 methods)
+- **`GovernanceConversationQuery`** — `operations/brain/guardian/conversation_governance.py`
+- **`GovernanceConversationResponse`** — `operations/brain/guardian/conversation_governance.py` (1 methods)
+- **`GovernanceDecision`** — `operations/brain/guardian/governance.py` (4 methods)
+- **`GovernanceEvidence`** — `operations/brain/guardian/governance.py` (1 methods)
+- **`GovernanceExplanation`** — `operations/brain/guardian/explanation.py` (2 methods)
+- **`GovernanceResult`** — `operations/brain/guardian/governance.py` (5 methods)
+- **`GraphEdge`** — `operations/orchestrator/dependency_graph.py`
+- **`GraphNode`** — `operations/orchestrator/dependency_graph.py`
+- **`GuardResult`** — `operations/reasoning/guard.py` (1 methods)
+- **`GuardianAlert`** — `operations/brain/guardian/watchdog.py` (1 methods)
+- **`GuardianAlerts`** — `operations/brain/guardian/dashboard.py` (1 methods)
+- **`GuardianConversationQuery`** — `operations/brain/guardian/conversation_supervisory.py`
+- **`GuardianConversationResponse`** — `operations/brain/guardian/conversation.py` (1 methods)
+- **`GuardianConversationResponse`** — `operations/brain/guardian/conversation_supervisory.py` (1 methods)
+- **`GuardianDashboard`** — `operations/brain/guardian/dashboard.py` (1 methods)
+- **`GuardianEvent`** — `operations/brain/guardian/history.py` (1 methods)
+- **`GuardianFinding`** — `operations/brain/guardian/summary.py`
+- **`GuardianHealth`** — `operations/brain/guardian/state.py` (1 methods)
+- **`GuardianHealthCard`** — `operations/brain/guardian/dashboard_v2.py` (1 methods)
+- **`GuardianHealthSnapshot`** — `operations/brain/guardian/snapshot.py`
+- **`GuardianIncident`** — `operations/brain/guardian/watchdog.py` (1 methods)
+- **`GuardianIntegrationResult`** — `operations/brain/guardian/runtime.py` (1 methods)
+- **`GuardianMetrics`** — `operations/brain/guardian/dashboard.py` (1 methods)
+- **`GuardianMetrics`** — `operations/brain/guardian/snapshot.py`
+- **`GuardianPipelineResult`** — `operations/brain/guardian/coordinator.py` (1 methods)
+- **`GuardianPolicyCard`** — `operations/brain/guardian/dashboard_v2.py` (1 methods)
+- **`GuardianPriority`** — `operations/brain/guardian/summary.py`
+- **`GuardianRecommendation`** — `operations/brain/guardian/recommendation.py` (1 methods)
+- **`GuardianRecommendationCard`** — `operations/brain/guardian/dashboard_v2.py` (1 methods)
+- **`GuardianRisk`** — `operations/brain/guardian/summary.py`
+- **`GuardianRiskCard`** — `operations/brain/guardian/dashboard_v2.py` (1 methods)
+- **`GuardianSection`** — `operations/brain/guardian/snapshot.py`
+- **`GuardianSnapshot`** — `operations/brain/guardian/snapshot.py` (1 methods)
+- **`GuardianSnapshot`** — `operations/brain/guardian/state.py` (1 methods)
+- **`GuardianState`** — `operations/brain/guardian/state.py` (1 methods)
+- **`GuardianStatistics`** — `operations/brain/guardian/state.py` (1 methods)
+- **`GuardianStatus`** — `operations/brain/guardian/dashboard.py` (1 methods)
+- **`GuardianSummary`** — `operations/brain/guardian/dashboard.py` (1 methods)
+- **`GuardianSummary`** — `operations/brain/guardian/summary.py` (1 methods)
+- **`GuardianSummaryCard`** — `operations/brain/guardian/dashboard_v2.py` (1 methods)
+- **`GuardianSummaryCard`** — `operations/brain/guardian/dashboard_v3.py` (1 methods)
+- **`GuardianSummarySection`** — `operations/brain/guardian/summary.py`
+- **`GuardianSupervisorSnapshot`** — `operations/brain/guardian/supervisor.py` (1 methods)
+- **`GuardianSupervisoryDashboard`** — `operations/brain/guardian/dashboard_guardian.py` (1 methods)
+- **`GuardianSupervisoryIssue`** — `operations/brain/guardian/dashboard_guardian.py` (1 methods)
+- **`GuardianSupervisoryMetric`** — `operations/brain/guardian/dashboard_guardian.py` (1 methods)
+- **`GuardianSupervisoryPanel`** — `operations/brain/guardian/dashboard_guardian.py` (1 methods)
+- **`GuardianSupervisoryRecommendation`** — `operations/brain/guardian/dashboard_guardian.py` (1 methods)
+- **`GuardianSupervisoryStatusCard`** — `operations/brain/guardian/dashboard_guardian.py` (1 methods)
+- **`GuardianTimeline`** — `operations/brain/guardian/history.py` (1 methods)
+- **`GuardianTrend`** — `operations/brain/guardian/trend.py` (1 methods)
+- **`GuardianTrendCard`** — `operations/brain/guardian/dashboard_v2.py` (1 methods)
+- **`GuardianV2Response`** — `operations/brain/guardian/conversation_v2.py` (2 methods)
+- **`GuardianWarning`** — `operations/brain/guardian/watchdog.py` (1 methods)
+- **`HeaderView`** — `operations/presentation/console_view.py`
+- **`HealthCard`** — `operations/brain/decision/dashboard_gateway.py` (1 methods)
+- **`HealthIssue`** — `operations/brain/guardian/health.py` (1 methods)
+- **`HealthScore`** — `operations/brain/guardian/health.py` (1 methods)
+- **`HealthSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`HealthSummary`** — `operations/brain/guardian/health.py` (1 methods)
+- **`HealthWidget`** — `operations/presentation/widgets.py`
+- **`HistoryCard`** — `operations/brain/decision/dashboard_activation.py` (1 methods)
+- **`HistoryCard`** — `operations/brain/decision/dashboard_certification.py` (1 methods)
+- **`HistoryCard`** — `operations/brain/decision/dashboard_finalization.py` (1 methods)
+- **`HistoryCard`** — `operations/brain/decision/dashboard_lifecycle.py` (1 methods)
+- **`HistoryCard`** — `operations/brain/decision/dashboard_session.py` (1 methods)
+- **`IncomingDecisionPackage`** — `operations/brain/decision/package_protocol.py` (1 methods)
+- **`IntegrityCard`** — `operations/brain/decision/dashboard_finalization.py` (1 methods)
+- **`KnowledgeCard`** — `operations/brain/learning/dashboard_learning.py`
+- **`KnowledgeRecord`** — `operations/brain/learning/knowledge_base.py` (2 methods)
+- **`KnowledgeSnapshot`** — `operations/brain/learning/knowledge_base.py` (1 methods)
+- **`KnowledgeStatistics`** — `operations/brain/learning/knowledge_base.py`
+- **`LayoutRegion`** — `operations/presentation/desktop/layout.py`
+- **`LearningDashboard`** — `operations/brain/learning/dashboard_learning.py`
+- **`LearningPipelineResult`** — `operations/brain/learning/runtime_v2.py`
+- **`LearningPolicy`** — `operations/brain/learning/policy.py`
+- **`LearningQueryResult`** — `operations/brain/learning/conversation_learning.py`
+- **`LearningRecommendation`** — `operations/brain/learning/runtime_v2.py`
+- **`LifecycleCard`** — `operations/brain/decision/dashboard_lifecycle.py` (1 methods)
+- **`LifecycleHistoryRecord`** — `operations/brain/decision/lifecycle_history.py` (1 methods)
+- **`LifecycleMetadata`** — `operations/brain/decision/approval_lifecycle.py` (1 methods)
+- **`LifecycleSnapshot`** — `operations/brain/decision/approval_lifecycle.py` (1 methods)
+- **`LifecycleStatistics`** — `operations/brain/decision/approval_lifecycle.py` (1 methods)
+- **`LifecycleTransition`** — `operations/brain/decision/approval_lifecycle.py` (1 methods)
+- **`LifecycleValidationResult`** — `operations/brain/decision/lifecycle_validator.py` (1 methods)
+- **`LightTheme`** extends Theme — `operations/presentation/theme.py` (1 methods)
+- **`LogEntry`** — `operations/presentation/console/log_viewer.py`
+- **`LogViewerFactory`** — `operations/presentation/console/log_viewer.py` (1 methods)
+- **`MappingCard`** — `operations/brain/decision/dashboard_adapter.py` (1 methods)
+- **`MenuItem`** — `operations/presentation/desktop/main_window.py` (1 methods)
+- **`MissionDashboardDTO`** — `operations/brain/reasoning/context_builder.py` (1 methods)
+- **`MissionEntry`** — `operations/presentation/console/mission_monitor.py`
+- **`MissionMonitor`** — `operations/presentation/console/mission_monitor.py` (5 methods)
+- **`MissionMonitorFactory`** — `operations/presentation/console/mission_monitor.py` (3 methods)
+- **`MissionPlan`** — `operations/orchestrator/mission_planner.py` (2 methods)
+- **`MissionPlanSummary`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`MissionSelected`** — `operations/presentation/console/event_bus.py`
+- **`MissionSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`MissionStatus`** — `operations/brain/guardian/supervisor.py`
+- **`MissionSummary`** — `operations/brain/reasoning/context_builder.py` (1 methods)
+- **`MissionWidget`** — `operations/presentation/widgets.py`
+- **`MissionWidgetCollection`** — `operations/presentation/widgets.py`
+- **`NavigationItem`** — `operations/presentation/navigation.py`
+- **`NavigationMenu`** — `operations/presentation/navigation_runtime.py` (2 methods)
+- **`NavigationSection`** — `operations/presentation/navigation.py` (1 methods)
+- **`NavigationState`** — `operations/presentation/navigation.py` (4 methods)
+- **`NormalizationCard`** — `operations/brain/decision/dashboard_package.py` (1 methods)
+- **`NotificationArea`** — `operations/presentation/desktop/main_window.py`
+- **`NotificationItem`** — `operations/presentation/console/notification_center.py` (3 methods)
+- **`NotificationRaised`** — `operations/presentation/console/event_bus.py`
+- **`NotificationWidget`** — `operations/presentation/widgets.py`
+- **`NotificationWidgetCollection`** — `operations/presentation/widgets.py`
+- **`ObservationSnapshot`** — `operations/brain/reasoning/context_builder.py` (1 methods)
+- **`ObservationSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`OpenEvidence`** — `operations/presentation/interaction.py`
+- **`OpenMission`** — `operations/presentation/interaction.py`
+- **`OpenTimeline`** — `operations/presentation/interaction.py`
+- **`OperationalStatusCard`** — `operations/brain/guardian/dashboard_v3.py` (1 methods)
+- **`OptimizationCandidate`** — `operations/brain/learning/optimizer_v2.py`
+- **`OptimizationCard`** — `operations/brain/learning/dashboard_learning.py`
+- **`OptimizationSummary`** — `operations/brain/learning/optimizer_v2.py`
+- **`OrchestrationAnswer`** — `operations/orchestrator/conversation.py` (1 methods)
+- **`OrchestrationQuery`** — `operations/orchestrator/conversation.py` (1 methods)
+- **`OrchestrationResult`** — `operations/orchestrator/coordinator.py` (2 methods)
+- **`OrchestrationStage`** — `operations/orchestrator/coordinator.py` (1 methods)
+- **`PackageBody`** — `operations/brain/decision/package_protocol.py` (1 methods)
+- **`PackageHeader`** — `operations/brain/decision/package_protocol.py` (1 methods)
+- **`PackageStatusCard`** — `operations/brain/decision/dashboard_package.py` (1 methods)
+- **`PatternCard`** — `operations/brain/learning/dashboard_learning.py`
+- **`PendingApprovalCard`** — `operations/brain/guardian/dashboard_v3.py` (1 methods)
+- **`PipelineResult`** — `operations/brain/reasoning/pipeline.py` (1 methods)
+- **`PlannedStep`** — `operations/orchestrator/mission_planner.py` (1 methods)
+- **`PlanningHealthDTO`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`PlanningSnapshot`** — `operations/brain/decision/planning.py` (1 methods)
+- **`PlanningStage`** — `operations/brain/decision/planning.py` (1 methods)
+- **`PlanningStatistics`** — `operations/brain/decision/planning.py` (1 methods)
+- **`PlanningStatusCard`** — `operations/brain/decision/dashboard_planning.py` (1 methods)
+- **`PlanningSummary`** — `operations/brain/decision/planning.py` (1 methods)
+- **`PolicyCard`** — `operations/brain/decision/dashboard_evaluation.py` (1 methods)
+- **`PolicyCard`** — `operations/brain/guardian/dashboard_v3.py` (1 methods)
+- **`PolicyCard`** — `operations/brain/learning/dashboard_learning.py`
+- **`PolicyDecision`** — `operations/brain/learning/policy.py`
+- **`PolicyResult`** — `operations/brain/guardian/policy.py` (1 methods)
+- **`PolicyResult`** — `operations/brain/guardian/policy_runtime.py` (1 methods)
+- **`PolicyRule`** — `operations/brain/guardian/policy.py` (1 methods)
+- **`PolicyViolation`** — `operations/brain/guardian/policy.py` (1 methods)
+- **`PolicyViolation`** — `operations/brain/guardian/policy_runtime.py` (1 methods)
+- **`PriorityItem`** — `operations/orchestrator/priority_optimizer.py` (1 methods)
+- **`PriorityItemSummary`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`PriorityListSummary`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`PriorityPlan`** — `operations/orchestrator/priority_optimizer.py` (3 methods)
+- **`PromptContext`** — `operations/reasoning/prompt_builder.py` (1 methods)
+- **`PromptResult`** — `operations/presentation/console/prompt_runtime.py`
+- **`PromptStrategy`** — `operations/brain/reasoning/strategy.py` (1 methods)
+- **`PromptTemplate`** — `operations/reasoning/templates.py` (1 methods)
+- **`ProviderMetadata`** — `operations/reasoning/provider.py` (1 methods)
+- **`ProviderSlot`** — `operations/brain/reasoning/scheduler.py` (2 methods)
+- **`ProviderStatus`** — `operations/brain/guardian/supervisor.py`
+- **`ProviderStatus`** — `operations/brain/reasoning/dashboard_reasoning.py` (1 methods)
+- **`ReadinessCard`** — `operations/brain/decision/dashboard_activation.py` (1 methods)
+- **`ReadinessCard`** — `operations/brain/decision/dashboard_approval.py` (1 methods)
+- **`ReadinessCard`** — `operations/brain/decision/dashboard_certification.py` (1 methods)
+- **`ReadinessCard`** — `operations/brain/decision/dashboard_evaluation.py` (1 methods)
+- **`ReadinessCard`** — `operations/brain/decision/dashboard_package.py` (1 methods)
+- **`ReadinessCard`** — `operations/brain/decision/dashboard_submission.py` (1 methods)
+- **`ReadinessCard`** — `operations/brain/guardian/dashboard_v3.py` (1 methods)
+- **`ReadinessCheck`** — `operations/brain/guardian/execution_readiness.py` (1 methods)
+- **`ReasoningContext`** — `operations/brain/reasoning/session.py` (1 methods)
+- **`ReasoningHistoryView`** — `operations/brain/reasoning/dashboard_reasoning.py` (1 methods)
+- **`ReasoningRecord`** — `operations/brain/reasoning/session.py` (1 methods)
+- **`ReasoningRequest`** — `operations/reasoning/provider.py` (1 methods)
+- **`ReasoningResponse`** — `operations/reasoning/provider.py` (1 methods)
+- **`ReasoningResult`** — `operations/brain/reasoning/conversation.py` (1 methods)
+- **`ReasoningStatus`** — `operations/brain/guardian/supervisor.py`
+- **`ReasoningStatus`** — `operations/brain/reasoning/dashboard_reasoning.py` (1 methods)
+- **`ReasoningWidget`** — `operations/brain/reasoning/dashboard_reasoning.py` (1 methods)
+- **`RecommendationSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`RecoveryEvent`** — `operations/presentation/console/recovery.py`
+- **`RefreshDashboard`** — `operations/presentation/interaction.py`
+- **`RefreshRequested`** — `operations/presentation/console/event_bus.py`
+- **`RefreshState`** — `operations/presentation/refresh.py` (2 methods)
+- **`RegistryCard`** — `operations/brain/decision/dashboard_gateway.py` (1 methods)
+- **`RegistryCard`** — `operations/brain/decision/dashboard_session.py` (1 methods)
+- **`RejectMission`** — `operations/presentation/interaction.py`
+- **`RequirementsCard`** — `operations/brain/decision/dashboard_approval.py` (1 methods)
+- **`RequirementsCard`** — `operations/brain/decision/dashboard_certification.py` (1 methods)
+- **`ResumeMission`** — `operations/presentation/interaction.py`
+- **`RiskAssessment`** — `operations/brain/guardian/risk.py` (4 methods)
+- **`RiskCard`** — `operations/brain/guardian/dashboard_v3.py` (1 methods)
+- **`RiskDimension`** — `operations/brain/guardian/risk.py` (2 methods)
+- **`RiskRule`** — `operations/risk_classification.py`
+- **`RollbackStep`** — `operations/execution_plan.py`
+- **`RoutingCard`** — `operations/brain/decision/dashboard_gateway.py` (1 methods)
+- **`RoutingV2Result`** — `operations/brain/guardian/routing_v2.py` (1 methods)
+- **`RuntimeResult`** — `operations/reasoning/runtime.py` (1 methods)
+- **`RuntimeV2Result`** — `operations/brain/guardian/runtime_v2.py` (3 methods)
+- **`SandboxOperation`** — `operations/sandbox.py` (1 methods)
+- **`SchedulerReport`** — `operations/brain/reasoning/scheduler.py` (1 methods)
+- **`SchedulerResult`** — `operations/brain/reasoning/scheduler.py` (1 methods)
+- **`SchedulerStatus`** — `operations/brain/guardian/supervisor.py`
+- **`SchedulerWidget`** — `operations/presentation/widgets.py`
+- **`ScreenChanged`** — `operations/presentation/console/event_bus.py`
+- **`SessionCard`** — `operations/brain/decision/dashboard_session.py` (1 methods)
+- **`SessionHistoryRecord`** — `operations/brain/decision/session_history.py` (1 methods)
+- **`SessionSnapshot`** — `operations/brain/reasoning/session.py` (1 methods)
+- **`SessionSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`SessionValidationResult`** — `operations/brain/decision/session_validator.py` (1 methods)
+- **`SessionWorkspace`** — `operations/presentation/console/session_workspace.py` (2 methods)
+- **`SessionWorkspaceFactory`** — `operations/presentation/console/session_workspace.py` (3 methods)
+- **`ShortcutEntry`** — `operations/presentation/console/shortcut.py` (3 methods)
+- **`ShutdownRequested`** — `operations/presentation/console/event_bus.py`
+- **`SidebarView`** — `operations/presentation/console_view.py`
+- **`SimulateRecommendation`** — `operations/presentation/interaction.py`
+- **`SpacingToken`** — `operations/presentation/desktop/theme.py`
+- **`StageResult`** — `operations/brain/guardian/runtime_v2.py`
+- **`StateCard`** — `operations/brain/decision/dashboard_lifecycle.py` (1 methods)
+- **`StateCard`** — `operations/brain/decision/dashboard_session.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_activation.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_adapter.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_approval.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_certification.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_evaluation.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_finalization.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_gateway.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_lifecycle.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_package.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_planning.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_session.py` (1 methods)
+- **`StatisticsCard`** — `operations/brain/decision/dashboard_submission.py` (1 methods)
+- **`StatusBar`** — `operations/presentation/console/status_bar.py` (7 methods)
+- **`StatusBarFactory`** — `operations/presentation/console/status_bar.py` (1 methods)
+- **`StatusBarView`** — `operations/presentation/console_view.py`
+- **`StatusCard`** — `operations/brain/decision/dashboard_adapter.py` (1 methods)
+- **`StepSummary`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`StrategyCard`** — `operations/brain/decision/dashboard_planning.py` (1 methods)
+- **`SubmissionMetadata`** — `operations/brain/decision/submission_plan.py` (1 methods)
+- **`SubmissionPlanCard`** — `operations/brain/decision/dashboard_submission.py` (1 methods)
+- **`SubmissionQueue`** — `operations/brain/decision/submission_queue.py` (1 methods)
+- **`SubmissionQueueCard`** — `operations/brain/decision/dashboard_submission.py` (1 methods)
+- **`SubmissionReference`** — `operations/brain/decision/submission_plan.py` (1 methods)
+- **`SubmissionSnapshot`** — `operations/brain/decision/submission_plan.py` (1 methods)
+- **`SubmissionStage`** — `operations/brain/decision/submission_plan.py` (1 methods)
+- **`SubmissionStatistics`** — `operations/brain/decision/submission_plan.py` (1 methods)
+- **`SubmissionValidationResult`** — `operations/brain/decision/submission_validator.py` (1 methods)
+- **`SummaryCard`** — `operations/brain/decision/dashboard_approval.py` (1 methods)
+- **`SummaryCard`** — `operations/brain/decision/dashboard_finalization.py` (1 methods)
+- **`SummaryWidget`** — `operations/presentation/widgets.py`
+- **`SupervisoryPipelineResult`** — `operations/brain/guardian/runtime_supervisory.py` (1 methods)
+- **`TelemetrySnapshot`** — `operations/presentation/console/telemetry.py` (1 methods)
+- **`Theme`** — `operations/presentation/theme.py` (3 methods)
+- **`ThemeChanged`** — `operations/presentation/console/event_bus.py`
+- **`TimelineEntry`** — `operations/presentation/console/timeline_explorer.py`
+- **`TimelineEvent`** — `operations/mission_timeline.py` (1 methods)
+- **`TimelineEvent`** — `operations/presentation/widgets.py`
+- **`TimelineExplorer`** — `operations/presentation/console/timeline_explorer.py` (16 methods)
+- **`TimelineExplorerFactory`** — `operations/presentation/console/timeline_explorer.py` (3 methods)
+- **`TimelineSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`TimelineSummary`** — `operations/brain/reasoning/context_builder.py` (1 methods)
+- **`TimelineWidgetCollection`** — `operations/presentation/widgets.py`
+- **`ToolbarItem`** — `operations/presentation/desktop/main_window.py`
+- **`TransitionsCard`** — `operations/brain/decision/dashboard_lifecycle.py` (1 methods)
+- **`TrendCard`** — `operations/brain/learning/dashboard_learning.py`
+- **`TrustSource`** — `operations/brain/decision/context.py` (1 methods)
+- **`TrustWidget`** — `operations/presentation/widgets.py`
+- **`UsageMetrics`** — `operations/reasoning/provider.py` (1 methods)
+- **`UserQuery`** — `operations/presentation/interaction.py` (1 methods)
+- **`V3IntegrationResult`** — `operations/brain/guardian/runtime_v3.py` (2 methods)
+- **`ValidationCard`** — `operations/brain/decision/dashboard_adapter.py` (1 methods)
+- **`ValidationCard`** — `operations/brain/decision/dashboard_approval.py` (1 methods)
+- **`ValidationCard`** — `operations/brain/decision/dashboard_gateway.py` (1 methods)
+- **`ValidationCard`** — `operations/brain/decision/dashboard_lifecycle.py` (1 methods)
+- **`ValidationCard`** — `operations/brain/decision/dashboard_package.py` (1 methods)
+- **`ValidationCard`** — `operations/brain/decision/dashboard_session.py` (1 methods)
+- **`ValidationCard`** — `operations/brain/decision/dashboard_submission.py` (1 methods)
+- **`ValidationIssue`** — `operations/brain/reasoning/validator.py` (1 methods)
+- **`ValidationReport`** — `operations/brain/reasoning/validator.py` (1 methods)
+- **`VerificationStep`** — `operations/execution_plan.py`
+- **`WarningsCard`** — `operations/brain/decision/dashboard_evaluation.py` (1 methods)
+- **`WidgetAction`** — `operations/presentation/desktop/renderer_adapter.py` (6 methods)
+- **`WidgetRegistry`** — `operations/presentation/widgets.py` (1 methods)
+- **`WidgetRenderer`** — `operations/presentation/widget_renderer.py` (27 methods)
+- **`WorkloadSnapshot`** — `operations/orchestrator/workload.py` (1 methods)
+- **`WorkloadSummary`** — `operations/presentation/dashboard_orchestrator.py` (1 methods)
+- **`WorkspaceRegion`** — `operations/presentation/desktop/qt/workspace.py` (2 methods)
+- **`WorkspaceWidget`** — `operations/presentation/widgets.py`
+
+## `plugins` — 23 DTOs
+
+- **`CapabilityCardP`** — `plugins/dashboard_plugin.py`
+- **`HealthCardP`** — `plugins/dashboard_plugin.py`
+- **`LifecycleCard`** — `plugins/dashboard_plugin.py`
+- **`PluginCapability`** — `plugins/plugin_protocol.py`
+- **`PluginCard`** — `plugins/dashboard_plugin.py`
+- **`PluginContext`** — `plugins/plugin_protocol.py`
+- **`PluginDashboard`** — `plugins/dashboard_plugin.py`
+- **`PluginDescriptor`** — `plugins/plugin_protocol.py`
+- **`PluginEntry`** — `plugins/plugin_registry.py`
+- **`PluginHealth`** — `plugins/plugin_protocol.py`
+- **`PluginLifecycle`** — `plugins/plugin_protocol.py`
+- **`PluginManifest`** — `plugins/plugin_loader.py`
+- **`PluginMetadata`** — `plugins/plugin_protocol.py`
+- **`PluginPackage`** — `plugins/plugin_loader.py`
+- **`PluginPipelineResult`** — `plugins/integration_plugin.py`
+- **`PluginPolicyResult`** — `plugins/plugin_policy.py` (1 methods)
+- **`PluginQueryResult`** — `plugins/conversation_plugin.py`
+- **`PluginResult`** — `plugins/plugin_protocol.py`
+- **`PluginRuntimeResult`** — `plugins/plugin_runtime.py`
+- **`PluginStatistics`** — `plugins/plugin_registry.py`
+- **`PluginValidation`** — `plugins/plugin_loader.py`
+- **`PolicyCardP`** — `plugins/dashboard_plugin.py`
+- **`SummaryCardP`** — `plugins/dashboard_plugin.py`
+
+## `runtime_kernel` — 55 DTOs
+
+- **`AccessControl`** — `runtime_kernel/runtime_security.py`
+- **`AlertRecord`** — `runtime_kernel/runtime_health.py`
+- **`AuditEntry`** — `runtime_kernel/runtime_security.py`
+- **`BridgeRoute`** — `runtime_kernel/runtime_adapter.py`
+- **`CatalogEntry`** — `runtime_kernel/runtime_registry.py`
+- **`ComponentHealth`** — `runtime_kernel/kernel_final.py`
+- **`CoordinationPlan`** — `runtime_kernel/runtime_coordinator.py`
+- **`CoordinationResult`** — `runtime_kernel/runtime_coordinator.py`
+- **`CoordinationTask`** — `runtime_kernel/runtime_coordinator.py`
+- **`EventDispatch`** — `runtime_kernel/runtime_event.py`
+- **`EventLog`** — `runtime_kernel/runtime_event.py`
+- **`EventSubscription`** — `runtime_kernel/runtime_event.py`
+- **`FinalVerdict`** — `runtime_kernel/kernel_final.py`
+- **`HealthCheck`** — `runtime_kernel/runtime_health.py`
+- **`HealthReport`** — `runtime_kernel/runtime_health.py`
+- **`HealthThreshold`** — `runtime_kernel/runtime_health.py`
+- **`InteropResult`** — `runtime_kernel/runtime_adapter.py`
+- **`KernelFinalReport`** — `runtime_kernel/kernel_final.py`
+- **`KernelSummary`** — `runtime_kernel/kernel_final.py`
+- **`LifecyclePhase`** — `runtime_kernel/runtime_lifecycle.py`
+- **`LocatorResult`** — `runtime_kernel/runtime_registry.py`
+- **`MetricSummary`** — `runtime_kernel/runtime_telemetry.py`
+- **`OrchestrationOrder`** — `runtime_kernel/runtime_coordinator.py`
+- **`ProtocolMap`** — `runtime_kernel/runtime_adapter.py`
+- **`RegistryEntry`** — `runtime_kernel/runtime_registry.py`
+- **`ResourceUsage`** — `runtime_kernel/runtime_health.py`
+- **`RestartPlan`** — `runtime_kernel/runtime_lifecycle.py`
+- **`RuntimeConfiguration`** — `runtime_kernel/runtime_context.py`
+- **`RuntimeContext`** — `runtime_kernel/runtime_context.py`
+- **`RuntimeDescriptor`** — `runtime_kernel/runtime_registry.py`
+- **`RuntimeEnvironment`** — `runtime_kernel/runtime_context.py`
+- **`RuntimeEvent`** — `runtime_kernel/runtime_event.py`
+- **`RuntimeIdentity`** — `runtime_kernel/runtime_context.py`
+- **`RuntimeManifest`** — `runtime_kernel/runtime_registry.py`
+- **`RuntimeProfile`** — `runtime_kernel/runtime_context.py`
+- **`RuntimeState`** — `runtime_kernel/runtime_state.py`
+- **`SchedulePlan`** — `runtime_kernel/runtime_scheduler.py`
+- **`ScheduleResult`** — `runtime_kernel/runtime_scheduler.py`
+- **`ScheduleSlot`** — `runtime_kernel/runtime_scheduler.py`
+- **`ScheduleWindow`** — `runtime_kernel/runtime_scheduler.py`
+- **`SecurityPolicy`** — `runtime_kernel/runtime_security.py`
+- **`SecurityVerdict`** — `runtime_kernel/runtime_security.py`
+- **`ShutdownPlan`** — `runtime_kernel/runtime_lifecycle.py`
+- **`StartupPlan`** — `runtime_kernel/runtime_lifecycle.py`
+- **`StateHistoryEntry`** — `runtime_kernel/runtime_state.py`
+- **`StateMachine`** — `runtime_kernel/runtime_state.py`
+- **`StateSnapshot`** — `runtime_kernel/runtime_state.py`
+- **`StateValidation`** — `runtime_kernel/runtime_state.py`
+- **`SubsystemAdapter`** — `runtime_kernel/runtime_adapter.py`
+- **`SyncPoint`** — `runtime_kernel/runtime_coordinator.py`
+- **`TaskSlot`** — `runtime_kernel/runtime_scheduler.py`
+- **`TelemetryMetric`** — `runtime_kernel/runtime_telemetry.py`
+- **`TelemetryReport`** — `runtime_kernel/runtime_telemetry.py`
+- **`TelemetrySample`** — `runtime_kernel/runtime_telemetry.py`
+- **`TransformRule`** — `runtime_kernel/runtime_adapter.py`
+
+## `sdk` — 27 DTOs
+
+- **`CompatibilityCardP`** — `sdk/dashboard_sdk.py`
+- **`CompatibilityReport`** — `sdk/extension_validator.py`
+- **`ConnectorManifest`** — `sdk/connector_sdk.py`
+- **`ConnectorTemplate`** — `sdk/connector_sdk.py`
+- **`ConnectorValidationS`** — `sdk/connector_sdk.py`
+- **`ExtensionCard`** — `sdk/dashboard_sdk.py`
+- **`PluginManifestS`** — `sdk/plugin_sdk.py`
+- **`PluginTemplate`** — `sdk/plugin_sdk.py`
+- **`PluginValidationS`** — `sdk/plugin_sdk.py`
+- **`ProviderManifest`** — `sdk/provider_sdk.py`
+- **`ProviderTemplate`** — `sdk/provider_sdk.py`
+- **`ProviderValidationS`** — `sdk/provider_sdk.py`
+- **`SDKCapability`** — `sdk/sdk_protocol.py`
+- **`SDKCard`** — `sdk/dashboard_sdk.py`
+- **`SDKCompatibility`** — `sdk/sdk_protocol.py`
+- **`SDKContext`** — `sdk/sdk_protocol.py`
+- **`SDKDashboard`** — `sdk/dashboard_sdk.py`
+- **`SDKMetadata`** — `sdk/sdk_protocol.py`
+- **`SDKPipelineResult`** — `sdk/integration_sdk.py`
+- **`SDKQueryResult`** — `sdk/conversation_sdk.py`
+- **`SDKResult`** — `sdk/sdk_protocol.py`
+- **`SDKVersion`** — `sdk/sdk_protocol.py` (4 methods)
+- **`SummaryCardSDK`** — `sdk/dashboard_sdk.py`
+- **`TemplateCard`** — `sdk/dashboard_sdk.py`
+- **`ValidationCardP`** — `sdk/dashboard_sdk.py`
+- **`ValidationIssue`** — `sdk/extension_validator.py`
+- **`ValidationSummary`** — `sdk/extension_validator.py`

@@ -1,0 +1,168 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SAM — Subsystem Overview</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f8fafc; --fg: #172033; --muted: #5b6475; --line: #64748b; --neutral: #e2e8f0; --input: #bfdbfe; --process: #c7d2fe; --storage: #99f6e4; --external: #fde68a; --risk: #fecaca; --bridge: #ddd6fe; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f172a; --fg: #e5e7eb; --muted: #a3adbd; --line: #94a3b8; --neutral: #334155; --input: #1d4ed8; --process: #4338ca; --storage: #0f766e; --external: #92400e; --risk: #991b1b; --bridge: #5b21b6; }
+  }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.4 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  main { max-width:1100px; margin:32px auto; padding:0 20px; }
+  svg { width:100%; height:auto; display:block; }
+  .title { font-size:20px; font-weight:650; fill:var(--fg); }
+  .label { font-size:13px; font-weight:600; fill:var(--fg); }
+  .small { font-size:11px; fill:var(--muted); }
+  .node { stroke:var(--line); stroke-width:1; rx:6; ry:6; }
+  .neutral { fill:var(--neutral); } .input { fill:var(--input); } .process { fill:var(--process); } .storage { fill:var(--storage); } .external { fill:var(--external); } .risk { fill:var(--risk); } .bridge { fill:var(--bridge); }
+  .edge { stroke:var(--line); stroke-width:1.5; fill:none; } .edge-bold { stroke:var(--line); stroke-width:2; fill:none; }
+  .zone { fill:none; stroke:var(--line); stroke-width:1; stroke-dasharray:6 5; opacity:0.8; rx:10; ry:10; }
+</style>
+<main>
+<svg viewBox="0 0 1040 740">
+  <text x="520" y="30" text-anchor="middle" class="title">SAM Subsystem Overview</text>
+  <text x="520" y="48" text-anchor="middle" class="small">v10.1.0 — Architecture Freeze</text>
+
+  <!-- Zone: Runtime Subsystems -->
+  <rect x="20" y="65" width="400" height="650" class="zone" />
+  <text x="220" y="82" text-anchor="middle" class="small" fill="var(--muted)">Runtime Subsystems</text>
+
+  <!-- Zone: Bridges -->
+  <rect x="440" y="65" width="160" height="650" class="zone" />
+  <text x="520" y="82" text-anchor="middle" class="small" fill="var(--muted)">Integration Layer</text>
+
+  <!-- Zone: Presentation -->
+  <rect x="620" y="65" width="400" height="650" class="zone" />
+  <text x="820" y="82" text-anchor="middle" class="small" fill="var(--muted)">Presentation &amp; Infrastructure</text>
+
+  <!-- RUNTIME SUBSYSTEMS (left) -->
+  <!-- Pipeline: bottom to top -->
+  <!-- Guardian (bottom-left) -->
+  <rect x="45" y="600" width="160" height="60" class="node input" />
+  <text x="125" y="630" text-anchor="middle" class="label">Guardian Live</text>
+  <text x="125" y="647" text-anchor="middle" class="small">monitor, assess, triage</text>
+
+  <!-- Decision -->
+  <rect x="235" y="600" width="160" height="60" class="node process" />
+  <text x="315" y="630" text-anchor="middle" class="label">Decision Runtime</text>
+  <text x="315" y="647" text-anchor="middle" class="small">evaluate, plan, approve</text>
+
+  <!-- Arrow Guardian -> Decision -->
+  <line x1="205" y1="630" x2="235" y2="630" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Approval -->
+  <rect x="45" y="480" width="160" height="60" class="node process" />
+  <text x="125" y="510" text-anchor="middle" class="label">Approval Runtime</text>
+  <text x="125" y="527" text-anchor="middle" class="small">policy, multilevel, audit</text>
+
+  <!-- Arrow Decision -> Approval -->
+  <line x1="315" y1="600" x2="125" y2="540" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Operational Brain -->
+  <rect x="235" y="480" width="160" height="60" class="node storage" />
+  <text x="315" y="510" text-anchor="middle" class="label">Operational Brain</text>
+  <text x="315" y="527" text-anchor="middle" class="small">plan, schedule, health</text>
+
+  <!-- Activation -->
+  <rect x="45" y="360" width="160" height="60" class="node process" />
+  <text x="125" y="390" text-anchor="middle" class="label">Activation Runtime</text>
+  <text x="125" y="407" text-anchor="middle" class="small">build, validate, package</text>
+
+  <!-- Arrow Activation <- Operational -->
+  <line x1="315" y1="480" x2="125" y2="420" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Execution -->
+  <rect x="235" y="360" width="160" height="60" class="node process" />
+  <text x="315" y="390" text-anchor="middle" class="label">Execution Runtime</text>
+  <text x="315" y="407" text-anchor="middle" class="small">plan, simulate, assemble</text>
+
+  <!-- Arrow Activation -> Execution -->
+  <line x1="205" y1="390" x2="235" y2="390" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Runtime Kernel (top) -->
+  <rect x="125" y="220" width="200" height="70" class="node risk" />
+  <text x="225" y="250" text-anchor="middle" class="label">Runtime Kernel</text>
+  <text x="225" y="267" text-anchor="middle" class="small">central coordination (preview)</text>
+
+  <!-- Arrow Execution -> Kernel -->
+  <line x1="225" y1="360" x2="225" y2="290" class="edge" marker-end="url(#arrow)" />
+
+  <!-- INTEGRATION LAYER (Bridges) -->
+  <!-- Bridge router -->
+  <rect x="460" y="400" width="120" height="60" class="node bridge" />
+  <text x="520" y="425" text-anchor="middle" class="label">Bridge Router</text>
+  <text x="520" y="442" text-anchor="middle" class="small">+ Transform Engine</text>
+
+  <!-- Conversation Bridge -->
+  <rect x="460" y="260" width="120" height="50" class="node input" />
+  <text x="520" y="285" text-anchor="middle" class="label">Conversation</text>
+  <text x="520" y="298" text-anchor="middle" class="small">Bridges</text>
+
+  <!-- Dashboard Bridge -->
+  <rect x="460" y="330" width="120" height="50" class="node input" />
+  <text x="520" y="355" text-anchor="middle" class="label">Dashboard</text>
+  <text x="520" y="368" text-anchor="middle" class="small">Bridges</text>
+
+  <!-- Arrow kernel -> bridges -->
+  <line x1="325" y1="250" x2="460" y2="285" class="edge" marker-end="url(#arrow)" />
+
+  <!-- PRESENTATION & INFRASTRUCTURE -->
+  <!-- CLI -->
+  <rect x="660" y="480" width="130" height="60" class="node external" />
+  <text x="725" y="510" text-anchor="middle" class="label">CLI (typer)</text>
+  <text x="725" y="527" text-anchor="middle" class="small">sam [command]</text>
+
+  <!-- Desktop -->
+  <rect x="820" y="480" width="130" height="60" class="node external" />
+  <text x="885" y="510" text-anchor="middle" class="label">Desktop (Qt)</text>
+  <text x="885" y="527" text-anchor="middle" class="small">sam desktop</text>
+
+  <!-- Hosting -->
+  <rect x="660" y="360" width="130" height="60" class="node external" />
+  <text x="725" y="390" text-anchor="middle" class="label">Hosting</text>
+  <text x="725" y="407" text-anchor="middle" class="small">Docker | service | systemd</text>
+
+  <!-- API -->
+  <rect x="820" y="360" width="130" height="60" class="node external" />
+  <text x="885" y="390" text-anchor="middle" class="label">API (FastAPI)</text>
+  <text x="885" y="407" text-anchor="middle" class="small">preview</text>
+
+  <!-- Plugin -->
+  <rect x="660" y="240" width="130" height="60" class="node storage" />
+  <text x="725" y="270" text-anchor="middle" class="label">Plugin System</text>
+  <text x="725" y="287" text-anchor="middle" class="small">discovery, lifecycle</text>
+
+  <!-- Adapter -->
+  <rect x="820" y="240" width="130" height="60" class="node storage" />
+  <text x="885" y="270" text-anchor="middle" class="label">Provider/Adapter</text>
+  <text x="885" y="287" text-anchor="middle" class="small">Time, External</text>
+
+  <!-- Arrows bridges -> presentation -->
+  <line x1="580" y1="305" x2="660" y2="270" class="edge" marker-end="url(#arrow)" />
+  <line x1="580" y1="355" x2="660" y2="390" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Launcher -->
+  <rect x="740" y="140" width="160" height="55" class="node risk" />
+  <text x="820" y="165" text-anchor="middle" class="label">Launcher</text>
+  <text x="820" y="180" text-anchor="middle" class="small">boot pipeline, entry point</text>
+
+  <!-- Launcher -> bridges -->
+  <line x1="820" y1="195" x2="520" y2="260" class="edge" marker-end="url(#arrow)" />
+
+  <!-- Legend -->
+  <rect x="45" y="105" width="14" height="14" class="node input" />
+  <text x="64" y="116" class="small">Pipeline Input</text>
+  <rect x="155" y="105" width="14" height="14" class="node process" />
+  <text x="174" y="116" class="small">Processing</text>
+  <rect x="265" y="105" width="14" height="14" class="node storage" />
+  <text x="284" y="116" class="small">Storage/Planning</text>
+  <rect x="375" y="105" width="14" height="14" class="node risk" />
+  <text x="394" y="116" class="small">Coordinator</text>
+  <rect x="490" y="105" width="14" height="14" class="node external" />
+  <text x="509" y="116" class="small">External UI</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10" fill="var(--line)" /></marker>
+  </defs>
+</svg>
+</main>

@@ -1,4 +1,20 @@
-# Changelog
+﻿# Changelog
+
+## v10.1.0 (2026-07-30) - Architecture Freeze v10
+
+### Added
+- AF-101: Public API Inventory - audit of all 52 packages
+- AF-102: Dependency Map - subsystem dependency graph (0 cycles, 0 forbidden)
+- AF-103: Pipeline Specification - 7 pipelines documented end-to-end
+- AF-104: DTO Catalog - 1,010 frozen dataclasses inventory
+- AF-105: Extension Point Catalog - 357 extension points identified
+- AF-106: Entry Point Audit - single official entry confirmed
+- AF-107: Layer Validation - 0 layer violations
+- AF-108: Module Ownership - all subsystems with purpose/dependencies
+- AF-109: Architecture Diagrams - 10 diagrams (3 detailed SVG + 7 skeleton)
+- AF-110: Architecture Decision Records - 8 ADRs created
+- AF-111: Architecture Certification - baseline certified
+
 
 ## v10.0.1 (2026-07-30) - Repository Stabilization
 
@@ -139,3 +155,6 @@ Phase X selesai. Runtime Kernel adalah lapisan koordinasi antar-subsystem yang b
 ### Added
 - Foundation: agent state, telemetry, contracts
 - Sprint 1-7, v0.0.1 -> v0.1.0
+
+
+
