@@ -35,14 +35,21 @@ from .snapshot import GuardianSnapshotManager
 from .validator import GuardianConsistencyValidator
 from .conversation_sync import LiveConversationSyncBridge
 from .dashboard_sync import LiveDashboardSyncBridge
+from .diff_engine import SnapshotDiffEngine
+from .change_detector import ChangeDetector
+from .impact import ImpactAnalyzer
+from .timeline import TransitionTimeline
+from .conversation_transition import LiveConversationTransitionBridge
+from .dashboard_transition import LiveDashboardTransitionBridge
 
 
 class GuardianLiveRuntime:
     """
     Synchronous live runtime for the Guardian.
 
-    Full Pipeline (v5.1.0):
-        Event → Dispatch → Synchronization → Guardian
+    Full Pipeline (v5.2.0):
+        Event → Dispatch → Synchronization
+        → Transition Intelligence → Guardian
         → Reasoning → Learning → Execution Preview
         → Dashboard → Conversation
 
@@ -71,6 +78,15 @@ class GuardianLiveRuntime:
         self._validator = GuardianConsistencyValidator(self._registry, self._snapshot_manager)
         self._conversation_sync = LiveConversationSyncBridge(self)
         self._dashboard_sync = LiveDashboardSyncBridge(self)
+
+        # Sprint 45 — Transition Intelligence
+        self._diff_engine = SnapshotDiffEngine()
+        self._change_detector = ChangeDetector()
+        self._impact_analyzer = ImpactAnalyzer()
+        self._timeline = TransitionTimeline()
+        self._conversation_transition = LiveConversationTransitionBridge(self)
+        self._dashboard_transition = LiveDashboardTransitionBridge(self)
+        self._last_registry_count: int = 0
 
         self._is_running: bool = False
         if runtime_id:
@@ -201,6 +217,38 @@ class GuardianLiveRuntime:
         """Get the dashboard sync bridge."""
         return self._dashboard_sync
 
+    # --- Sprint 45 — Transition Intelligence ---
+
+    @property
+    def diff_engine(self) -> SnapshotDiffEngine:
+        """Get the snapshot diff engine."""
+        return self._diff_engine
+
+    @property
+    def change_detector(self) -> ChangeDetector:
+        """Get the change detector."""
+        return self._change_detector
+
+    @property
+    def impact_analyzer(self) -> ImpactAnalyzer:
+        """Get the impact analyzer."""
+        return self._impact_analyzer
+
+    @property
+    def timeline(self) -> TransitionTimeline:
+        """Get the transition timeline."""
+        return self._timeline
+
+    @property
+    def conversation_transition(self) -> 'LiveConversationTransitionBridge':
+        """Get the conversation transition bridge."""
+        return self._conversation_transition
+
+    @property
+    def dashboard_transition(self) -> 'LiveDashboardTransitionBridge':
+        """Get the dashboard transition bridge."""
+        return self._dashboard_transition
+
     # --- History ---
 
     def record_dispatch(
@@ -249,6 +297,8 @@ class GuardianLiveRuntime:
             "sync_count": self._synchronizer.sync_count,
             "snapshot_count": self._snapshot_manager.count,
             "consistent": self._validator.is_consistent(),
+            "transition_count": self._timeline.count,
+            "critical_transitions": self._timeline.get_summary().critical_count,
         }
 
     # --- Pipeline Execution ---
@@ -260,16 +310,17 @@ class GuardianLiveRuntime:
         """
         Execute the full live pipeline.
 
-        Pipeline (v5.1.0):
+        Pipeline (v5.2.0):
             1. Create observation event
             2. Dispatch to guardian
             3. Synchronization
-            4. Reasoning
-            5. Learning
-            6. Execution Preview
-            7. Dashboard refresh
-            8. Conversation update
-            9. Return pipeline result
+            4. Transition Intelligence
+            5. Reasoning
+            6. Learning
+            7. Execution Preview
+            8. Dashboard refresh
+            9. Conversation update
+            10. Return pipeline result
 
         Args:
             observation_payload: Optional observation data.
@@ -292,6 +343,7 @@ class GuardianLiveRuntime:
         snapshot = self._dispatcher.last_snapshot
 
         sync_result = None
+        transition_result = None
         reasoning_result = None
         learning_result = None
         execution_result = None
@@ -306,12 +358,36 @@ class GuardianLiveRuntime:
             )
 
             if not snapshot.errors:
-                # 3a. Synchronization (NEW v5.1.0)
+                # 3a. Synchronization
                 sync_result = self._synchronizer.synchronize(event)
 
                 # 3b. Capture registry snapshot
                 registry_snapshot = self._registry.snapshot()
                 self._snapshot_manager.capture(registry_snapshot)
+
+                # 3c. Transition Intelligence (NEW v5.2.0)
+                if self._snapshot_manager.count >= 2:
+                    snaps = self._snapshot_manager.history
+                    transitions = self._change_detector.detect(
+                        snaps[-2], snaps[-1]
+                    )
+                    self._timeline.record_batch(transitions)
+                    impact_result = self._impact_analyzer.analyze_batch(transitions)
+
+                    # Registry change detection
+                    current_count = self._registry.count
+                    reg_transition = self._change_detector.detect_registry_change(
+                        self._last_registry_count, current_count
+                    )
+                    if reg_transition:
+                        self._timeline.record(reg_transition)
+                    self._last_registry_count = current_count
+
+                    transition_result = {
+                        "transitions_found": len(transitions),
+                        "impact": impact_result,
+                        "total_in_timeline": self._timeline.count,
+                    }
 
                 # 4. Reasoning
                 reasoning_result = self._reasoning.trigger(event)
@@ -329,6 +405,7 @@ class GuardianLiveRuntime:
             "snapshot": snapshot.to_dict() if snapshot else None,
             "pipeline": {
                 "synchronization": sync_result,
+                "transition_intelligence": transition_result,
                 "reasoning": reasoning_result,
                 "learning": learning_result,
                 "execution_preview": execution_result,
@@ -336,4 +413,5 @@ class GuardianLiveRuntime:
             "is_running": self._is_running,
             "registry_count": self._registry.count,
             "snapshot_count": self._snapshot_manager.count,
+            "transition_count": self._timeline.count,
         }
