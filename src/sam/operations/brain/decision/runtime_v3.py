@@ -51,6 +51,9 @@ from .activation_engine import ActivationEngine
 from .activation_history import ActivationHistory
 from .conversation_activation import DecisionConversationActivationBridge
 from .dashboard_activation import DecisionDashboardActivationBridge
+from .certification_engine import CertificationEngine
+from .conversation_certification import DecisionConversationCertificationBridge
+from .dashboard_certification import DecisionDashboardCertificationBridge
 
 
 class DecisionRuntimeV3:
@@ -85,6 +88,7 @@ class DecisionRuntimeV3:
         self._session_history = SessionHistory()
         self._lifecycle_engine = LifecycleEngine()
         self._activation_engine = ActivationEngine()
+        self._certification_engine = CertificationEngine()
 
         self._conversation = DecisionConversationPackageBridge(self)
         self._dashboard = DecisionDashboardPackageBridge(self)
@@ -106,6 +110,8 @@ class DecisionRuntimeV3:
         self._dashboard_lifecycle = DecisionDashboardLifecycleBridge(self)
         self._conversation_activation = DecisionConversationActivationBridge(self)
         self._dashboard_activation = DecisionDashboardActivationBridge(self)
+        self._conversation_certification = DecisionConversationCertificationBridge(self)
+        self._dashboard_certification = DecisionDashboardCertificationBridge(self)
 
         self._latest_incoming: Optional[IncomingDecisionPackage] = None
         self._latest_normalized: Optional[IncomingDecisionPackage] = None
@@ -166,6 +172,10 @@ class DecisionRuntimeV3:
     def conversation_activation(self): return self._conversation_activation
     @property
     def dashboard_activation(self): return self._dashboard_activation
+    @property
+    def conversation_certification(self): return self._conversation_certification
+    @property
+    def dashboard_certification(self): return self._dashboard_certification
 
     def consume(self, package_dict: Dict[str, Any]) -> Dict[str, Any]:
         incoming = self._consumer.consume(package_dict)
@@ -249,6 +259,14 @@ class DecisionRuntimeV3:
                         session_id=lifecycle.session_id,
                     )
 
+                # Approval Certification (NEW v5.19.0)
+                if activation:
+                    certification = self._certification_engine.certify(
+                        activation,
+                        activation_id=activation.activation_id,
+                        lifecycle_id=activation.lifecycle_id,
+                    )
+
         return {
             "package_id": incoming.package_id, "received": True,
             "valid": validation.valid, "validation_score": validation.score,
@@ -273,6 +291,7 @@ class DecisionRuntimeV3:
             "session_count": self._session_registry.count if self._session_registry else 0,
             "lifecycle_count": self._lifecycle_engine.count if self._lifecycle_engine else 0,
             "activation_count": self._activation_engine.count if self._activation_engine else 0,
+            "certification_count": self._certification_engine.count if self._certification_engine else 0,
             "has_latest": self._latest_incoming is not None,
             "has_evaluation": self._latest_evaluation is not None,
             "has_plan": self._latest_plan is not None,
