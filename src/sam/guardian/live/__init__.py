@@ -4,9 +4,10 @@ SAM Guardian Live Runtime Foundation.
 Synchronous event-driven runtime for Guardian internal communication.
 All DTOs are frozen. No async, no threading, no network.
 
-v5.1.0 — Added Runtime Synchronization:
-    state.py, registry.py, synchronizer.py, snapshot.py,
-    validator.py, conversation_sync.py, dashboard_sync.py
+v5.2.0 — Added Transition Intelligence:
+    transition.py, diff_engine.py, change_detector.py,
+    impact.py, timeline.py, conversation_transition.py,
+    dashboard_transition.py
 """
 
 from .event import (
@@ -50,6 +51,30 @@ from .dashboard_sync import (
     SnapshotCard,
     ConsistencyCard,
     SyncHealthCard,
+)
+
+# Sprint 45 — Transition Intelligence
+from .transition import (
+    RuntimeTransition,
+    TransitionType,
+    ImpactLevel,
+    TransitionSummary,
+    TransitionStatistics,
+    TransitionHistory,
+)
+from .diff_engine import SnapshotDiffEngine
+from .change_detector import ChangeDetector
+from .impact import ImpactAnalyzer
+from .timeline import TransitionTimeline
+from .conversation_transition import LiveConversationTransitionBridge
+from .dashboard_transition import (
+    LiveDashboardTransitionBridge,
+    RecentChangesCard,
+    ImpactCard,
+    TimelineCard,
+    CriticalEventsCard,
+    TransitionStatisticsCard,
+    RuntimeEvolutionCard,
 )
 
 __all__ = [
@@ -97,4 +122,23 @@ __all__ = [
     "SnapshotCard",
     "ConsistencyCard",
     "SyncHealthCard",
+    # Sprint 45 — Transition Intelligence
+    "RuntimeTransition",
+    "TransitionType",
+    "ImpactLevel",
+    "TransitionSummary",
+    "TransitionStatistics",
+    "TransitionHistory",
+    "SnapshotDiffEngine",
+    "ChangeDetector",
+    "ImpactAnalyzer",
+    "TransitionTimeline",
+    "LiveConversationTransitionBridge",
+    "LiveDashboardTransitionBridge",
+    "RecentChangesCard",
+    "ImpactCard",
+    "TimelineCard",
+    "CriticalEventsCard",
+    "TransitionStatisticsCard",
+    "RuntimeEvolutionCard",
 ]
