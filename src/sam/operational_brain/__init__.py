@@ -1,7 +1,8 @@
-"""Operational Brain — SAM Operational Brain Runtime v7.3.0
+"""Operational Brain — SAM Operational Brain Runtime v7.4.0
 
 Subsystem untuk mengorkestrasi operasi SAM tanpa melakukan eksekusi.
-Foundation (v7.0.0) → Planning (v7.1.0) → Scheduling (v7.2.0) → Plan (v7.3.0).
+Foundation (v7.0.0) → Planning (v7.1.0) → Scheduling (v7.2.0)
+→ Export (v7.3.0) → Readiness (v7.4.0).
 """
 
 from sam.operational_brain.operational_context import OperationalContext
@@ -41,6 +42,14 @@ from sam.operational_brain.dashboard_operational import OperationalDashboardCard
 from sam.operational_brain.dashboard_planning import PlanningCard, DashboardPlanning
 from sam.operational_brain.dashboard_scheduling import SchedulingCard, DashboardScheduling
 from sam.operational_brain.dashboard_plan_export import PlanExportCard, DashboardPlanExport
+from sam.operational_brain.readiness_checker import (
+    ReadinessStatus,
+    ReadinessCheck,
+    ReadinessReport,
+    ReadinessChecker,
+)
+from sam.operational_brain.conversation_readiness import ConversationReadiness
+from sam.operational_brain.dashboard_readiness import ReadinessCard, DashboardReadiness
 
 __all__ = [
     "OperationalContext",
@@ -62,4 +71,7 @@ __all__ = [
     "PlanningCard", "DashboardPlanning",
     "SchedulingCard", "DashboardScheduling",
     "PlanExportCard", "DashboardPlanExport",
+    "ReadinessStatus", "ReadinessCheck", "ReadinessReport", "ReadinessChecker",
+    "ConversationReadiness",
+    "ReadinessCard", "DashboardReadiness",
 ]
