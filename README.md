@@ -4,19 +4,36 @@
 
 SAM (Self-evolving AI Manager) adalah platform guardian otonom yang mengamati, melindungi, dan memulihkan sistem AI. Dari runtime kernel hingga event-driven live runtime, web dashboard, dan desktop console — SAM menangani seluruh siklus operasi.
 
-## Fitur v8.5.0
+## Fitur v9.11.0 — Execution Runtime (NEW)
 
 | Fitur | Deskripsi |
 |---|---|
-| **Activation Runtime (NEW)** | Menerima Operational Plan → menghasilkan Activation Package Ready. Pipeline 6 fase: Context → Validation → Strategy → Package → Monitoring → Runtime. Deterministic, synchronous, in-memory. |
-| **Activation Engine** | Pipeline 8 fase (context → build → validate → constrain → strategy → package → monitor → complete). `ActivationCoordinator` akses ke semua komponen. |
-| **Activation Strategy** | 5 tipe strategi (direct, staged, parallel, conditional, fallback), priority scoring, time windows, sequence builder. |
-| **Activation Validation** | Rules engine, constraints checking, readiness assessment, validation report. |
-| **Activation Package** | Package builder, validator, registry, exporter — semua frozen DTO. |
-| **Activation Monitor** | Metrics collector, event monitor, history tracker, snapshot, health checker. |
-| **Activation Dashboard** | 6 kartu: Activation, Validation, Strategy, Package, Monitor, Runtime — semuanya immutable. |
-| **12 Conversation & Dashboard Bridges** | Conversational queries + immutable dashboard cards untuk setiap layer. |
-| **Guardian Live Runtime (v5.x)** | Event-driven synchronous runtime: dispatcher → guardian → reasoning → learning → execution preview → dashboard → conversation. No async, no threading, no network. |
+| **Execution Runtime (NEW)** | Menerima Activation Package Ready → menghasilkan Execution Plan Ready. 12 sprint (88–99), ~1,600 tests, 35+ files. Preview-only, deterministic, synchronous. |
+| **Execution Assembly** | AssemblyEngine merakit 7 komponen: Plan, Resources, Dependencies, Timeline, Alerts, Risk, Quality → Execution Plan Ready. |
+| **Execution Resources** | ResourceAllocator, ResourcePlan, ConversationResources, DashboardResources (allocation, limits, availability, summary). |
+| **Execution Dependencies** | DependencyGraphBuilder, DependencyValidator, ExecutionOrderResolver (topological sort, cycle detection). |
+| **Execution Timeline** | TimelineBuilder, TimelineEvent, ExecutionWindow, Milestone, TimelineSnapshot. |
+| **Execution Alerts** | AlertEngine dengan 5 operator (gt/lt/gte/lte/eq), rule registration, acknowledge, summary. |
+| **Execution Simulation** | SimulationEngine dengan step tracking, result aggregation, multiple scenarios. |
+| **Execution Budget/Cost** | BudgetEngine, CostEstimate, BudgetReport dengan over-budget detection. |
+| **Execution Risk** | RiskEngine dengan factor-based scoring (effort, dependencies, priority), 4 risk levels. |
+| **Execution Quality** | QualityEngine dengan 3 metrics (effort variance, dependency coverage, type diversity), QualityGate. |
+| **15 Conversation Bridges** | Masing-masing 8 queries per subsystem. |
+| **15 Dashboard Bridges** | Masing-masing 5 ExecutionCard per subsystem (75 total cards). |
+
+## Pipeline Upgrade (Phase IX)
+
+```
+Activation Package Ready
+       ↓
+Execution Runtime (preview-only)
+  ├── ExecutionRequest → ExecutionBuilder
+  ├── ExecutionValidator + ExecutionStrategy
+  ├── ResourcePlan + DependencyGraph + Timeline
+  ├── AlertEngine + BudgetEngine + RiskEngine + QualityEngine
+  ├── SimulationEngine
+  └── AssemblyEngine → Execution Plan Ready
+```
 
 | Fitur | Deskripsi |
 |---|---|
