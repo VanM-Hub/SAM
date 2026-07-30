@@ -68,7 +68,7 @@ Phase VI    Decision Runtime                     v6.0.0–v7.0.0
 Phase VII   Operational Brain Integration        v7.0.0–v8.0.0
 Phase VIII  Activation Runtime                   v8.0.0–v8.5.0
 Phase IX    Execution Runtime                    v9.0.0–v9.11.0
-Phase X     Runtime Kernel                       v10.0.0 🚀
+Phase X     Runtime Kernel                       v10.0.0
 
 Pipeline Runtime Kernel:
   Boot → Context → Registry → State → Lifecycle → Bridge
@@ -124,7 +124,7 @@ SAM/
 │   ├── guardian/live/        # Phase V
 │   ├── operational_brain/    # Phase II
 │   ├── operations/brain/decision/  # Phase VI
-│   └── runtime_kernel/       # Phase X (baru)
+    └── runtime_kernel/       # Phase X (baru)
 ├── tests/
 │   ├── unit/                 # 1,282+ unit tests
 │   ├── sprint100/ - sprint111/  # 1,719 sprint validation
