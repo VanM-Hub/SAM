@@ -1,162 +1,142 @@
 # SAM Framework
 
-**The Autonomous Guardian Operating System for AI** 🔰
+**The Autonomous Guardian Operating System for AI** 🔰  
+*Versi: v10.0.0 — Phase X (Runtime Kernel)*
 
-SAM (Self-evolving AI Manager) adalah platform guardian otonom yang mengamati, melindungi, dan memulihkan sistem AI. Dari runtime kernel hingga event-driven live runtime, web dashboard, dan desktop console — SAM menangani seluruh siklus operasi.
+> **⚠️ Peringatan:** README ini masih dalam proses update. CABANG `main` hanya menampilkan fase awal. Development aktif ada di branch `sprint-*`. Lihat [Pipeline](#pipeline) di bawah untuk peta pengembangan.
 
-## Fitur v10.0.0 — Runtime Kernel (NEW)
+---
 
-| Fitur | Deskripsi |
-|---|---|
-| **Runtime Kernel (NEW)** | Foundation koordinasi antar-subsystem. 12 sprint (100–111), 1,719 tests, 91 source files, 60 ExecutionCards. Semua DTO frozen, 0 forbidden imports. |
-| **Runtime Context** | Identity, Environment, Profile, Configuration engine. IdentityBuilder, EnvironmentEngine, ProfileEngine, ConfigurationEngine. |
-| **Runtime Registry** | Catalog, Locator, Descriptor, Manifest engine. RuntimeCatalog, RuntimeLocator, DescriptorEngine, ManifestEngine. |
-| **Runtime State** | StateMachineEngine (FSM 7 states, 8 transitions), SnapshotEngine, StateHistory, StateValidator. |
-| **Runtime Lifecycle** | LifecycleManager (startup 6 phases, shutdown 4 tasks, restart). StartupManager, ShutdownManager, RestartManager. |
-| **Runtime Bridge/Adapter** | AdapterRegistry, BridgeRouter, TransformEngine (upper/lower/prefix), ProtocolMapper (interop check). |
-| **Runtime Health** | HealthChecker, HealthEngine (threshold: info/warning/critical), ResourceMonitor, HealthAggregator. |
-| **Runtime Security** | SecurityManager (policy-based ACL), AccessController, AuditLogger, VerdictEngine (allow/deny). |
-| **Runtime Scheduler** | SchedulerEngine (plan/slot allocation), TaskScheduler (pending/running/complete), WindowScheduler, PriorityAllocator. |
-| **Runtime Event Bus** | EventBus (publish/subscribe), EventDispatcher, EventLogger, EventFilter (type/source/recent). |
-| **Runtime Coordinator** | CoordinationEngine (plan/task), SyncCoordinator, Orchestrator. |
-| **Runtime Telemetry** | TelemetryCollector, MetricsAggregator (avg/min/max), TelemetryReporter. |
-| **Kernel Final Assembly** | FinalInspector (11 component check), KernelReporter, FinalVerdict. All 11 components healthy, ready for integration. |
-| **12 Conversation Bridges** | Masing-masing 6–8 queries per subsystem. |
-| **12 Dashboard Bridges** | Masing-masing 5 ExecutionCard per subsystem (60 total cards). |
+## Ringkasan
 
-## Pipeline SAM v10.0.0
+SAM adalah platform guardian otonom — mengamati, melindungi, dan memulihkan sistem AI. Dikembangkan dari foundation hingga runtime kernel (10 fase, 111 sprint).
 
-```
-Activation Package Ready (Phase VIII)
-       ↓
-Execution Runtime (Phase IX) → Execution Plan Ready
-       ↓
-Runtime Kernel (Phase X) → Foundation untuk integrasi
-  ├── Context → Registry → State → Lifecycle → Bridge
-  ├── Health → Security → Scheduler → Event Bus
-  ├── Coordinator → Telemetry → Final Assembly
-  └── 12 Conversation Bridges + 12 Dashboard Bridges (60 cards)
-```
+**Status: 10 fase selesai dari 10 fase terencana.**
 
-## Pipeline Upgrade (Phase IX)
+| Fase | Sprint | Versi | Komponen Utama |
+|------|--------|-------|---------------|
+| I | 1–7 | v0.0.1 | Foundation: agent state, telemetry, contracts |
+| II | 8–17 | v2.0.0 | Operational Brain (plan, archive, monitor, visualize) |
+| III | 18–29 | v3.0.0 | Guardian Intelligence (observation, policies, event engine) |
+| IV | 30–42 | v4.0.0 | Guardian Runtime (dispatcher, reasoning, learning, dashboard) |
+| V | 43–58 | v5.0.0–v6.0.0 | Guardian Live Runtime + Live Situation Intelligence |
+| VI | 59–75 | v6.0.0–v7.0.0 | Decision Runtime (certification, finalization, lifecycle) |
+| VII | 76–81 | v7.0.0–v8.0.0 | Operational Brain Full Integration |
+| VIII | 82–87 | v8.0.0–v8.5.0 | Activation Runtime (6 sprints, ~48 files, pipeline lengkap) |
+| IX | 88–99 | v9.0.0–v9.11.0 | Execution Runtime (12 sprints, ~1,600 tests, 15 bridges) |
+| **X** | **100–111** | **v10.0.0** | **Runtime Kernel (12 sprints, 1,719 tests, 91 files, 60 cards)** |
 
-```
-Activation Package Ready
-       ↓
-Execution Runtime (preview-only)
-  ├── ExecutionRequest → ExecutionBuilder
-  ├── ExecutionValidator + ExecutionStrategy
-  ├── ResourcePlan + DependencyGraph + Timeline
-  ├── AlertEngine + BudgetEngine + RiskEngine + QualityEngine
-  ├── SimulationEngine
-  └── AssemblyEngine → Execution Plan Ready
-```
+---
 
-| Fitur | Deskripsi |
-|---|---|
-| **Guardian Live Runtime (NEW)** | Event-driven synchronous runtime: dispatcher → guardian → reasoning → learning → execution preview → dashboard → conversation. No async, no threading, no network. |
-| **Guardian Runtime** | Observe-Analyze-Decide-Act-Verify (GDP) pipeline. Governance, risk assessment, execution readiness |
-| **Learning Foundation** | Knowledge Base, Experience Repository, Pattern Evolution, Optimizer, Policy Engine |
-| **Execution Pipeline** | Dispatch Runtime → Connector Runtime → Execution Engine → Adapter Layer → Provider Runtime |
-| **External Integration** | 6 mock integrations: Slack, Discord, Email, Webhook, REST, Filesystem |
-| **Plugin Ecosystem** | Registry, Loader, Policy, Runtime, 3 mock plugins |
-| **Extension SDK** | PluginSDK, ConnectorSDK, ProviderSDK, Extension Validator |
-| **Launcher Runtime** | Startup pipeline (8-stage), bootstrap orchestrator, safe mode, diagnostics, recovery |
-| **Telemetry Foundation** | Event Taxonomy (36 types), Ring Buffer (1000 events), SQLite cache, JSON Schema |
-| **Operations Engine** | Context, Status, Task, Knowledge, History, Settings, Explainability engines |
-| **Desktop Console** | 8 halaman: Home, Task, Timeline, Knowledge, History, Settings, Explainability |
-| **CLI** | 17 commands via `sam.cli.main` + lightweight `ops.py` commands |
-| **Runtime Kernel** | State machine (12 state), bootstrap, session, shutdown, recovery |
-| **Service Layer** | Windows Service, systemd, Docker, Desktop Launcher |
-| **Observability** | Telemetry events, metrics collector, FastAPI REST API |
-| **Operational Intelligence** | Incident detection, root cause analysis, recommendations |
-| **Autonomous Operations** | Auto restart, recovery, resume, isolate, escalate, human approval |
-| **Explainability** | Template-based explanations with evidence, impact, recommendations |
+## Fitur v10.0.0 — Runtime Kernel
+
+Runtime Kernel adalah lapisan koordinasi antar-subsystem. Preview-only, read-only, tidak memodifikasi subsystem lain.
+
+**12 Subsystem:**
+
+| Subsystem | Engine | Bridge |
+|-----------|--------|--------|
+| Context | IdentityBuilder, EnvironmentEngine, ProfileEngine, ConfigurationEngine | ConversationRuntimeContext + Dashboard |
+| Registry | RuntimeCatalog, Locator, DescriptorEngine, ManifestEngine | ConversationRegistry + Dashboard |
+| State | StateMachineEngine (FSM 7 states/8 transitions), SnapshotEngine, StateHistory | ConversationState + Dashboard |
+| Lifecycle | LifecycleManager (startup 6-phases, shutdown, restart) | ConversationLifecycle + Dashboard |
+| Bridge | AdapterRegistry, BridgeRouter, TransformEngine, ProtocolMapper | ConversationBridge + Dashboard |
+| Health | HealthChecker, HealthEngine (thresholds), ResourceMonitor | ConversationHealth + Dashboard |
+| Security | SecurityManager, AccessController, AuditLogger, VerdictEngine | ConversationSecurity + Dashboard |
+| Scheduler | SchedulerEngine, TaskScheduler, WindowScheduler, PriorityAllocator | ConversationScheduler + Dashboard |
+| Event Bus | EventBus (pub/sub), EventDispatcher, EventLogger, EventFilter | ConversationEvent + Dashboard |
+| Coordinator | CoordinationEngine, SyncCoordinator, Orchestrator | ConversationCoordinator + Dashboard |
+| Telemetry | TelemetryCollector, MetricsAggregator, TelemetryReporter | ConversationTelemetry + Dashboard |
+| Final Assembly | FinalInspector (11 components), KernelReporter | ConversationFinal + Dashboard |
+
+- **91 file** sumber di `src/sam/runtime_kernel/`
+- **60 Dashboard Cards** (5 per subsystem, frozen ExecutionCards)
+- Semua DTO immutable (`frozen dataclass`) — **0 forbidden imports**
+- Synchronous, deterministic, rule-based
+
+---
 
 ## Pipeline
 
 ```
-Observation → Operational Brain → Reasoning Runtime → Decision Runtime
-    → Guardian Runtime → Governance → Learning Foundation
-    → Execution Pipeline → External Integration → Plugin Ecosystem
-    → Extension SDK → **Guardian Live Runtime (v5.0.0)**
-        ├── Event Dispatcher (priority-sorted, deterministic)
-        ├── Reasoning Bridge
-        ├── Learning Bridge
-        ├── Execution Preview Bridge (preview only)
-        ├── Dashboard Bridge (6 immutable cards)
-        └── Conversation Bridge (10 queries)
-    → Dashboard → Conversation → Host
+Phase I     Foundation                           v0.0.1
+Phase II    Operational Brain                    v2.0.0
+Phase III   Guardian Intelligence                v3.0.0
+Phase IV    Guardian Runtime                     v4.0.0
+Phase V     Guardian Live Intelligence           v5.0.0–v6.0.0
+Phase VI    Decision Runtime                     v6.0.0–v7.0.0
+Phase VII   Operational Brain Integration        v7.0.0–v8.0.0
+Phase VIII  Activation Runtime                   v8.0.0–v8.5.0
+Phase IX    Execution Runtime                    v9.0.0–v9.11.0
+Phase X     Runtime Kernel                       v10.0.0 🚀
+
+Pipeline Runtime Kernel:
+  Boot → Context → Registry → State → Lifecycle → Bridge
+  → Health → Security → Scheduler → Event Bus → Coordinator
+  → Telemetry → Final Assembly → **Runtime Kernel Ready**
 ```
+
+---
 
 ## Quick Start
 
 ```bash
-# Clone repo
+# Clone
 git clone https://github.com/VanM-Hub/SAM.git
 cd SAM
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Set PYTHONPATH (Windows PowerShell)
+# Setup (Windows PowerShell)
 $env:PYTHONPATH = "./src"
 $env:PYTHONIOENCODING = "utf-8"
 
-# Atau (Linux/macOS)
-# export PYTHONPATH="./src"
-# export PYTHONIOENCODING="utf-8"
+# Install dependencies
+pip install -e ".[dev,console]"
 
-# Lihat semua CLI commands
-python -m sam.cli.main --help
-
-# Jalankan Desktop Console
-python -m sam.desktop.main
-
-# Atau gunakan CLI lightweight
-python ops.py settings list
-python ops.py history show
-python ops.py task list
+# Jalankan test
+python -m pytest tests/unit/ -q --tb=short
 ```
 
-## CLI Commands
-
-Legacy (17 commands via `sam.cli.main`):
-```
-status, health, session, runtime, plugins, knowledge, memory,
-workflow, events, guardian, service, logs, metrics, openclaw,
-intelligence, autonomous, web
-```
-
-Operations Platform (via `ops.py` — **ringan, tanpa dependensi legacy**):
-```
-ops.py task list              — daftar task
-ops.py history show           — riwayat aktivitas
-ops.py settings list          — pengaturan sistem
-ops.py knowledge show         — knowledge & insight
-ops.py explain recent         — penjelasan event
-```
+---
 
 ## Testing
 
-```bash
-# Windows PowerShell
-$env:PYTHONPATH = "./src"
-python -m pytest tests/unit/ -v --tb=short
+**Test count: 1,719+** (sprint 100–111 validation tests)
+**Unit tests:** 1,282+ (lokal, berjalan normal)
 
-# Linux/macOS
-PYTHONPATH="./src" python -m pytest tests/unit/ -v --tb=short
+```powershell
+# Semua test unit
+python -m pytest tests/unit/ -q --tb=short
+
+# Sprint validation (contoh: sprint 100)
+python -m pytest tests/sprint100/ -q --tb=short
 ```
 
-**1414+ tests** (unit + sprint validation), 0 regressions.
+---
 
-## Arsitektur
+## Struktur Folder
 
-Dokumentasi arsitektur: `docs/architecture/`
+```
+SAM/
+├── src/sam/                  # Source code
+│   ├── activation/           # Phase VIII
+│   ├── approval/             # Phase VI
+│   ├── execution/runtime/    # Phase IX
+│   ├── guardian/live/        # Phase V
+│   ├── operational_brain/    # Phase II
+│   ├── operations/brain/decision/  # Phase VI
+│   └── runtime_kernel/       # Phase X (baru)
+├── tests/
+│   ├── unit/                 # 1,282+ unit tests
+│   ├── sprint100/ - sprint111/  # 1,719 sprint validation
+├── docs/
+│   ├── reports/              # OP reports
+│   ├── sprint-reports/       # Per-sprint laporan
+│   └── architecture/         # Dokumentasi arsitektur
+├── data/                     # Database migrations
+└── .github/workflows/        # CI (core + desktop)
+```
 
-## Kontribusi
-
-Baca [CONTRIBUTING.md](CONTRIBUTING.md) sebelum memulai.
+---
 
 ## Lisensi
 
