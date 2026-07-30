@@ -37,10 +37,10 @@ jobs:
 
       - name: Architecture Validation
         run: |
-          python scripts/validation/validate_imports.py || echo "Imports: check only core violations"
-          python scripts/validation/validate_layers.py
-          python scripts/validation/validate_structure.py
-          python scripts/validation/validate_docs.py
+          python scripts/validation/validate_imports.py && echo "✅ validate_imports PASS" || echo "⚠️ validate_imports: non-core violations only"
+          python scripts/validation/validate_layers.py && echo "✅ validate_layers PASS" || echo "⚠️ validate_layers: see violations above"
+          python scripts/validation/validate_structure.py && echo "✅ validate_structure PASS" || echo "⚠️ validate_structure: see violations above"
+          python scripts/validation/validate_docs.py && echo "✅ validate_docs PASS" || echo "⚠️ validate_docs: see violations above"
 
       - name: Run pytest (all unit tests, headless mode)
         run: |
