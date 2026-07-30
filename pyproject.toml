@@ -34,6 +34,7 @@ console = [
     "rich>=12.0",
     "typer>=0.9",
     "pyyaml>=6.0",
+    "aiosqlite>=0.19",
 ]
 desktop = [
     "PySide6>=6.5",
@@ -43,7 +44,6 @@ server = [
     "uvicorn>=0.20",
     "httpx>=0.24",
     "jinja2>=3.0",
-    "aiosqlite>=0.19",
 ]
 all = [
     "sam-ops[console,desktop,server]",
