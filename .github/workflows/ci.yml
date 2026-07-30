@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install build wheel setuptools
-          # Core + optional groups from pyproject.toml
           pip install ".[dev,desktop]"
           pip list
 
@@ -41,12 +40,12 @@ jobs:
         run: |
           pip install ruff
           ruff check src/ --quiet --exit-zero
-          ruff format --check src/ || echo '⚠️ Format check non-fatal for now'
+          ruff format --check src/ || echo 'Format check non-fatal for now'
 
-      - name: Import isolation — desktop domain check
+      - name: Import isolation - desktop domain check
         run: |
-          BAD=$(python -c "
-import os, re
+          BAD=$(python3 -c "
+import os
 qt = 'src/sam/operations/presentation/desktop/qt'
 bad = []
 for f in sorted(os.listdir(qt)):
@@ -67,13 +66,13 @@ for f in sorted(os.listdir(qt)):
             if 'sam.operations.conversation' in s:
                 bad.append(f'{f}: {s}')
 if bad:
-    print('⚠️ Bad imports:')
+    print('Bad imports:')
     for b in bad:
         print(f'  {b}')
     exit(1 if bad else 0)
 ")
           if [ -n "$BAD" ]; then echo "Failed"; exit 1; fi
-          echo "✅ 0 domain/repo/api imports"
+          echo "0 domain/repo/api imports"
 
       - name: Run core tests (headless)
         run: |
@@ -102,4 +101,4 @@ if bad:
     runs-on: ubuntu-latest
     steps:
       - name: All checks passed
-        run: echo "✅ SAM CI — 681+ core + Qt desktop smoke tests passed across 3 Python versions"
+        run: echo "SAM CI - 681+ core + Qt desktop smoke tests passed across 3 Python versions"
