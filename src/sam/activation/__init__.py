@@ -1,4 +1,4 @@
-"""SAM Activation Runtime — Phase VIII. v8.2.0"""
+"""SAM Activation Runtime — Phase VIII. v8.3.0"""
 from sam.activation.activation_context import ActivationContext
 from sam.activation.activation_request import ActivationRequest
 from sam.activation.activation_candidate import ActivationCandidate
@@ -15,12 +15,19 @@ from sam.activation.activation_alternative import AlternativeGenerator, Activati
 from sam.activation.activation_priority import ActivationPriority, PriorityAssignment
 from sam.activation.activation_window import ActivationWindowManager, ActivationWindow
 from sam.activation.activation_sequence import SequenceBuilder, ActivationSequence, ActivationStep
+from sam.activation.activation_package import ActivationPackage
+from sam.activation.package_builder import PackageBuilder
+from sam.activation.package_validator import PackageValidator, PackageValidation
+from sam.activation.package_registry import PackageRegistry
+from sam.activation.package_export import PackageExporter, PackageExport
 from sam.activation.conversation_activation import ConversationActivation
 from sam.activation.conversation_validation import ConversationValidation
 from sam.activation.conversation_strategy import ConversationStrategy
+from sam.activation.conversation_package import ConversationPackage
 from sam.activation.dashboard_activation import DashboardActivation, ActivationCard
 from sam.activation.dashboard_validation import DashboardValidation, ValidationCard
 from sam.activation.dashboard_strategy import DashboardStrategy, StrategyCard
+from sam.activation.dashboard_package import DashboardPackage, PackageCard
 from sam.activation.runtime import ActivationRuntime
 
 __all__ = [
@@ -37,9 +44,15 @@ __all__ = [
     "ActivationPriority", "PriorityAssignment",
     "ActivationWindowManager", "ActivationWindow",
     "SequenceBuilder", "ActivationSequence", "ActivationStep",
-    "ConversationActivation", "ConversationValidation", "ConversationStrategy",
+    "ActivationPackage",
+    "PackageBuilder",
+    "PackageValidator", "PackageValidation",
+    "PackageRegistry",
+    "PackageExporter", "PackageExport",
+    "ConversationActivation", "ConversationValidation", "ConversationStrategy", "ConversationPackage",
     "DashboardActivation", "ActivationCard",
     "DashboardValidation", "ValidationCard",
     "DashboardStrategy", "StrategyCard",
+    "DashboardPackage", "PackageCard",
     "ActivationRuntime",
 ]
