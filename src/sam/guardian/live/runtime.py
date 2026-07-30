@@ -61,21 +61,24 @@ from .dashboard_handoff import LiveDashboardHandoffBridge as LiveDashboardHandof
 from .builder import JustificationBuilder
 from .conversation_justification import LiveConversationJustificationBridge
 from .dashboard_justification import LiveDashboardJustificationBridge as LiveDashboardJustificationBridgeCls
+from .package_builder import PackageBuilder
+from .package_registry import PackageRegistry
+from .conversation_package import LiveConversationPackageBridge
+from .dashboard_package import LiveDashboardPackageBridge as LiveDashboardPackageBridgeCls
 
 
 class GuardianLiveRuntime:
     """
     Synchronous live runtime for the Guardian.
 
-    Full Pipeline (v5.7.0):
-        Event → Dispatch → Synchronization
-        → Transition → Situation → Assessment
-        → Intent → Decision Handoff → Decision Justification
+    Full Pipeline (v5.8.0):
+        Event → Dispatch → Synchronization → Transition
+        → Situation → Assessment → Intent → Handoff
+        → Justification → Decision Package
         → Guardian → Reasoning → Learning
         → Execution Preview → Dashboard → Conversation
 
-    DecisionInput and Justification are DTO only.
-    Does NOT call Decision Runtime, create missions, or execute.
+    All DTO only. No execution, missions, or approvals.
     """
 
     def __init__(
@@ -141,6 +144,12 @@ class GuardianLiveRuntime:
         self._justification_history: 'List[DecisionJustification]' = []
         self._conversation_justification = LiveConversationJustificationBridge(self)
         self._dashboard_justification = LiveDashboardJustificationBridgeCls(self)
+
+        # Sprint 51 — Decision Package
+        self._package_builder = PackageBuilder()
+        self._package_registry = PackageRegistry()
+        self._conversation_package = LiveConversationPackageBridge(self)
+        self._dashboard_package = LiveDashboardPackageBridgeCls(self)
 
         self._is_running: bool = False
         if runtime_id:
@@ -428,6 +437,28 @@ class GuardianLiveRuntime:
         """Get the dashboard justification bridge."""
         return self._dashboard_justification
 
+    # --- Sprint 51 — Decision Package ---
+
+    @property
+    def package_builder(self) -> 'PackageBuilder':
+        """Get the package builder."""
+        return self._package_builder
+
+    @property
+    def package_registry(self) -> 'PackageRegistry':
+        """Get the package registry."""
+        return self._package_registry
+
+    @property
+    def conversation_package(self) -> 'LiveConversationPackageBridge':
+        """Get the conversation package bridge."""
+        return self._conversation_package
+
+    @property
+    def dashboard_package(self) -> 'LiveDashboardPackageBridgeCls':
+        """Get the dashboard package bridge."""
+        return self._dashboard_package
+
     # --- History ---
 
     def record_dispatch(
@@ -505,6 +536,7 @@ class GuardianLiveRuntime:
             "decision_eligible": self._decision_queue.eligible_count,
             "decision_blocked": self._decision_queue.blocked_count,
             "justification_count": len(self._justification_history),
+            "package_count": self._package_registry.count,
         }
 
     # --- Pipeline Execution ---
@@ -661,6 +693,30 @@ class GuardianLiveRuntime:
                                 })
                         transition_result["justifications"] = justification_result
 
+                        # 3i. Decision Package (NEW v5.8.0)
+                        package_result = []
+                        if self._justification_history:
+                            for just_obj in self._justification_history[-len(intent_result):]:
+                                # Find matching decision input
+                                di = None
+                                for item in self._decision_queue.history():
+                                    if item.input_id == just_obj.decision_input_id:
+                                        di = item
+                                        break
+                                pkg = self._package_builder.build(
+                                    decision_input=di,
+                                    justification=just_obj,
+                                    sections={"timestamp": event.timestamp},
+                                    runtime_id=self._synchronizer.current_runtime_id or "",
+                                )
+                                self._package_registry.register(pkg)
+                                package_result.append({
+                                    "package_id": pkg.package_id,
+                                    "sections": pkg.total_sections,
+                                    "version": pkg.metadata.version if pkg.metadata else "",
+                                })
+                        transition_result["packages"] = package_result
+
                 # 4. Reasoning
                 reasoning_result = self._reasoning.trigger(event)
                 # 5. Learning
@@ -690,4 +746,5 @@ class GuardianLiveRuntime:
             "intent_count": len(self._intent_history),
             "handoff_count": self._decision_queue.count,
             "justification_count": len(self._justification_history),
+            "package_count": self._package_registry.count,
         }
