@@ -77,6 +77,22 @@ from .dashboard_transition import (
     RuntimeEvolutionCard,
 )
 
+# Sprint 46 — Situation Intelligence
+from .situation import (
+    GuardianSituation, SituationType, SituationSeverity,
+    SituationSummary, SituationStatistics, SituationSnapshot, SituationCandidate,
+)
+from .correlator import TransitionCorrelator
+from .classifier import SituationClassifier
+from .severity import SituationSeverityCalculator
+from .history_situation import SituationHistory
+from .conversation_situation import LiveConversationSituationBridge
+from .dashboard_situation import (
+    LiveDashboardSituationBridge as LiveDashboardSituationBridgeExport,
+    CurrentSituationCard, SituationTimelineCard, SituationSeverityCard,
+    SituationStatisticsCard, RuntimeDistributionCard, SituationHistoryCard,
+)
+
 __all__ = [
     # Sprint 43 — Core
     "GuardianEvent",
@@ -141,4 +157,24 @@ __all__ = [
     "CriticalEventsCard",
     "TransitionStatisticsCard",
     "RuntimeEvolutionCard",
+    # Sprint 46 — Situation Intelligence
+    "GuardianSituation",
+    "SituationType",
+    "SituationSeverity",
+    "SituationSummary",
+    "SituationStatistics",
+    "SituationSnapshot",
+    "SituationCandidate",
+    "TransitionCorrelator",
+    "SituationClassifier",
+    "SituationSeverityCalculator",
+    "SituationHistory",
+    "LiveConversationSituationBridge",
+    "LiveDashboardSituationBridgeExport",
+    "CurrentSituationCard",
+    "SituationTimelineCard",
+    "SituationSeverityCard",
+    "SituationStatisticsCard",
+    "RuntimeDistributionCard",
+    "SituationHistoryCard",
 ]
