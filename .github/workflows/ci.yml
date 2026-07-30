@@ -10,10 +10,38 @@ env:
   PYTHONPATH: ${{ github.workspace }}/src
 
 jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev,console]"
+
+      - name: Lint with Ruff
+        run: |
+          python -m ruff check src/ --quiet --exit-zero
+
+      - name: Architecture Validation
+        run: |
+          python scripts/validation/validate_imports.py && echo "validate_imports PASS" || echo "validate_imports: non-core violations only"
+          python scripts/validation/validate_layers.py && echo "validate_layers PASS" || echo "validate_layers: see violations above"
+          python scripts/validation/validate_structure.py && echo "validate_structure PASS" || echo "validate_structure: see violations above"
+          python scripts/validation/validate_docs.py && echo "validate_docs PASS" || echo "validate_docs: see violations above"
+
   core:
+    needs: validation
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         python-version: ['3.10', '3.11', '3.12']
 
@@ -32,23 +60,36 @@ jobs:
           python -m pip install --upgrade pip
           pip install ".[dev,console]"
 
-      - name: Lint with Ruff
-        run: |
-          python -m ruff check src/ --quiet --exit-zero
-
-      - name: Architecture Validation
-        run: |
-          python scripts/validation/validate_imports.py && echo "✅ validate_imports PASS" || echo "⚠️ validate_imports: non-core violations only"
-          python scripts/validation/validate_layers.py && echo "✅ validate_layers PASS" || echo "⚠️ validate_layers: see violations above"
-          python scripts/validation/validate_structure.py && echo "✅ validate_structure PASS" || echo "⚠️ validate_structure: see violations above"
-          python scripts/validation/validate_docs.py && echo "✅ validate_docs PASS" || echo "⚠️ validate_docs: see violations above"
-
-      - name: Run pytest (all unit tests, headless mode)
-        continue-on-error: true
+      - name: Run core tests (unit)
         run: |
           python -m pytest tests/unit/ \
-            --ignore=tests/unit/test_api.py \
-            --ignore=tests/unit/test_importer.py --ignore=tests/unit/test_hardening.py \
+            --tb=short \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-fail-under=5 \
+            -q
+
+  server:
+    needs: validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev,server]"
+
+      - name: Run API / server tests
+        run: |
+          python -m pytest tests/api/ \
             --tb=short \
             --cov=src \
             --cov-report=term-missing \
@@ -56,7 +97,7 @@ jobs:
             -q
 
   desktop:
-    needs: core
+    needs: validation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -73,24 +114,19 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq libxcb-cursor0 libegl1-mesa libgl1-mesa-glx
 
-      - name: Install dependencies (with desktop)
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install ".[dev,desktop]"
 
-      - name: Run desktop smoke tests
+      - name: Run desktop tests
         run: |
-          QT_QPA_PLATFORM=offscreen python -m pytest tests/unit/test_desktop_smoke.py -v --tb=short
+          QT_QPA_PLATFORM=offscreen python -m pytest tests/desktop/ \
+            --tb=short -v -q
 
-      - name: Upload coverage artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: .coverage
-
-  summary:
-    needs: [core, desktop]
+  coverage:
+    needs: [core, server, desktop]
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: echo "SAM CI - all checks passed"
+      - run: echo "SAM CI — jobs complete"
