@@ -26,17 +26,23 @@ from .conversation_planning import DecisionConversationPlanningBridge
 from .dashboard_planning import DecisionDashboardPlanningBridge
 from .conversation_approval import DecisionConversationApprovalBridge
 from .dashboard_approval import DecisionDashboardApprovalBridge
+from .approval_bridge import ApprovalBridge
+from .approval_status import ApprovalStatusMirrorStore, ApprovalStatusMirror, ApprovalState
+from .conversation_adapter import DecisionConversationAdapterBridge
+from .dashboard_adapter import DecisionDashboardAdapterBridge
 
 
 class DecisionRuntimeV3:
     """
-    Decision Runtime V3 — Full Preparation Pipeline.
+    Decision Runtime V3 — Full Pipeline with Approval Adapter.
 
     Pipeline:
         Receive → Validate → Normalize → Context Builder
         → Evaluate → Plan → Approval Preparation
+        → Approval Adapter (NEW)
 
     Does NOT create missions, submit approvals, or execute.
+    Approval adapter is preview only.
     """
 
     def __init__(self) -> None:
@@ -47,6 +53,8 @@ class DecisionRuntimeV3:
         self._evaluator = DecisionEvaluator()
         self._planner = DecisionPlanner()
         self._approval_builder = ApprovalBuilder()
+        self._bridge = ApprovalBridge()
+        self._status_store = ApprovalStatusMirrorStore()
 
         self._conversation = DecisionConversationPackageBridge(self)
         self._dashboard = DecisionDashboardPackageBridge(self)
@@ -56,6 +64,8 @@ class DecisionRuntimeV3:
         self._dashboard_plan = DecisionDashboardPlanningBridge(self)
         self._conversation_approval = DecisionConversationApprovalBridge(self)
         self._dashboard_approval = DecisionDashboardApprovalBridge(self)
+        self._conversation_adapter = DecisionConversationAdapterBridge(self)
+        self._dashboard_adapter = DecisionDashboardAdapterBridge(self)
 
         self._latest_incoming: Optional[IncomingDecisionPackage] = None
         self._latest_normalized: Optional[IncomingDecisionPackage] = None
@@ -89,6 +99,10 @@ class DecisionRuntimeV3:
     def conversation_approval(self): return self._conversation_approval
     @property
     def dashboard_approval(self): return self._dashboard_approval
+    @property
+    def conversation_adapter(self): return self._conversation_adapter
+    @property
+    def dashboard_adapter(self): return self._dashboard_adapter
 
     def consume(self, package_dict: Dict[str, Any]) -> Dict[str, Any]:
         incoming = self._consumer.consume(package_dict)
@@ -122,6 +136,18 @@ class DecisionRuntimeV3:
             self._latest_approval = approval; self._approval_count += 1
             if approval.ready_for_submission: self._approval_ready_count += 1
 
+            # Approval Adapter (NEW v5.13.0)
+            import datetime
+            bridge_result = self._bridge.bridge(approval)
+            status_mirror = ApprovalStatusMirror(
+                envelope_id=bridge_result["envelope_id"],
+                state=ApprovalState.PENDING,
+                timestamp=datetime.datetime.now().timestamp(),
+                message="Prepared for approval — preview only",
+                references={"approval_id": bridge_result["envelope_id"]},
+            )
+            self._status_store.record(status_mirror)
+
         return {
             "package_id": incoming.package_id, "received": True,
             "valid": validation.valid, "validation_score": validation.score,
@@ -139,6 +165,7 @@ class DecisionRuntimeV3:
             "evaluation_count": self._evaluation_count, "ready_count": self._ready_count,
             "blocked_count": self._blocked_count, "plan_count": self._plan_count,
             "approval_count": self._approval_count, "approval_ready": self._approval_ready_count,
+            "bridge_count": self._bridge.bridge_count if self._bridge else 0,
             "has_latest": self._latest_incoming is not None,
             "has_evaluation": self._latest_evaluation is not None,
             "has_plan": self._latest_plan is not None,
