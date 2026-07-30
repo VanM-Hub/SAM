@@ -54,6 +54,9 @@ from .dashboard_activation import DecisionDashboardActivationBridge
 from .certification_engine import CertificationEngine
 from .conversation_certification import DecisionConversationCertificationBridge
 from .dashboard_certification import DecisionDashboardCertificationBridge
+from .finalization_engine import FinalizationEngine
+from .conversation_finalization import DecisionConversationFinalizationBridge
+from .dashboard_finalization import DecisionDashboardFinalizationBridge
 
 
 class DecisionRuntimeV3:
@@ -89,6 +92,7 @@ class DecisionRuntimeV3:
         self._lifecycle_engine = LifecycleEngine()
         self._activation_engine = ActivationEngine()
         self._certification_engine = CertificationEngine()
+        self._finalization_engine = FinalizationEngine()
 
         self._conversation = DecisionConversationPackageBridge(self)
         self._dashboard = DecisionDashboardPackageBridge(self)
@@ -112,6 +116,8 @@ class DecisionRuntimeV3:
         self._dashboard_activation = DecisionDashboardActivationBridge(self)
         self._conversation_certification = DecisionConversationCertificationBridge(self)
         self._dashboard_certification = DecisionDashboardCertificationBridge(self)
+        self._conversation_finalization = DecisionConversationFinalizationBridge(self)
+        self._dashboard_finalization = DecisionDashboardFinalizationBridge(self)
 
         self._latest_incoming: Optional[IncomingDecisionPackage] = None
         self._latest_normalized: Optional[IncomingDecisionPackage] = None
@@ -176,6 +182,10 @@ class DecisionRuntimeV3:
     def conversation_certification(self): return self._conversation_certification
     @property
     def dashboard_certification(self): return self._dashboard_certification
+    @property
+    def conversation_finalization(self): return self._conversation_finalization
+    @property
+    def dashboard_finalization(self): return self._dashboard_finalization
 
     def consume(self, package_dict: Dict[str, Any]) -> Dict[str, Any]:
         incoming = self._consumer.consume(package_dict)
@@ -267,6 +277,16 @@ class DecisionRuntimeV3:
                         lifecycle_id=activation.lifecycle_id,
                     )
 
+                # Decision Finalization (NEW v5.20.0)
+                if certification:
+                    final_record = self._finalization_engine.finalize(
+                        certification=certification,
+                        activation=activation if activation else None,
+                        session_id=session.session_id if session else "",
+                        lifecycle_id=lifecycle.lifecycle_id if lifecycle else "",
+                        gateway_request_id=gateway_result.request_id if hasattr(gateway_result, 'request_id') else "",
+                    )
+
         return {
             "package_id": incoming.package_id, "received": True,
             "valid": validation.valid, "validation_score": validation.score,
@@ -292,6 +312,7 @@ class DecisionRuntimeV3:
             "lifecycle_count": self._lifecycle_engine.count if self._lifecycle_engine else 0,
             "activation_count": self._activation_engine.count if self._activation_engine else 0,
             "certification_count": self._certification_engine.count if self._certification_engine else 0,
+            "finalization_count": self._finalization_engine.count if self._finalization_engine else 0,
             "has_latest": self._latest_incoming is not None,
             "has_evaluation": self._latest_evaluation is not None,
             "has_plan": self._latest_plan is not None,
