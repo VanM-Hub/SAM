@@ -41,17 +41,21 @@ from .impact import ImpactAnalyzer
 from .timeline import TransitionTimeline
 from .conversation_transition import LiveConversationTransitionBridge
 from .dashboard_transition import LiveDashboardTransitionBridge
+from .classifier import SituationClassifier
+from .history_situation import SituationHistory
+from .conversation_situation import LiveConversationSituationBridge
+from .dashboard_situation import LiveDashboardSituationBridge as LiveDashboardSituationBridgeCls
 
 
 class GuardianLiveRuntime:
     """
     Synchronous live runtime for the Guardian.
 
-    Full Pipeline (v5.2.0):
+    Full Pipeline (v5.3.0):
         Event → Dispatch → Synchronization
-        → Transition Intelligence → Guardian
-        → Reasoning → Learning → Execution Preview
-        → Dashboard → Conversation
+        → Transition Intelligence → Situation Intelligence
+        → Guardian → Reasoning → Learning
+        → Execution Preview → Dashboard → Conversation
 
     Does NOT replace the existing Guardian Runtime.
     All calls synchronous, DTO-only, preview only.
@@ -87,6 +91,12 @@ class GuardianLiveRuntime:
         self._conversation_transition = LiveConversationTransitionBridge(self)
         self._dashboard_transition = LiveDashboardTransitionBridge(self)
         self._last_registry_count: int = 0
+
+        # Sprint 46 — Situation Intelligence
+        self._classifier = SituationClassifier()
+        self._situation_history = SituationHistory()
+        self._conversation_situation = LiveConversationSituationBridge(self)
+        self._dashboard_situation = LiveDashboardSituationBridgeCls(self)
 
         self._is_running: bool = False
         if runtime_id:
@@ -249,6 +259,28 @@ class GuardianLiveRuntime:
         """Get the dashboard transition bridge."""
         return self._dashboard_transition
 
+    # --- Sprint 46 — Situation Intelligence ---
+
+    @property
+    def classifier(self) -> 'SituationClassifier':
+        """Get the situation classifier."""
+        return self._classifier
+
+    @property
+    def situation_history(self) -> 'SituationHistory':
+        """Get the situation history."""
+        return self._situation_history
+
+    @property
+    def conversation_situation(self) -> 'LiveConversationSituationBridge':
+        """Get the conversation situation bridge."""
+        return self._conversation_situation
+
+    @property
+    def dashboard_situation(self) -> 'LiveDashboardSituationBridgeCls':
+        """Get the dashboard situation bridge."""
+        return self._dashboard_situation
+
     # --- History ---
 
     def record_dispatch(
@@ -299,6 +331,15 @@ class GuardianLiveRuntime:
             "consistent": self._validator.is_consistent(),
             "transition_count": self._timeline.count,
             "critical_transitions": self._timeline.get_summary().critical_count,
+            "situation_count": self._situation_history.count,
+            "current_situation": (
+                self._situation_history.latest.situation_type.name
+                if self._situation_history.latest else None
+            ),
+            "current_severity": (
+                self._situation_history.latest.severity.name
+                if self._situation_history.latest else None
+            ),
         }
 
     # --- Pipeline Execution ---
@@ -389,6 +430,12 @@ class GuardianLiveRuntime:
                         "total_in_timeline": self._timeline.count,
                     }
 
+                    # 3d. Situation Intelligence (NEW v5.3.0)
+                    if transitions:
+                        situations = self._classifier.classify(transitions)
+                        self._situation_history.record_batch(situations)
+                        transition_result["situations_found"] = len(situations)
+
                 # 4. Reasoning
                 reasoning_result = self._reasoning.trigger(event)
                 # 5. Learning
@@ -414,4 +461,5 @@ class GuardianLiveRuntime:
             "registry_count": self._registry.count,
             "snapshot_count": self._snapshot_manager.count,
             "transition_count": self._timeline.count,
+            "situation_count": self._situation_history.count,
         }
