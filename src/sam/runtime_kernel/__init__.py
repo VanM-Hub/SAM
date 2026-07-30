@@ -60,3 +60,11 @@ from sam.runtime_kernel.access_controller import AccessController
 from sam.runtime_kernel.audit_logger import AuditLogger
 from sam.runtime_kernel.verdict_engine import VerdictEngine
 from sam.runtime_kernel.conversation_security import ConversationSecurity, DashboardSecurity
+from sam.runtime_kernel.runtime_scheduler import (
+    ScheduleSlot, SchedulePlan, ScheduleWindow, TaskSlot, ScheduleResult,
+)
+from sam.runtime_kernel.scheduler_engine import SchedulerEngine
+from sam.runtime_kernel.task_scheduler import TaskScheduler
+from sam.runtime_kernel.window_scheduler import WindowScheduler
+from sam.runtime_kernel.priority_allocator import PriorityAllocator
+from sam.runtime_kernel.conversation_scheduler import ConversationScheduler, DashboardScheduler
