@@ -38,6 +38,11 @@ from .dashboard_submission import DecisionDashboardSubmissionBridge
 from .approval_gateway import ApprovalGateway
 from .conversation_gateway import DecisionConversationGatewayBridge
 from .dashboard_gateway import DecisionDashboardGatewayBridge
+from .session_builder import SessionBuilder
+from .session_registry import SessionRegistry
+from .session_history import SessionHistory
+from .conversation_session import DecisionConversationSessionBridge
+from .dashboard_session import DecisionDashboardSessionBridge
 
 
 class DecisionRuntimeV3:
@@ -67,6 +72,9 @@ class DecisionRuntimeV3:
         self._queue_planner = SubmissionQueuePlanner()
         self._submission_queue = None
         self._gateway = ApprovalGateway()
+        self._session_builder = SessionBuilder()
+        self._session_registry = SessionRegistry()
+        self._session_history = SessionHistory()
 
         self._conversation = DecisionConversationPackageBridge(self)
         self._dashboard = DecisionDashboardPackageBridge(self)
@@ -82,6 +90,8 @@ class DecisionRuntimeV3:
         self._dashboard_submission = DecisionDashboardSubmissionBridge(self)
         self._conversation_gateway = DecisionConversationGatewayBridge(self)
         self._dashboard_gateway = DecisionDashboardGatewayBridge(self)
+        self._conversation_session = DecisionConversationSessionBridge(self)
+        self._dashboard_session = DecisionDashboardSessionBridge(self)
 
         self._latest_incoming: Optional[IncomingDecisionPackage] = None
         self._latest_normalized: Optional[IncomingDecisionPackage] = None
@@ -130,6 +140,10 @@ class DecisionRuntimeV3:
     def conversation_gateway(self): return self._conversation_gateway
     @property
     def dashboard_gateway(self): return self._dashboard_gateway
+    @property
+    def conversation_session(self): return self._conversation_session
+    @property
+    def dashboard_session(self): return self._dashboard_session
 
     def consume(self, package_dict: Dict[str, Any]) -> Dict[str, Any]:
         incoming = self._consumer.consume(package_dict)
@@ -185,6 +199,19 @@ class DecisionRuntimeV3:
                 # Approval Gateway (NEW v5.15.0)
                 gateway_result = self._gateway.process(submission_plan)
 
+                # Approval Session (NEW v5.16.0)
+                if gateway_result.success:
+                    request = self._gateway.registry.last_request
+                    if request:
+                        session = self._session_builder.build(request)
+                        self._session_registry.register(session)
+                        self._session_history.record(
+                            session_id=session.session_id,
+                            event="created",
+                            prev="NONE",
+                            new_s=session.state.name,
+                        )
+
         return {
             "package_id": incoming.package_id, "received": True,
             "valid": validation.valid, "validation_score": validation.score,
@@ -206,6 +233,7 @@ class DecisionRuntimeV3:
             "submission_count": self._submission_count,
             "submission_ready": self._submission_ready_count,
             "gateway_count": self._gateway.gateway_count if self._gateway else 0,
+            "session_count": self._session_registry.count if self._session_registry else 0,
             "has_latest": self._latest_incoming is not None,
             "has_evaluation": self._latest_evaluation is not None,
             "has_plan": self._latest_plan is not None,
