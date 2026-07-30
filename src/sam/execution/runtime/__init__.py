@@ -30,3 +30,13 @@ from sam.execution.runtime.resource_plan import (
 from sam.execution.runtime.resource_allocator import ResourceAllocator
 from sam.execution.runtime.conversation_resources import ConversationResources
 from sam.execution.runtime.dashboard_resources import DashboardResources
+from sam.execution.runtime.dependency_graph import (
+    DependencyGraph, DependencyNode, DependencyValidation,
+    ExecutionOrder, DependencySummary,
+)
+from sam.execution.runtime.dependency_resolver import (
+    DependencyGraphBuilder, DependencyValidator, ExecutionOrderResolver,
+)
+from sam.execution.runtime.conversation_dependencies import (
+    ConversationDependencies, DashboardDependencies,
+)
