@@ -60,3 +60,10 @@ from .strategy import StrategyBuilder
 from .constraints import ConstraintEngine
 from .conversation_planning import DecisionConversationPlanningBridge
 from .dashboard_planning import DecisionDashboardPlanningBridge
+from .approval_preparation import ApprovalPreparation,ApprovalCandidate,ApprovalRequirement,ApprovalMetadata,ApprovalStatistics,ApprovalSnapshot
+from .approval_builder import ApprovalBuilder
+from .approval_validator import ApprovalValidator,ApprovalValidationResult
+from .approval_requirements import ApprovalRequirementsEngine,ApprovalRequirementSet
+from .approval_summary import ApprovalSummaryBuilder
+from .conversation_approval import DecisionConversationApprovalBridge
+from .dashboard_approval import DecisionDashboardApprovalBridge
