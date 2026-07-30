@@ -1,14 +1,16 @@
-# .gitignore template
-.DS_Thumbs.db
+# OS files
+.DS_Store
 Thumbs.db
-*.log
-*.tmp
-*.temp
-bin/
-obj/
+
+# Python
 __pycache__/
 *.pyc
-.env
+*.pyo
+*.egg-info/
+build/
+dist/
+
+# IDE
 .idea/
 .vscode/
 *.sln
@@ -20,60 +22,35 @@ __pycache__/
 # Embedded repos
 ACC/
 
-# Build artifacts
-src/sam.egg-info/
+# Environment
+.env
 
-# Workspace artifacts (local runtime data, jangan di-track)
-workspace/sessions/
-workspace/desired-state.yaml
-workspace/mission.yaml
-
-# Databases — runtime state, test artifacts, backup
-*.db
-*.db.backup*
-*.sqlite
-*.sqlite3
-
-# Runtime databases (jangan commit)
-data/*.db
-data/*.db-wal
-data/*.db-shm
-
-# But migrations dir is tracked via ! override
-!data/migrations/
-
-data/migrations/*.sql
+# Temp files
+*.log
+*.log.*
+*.tmp
+*.temp
+temp_screenshot.png
+*.bat
 
 # Coverage
 .coverage
 htmlcov/
-
-# Local runtime data (jangan commit!)
-workspace/*.db
-workspace/telemetry/
-
-# Screenshots, temp files (ops.py helper, dll)
-*.bat
-temp_screenshot.png
-*.log.*
-
-# Test results
 test-results.xml
 
-# Runtime data (jangan commit!)
+# Local runtime data
+workspace/
 approvals.json
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
-workspace/
-
-# Database files (local only)
+# Database — jangan commit! Semua file .db, .sqlite, .sqlite3
 *.db
-test-results.xml
+*.db.backup*
+*.sqlite
+*.sqlite3
+data/*.db
+data/*.db-wal
+data/*.db-shm
 
-temp_screenshot.png
-
-.coverage
-htmlcov/
+# TAPI migrations dir di-track via ! override
+!data/migrations/
+data/migrations/*.sql
