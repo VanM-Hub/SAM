@@ -63,3 +63,8 @@ from sam.execution.runtime.conversation_risk import ConversationRisk, DashboardR
 from sam.execution.runtime.quality import QualityMetric, QualityAssessment, QualityGate, QualitySummary
 from sam.execution.runtime.quality_engine import QualityEngine
 from sam.execution.runtime.conversation_quality import ConversationQuality, DashboardQuality
+from sam.execution.runtime.assembly import (
+    AssemblyComponent, ExecutionAssembly, ReadinessReport, AssemblySummary,
+)
+from sam.execution.runtime.assembly_engine import AssemblyEngine
+from sam.execution.runtime.conversation_assembly import ConversationAssembly, DashboardAssembly
