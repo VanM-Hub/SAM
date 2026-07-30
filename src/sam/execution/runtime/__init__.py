@@ -1,9 +1,25 @@
-"""Execution Runtime — Phase IX Sprint 88 Foundation."""
+"""Execution Runtime — Phase IX (Sprint 88–90+)."""
 from sam.execution.runtime.execution_context import ExecutionContext
 from sam.execution.runtime.execution_request import ExecutionRequest
 from sam.execution.runtime.execution_candidate import ExecutionCandidate
+from sam.execution.runtime.execution_draft import ExecutionDraft
 from sam.execution.runtime.execution_registry import ExecutionRegistry, ExecutionSnapshot
 from sam.execution.runtime.execution_builder import ExecutionBuilder
-from sam.execution.runtime.runtime import ExecutionRuntime, ExecutionDraft
+from sam.execution.runtime.runtime import ExecutionRuntime
 from sam.execution.runtime.conversation_execution import ConversationExecution
 from sam.execution.runtime.dashboard_execution import DashboardExecution, ExecutionCard
+from sam.execution.runtime.execution_validator import (
+    ExecutionValidator, ExecutionRules, ExecutionConstraints,
+    ExecutionReadiness, ExecutionReportBuilder, ExecutionReport,
+    ExecutionValidationError, ExecutionValidationReport,
+)
+from sam.execution.runtime.execution_plan import ExecutionPlan
+from sam.execution.runtime.execution_strategy import (
+    ExecutionStrategy, SequenceBuilder, ExecutionPriority,
+    ExecutionSchedule, StrategyResult, SequenceStep,
+    ExecutionSequence, PriorityAssignment, ScheduleWindow,
+)
+from sam.execution.runtime.conversation_validation import ConversationValidation
+from sam.execution.runtime.dashboard_validation import DashboardValidation
+from sam.execution.runtime.conversation_planning import ConversationPlanning
+from sam.execution.runtime.dashboard_planning import DashboardPlanning
