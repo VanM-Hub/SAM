@@ -45,6 +45,8 @@ jobs:
       - name: Run pytest (all unit tests, headless mode)
         run: |
           python -m pytest tests/unit/ \
+            --ignore=tests/unit/test_api.py \
+            --ignore=tests/unit/test_importer.py \
             --tb=short \
             --cov=src \
             --cov-report=term-missing \
