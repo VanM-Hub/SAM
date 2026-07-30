@@ -4,10 +4,10 @@ SAM Guardian Live Runtime Foundation.
 Synchronous event-driven runtime for Guardian internal communication.
 All DTOs are frozen. No async, no threading, no network.
 
-v5.5.0 — Added Operational Intent:
-    intent.py, intent_builder.py, intent_policy.py,
-    intent_ranker.py, intent_validator.py, conversation_intent.py,
-    dashboard_intent.py
+v5.6.0 — Added Decision Handoff:
+    decision_input.py, handoff.py, mapping.py,
+    eligibility.py, queue.py, conversation_handoff.py,
+    dashboard_handoff.py
 """
 
 # Sprint 43
@@ -62,6 +62,14 @@ from .intent_ranker import IntentRanker
 from .intent_validator import IntentValidator
 from .conversation_intent import LiveConversationIntentBridge
 from .dashboard_intent import LiveDashboardIntentBridge as LDIB,CurrentIntentCard,IntentQueueCard,IntentPriorityCard,IntentPoliciesCard,IntentValidationCard,IntentHistoryCard
+# Sprint 49
+from .decision_input import DecisionInput,DecisionCandidate,DecisionReason,DecisionMetadata,DecisionStatistics,DecisionSnapshot,EligibilityStatus
+from .handoff import HandoffEngine
+from .mapping import IntentMapper
+from .eligibility import EligibilityEngine,EligibilityResult
+from .queue import DecisionQueue
+from .conversation_handoff import LiveConversationHandoffBridge
+from .dashboard_handoff import LiveDashboardHandoffBridge as LDHB,DecisionQueueCard,EligibleItemsCard,BlockedItemsCard,QueueStatisticsCard,LatestHandoffCard,QueueHealthCard
 
 __all__ = [
     "GuardianEvent","GuardianEventType","GuardianEventPriority","GuardianEventSource","GuardianEventMetadata","GuardianEventSnapshot",
@@ -83,4 +91,7 @@ __all__ = [
     "GuardianIntent","IntentType","IntentPriority","IntentStatus","IntentSummary","IntentSnapshot","IntentStatistics","ValidationResult",
     "IntentBuilder","IntentPolicyEngine","IntentRanker","IntentValidator",
     "LiveConversationIntentBridge","LDIB","CurrentIntentCard","IntentQueueCard","IntentPriorityCard","IntentPoliciesCard","IntentValidationCard","IntentHistoryCard",
+    "DecisionInput","DecisionCandidate","DecisionReason","DecisionMetadata","DecisionStatistics","DecisionSnapshot","EligibilityStatus",
+    "HandoffEngine","IntentMapper","EligibilityEngine","EligibilityResult","DecisionQueue",
+    "LiveConversationHandoffBridge","LDHB","DecisionQueueCard","EligibleItemsCard","BlockedItemsCard","QueueStatisticsCard","LatestHandoffCard","QueueHealthCard",
 ]
