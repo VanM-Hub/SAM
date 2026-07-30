@@ -10,6 +10,50 @@ from sam.mission.loader import MissionLoader
 from sam.dos.loader import DOSLoader
 
 
+# ─── Fixtures ─────────────────────────────────────────────────────────
+
+@pytest.fixture
+def mission_yaml(tmp_path):
+    """Create a hermetic mission.yaml in tmp_path."""
+    content = """
+id: "test-mission-1"
+name: "Protect OpenClaw"
+description: "Test mission"
+priority: 1
+min_health: 0.8
+objectives:
+  - id: "obj-1"
+    name: "Health Check"
+    status: "active"
+  - id: "obj-2"
+    name: "Network Monitor"
+    status: "active"
+  - id: "obj-3"
+    name: "Data Sync"
+    status: "active"
+"""
+    f = tmp_path / "mission.yaml"
+    f.write_text(content)
+    return tmp_path
+
+
+@pytest.fixture
+def dos_yaml(tmp_path):
+    """Create a hermetic desired-state.yaml in tmp_path."""
+    content = """
+runtime_state: "RUNNING"
+plugins_expected: 14
+knowledge_loaded: true
+memory_healthy: true
+session_persistent: true
+min_health_score: 95.0
+guardian_mode: "autonomous"
+"""
+    f = tmp_path / "desired-state.yaml"
+    f.write_text(content)
+    return tmp_path
+
+
 # ─── Contracts ───────────────────────────────────────────────────────
 
 class TestMissionContract:
@@ -144,15 +188,15 @@ class TestRuntimeCoordinator:
 # ─── Mission Loader ─────────────────────────────────────────────────
 
 class TestMissionLoader:
-    def test_load_from_workspace(self):
-        ml = MissionLoader("workspace")
+    def test_load_from_workspace(self, mission_yaml):
+        ml = MissionLoader(str(mission_yaml))
         m = ml.load()
         assert m.name == "Protect OpenClaw"
         assert m.priority == 1
         assert len(m.objectives) == 3
 
     def test_load_file_not_found(self):
-        ml = MissionLoader("nonexistent")
+        ml = MissionLoader(str(pytest.importorskip("pathlib").Path("nonexistent_xyz")))
         mission = ml.load()
         # Should return default mission, not raise FileNotFoundError
         assert mission.id == "default-mission"
@@ -161,15 +205,15 @@ class TestMissionLoader:
 # ─── DOS Loader ─────────────────────────────────────────────────────
 
 class TestDOSLoader:
-    def test_load_from_workspace(self):
-        dl = DOSLoader("workspace")
+    def test_load_from_workspace(self, dos_yaml):
+        dl = DOSLoader(str(dos_yaml))
         dos = dl.load()
         assert dos.runtime_state == "RUNNING"
         assert dos.plugins_expected == 14
         assert dos.guardian_mode == "autonomous"
 
     def test_load_file_not_found(self):
-        dl = DOSLoader("nonexistent")
+        dl = DOSLoader(str(pytest.importorskip("pathlib").Path("nonexistent_xyz")))
         dos = dl.load()
         # Should return default DOS, not raise FileNotFoundError
         assert dos is not None
