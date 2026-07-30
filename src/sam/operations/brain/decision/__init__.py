@@ -95,3 +95,10 @@ from .session_registry import SessionRegistry
 from .session_history import SessionHistory,SessionHistoryRecord
 from .conversation_session import DecisionConversationSessionBridge
 from .dashboard_session import DecisionDashboardSessionBridge
+from .approval_lifecycle import ApprovalLifecycle,ApprovalLifecycleState,LifecycleTransition,LifecycleMetadata,LifecycleSnapshot,LifecycleStatistics
+from .lifecycle_engine import LifecycleEngine
+from .lifecycle_rules import LifecycleRules
+from .lifecycle_history import LifecycleHistory,LifecycleHistoryRecord
+from .lifecycle_validator import LifecycleValidator,LifecycleValidationResult
+from .conversation_lifecycle import DecisionConversationLifecycleBridge
+from .dashboard_lifecycle import DecisionDashboardLifecycleBridge
