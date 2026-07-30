@@ -10,3 +10,12 @@ from sam.runtime_kernel.runtime_configuration import ConfigurationEngine
 from sam.runtime_kernel.conversation_runtime_context import (
     ConversationRuntimeContext, DashboardRuntimeContext,
 )
+from sam.runtime_kernel.runtime_registry import (
+    RegistryEntry, CatalogEntry, LocatorResult,
+    RuntimeDescriptor, RuntimeManifest,
+)
+from sam.runtime_kernel.runtime_catalog import RuntimeCatalog
+from sam.runtime_kernel.runtime_locator import RuntimeLocator
+from sam.runtime_kernel.runtime_descriptor import DescriptorEngine
+from sam.runtime_kernel.runtime_manifest import ManifestEngine
+from sam.runtime_kernel.conversation_registry import ConversationRegistry, DashboardRegistry
