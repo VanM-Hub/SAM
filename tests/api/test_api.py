@@ -52,9 +52,23 @@ class TestAPIServer:
         assert app.title == "SAM Runtime API"
         assert app.version == "1.0"
 
+    def _collect_paths(self, app):
+        paths = set()
+        for r in app.routes:
+            # APIRoute objects have .path; prefix/Included routers may expose .prefix or .routes
+            if hasattr(r, "path"):
+                paths.add(getattr(r, "path"))
+            elif hasattr(r, "prefix"):
+                paths.add(getattr(r, "prefix"))
+            elif hasattr(r, "routes"):
+                for sub in getattr(r, "routes"):
+                    if hasattr(sub, "path"):
+                        paths.add(getattr(sub, "path"))
+        return paths
+
     def test_server_root_endpoint(self):
         from sam.api.server import app
-        routes = {r.path for r in app.routes}
+        routes = self._collect_paths(app)
         assert "/" in routes
         # FastAPI includes trailing slash by default for prefix routers
         assert "/health/" in routes or "/health" in routes
