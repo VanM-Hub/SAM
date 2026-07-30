@@ -45,17 +45,21 @@ from .classifier import SituationClassifier
 from .history_situation import SituationHistory
 from .conversation_situation import LiveConversationSituationBridge
 from .dashboard_situation import LiveDashboardSituationBridge as LiveDashboardSituationBridgeCls
+from .assessment_builder import AssessmentBuilder
+from .conversation_assessment import LiveConversationAssessmentBridge
+from .dashboard_assessment import LiveDashboardAssessmentBridge as LiveDashboardAssessmentBridgeCls
 
 
 class GuardianLiveRuntime:
     """
     Synchronous live runtime for the Guardian.
 
-    Full Pipeline (v5.3.0):
+    Full Pipeline (v5.4.0):
         Event → Dispatch → Synchronization
         → Transition Intelligence → Situation Intelligence
-        → Guardian → Reasoning → Learning
-        → Execution Preview → Dashboard → Conversation
+        → Operational Assessment → Guardian
+        → Reasoning → Learning → Execution Preview
+        → Dashboard → Conversation
 
     Does NOT replace the existing Guardian Runtime.
     All calls synchronous, DTO-only, preview only.
@@ -97,6 +101,12 @@ class GuardianLiveRuntime:
         self._situation_history = SituationHistory()
         self._conversation_situation = LiveConversationSituationBridge(self)
         self._dashboard_situation = LiveDashboardSituationBridgeCls(self)
+
+        # Sprint 47 — Operational Assessment
+        self._assessment_builder = AssessmentBuilder()
+        self._assessment_history: 'List[GuardianAssessment]' = []
+        self._conversation_assessment = LiveConversationAssessmentBridge(self)
+        self._dashboard_assessment = LiveDashboardAssessmentBridgeCls(self)
 
         self._is_running: bool = False
         if runtime_id:
@@ -281,6 +291,28 @@ class GuardianLiveRuntime:
         """Get the dashboard situation bridge."""
         return self._dashboard_situation
 
+    # --- Sprint 47 — Operational Assessment ---
+
+    @property
+    def assessment_builder(self) -> 'AssessmentBuilder':
+        """Get the assessment builder."""
+        return self._assessment_builder
+
+    @property
+    def assessment_history(self) -> 'List[GuardianAssessment]':
+        """Get the assessment history."""
+        return list(self._assessment_history)
+
+    @property
+    def conversation_assessment(self) -> 'LiveConversationAssessmentBridge':
+        """Get the conversation assessment bridge."""
+        return self._conversation_assessment
+
+    @property
+    def dashboard_assessment(self) -> 'LiveDashboardAssessmentBridgeCls':
+        """Get the dashboard assessment bridge."""
+        return self._dashboard_assessment
+
     # --- History ---
 
     def record_dispatch(
@@ -339,6 +371,15 @@ class GuardianLiveRuntime:
             "current_severity": (
                 self._situation_history.latest.severity.name
                 if self._situation_history.latest else None
+            ),
+            "assessment_count": len(self._assessment_history),
+            "current_risk": (
+                self._assessment_history[-1].risk.name
+                if self._assessment_history else None
+            ),
+            "current_priority": (
+                self._assessment_history[-1].priority.name
+                if self._assessment_history else None
             ),
         }
 
@@ -435,6 +476,22 @@ class GuardianLiveRuntime:
                         situations = self._classifier.classify(transitions)
                         self._situation_history.record_batch(situations)
                         transition_result["situations_found"] = len(situations)
+
+                        # 3e. Operational Assessment (NEW v5.4.0)
+                        assessment_result = []
+                        for sit in situations:
+                            a = self._assessment_builder.build_from_situation(
+                                sit, transitions
+                            )
+                            self._assessment_history.append(a)
+                            assessment_result.append({
+                                "assessment_id": a.assessment_id,
+                                "level": a.level.name,
+                                "risk": a.risk.name,
+                                "priority": a.priority.name,
+                                "confidence": a.confidence,
+                            })
+                        transition_result["assessments"] = assessment_result
 
                 # 4. Reasoning
                 reasoning_result = self._reasoning.trigger(event)
