@@ -44,3 +44,11 @@ from sam.runtime_kernel.bridge_router import BridgeRouter
 from sam.runtime_kernel.transform_engine import TransformEngine
 from sam.runtime_kernel.protocol_mapper import ProtocolMapper
 from sam.runtime_kernel.conversation_bridge import ConversationBridge, DashboardBridge
+from sam.runtime_kernel.runtime_health import (
+    HealthCheck, HealthReport, ResourceUsage, HealthThreshold, AlertRecord,
+)
+from sam.runtime_kernel.health_checker import HealthChecker
+from sam.runtime_kernel.health_engine import HealthEngine
+from sam.runtime_kernel.resource_monitor import ResourceMonitor
+from sam.runtime_kernel.health_aggregator import HealthAggregator
+from sam.runtime_kernel.conversation_health import ConversationHealth, DashboardHealth
