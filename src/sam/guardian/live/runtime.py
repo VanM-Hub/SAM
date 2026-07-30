@@ -29,28 +29,22 @@ from .dashboard import LiveDashboardBridge
 from .reasoning_bridge import LiveReasoningBridge
 from .learning_bridge import LiveLearningBridge
 from .execution_bridge import LiveExecutionBridge
+from .registry import GuardianRuntimeRegistry
+from .synchronizer import GuardianRuntimeSynchronizer
+from .snapshot import GuardianSnapshotManager
+from .validator import GuardianConsistencyValidator
+from .conversation_sync import LiveConversationSyncBridge
+from .dashboard_sync import LiveDashboardSyncBridge
 
 
 class GuardianLiveRuntime:
     """
     Synchronous live runtime for the Guardian.
 
-    Full Pipeline:
-        Receive Event
-        ↓
-        Dispatch
-        ↓
-        Guardian
-        ↓
-        Reasoning
-        ↓
-        Learning
-        ↓
-        Execution Preview
-        ↓
-        Dashboard
-        ↓
-        Conversation
+    Full Pipeline (v5.1.0):
+        Event → Dispatch → Synchronization → Guardian
+        → Reasoning → Learning → Execution Preview
+        → Dashboard → Conversation
 
     Does NOT replace the existing Guardian Runtime.
     All calls synchronous, DTO-only, preview only.
@@ -59,6 +53,7 @@ class GuardianLiveRuntime:
     def __init__(
         self,
         history_max_size: int = 1000,
+        runtime_id: Optional[str] = None,
     ) -> None:
         self._dispatcher = GuardianEventDispatcher()
         self._publisher = GuardianEventPublisher(self._dispatcher)
@@ -68,7 +63,18 @@ class GuardianLiveRuntime:
         self._reasoning = LiveReasoningBridge(self)
         self._learning = LiveLearningBridge(self)
         self._execution = LiveExecutionBridge(self)
+
+        # Sprint 44 — Synchronization
+        self._registry = GuardianRuntimeRegistry()
+        self._synchronizer = GuardianRuntimeSynchronizer(self._registry)
+        self._snapshot_manager = GuardianSnapshotManager()
+        self._validator = GuardianConsistencyValidator(self._registry, self._snapshot_manager)
+        self._conversation_sync = LiveConversationSyncBridge(self)
+        self._dashboard_sync = LiveDashboardSyncBridge(self)
+
         self._is_running: bool = False
+        if runtime_id:
+            self._synchronizer.set_runtime_id(runtime_id)
 
     # --- Lifecycle ---
 
@@ -163,6 +169,38 @@ class GuardianLiveRuntime:
         """Get the live execution bridge."""
         return self._execution
 
+    # --- Sprint 44 — Synchronization ---
+
+    @property
+    def registry(self) -> GuardianRuntimeRegistry:
+        """Get the runtime registry."""
+        return self._registry
+
+    @property
+    def synchronizer(self) -> GuardianRuntimeSynchronizer:
+        """Get the runtime synchronizer."""
+        return self._synchronizer
+
+    @property
+    def snapshot_manager(self) -> GuardianSnapshotManager:
+        """Get the snapshot manager."""
+        return self._snapshot_manager
+
+    @property
+    def validator(self) -> GuardianConsistencyValidator:
+        """Get the consistency validator."""
+        return self._validator
+
+    @property
+    def conversation_sync(self) -> 'LiveConversationSyncBridge':
+        """Get the conversation sync bridge."""
+        return self._conversation_sync
+
+    @property
+    def dashboard_sync(self) -> 'LiveDashboardSyncBridge':
+        """Get the dashboard sync bridge."""
+        return self._dashboard_sync
+
     # --- History ---
 
     def record_dispatch(
@@ -206,6 +244,11 @@ class GuardianLiveRuntime:
             "reasoning_triggers": self._reasoning.trigger_count,
             "learning_feeds": self._learning.feed_count,
             "execution_previews": self._execution.preview_count,
+            "registry_count": self._registry.count,
+            "registry_runtimes": self._registry.ids,
+            "sync_count": self._synchronizer.sync_count,
+            "snapshot_count": self._snapshot_manager.count,
+            "consistent": self._validator.is_consistent(),
         }
 
     # --- Pipeline Execution ---
@@ -217,14 +260,16 @@ class GuardianLiveRuntime:
         """
         Execute the full live pipeline.
 
-        Pipeline:
+        Pipeline (v5.1.0):
             1. Create observation event
             2. Dispatch to guardian
-            3. Forward to reasoning
-            4. Forward to learning
-            5. Forward to execution preview
-            6. Update dashboard cards
-            7. Return pipeline result
+            3. Synchronization
+            4. Reasoning
+            5. Learning
+            6. Execution Preview
+            7. Dashboard refresh
+            8. Conversation update
+            9. Return pipeline result
 
         Args:
             observation_payload: Optional observation data.
@@ -246,6 +291,11 @@ class GuardianLiveRuntime:
         # Step 2: Dispatch and get snapshot
         snapshot = self._dispatcher.last_snapshot
 
+        sync_result = None
+        reasoning_result = None
+        learning_result = None
+        execution_result = None
+
         # Step 3: Record in history
         if snapshot:
             self.record_dispatch(
@@ -255,26 +305,35 @@ class GuardianLiveRuntime:
                 error_count=len(snapshot.errors),
             )
 
-            # Step 4: Pipeline cascade (synchronous, DTO-only)
             if not snapshot.errors:
-                # 4a. Reasoning
+                # 3a. Synchronization (NEW v5.1.0)
+                sync_result = self._synchronizer.synchronize(event)
+
+                # 3b. Capture registry snapshot
+                registry_snapshot = self._registry.snapshot()
+                self._snapshot_manager.capture(registry_snapshot)
+
+                # 4. Reasoning
                 reasoning_result = self._reasoning.trigger(event)
-                # 4b. Learning
+                # 5. Learning
                 learning_result = self._learning.feed(event)
-                # 4c. Execution Preview
+                # 6. Execution Preview
                 execution_result = self._execution.preview(event)
-                # 4d. Dashboard refresh
+                # 7. Dashboard refresh
                 self._dashboard.refresh()
-                # 4e. Conversation update
+                # 8. Conversation update
                 self._conversation.update()
 
         return {
             "event_id": event.event_id,
             "snapshot": snapshot.to_dict() if snapshot else None,
             "pipeline": {
-                "reasoning": reasoning_result if snapshot else None,
-                "learning": learning_result if snapshot else None,
-                "execution_preview": execution_result if snapshot else None,
+                "synchronization": sync_result,
+                "reasoning": reasoning_result,
+                "learning": learning_result,
+                "execution_preview": execution_result,
             } if snapshot and not snapshot.errors else None,
             "is_running": self._is_running,
+            "registry_count": self._registry.count,
+            "snapshot_count": self._snapshot_manager.count,
         }
