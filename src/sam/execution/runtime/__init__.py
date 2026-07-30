@@ -23,3 +23,10 @@ from sam.execution.runtime.conversation_validation import ConversationValidation
 from sam.execution.runtime.dashboard_validation import DashboardValidation
 from sam.execution.runtime.conversation_planning import ConversationPlanning
 from sam.execution.runtime.dashboard_planning import DashboardPlanning
+from sam.execution.runtime.resource_plan import (
+    ResourcePlan, ResourceAllocation, ResourceLimits,
+    ResourceAvailability, ResourceSummary,
+)
+from sam.execution.runtime.resource_allocator import ResourceAllocator
+from sam.execution.runtime.conversation_resources import ConversationResources
+from sam.execution.runtime.dashboard_resources import DashboardResources
