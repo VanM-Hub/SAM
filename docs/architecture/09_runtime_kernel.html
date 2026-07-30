@@ -1,0 +1,148 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SAM — Runtime Kernel Architecture</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f8fafc; --fg: #172033; --muted: #5b6475; --line: #64748b; --neutral: #e2e8f0; --input: #bfdbfe; --process: #c7d2fe; --storage: #99f6e4; --external: #fde68a; --risk: #fecaca; --bridge: #ddd6fe; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f172a; --fg: #e5e7eb; --muted: #a3adbd; --line: #94a3b8; --neutral: #334155; --input: #1d4ed8; --process: #4338ca; --storage: #0f766e; --external: #92400e; --risk: #991b1b; --bridge: #5b21b6; }
+  }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.4 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  main { max-width:1100px; margin:32px auto; padding:0 20px; }
+  svg { width:100%; height:auto; display:block; }
+  .title { font-size:20px; font-weight:650; fill:var(--fg); }
+  .label { font-size:13px; font-weight:600; fill:var(--fg); }
+  .small { font-size:11px; fill:var(--muted); }
+  .node { stroke:var(--line); stroke-width:1; rx:6; ry:6; }
+  .neutral { fill:var(--neutral); } .input { fill:var(--input); } .process { fill:var(--process); } .storage { fill:var(--storage); } .external { fill:var(--external); } .risk { fill:var(--risk); } .bridge { fill:var(--bridge); }
+  .edge { stroke:var(--line); stroke-width:1.5; fill:none; } .edge-bold { stroke:var(--line); stroke-width:2.5; fill:none; }
+  .zone { fill:none; stroke:var(--line); stroke-width:1; stroke-dasharray:6 5; opacity:0.8; rx:10; ry:10; }
+</style>
+<main>
+<svg viewBox="0 0 1000 800">
+  <text x="500" y="30" text-anchor="middle" class="title">Runtime Kernel — 13-Stage Pipeline</text>
+  <text x="500" y="48" text-anchor="middle" class="small">PIPELINE: Boot → Context → Registry → State → Lifecycle → Bridge → Health → Security → Scheduler → Event Bus → Coordinator → Telemetry → Final</text>
+
+  <!-- Pipeline blocks — top to bottom -->
+  <!-- Row 1: Boot + Launcher -->
+  <rect x="100" y="70" width="180" height="55" class="node input" />
+  <text x="190" y="95" text-anchor="middle" class="label">1. Boot</text>
+  <text x="190" y="110" text-anchor="middle" class="small">StartupManager (6 phases)</text>
+
+  <line x1="280" y1="97" x2="350" y2="97" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="350" y="70" width="180" height="55" class="node process" />
+  <text x="440" y="95" text-anchor="middle" class="label">2. Runtime Context</text>
+  <text x="440" y="110" text-anchor="middle" class="small">Identity, Environment, Profile</text>
+
+  <line x1="530" y1="97" x2="600" y2="97" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="600" y="70" width="180" height="55" class="node process" />
+  <text x="690" y="95" text-anchor="middle" class="label">3. Registry</text>
+  <text x="690" y="110" text-anchor="middle" class="small">Catalog, Locator, Descriptor</text>
+
+  <!-- Row 2 -->
+  <line x1="690" y1="125" x2="690" y2="155" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="100" y="155" width="180" height="55" class="node process" />
+  <text x="190" y="180" text-anchor="middle" class="label">4. Runtime State</text>
+  <text x="190" y="195" text-anchor="middle" class="small">FSM (7 states, 8 transitions)</text>
+
+  <line x1="280" y1="182" x2="350" y2="182" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="350" y="155" width="180" height="55" class="node process" />
+  <text x="440" y="180" text-anchor="middle" class="label">5. Lifecycle</text>
+  <text x="440" y="195" text-anchor="middle" class="small">Startup/Shutdown/Restart</text>
+
+  <line x1="530" y1="182" x2="600" y2="182" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="600" y="155" width="180" height="55" class="node process" />
+  <text x="690" y="180" text-anchor="middle" class="label">6. Bridge/Adapter</text>
+  <text x="690" y="195" text-anchor="middle" class="small">AdapterRegistry, TransformEngine</text>
+
+  <!-- Row 3 -->
+  <line x1="690" y1="210" x2="690" y2="240" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="100" y="240" width="180" height="55" class="node storage" />
+  <text x="190" y="265" text-anchor="middle" class="label">7. Health</text>
+  <text x="190" y="280" text-anchor="middle" class="small">Checker, Engine, Monitor</text>
+
+  <line x1="280" y1="267" x2="350" y2="267" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="350" y="240" width="180" height="55" class="node storage" />
+  <text x="440" y="265" text-anchor="middle" class="label">8. Security</text>
+  <text x="440" y="280" text-anchor="middle" class="small">ACL, AuditLogger, Verdict</text>
+
+  <line x1="530" y1="267" x2="600" y2="267" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="600" y="240" width="180" height="55" class="node process" />
+  <text x="690" y="265" text-anchor="middle" class="label">9. Scheduler</text>
+  <text x="690" y="280" text-anchor="middle" class="small">Task/Window Scheduler</text>
+
+  <!-- Row 4 -->
+  <line x1="690" y1="295" x2="690" y2="325" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="100" y="325" width="180" height="55" class="node process" />
+  <text x="190" y="350" text-anchor="middle" class="label">10. Event Bus</text>
+  <text x="190" y="365" text-anchor="middle" class="small">Pub/Sub, Dispatcher</text>
+
+  <line x1="280" y1="352" x2="350" y2="352" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="350" y="325" width="180" height="55" class="node process" />
+  <text x="440" y="350" text-anchor="middle" class="label">11. Coordinator</text>
+  <text x="440" y="365" text-anchor="middle" class="small">Orchestrator, SyncCoordinator</text>
+
+  <line x1="530" y1="352" x2="600" y2="352" class="edge" marker-end="url(#arrow)" />
+
+  <rect x="600" y="325" width="180" height="55" class="node storage" />
+  <text x="690" y="350" text-anchor="middle" class="label">12. Telemetry</text>
+  <text x="690" y="365" text-anchor="middle" class="small">Collector, Metrics, Reporter</text>
+
+  <!-- Final -->
+  <line x1="690" y1="380" x2="690" y2="415" class="edge edge-bold" marker-end="url(#arrow)" />
+
+  <rect x="350" y="415" width="200" height="65" class="node risk" />
+  <text x="450" y="445" text-anchor="middle" class="label">13. Kernel Final</text>
+  <text x="450" y="462" text-anchor="middle" class="small">FinalInspector → FinalVerdict</text>
+
+  <!-- Subsystems it orchestrates -->
+  <rect x="100" y="510" width="800" height="190" class="zone" />
+  <text x="500" y="530" text-anchor="middle" class="small" fill="var(--muted)">Orchestrated Subsystems (via Bridges)</text>
+
+  <rect x="120" y="545" width="120" height="55" class="node input" />
+  <text x="180" y="572" text-anchor="middle" class="label">Guardian</text>
+  <text x="180" y="586" text-anchor="middle" class="small">Live Bridge</text>
+
+  <rect x="260" y="545" width="120" height="55" class="node process" />
+  <text x="320" y="572" text-anchor="middle" class="label">Decision</text>
+  <text x="320" y="586" text-anchor="middle" class="small">Eval/Plan/Approve</text>
+
+  <rect x="400" y="545" width="120" height="55" class="node process" />
+  <text x="460" y="572" text-anchor="middle" class="label">Approval</text>
+  <text x="460" y="586" text-anchor="middle" class="small">Multi-level</text>
+
+  <rect x="540" y="545" width="120" height="55" class="node process" />
+  <text x="600" y="572" text-anchor="middle" class="label">Activation</text>
+  <text x="600" y="586" text-anchor="middle" class="small">Package Build</text>
+
+  <rect x="680" y="545" width="120" height="55" class="node process" />
+  <text x="740" y="572" text-anchor="middle" class="label">Execution</text>
+  <text x="740" y="586" text-anchor="middle" class="small">Simulate/Assemble</text>
+
+  <rect x="270" y="620" width="240" height="55" class="node storage" />
+  <text x="390" y="647" text-anchor="middle" class="label">Operational Brain</text>
+  <text x="390" y="661" text-anchor="middle" class="small">Plan/Schedule/Health</text>
+
+  <!-- Arrow: kernel to subsystems -->
+  <line x1="450" y1="480" x2="180" y2="545" class="edge" marker-end="url(#arrow)" />
+  <line x1="450" y1="480" x2="320" y2="545" class="edge" marker-end="url(#arrow)" />
+  <line x1="450" y1="480" x2="460" y2="545" class="edge" marker-end="url(#arrow)" />
+  <line x1="450" y1="480" x2="600" y2="545" class="edge" marker-end="url(#arrow)" />
+  <line x1="450" y1="480" x2="740" y2="545" class="edge" marker-end="url(#arrow)" />
+  <line x1="450" y1="480" x2="390" y2="620" class="edge" marker-end="url(#arrow)" />
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10" fill="var(--line)" /></marker>
+  </defs>
+</svg>
+</main>
