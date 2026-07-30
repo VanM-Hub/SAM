@@ -19,3 +19,12 @@ from sam.runtime_kernel.runtime_locator import RuntimeLocator
 from sam.runtime_kernel.runtime_descriptor import DescriptorEngine
 from sam.runtime_kernel.runtime_manifest import ManifestEngine
 from sam.runtime_kernel.conversation_registry import ConversationRegistry, DashboardRegistry
+from sam.runtime_kernel.runtime_state import (
+    RuntimeState, StateMachine, StateSnapshot,
+    StateHistoryEntry, StateValidation,
+)
+from sam.runtime_kernel.state_machine import StateMachineEngine
+from sam.runtime_kernel.state_snapshot import SnapshotEngine
+from sam.runtime_kernel.state_history import StateHistory
+from sam.runtime_kernel.state_validator import StateValidator
+from sam.runtime_kernel.conversation_state import ConversationState, DashboardState
