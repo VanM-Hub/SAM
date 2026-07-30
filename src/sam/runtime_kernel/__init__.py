@@ -52,3 +52,11 @@ from sam.runtime_kernel.health_engine import HealthEngine
 from sam.runtime_kernel.resource_monitor import ResourceMonitor
 from sam.runtime_kernel.health_aggregator import HealthAggregator
 from sam.runtime_kernel.conversation_health import ConversationHealth, DashboardHealth
+from sam.runtime_kernel.runtime_security import (
+    SecurityPolicy, AccessControl, AuditEntry, SecurityVerdict,
+)
+from sam.runtime_kernel.security_manager import SecurityManager
+from sam.runtime_kernel.access_controller import AccessController
+from sam.runtime_kernel.audit_logger import AuditLogger
+from sam.runtime_kernel.verdict_engine import VerdictEngine
+from sam.runtime_kernel.conversation_security import ConversationSecurity, DashboardSecurity
