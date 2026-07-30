@@ -42,6 +42,7 @@ jobs:
     needs: validation
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.10', '3.11', '3.12']
 
@@ -125,8 +126,8 @@ jobs:
             --tb=short -v -q
 
   coverage:
-    needs: [core, server, desktop]
     if: always()
+    needs: [core, server, desktop]
     runs-on: ubuntu-latest
     steps:
       - run: echo "SAM CI — jobs complete"
