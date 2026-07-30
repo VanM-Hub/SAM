@@ -35,6 +35,7 @@ console = [
     "typer>=0.9",
     "pyyaml>=6.0",
     "aiosqlite>=0.19",
+    "anyio>=4",
 ]
 desktop = [
     "PySide6>=6.5",
