@@ -4,7 +4,19 @@
 
 SAM (Self-evolving AI Manager) adalah platform guardian otonom yang mengamati, melindungi, dan memulihkan sistem AI. Dari runtime kernel hingga event-driven live runtime, web dashboard, dan desktop console — SAM menangani seluruh siklus operasi.
 
-## Fitur v5.0.0
+## Fitur v8.5.0
+
+| Fitur | Deskripsi |
+|---|---|
+| **Activation Runtime (NEW)** | Menerima Operational Plan → menghasilkan Activation Package Ready. Pipeline 6 fase: Context → Validation → Strategy → Package → Monitoring → Runtime. Deterministic, synchronous, in-memory. |
+| **Activation Engine** | Pipeline 8 fase (context → build → validate → constrain → strategy → package → monitor → complete). `ActivationCoordinator` akses ke semua komponen. |
+| **Activation Strategy** | 5 tipe strategi (direct, staged, parallel, conditional, fallback), priority scoring, time windows, sequence builder. |
+| **Activation Validation** | Rules engine, constraints checking, readiness assessment, validation report. |
+| **Activation Package** | Package builder, validator, registry, exporter — semua frozen DTO. |
+| **Activation Monitor** | Metrics collector, event monitor, history tracker, snapshot, health checker. |
+| **Activation Dashboard** | 6 kartu: Activation, Validation, Strategy, Package, Monitor, Runtime — semuanya immutable. |
+| **12 Conversation & Dashboard Bridges** | Conversational queries + immutable dashboard cards untuk setiap layer. |
+| **Guardian Live Runtime (v5.x)** | Event-driven synchronous runtime: dispatcher → guardian → reasoning → learning → execution preview → dashboard → conversation. No async, no threading, no network. |
 
 | Fitur | Deskripsi |
 |---|---|
