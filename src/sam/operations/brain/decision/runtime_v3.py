@@ -18,6 +18,7 @@ from .planning import DecisionPlan
 from .planner import DecisionPlanner
 from .approval_preparation import ApprovalPreparation
 from .approval_builder import ApprovalBuilder
+from .submission_plan import ApprovalSubmissionPlan
 from .conversation_package import DecisionConversationPackageBridge
 from .dashboard_package import DecisionDashboardPackageBridge
 from .conversation_evaluation import DecisionConversationEvaluationBridge
@@ -30,6 +31,10 @@ from .approval_bridge import ApprovalBridge
 from .approval_status import ApprovalStatusMirrorStore, ApprovalStatusMirror, ApprovalState
 from .conversation_adapter import DecisionConversationAdapterBridge
 from .dashboard_adapter import DecisionDashboardAdapterBridge
+from .submission_builder import SubmissionBuilder
+from .submission_queue import SubmissionQueuePlanner, SubmissionQueue
+from .conversation_submission import DecisionConversationSubmissionBridge
+from .dashboard_submission import DecisionDashboardSubmissionBridge
 
 
 class DecisionRuntimeV3:
@@ -55,6 +60,9 @@ class DecisionRuntimeV3:
         self._approval_builder = ApprovalBuilder()
         self._bridge = ApprovalBridge()
         self._status_store = ApprovalStatusMirrorStore()
+        self._submission_builder = SubmissionBuilder()
+        self._queue_planner = SubmissionQueuePlanner()
+        self._submission_queue = None
 
         self._conversation = DecisionConversationPackageBridge(self)
         self._dashboard = DecisionDashboardPackageBridge(self)
@@ -66,6 +74,8 @@ class DecisionRuntimeV3:
         self._dashboard_approval = DecisionDashboardApprovalBridge(self)
         self._conversation_adapter = DecisionConversationAdapterBridge(self)
         self._dashboard_adapter = DecisionDashboardAdapterBridge(self)
+        self._conversation_submission = DecisionConversationSubmissionBridge(self)
+        self._dashboard_submission = DecisionDashboardSubmissionBridge(self)
 
         self._latest_incoming: Optional[IncomingDecisionPackage] = None
         self._latest_normalized: Optional[IncomingDecisionPackage] = None
@@ -74,6 +84,7 @@ class DecisionRuntimeV3:
         self._latest_evaluation: Optional[DecisionEvaluation] = None
         self._latest_plan: Optional[DecisionPlan] = None
         self._latest_approval: Optional[ApprovalPreparation] = None
+        self._latest_submission: Optional[ApprovalSubmissionPlan] = None
         self._consume_count: int = 0
         self._valid_count: int = 0
         self._evaluation_count: int = 0
@@ -82,6 +93,8 @@ class DecisionRuntimeV3:
         self._plan_count: int = 0
         self._approval_count: int = 0
         self._approval_ready_count: int = 0
+        self._submission_count: int = 0
+        self._submission_ready_count: int = 0
 
     @property
     def conversation(self): return self._conversation
@@ -103,6 +116,10 @@ class DecisionRuntimeV3:
     def conversation_adapter(self): return self._conversation_adapter
     @property
     def dashboard_adapter(self): return self._dashboard_adapter
+    @property
+    def conversation_submission(self): return self._conversation_submission
+    @property
+    def dashboard_submission(self): return self._dashboard_submission
 
     def consume(self, package_dict: Dict[str, Any]) -> Dict[str, Any]:
         incoming = self._consumer.consume(package_dict)
@@ -148,6 +165,13 @@ class DecisionRuntimeV3:
             )
             self._status_store.record(status_mirror)
 
+            # Submission Planning (NEW v5.14.0)
+            if self._bridge.last_envelope:
+                submission_plan = self._submission_builder.build(self._bridge.last_envelope)
+                self._latest_submission = submission_plan; self._submission_count += 1
+                if submission_plan.ready: self._submission_ready_count += 1
+                self._submission_queue = self._queue_planner.plan([submission_plan])
+
         return {
             "package_id": incoming.package_id, "received": True,
             "valid": validation.valid, "validation_score": validation.score,
@@ -166,6 +190,8 @@ class DecisionRuntimeV3:
             "blocked_count": self._blocked_count, "plan_count": self._plan_count,
             "approval_count": self._approval_count, "approval_ready": self._approval_ready_count,
             "bridge_count": self._bridge.bridge_count if self._bridge else 0,
+            "submission_count": self._submission_count,
+            "submission_ready": self._submission_ready_count,
             "has_latest": self._latest_incoming is not None,
             "has_evaluation": self._latest_evaluation is not None,
             "has_plan": self._latest_plan is not None,
