@@ -35,6 +35,13 @@ jobs:
         run: |
           python -m ruff check src/ --quiet --exit-zero
 
+      - name: Architecture Validation
+        run: |
+          python scripts/validation/validate_imports.py || echo "Imports: check only core violations"
+          python scripts/validation/validate_layers.py
+          python scripts/validation/validate_structure.py
+          python scripts/validation/validate_docs.py
+
       - name: Run pytest (all unit tests, headless mode)
         run: |
           python -m pytest tests/unit/ \

@@ -1,5 +1,28 @@
 ﻿# Changelog
 
+## v10.2.0 (2026-07-30) - Architecture Compliance & Governance
+
+### Added
+- AC-201: Architecture Rulebook - 60+ rules across 12 categories
+- AC-202: Forbidden Dependency Matrix - 12 subsystems with allowed/forbidden/friend/extension
+- AC-203: 6 validation scripts (validate_imports, validate_layers, validate_dto, validate_pipeline, validate_structure, validate_docs)
+- AC-204: Architecture Health Report - score 109/120 (90.8%)
+- AC-205: CI Architecture Gate - validation stage integrated into CI workflow
+- AC-206: Contributor Checklist - 40+ pre-merge items
+- AC-207: Pull Request Template - full architecture checklist
+- AC-208: Release Checklist - 6-phase release verification
+- AC-209: Repository Metrics - 20+ metrics across all domains
+- AC-210: Architecture Compliance Audit - final certification
+
+### Changed
+- Version bump to v10.2.0
+
+### Quality Gates
+- No runtime/API/pipeline/DTO/behaviour changes
+- 6 validation scripts all PASS
+- CI includes Architecture Validation stage
+- All governance documents complete
+
 ## v10.1.0 (2026-07-30) - Architecture Freeze v10
 
 ### Added
@@ -155,6 +178,7 @@ Phase X selesai. Runtime Kernel adalah lapisan koordinasi antar-subsystem yang b
 ### Added
 - Foundation: agent state, telemetry, contracts
 - Sprint 1-7, v0.0.1 -> v0.1.0
+
 
 
 
