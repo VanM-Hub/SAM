@@ -36,3 +36,11 @@ from sam.runtime_kernel.startup_manager import StartupManager
 from sam.runtime_kernel.shutdown_manager import ShutdownManager
 from sam.runtime_kernel.restart_manager import RestartManager
 from sam.runtime_kernel.conversation_lifecycle import ConversationLifecycle, DashboardLifecycle
+from sam.runtime_kernel.runtime_adapter import (
+    SubsystemAdapter, BridgeRoute, TransformRule, ProtocolMap, InteropResult,
+)
+from sam.runtime_kernel.adapter_registry import AdapterRegistry
+from sam.runtime_kernel.bridge_router import BridgeRouter
+from sam.runtime_kernel.transform_engine import TransformEngine
+from sam.runtime_kernel.protocol_mapper import ProtocolMapper
+from sam.runtime_kernel.conversation_bridge import ConversationBridge, DashboardBridge
