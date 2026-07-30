@@ -54,21 +54,25 @@ from .intent_ranker import IntentRanker
 from .intent_validator import IntentValidator
 from .conversation_intent import LiveConversationIntentBridge
 from .dashboard_intent import LiveDashboardIntentBridge as LiveDashboardIntentBridgeCls
+from .handoff import HandoffEngine
+from .queue import DecisionQueue
+from .conversation_handoff import LiveConversationHandoffBridge
+from .dashboard_handoff import LiveDashboardHandoffBridge as LiveDashboardHandoffBridgeCls
 
 
 class GuardianLiveRuntime:
     """
     Synchronous live runtime for the Guardian.
 
-    Full Pipeline (v5.5.0):
+    Full Pipeline (v5.6.0):
         Event → Dispatch → Synchronization
         → Transition Intelligence → Situation Intelligence
         → Operational Assessment → Operational Intent
-        → Guardian → Reasoning → Learning
-        → Execution Preview → Dashboard → Conversation
+        → Decision Handoff → Guardian → Reasoning
+        → Learning → Execution Preview → Dashboard → Conversation
 
-    Does NOT replace the existing Guardian Runtime.
-    Intent is DTO only — does NOT execute, create missions, or call Decision Runtime.
+    DecisionInput is DTO only. Does NOT call Decision Runtime.
+    Does NOT create missions, submit approvals, or execute.
     """
 
     def __init__(
@@ -122,6 +126,12 @@ class GuardianLiveRuntime:
         self._intent_history: 'List[GuardianIntent]' = []
         self._conversation_intent = LiveConversationIntentBridge(self)
         self._dashboard_intent = LiveDashboardIntentBridgeCls(self)
+
+        # Sprint 49 — Decision Handoff
+        self._handoff_engine = HandoffEngine()
+        self._decision_queue = DecisionQueue()
+        self._conversation_handoff = LiveConversationHandoffBridge(self)
+        self._dashboard_handoff = LiveDashboardHandoffBridgeCls(self)
 
         self._is_running: bool = False
         if runtime_id:
@@ -365,6 +375,28 @@ class GuardianLiveRuntime:
         """Get the dashboard intent bridge."""
         return self._dashboard_intent
 
+    # --- Sprint 49 — Decision Handoff ---
+
+    @property
+    def handoff_engine(self) -> 'HandoffEngine':
+        """Get the handoff engine."""
+        return self._handoff_engine
+
+    @property
+    def decision_queue(self) -> 'DecisionQueue':
+        """Get the decision queue."""
+        return self._decision_queue
+
+    @property
+    def conversation_handoff(self) -> 'LiveConversationHandoffBridge':
+        """Get the conversation handoff bridge."""
+        return self._conversation_handoff
+
+    @property
+    def dashboard_handoff(self) -> 'LiveDashboardHandoffBridgeCls':
+        """Get the dashboard handoff bridge."""
+        return self._dashboard_handoff
+
     # --- History ---
 
     def record_dispatch(
@@ -438,6 +470,9 @@ class GuardianLiveRuntime:
                 self._intent_history[-1].intent_type.name
                 if self._intent_history else None
             ),
+            "decision_queue_count": self._decision_queue.count,
+            "decision_eligible": self._decision_queue.eligible_count,
+            "decision_blocked": self._decision_queue.blocked_count,
         }
 
     # --- Pipeline Execution ---
@@ -567,6 +602,19 @@ class GuardianLiveRuntime:
                             })
                         transition_result["intents"] = intent_result
 
+                        # 3g. Decision Handoff (NEW v5.6.0)
+                        handoff_result = []
+                        for intent_obj in self._intent_history[-len(intent_result):]:
+                            decision_input = self._handoff_engine.handoff(intent_obj)
+                            self._decision_queue.enqueue(decision_input)
+                            handoff_result.append({
+                                "input_id": decision_input.input_id,
+                                "eligibility": decision_input.eligibility.name,
+                                "candidates": len(decision_input.candidates),
+                                "priority_score": decision_input.priority_score,
+                            })
+                        transition_result["handoffs"] = handoff_result
+
                 # 4. Reasoning
                 reasoning_result = self._reasoning.trigger(event)
                 # 5. Learning
@@ -594,4 +642,5 @@ class GuardianLiveRuntime:
             "transition_count": self._timeline.count,
             "situation_count": self._situation_history.count,
             "intent_count": len(self._intent_history),
+            "handoff_count": self._decision_queue.count,
         }
