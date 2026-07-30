@@ -84,3 +84,10 @@ from sam.runtime_kernel.coordination_engine import CoordinationEngine
 from sam.runtime_kernel.sync_coordinator import SyncCoordinator
 from sam.runtime_kernel.orchestrator import Orchestrator
 from sam.runtime_kernel.conversation_coordinator import ConversationCoordinator, DashboardCoordinator
+from sam.runtime_kernel.runtime_telemetry import (
+    TelemetryMetric, TelemetrySample, MetricSummary, TelemetryReport,
+)
+from sam.runtime_kernel.telemetry_collector import TelemetryCollector
+from sam.runtime_kernel.metrics_aggregator import MetricsAggregator
+from sam.runtime_kernel.telemetry_reporter import TelemetryReporter
+from sam.runtime_kernel.conversation_telemetry import ConversationTelemetry, DashboardTelemetry
