@@ -76,3 +76,11 @@ from sam.runtime_kernel.event_dispatcher import EventDispatcher
 from sam.runtime_kernel.event_logger import EventLogger
 from sam.runtime_kernel.event_filter import EventFilter
 from sam.runtime_kernel.conversation_event import ConversationEvent, DashboardEvent
+from sam.runtime_kernel.runtime_coordinator import (
+    CoordinationTask, CoordinationPlan, SyncPoint,
+    OrchestrationOrder, CoordinationResult,
+)
+from sam.runtime_kernel.coordination_engine import CoordinationEngine
+from sam.runtime_kernel.sync_coordinator import SyncCoordinator
+from sam.runtime_kernel.orchestrator import Orchestrator
+from sam.runtime_kernel.conversation_coordinator import ConversationCoordinator, DashboardCoordinator
