@@ -47,6 +47,10 @@ from .lifecycle_engine import LifecycleEngine
 from .lifecycle_history import LifecycleHistory
 from .conversation_lifecycle import DecisionConversationLifecycleBridge
 from .dashboard_lifecycle import DecisionDashboardLifecycleBridge
+from .activation_engine import ActivationEngine
+from .activation_history import ActivationHistory
+from .conversation_activation import DecisionConversationActivationBridge
+from .dashboard_activation import DecisionDashboardActivationBridge
 
 
 class DecisionRuntimeV3:
@@ -80,6 +84,7 @@ class DecisionRuntimeV3:
         self._session_registry = SessionRegistry()
         self._session_history = SessionHistory()
         self._lifecycle_engine = LifecycleEngine()
+        self._activation_engine = ActivationEngine()
 
         self._conversation = DecisionConversationPackageBridge(self)
         self._dashboard = DecisionDashboardPackageBridge(self)
@@ -99,6 +104,8 @@ class DecisionRuntimeV3:
         self._dashboard_session = DecisionDashboardSessionBridge(self)
         self._conversation_lifecycle = DecisionConversationLifecycleBridge(self)
         self._dashboard_lifecycle = DecisionDashboardLifecycleBridge(self)
+        self._conversation_activation = DecisionConversationActivationBridge(self)
+        self._dashboard_activation = DecisionDashboardActivationBridge(self)
 
         self._latest_incoming: Optional[IncomingDecisionPackage] = None
         self._latest_normalized: Optional[IncomingDecisionPackage] = None
@@ -155,6 +162,10 @@ class DecisionRuntimeV3:
     def conversation_lifecycle(self): return self._conversation_lifecycle
     @property
     def dashboard_lifecycle(self): return self._dashboard_lifecycle
+    @property
+    def conversation_activation(self): return self._conversation_activation
+    @property
+    def dashboard_activation(self): return self._dashboard_activation
 
     def consume(self, package_dict: Dict[str, Any]) -> Dict[str, Any]:
         incoming = self._consumer.consume(package_dict)
@@ -230,6 +241,14 @@ class DecisionRuntimeV3:
                         session_ready=session.ready,
                     )
 
+                # Approval Activation (NEW v5.18.0)
+                if lifecycle:
+                    activation = self._activation_engine.evaluate(
+                        lifecycle,
+                        lifecycle_id=lifecycle.lifecycle_id,
+                        session_id=lifecycle.session_id,
+                    )
+
         return {
             "package_id": incoming.package_id, "received": True,
             "valid": validation.valid, "validation_score": validation.score,
@@ -253,6 +272,7 @@ class DecisionRuntimeV3:
             "gateway_count": self._gateway.gateway_count if self._gateway else 0,
             "session_count": self._session_registry.count if self._session_registry else 0,
             "lifecycle_count": self._lifecycle_engine.count if self._lifecycle_engine else 0,
+            "activation_count": self._activation_engine.count if self._activation_engine else 0,
             "has_latest": self._latest_incoming is not None,
             "has_evaluation": self._latest_evaluation is not None,
             "has_plan": self._latest_plan is not None,

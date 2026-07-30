@@ -102,3 +102,10 @@ from .lifecycle_history import LifecycleHistory,LifecycleHistoryRecord
 from .lifecycle_validator import LifecycleValidator,LifecycleValidationResult
 from .conversation_lifecycle import DecisionConversationLifecycleBridge
 from .dashboard_lifecycle import DecisionDashboardLifecycleBridge
+from .approval_activation import ApprovalActivation,ActivationState,ActivationDecision,ActivationMetadata,ActivationSnapshot,ActivationStatistics
+from .activation_engine import ActivationEngine
+from .activation_rules import ActivationRules
+from .activation_history import ActivationHistory,ActivationHistoryRecord
+from .activation_validator import ActivationValidator,ActivationValidationResult
+from .conversation_activation import DecisionConversationActivationBridge
+from .dashboard_activation import DecisionDashboardActivationBridge
