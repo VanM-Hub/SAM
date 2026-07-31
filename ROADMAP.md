@@ -33,7 +33,6 @@ Karakteristik kunci:
 
 > **✅ ARSITEKTUR SAM KOMPLIT — v23.0.0 = Architecture Complete.**
 > Fase I–XXIII (fondasi runtime deterministik, 23 phase, ~200+ sprint) SELESAI. XXIV opsional. **Mulai titik ini, roadmap bergeser dari Architecture Development ke Product Integration & Operationalization (Tahap 2 & 3), tanpa menambah runtime baru.**
-> Keputusan ini dari Aster (2026-08-01): nilai terbesar berikutnya bukan dari runtime baru, melainkan membuat semua runtime yang ada bekerja bersama untuk pekerjaan nyata.
 
 | Phase | Nama | Status |
 |-------|------|--------|
