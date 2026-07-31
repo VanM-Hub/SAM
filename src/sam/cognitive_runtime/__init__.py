@@ -57,6 +57,19 @@ from .runtime import (
     ConversationRuntimeBridge,
     DashboardRuntimeBridge,
 )
+from .workspace import (
+    CognitiveWorkspace,
+    WorkspaceCatalog,
+    WorkspaceCatalogEntry,
+    WorkspaceIndex,
+    WorkspaceIndexer,
+    WorkspaceLoader,
+    WorkspaceLoadResult,
+    WorkspaceHistory,
+    WorkspaceHistoryEntry,
+    ConversationWorkspaceBridge,
+    DashboardWorkspaceBridge,
+)
 
 __all__ = [
     "ExecutionCard",
@@ -100,4 +113,15 @@ __all__ = [
     "CognitiveStatisticsCollector",
     "ConversationRuntimeBridge",
     "DashboardRuntimeBridge",
+    "CognitiveWorkspace",
+    "WorkspaceCatalog",
+    "WorkspaceCatalogEntry",
+    "WorkspaceIndex",
+    "WorkspaceIndexer",
+    "WorkspaceLoader",
+    "WorkspaceLoadResult",
+    "WorkspaceHistory",
+    "WorkspaceHistoryEntry",
+    "ConversationWorkspaceBridge",
+    "DashboardWorkspaceBridge",
 ]
