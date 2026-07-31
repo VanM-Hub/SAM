@@ -1,0 +1,7 @@
+{
+  "errors": [],
+  "warnings": [
+    "MISSING: sam.operations.brain.decision/ missing certification.py (similar: certification_validator, certification_history, certification_rules, approval_certification, certification_engine, dashboard_certification, conversation_certification)"
+  ],
+  "pass": true
+}
