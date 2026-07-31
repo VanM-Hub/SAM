@@ -85,6 +85,21 @@ from .monitor import (
     ConversationMonitorBridge,
     DashboardMonitorBridge,
 )
+from .certification import (
+    CognitiveCertification,
+    CognitiveCertificationCriterion,
+    CognitiveCertificationResult,
+    CognitiveScore,
+    CognitiveScoreDimension,
+    CognitiveScorer,
+    CognitiveManifest,
+    CognitiveCertificationReport,
+    CognitiveCertificationReporter,
+    CognitiveCertificationValidation,
+    CognitiveCertificationValidator,
+    ConversationCertificationBridge,
+    DashboardCertificationBridge,
+)
 
 __all__ = [
     "ExecutionCard",
@@ -152,4 +167,17 @@ __all__ = [
     "CognitiveReporter",
     "ConversationMonitorBridge",
     "DashboardMonitorBridge",
+    "CognitiveCertification",
+    "CognitiveCertificationCriterion",
+    "CognitiveCertificationResult",
+    "CognitiveScore",
+    "CognitiveScoreDimension",
+    "CognitiveScorer",
+    "CognitiveManifest",
+    "CognitiveCertificationReport",
+    "CognitiveCertificationReporter",
+    "CognitiveCertificationValidation",
+    "CognitiveCertificationValidator",
+    "ConversationCertificationBridge",
+    "DashboardCertificationBridge",
 ]
