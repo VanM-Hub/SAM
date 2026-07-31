@@ -1,4 +1,4 @@
-# SAM Roadmap
+﻿# SAM Roadmap
 
 > **Sumber kebenaran tunggal (single source of truth) untuk seluruh fase SAM.**
 > Visi: **Deterministic Operational Intelligence Platform** — observasi, pemahaman, perencanaan, koordinasi, penyiapan, dan pengawasan operasi lintas sistem secara aman, dapat diaudit, provider-agnostic, dan dapat dipertanggungjawabkan.
@@ -29,10 +29,10 @@ Karakteristik kunci:
 
 ---
 
-## Ringkasan Fase (I–XXIV)
+## Ringkasan Fase (I–XXIII)
 
 > **✅ ARSITEKTUR SAM KOMPLIT — v23.0.0 = Architecture Complete.**
-> Fase I–XXIII (fondasi runtime deterministik, 23 phase, ~200+ sprint) SELESAI. XXIV opsional. **Mulai titik ini, roadmap bergeser dari Architecture Development ke Product Integration & Operationalization (Tahap 2 & 3), tanpa menambah runtime baru.**
+> Fase I–XXIII (fondasi runtime deterministik, 23 phase, ~200+ sprint) SELESAI. **Mulai titik ini, roadmap bergeser dari Architecture Development ke Product Integration & Operationalization (Tahap 2 & 3), tanpa menambah runtime baru.**
 
 | Phase | Nama | Status |
 |-------|------|--------|
@@ -59,13 +59,12 @@ Karakteristik kunci:
 | XXI | Policy Runtime | ✅ DONE |
 | XXII | Audit Runtime | ✅ DONE |
 | XXIII | Artifact Runtime | ✅ DONE |
-| XXIV | Simulation Runtime (opsional) | 📋 PLANNED — TIDAK DIPRIORITASKAN |
 
-> **Total: 24 phase (XXIV opsional).** Fondasi arsitektur LENGKAP di v23.0.0. Fokus kini beralih ke **Product Integration & Operationalization** (Tahap 2: Program A–K; Tahap 3: Product Release) — lihat bagian *Roadmap Produk (pasca v23.0.0)* di bawah.
+> **Total: 23 phase.** Fondasi arsitektur LENGKAP di v23.0.0. Fokus kini beralih ke **Product Integration & Operationalization** (Tahap 2: Program A–K; Tahap 3: Product Release) — lihat bagian *Roadmap Produk (pasca v23.0.0)* di bawah.
 
 ---
 
-## Fase Detail (I–XXIV)
+## Fase Detail (I–XXIII)
 
 ### Fase Selesai (I-XXIII) — membangun seluruh "mesin"
 
@@ -95,7 +94,7 @@ Karakteristik kunci:
 | XXII | 212-219 | v22.0.0 | Audit Runtime (8 sprints, 173 tests, 66 files) |
 | XXIII | 220-227 | v23.0.0 | Artifact Runtime (8 sprints, 135 tests, 66 files) |
 
-### Fase Terencana (XVI–XXIV)
+### Fase Terencana (XVI–XXIII)
 
 | Phase | Nama | Deskripsi |
 |-------|------|-----------|
@@ -107,7 +106,6 @@ Karakteristik kunci:
 | XXI | Policy Runtime | Menyatukan seluruh policy lintas subsystem (saat ini masih tersebar): deskripsi, model policy, builder, katalog, monitoring, sertifikasi + integrasi read-only. Tidak evaluasi/keputusan |
 | XXII | Audit Runtime | Immutable audit trail: provenance, traceability end-to-end, integritas log. Semua operasi terekam deterministik, tanpa bisa diubah |
 | XXIII | Artifact Runtime | Semua output SAM menjadi artifact resmi: manifest, versioning, signing. Representasi immutable artifact + siklus hidupnya |
-| XXIV | Simulation Runtime (opsional) | Menjalankan simulasi pipeline tanpa menyentuh runtime lain - dry-run end-to-end dalam mode preview |
 
 ---
 
@@ -122,9 +120,8 @@ Arsitektur SAM tidak akan terus menambah runtime tanpa batas. Setelah fondasi le
 | XXI | **Policy Runtime** | ✅ v21.0.0 |
 | XXII | **Audit Runtime** | ✅ v22.0.0 |
 | XXIII | **Artifact Runtime** | ✅ v23.0.0 |
-| XXIV (opsional) | **Simulation Runtime** | 📋 tidak diprioritaskan |
 
-> **Tahap 1 SELESAI di v23.0.0 (Architecture Complete).** Phase XXIV (Simulation) sengaja tidak diprioritaskan — seluruh runtime inti sudah siap dikonsumsi.
+> **Tahap 1 SELESAI di v23.0.0 (Architecture Complete).** Seluruh runtime inti sudah siap dikonsumsi.
 
 ### Tahap 2 — Product Integration (Program A–K)
 

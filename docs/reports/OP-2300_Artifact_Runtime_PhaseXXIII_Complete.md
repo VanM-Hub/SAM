@@ -6,7 +6,7 @@
 
 Phase XXIII membangun **Artifact Runtime** — **representasi resmi seluruh keluaran pipeline SAM dalam bentuk artifact deterministik tanpa melakukan penyimpanan ataupun publikasi.**
 
-> Ini fase ke-3 **Tahap 1 (lengkapi fondasi)** dari rencana 3 tahap (XXI Policy ✅, XXII Audit ✅, XXIII Artifact ✅, XXIV Simulation opsional).
+> Ini fase ke-3 **Tahap 1 (lengkapi fondasi)** dari rencana 3 tahap (XXI Policy ✅, XXII Audit ✅, XXIII Artifact ✅).
 
 > **Lokasi folder:** dibangun di `src/sam/artifact_runtime/`. Tidak ada `src/sam/artifact/` lama yang bentrok. Test di `tests/artifact_runtime/`.
 
@@ -66,4 +66,4 @@ Artifact, ArtifactReference, ArtifactManifest, ArtifactMetadata — semua frozen
 
 ## Hasil Akhir
 
-Artifact Runtime menjadi **representasi resmi seluruh keluaran pipeline SAM dalam bentuk artifact deterministik tanpa melakukan penyimpanan ataupun publikasi.** Fase ke-3 Tahap 1 selesai. **Fase berikutnya (opsional):** Phase XXIV — Simulation Runtime, atau lanjut ke Tahap 2 (integrasi nyata).
+Artifact Runtime menjadi **representasi resmi seluruh keluaran pipeline SAM dalam bentuk artifact deterministik tanpa melakukan penyimpanan ataupun publikasi.** Fase ke-3 Tahap 1 selesai. Selanjutnya: lanjut ke Tahap 2 (integrasi nyata).

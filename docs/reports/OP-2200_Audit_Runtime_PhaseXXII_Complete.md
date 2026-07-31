@@ -6,7 +6,7 @@
 
 Phase XXII membangun **Audit Runtime** — **sumber audit/provenance deterministik lintas pipeline** yang menjadi jejak immutable dari seluruh operasi SAM. **Menjadi sumber audit/provenance deterministik tanpa melakukan penyimpanan maupun eksekusi.**
 
-> Ini fase ke-2 **Tahap 1 (lengkapi fondasi)** dari rencana 3 tahap (XXI Policy ✅, XXII Audit, XXIII Artifact, XXIV Simulation opsional).
+> Ini fase ke-2 **Tahap 1 (lengkapi fondasi)** dari rencana 3 tahap (XXI Policy ✅, XXII Audit, XXIII Artifact).
 
 > **Lokasi folder:** dibangun di `src/sam/audit_runtime/`. Tidak ada `src/sam/audit/` lama yang bentrok. Test di `tests/audit_runtime/`.
 

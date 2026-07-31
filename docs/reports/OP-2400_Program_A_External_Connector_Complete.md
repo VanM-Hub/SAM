@@ -1,4 +1,4 @@
-# OP-2400 — Program A: External Connector Integration (Phase XXIV)
+# OP-2400 — Program A: External Connector Integration
 
 **Versi:** v24.0.0 · **Tanggal:** 2026-08-01 · **Status:** ✅ SELESAI
 
