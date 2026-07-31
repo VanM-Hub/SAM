@@ -29,6 +29,18 @@ from .context import (
     ConversationContextBridge,
     DashboardContextBridge,
 )
+from .builder import (
+    CognitiveBuilder,
+    CognitiveBuildResult,
+    ContextBuilder,
+    SnapshotBuilder,
+    WorkspaceBuilder,
+    CognitiveWorkspaceDTO,
+    PreviewBuilder,
+    CognitivePreviewDTO,
+    ConversationBuilderBridge,
+    DashboardBuilderBridge,
+)
 
 __all__ = [
     "ExecutionCard",
@@ -48,4 +60,14 @@ __all__ = [
     "CognitiveValidation",
     "ConversationContextBridge",
     "DashboardContextBridge",
+    "CognitiveBuilder",
+    "CognitiveBuildResult",
+    "ContextBuilder",
+    "SnapshotBuilder",
+    "WorkspaceBuilder",
+    "CognitiveWorkspaceDTO",
+    "PreviewBuilder",
+    "CognitivePreviewDTO",
+    "ConversationBuilderBridge",
+    "DashboardBuilderBridge",
 ]
