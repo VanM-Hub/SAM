@@ -48,7 +48,7 @@ Karakteristik kunci:
 | XIII | Mission Runtime | ✅ DONE |
 | XIV | Provider Runtime | ✅ DONE |
 | XV | Agent Runtime | ✅ DONE |
-| XVI | Real Provider Runtime | 📋 PLANNED |
+| XVI | Skill Runtime | ✅ DONE |
 | XVII | Operational Intelligence Console | 📋 PLANNED |
 | XVIII | Execution Integration | 📋 PLANNED |
 | XIX | Knowledge Runtime | 📋 PLANNED |
@@ -60,7 +60,7 @@ Karakteristik kunci:
 
 ## Fase Detail (I–XX)
 
-### Fase Selesai (I–XV) — membangun seluruh "mesin"
+### Fase Selesai (I–XVI) — membangun seluruh "mesin"
 
 | Phase | Sprint | Versi | Komponen Inti |
 |-------|--------|-------|---------------|
@@ -79,14 +79,15 @@ Karakteristik kunci:
 | XIII | 134-143 | v13.0.0 | Mission Runtime (10 sprints, 145 tests, 70 files) |
 | XIV | 144-155 | v14.0.0 | Provider Runtime (12 sprints, 164 tests, 10 folders) |
 | XV | 156-163 | v15.0.0 | Agent Runtime (8 sprints, 211 tests, 11 folders) |
+| XVI | 164-171 | v16.0.0 | Skill Runtime (8 sprints, 192 tests, 67 files) |
 
 ### Fase Terencana (XVI–XX)
 
 | Phase | Nama | Deskripsi |
 |-------|------|-----------|
-| XVI | Real Provider Runtime | Provider benar-benar bekerja (Filesystem, SQLite, Docker, Shell, OpenClaw) — bukan preview lagi |
+| XVI | Skill Runtime | Skills preview-only: deskripsi, definisi, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Orchestrator→Connector→Provider) |
 | XVII | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
-| XVIII | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider. Tetap manual approval. Belum autonomous |
+| XVIII | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider (Real Provider Runtime: Filesystem, SQLite, Docker, Shell, OpenClaw aktif). Tetap manual approval. Belum autonomous |
 | XIX | Knowledge Runtime | Berbeda dari Learning Runtime: indexing, semantic registry, documentation graph, operational memory, artifact relationship — bukan LLM, melainkan knowledge layer |
 | XX | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification |
 
