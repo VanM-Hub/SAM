@@ -29,6 +29,21 @@ from ..artifact_runtime.model.conversation_model import (
 from ..artifact_runtime.model.dashboard_model import (
     DashboardModelBridge,
 )
+from ..artifact_runtime.builder import (
+    ArtifactBuilder,
+    ArtifactBuildResult,
+    ArtifactPreviewDTO,
+    ManifestBuilder,
+    ReferenceBuilder,
+    MetadataBuilder,
+    PreviewBuilder,
+)
+from ..artifact_runtime.builder.conversation_builder import (
+    ConversationBuilderBridge,
+)
+from ..artifact_runtime.builder.dashboard_builder import (
+    DashboardBuilderBridge,
+)
 
 __all__ = [
     "ArtifactDescriptor",
@@ -45,4 +60,13 @@ __all__ = [
     "ArtifactValidator",
     "ConversationModelBridge",
     "DashboardModelBridge",
+    "ArtifactBuilder",
+    "ArtifactBuildResult",
+    "ArtifactPreviewDTO",
+    "ManifestBuilder",
+    "ReferenceBuilder",
+    "MetadataBuilder",
+    "PreviewBuilder",
+    "ConversationBuilderBridge",
+    "DashboardBuilderBridge",
 ]
