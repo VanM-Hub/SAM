@@ -16,6 +16,16 @@ from .foundation import (
     ConversationWorkflowBridge,
     DashboardWorkflowBridge,
 )
+from .model import (
+    Workflow,
+    WorkflowStep,
+    WorkflowDependency,
+    WorkflowConstraint,
+    WorkflowValidator,
+    WorkflowValidation,
+    ConversationModelBridge,
+    DashboardModelBridge,
+)
 
 __all__ = [
     "WorkflowCard",
@@ -26,4 +36,12 @@ __all__ = [
     "WorkflowRegistry",
     "ConversationWorkflowBridge",
     "DashboardWorkflowBridge",
+    "Workflow",
+    "WorkflowStep",
+    "WorkflowDependency",
+    "WorkflowConstraint",
+    "WorkflowValidator",
+    "WorkflowValidation",
+    "ConversationModelBridge",
+    "DashboardModelBridge",
 ]
