@@ -70,6 +70,21 @@ from .workspace import (
     ConversationWorkspaceBridge,
     DashboardWorkspaceBridge,
 )
+from .monitor import (
+    CognitiveMonitor,
+    CognitiveStatus,
+    CognitiveMetrics,
+    CognitiveMetricSample,
+    CognitiveMetricsCollector,
+    CognitiveHealth,
+    CognitiveHealthCheck,
+    CognitiveSnapshot,
+    CognitiveSnapshotter,
+    CognitiveReport,
+    CognitiveReporter,
+    ConversationMonitorBridge,
+    DashboardMonitorBridge,
+)
 
 __all__ = [
     "ExecutionCard",
@@ -124,4 +139,17 @@ __all__ = [
     "WorkspaceHistoryEntry",
     "ConversationWorkspaceBridge",
     "DashboardWorkspaceBridge",
+    "CognitiveMonitor",
+    "CognitiveStatus",
+    "CognitiveMetrics",
+    "CognitiveMetricSample",
+    "CognitiveMetricsCollector",
+    "CognitiveHealth",
+    "CognitiveHealthCheck",
+    "CognitiveSnapshot",
+    "CognitiveSnapshotter",
+    "CognitiveReport",
+    "CognitiveReporter",
+    "ConversationMonitorBridge",
+    "DashboardMonitorBridge",
 ]
