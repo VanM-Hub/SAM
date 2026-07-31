@@ -49,9 +49,9 @@ Karakteristik kunci:
 | XIV | Provider Runtime | ✅ DONE |
 | XV | Agent Runtime | ✅ DONE |
 | XVI | Skill Runtime | ✅ DONE |
-| XVII | Operational Intelligence Console | 📋 PLANNED |
-| XVIII | Execution Integration | 📋 PLANNED |
-| XIX | Knowledge Runtime | 📋 PLANNED |
+| XVII | Memory Runtime | ✅ DONE |
+| XVIII | Operational Intelligence Console | 📋 PLANNED |
+| XIX | Execution Integration | 📋 PLANNED |
 | XX | Platform Certification | 📋 PLANNED |
 
 > **Total: 20 phase.** Phase XX adalah end-state. Sesudahnya bukan roadmap lagi, melainkan maintenance.
@@ -60,7 +60,7 @@ Karakteristik kunci:
 
 ## Fase Detail (I–XX)
 
-### Fase Selesai (I–XVI) — membangun seluruh "mesin"
+### Fase Selesai (I–XVII) — membangun seluruh "mesin"
 
 | Phase | Sprint | Versi | Komponen Inti |
 |-------|--------|-------|---------------|
@@ -80,16 +80,17 @@ Karakteristik kunci:
 | XIV | 144-155 | v14.0.0 | Provider Runtime (12 sprints, 164 tests, 10 folders) |
 | XV | 156-163 | v15.0.0 | Agent Runtime (8 sprints, 211 tests, 11 folders) |
 | XVI | 164-171 | v16.0.0 | Skill Runtime (8 sprints, 192 tests, 67 files) |
+| XVII | 172-179 | v17.0.0 | Memory Runtime (8 sprints, 209 tests, 67 files) |
 
 ### Fase Terencana (XVI–XX)
 
 | Phase | Nama | Deskripsi |
 |-------|------|-----------|
 | XVI | Skill Runtime | Skills preview-only: deskripsi, definisi, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Orchestrator→Connector→Provider) |
-| XVII | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
-| XVIII | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider (Real Provider Runtime: Filesystem, SQLite, Docker, Shell, OpenClaw aktif). Tetap manual approval. Belum autonomous |
-| XIX | Knowledge Runtime | Berbeda dari Learning Runtime: indexing, semantic registry, documentation graph, operational memory, artifact relationship — bukan LLM, melainkan knowledge layer |
-| XX | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification |
+| XVII | Memory Runtime | Memori preview-only: deskripsi, model, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Memory→Orchestrator→Connector→Provider) |
+| XVIII | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
+| XIX | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider (Real Provider Runtime: Filesystem, SQLite, Docker, Shell, OpenClaw aktif). Tetap manual approval. Belum autonomous |
+| XX | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification. (Knowledge Runtime: indexing, semantic registry, documentation graph, operational memory — diperkenalkan di sini) |
 
 ---
 
