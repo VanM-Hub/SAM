@@ -5,11 +5,11 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v13.0.0 - Phase XIII (Mission Runtime)
-Next:         v14.0.0 - Real Connector Implementations
+Current:      v15.0.0 - Phase XV (Agent Runtime)
+Next:         v16.0.0 - Integrasi eksekusi nyata
 Framework:    Python
 Build:        setuptools
-Test:         pytest (unit 1421 + integration 48 + api 28 + e2e 110)
+Test:         pytest (unit 2154 + integration 48 + api 28 + e2e 110)
 Lint:         ruff
 CI:           GitHub Actions (core + server + desktop)
 ```
@@ -29,6 +29,8 @@ CI:           GitHub Actions (core + server + desktop)
 | Connector Runtime | `src/sam/connectors/` | 77 | Preview-only |
 | Orchestration Runtime | `src/sam/orchestrator/` | 78 | Plan-only |
 | Mission Runtime | `src/sam/mission_runtime/` | 70 | Lifecycle-only |
+| Provider Runtime | `src/sam/providers/` | 71 | Preview-only |
+| Agent Runtime | `src/sam/agent/` | 67 | Lifecycle-only |
 
 ## Dependencies
 
