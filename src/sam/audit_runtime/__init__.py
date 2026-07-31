@@ -76,6 +76,21 @@ from .monitoring import (
     ConversationMonitoringBridge,
     DashboardMonitoringBridge,
 )
+from .certification import (
+    AuditCertification,
+    AuditCertificationCriterion,
+    AuditCertificationResult,
+    AuditScore,
+    AuditScoreDimension,
+    PolicyScorer,
+    AuditManifest,
+    AuditCertificationReport,
+    AuditCertificationReporter,
+    AuditCertificationValidation,
+    AuditCertificationValidator,
+    ConversationCertificationBridge,
+    DashboardCertificationBridge,
+)
 
 __all__ = [
     "AuditDescriptor",
@@ -142,4 +157,17 @@ __all__ = [
     "AuditReporter",
     "ConversationMonitoringBridge",
     "DashboardMonitoringBridge",
+    "AuditCertification",
+    "AuditCertificationCriterion",
+    "AuditCertificationResult",
+    "AuditScore",
+    "AuditScoreDimension",
+    "PolicyScorer",
+    "AuditManifest",
+    "AuditCertificationReport",
+    "AuditCertificationReporter",
+    "AuditCertificationValidation",
+    "AuditCertificationValidator",
+    "ConversationCertificationBridge",
+    "DashboardCertificationBridge",
 ]
