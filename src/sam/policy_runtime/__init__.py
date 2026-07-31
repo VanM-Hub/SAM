@@ -14,6 +14,17 @@ from .foundation import (
     ConversationPolicyBridge,
     DashboardPolicyBridge,
 )
+from .model import (
+    Policy,
+    PolicyRule,
+    PolicyScope,
+    VALID_SCOPES,
+    PolicyConstraint,
+    PolicyValidator,
+    PolicyValidation,
+    ConversationModelBridge,
+    DashboardModelBridge,
+)
 
 __all__ = [
     "PolicyCard",
@@ -24,4 +35,13 @@ __all__ = [
     "PolicyRegistry",
     "ConversationPolicyBridge",
     "DashboardPolicyBridge",
+    "Policy",
+    "PolicyRule",
+    "PolicyScope",
+    "VALID_SCOPES",
+    "PolicyConstraint",
+    "PolicyValidator",
+    "PolicyValidation",
+    "ConversationModelBridge",
+    "DashboardModelBridge",
 ]
