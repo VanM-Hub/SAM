@@ -2,6 +2,7 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v22.0.0 | 2026-08-01 | XXII (Audit Runtime) | 8 sprints, 66 files, 173 tests |
 | v21.0.0 | 2026-08-01 | XXI (Policy Runtime) | 8 sprints, 66 files, 208 tests |
 | v20.0.0 | 2026-08-01 | XX (Workflow Runtime) | 8 sprints, 66 files, 210 tests |
 | v19.0.0 | 2026-08-01 | XIX (Cognitive Runtime) | 8 sprints, 8 folders, 201 tests |
