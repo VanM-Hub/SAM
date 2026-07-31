@@ -31,7 +31,9 @@ Karakteristik kunci:
 
 ## Ringkasan Fase (I–XXIV)
 
-> **Arsitektur SAM kini berada di ~85–90% perjalanan.** Fase I–XX (fondasi runtime, 17 runtime inti + Workflow) SELESAI. Sisa pembangunan dibagi menjadi **3 Tahap**: lengkapi fondasi (XXI–XXIV), integrasi nyata, lalu produk.
+> **✅ ARSITEKTUR SAM KOMPLIT — v23.0.0 = Architecture Complete.**
+> Fase I–XXIII (fondasi runtime deterministik, 23 phase, ~200+ sprint) SELESAI. XXIV opsional. **Mulai titik ini, roadmap bergeser dari Architecture Development ke Product Integration & Operationalization (Tahap 2 & 3), tanpa menambah runtime baru.**
+> Keputusan ini dari Aster (2026-08-01): nilai terbesar berikutnya bukan dari runtime baru, melainkan membuat semua runtime yang ada bekerja bersama untuk pekerjaan nyata.
 
 | Phase | Nama | Status |
 |-------|------|--------|
@@ -58,9 +60,9 @@ Karakteristik kunci:
 | XXI | Policy Runtime | ✅ DONE |
 | XXII | Audit Runtime | ✅ DONE |
 | XXIII | Artifact Runtime | ✅ DONE |
-| XXIV | Simulation Runtime (opsional) | 📋 PLANNED |
+| XXIV | Simulation Runtime (opsional) | 📋 PLANNED — TIDAK DIPRIORITASKAN |
 
-> **Total: 24 phase (XXIV opsional).** Setelah fondasi arsitektur lengkap, fokus bergeser ke Tahap 2 (integrasi nyata) dan Tahap 3 (produk).
+> **Total: 24 phase (XXIV opsional).** Fondasi arsitektur LENGKAP di v23.0.0. Fokus kini beralih ke **Product Integration & Operationalization** (Tahap 2: Program A–H; Tahap 3: Product Release) — lihat bagian *Roadmap Produk (pasca v23.0.0)* di bawah.
 
 ---
 
@@ -112,39 +114,58 @@ Karakteristik kunci:
 
 ## 3 Tahap Pembangunan (rencana Aster)
 
-Arsitektur SAM tidak akan terus menambah runtime tanpa batas. Setelah fondasi ini lengkap, prioritas bergeser dari membangun lapisan baru ke **menghubungkan semua lapisan menjadi sistem yang benar-benar dapat digunakan**.
+Arsitektur SAM tidak akan terus menambah runtime tanpa batas. Setelah fondasi lengkap (v23.0.0 = **Architecture Complete**), prioritas bergeser dari membangun lapisan baru ke **Product Integration & Operationalization**.
 
-### Tahap 1 — Lengkapi Fondasi (XXI–XXIV, 3–4 phase)
+### Tahap 1 — Lengkapi Fondasi (XXI–XXIII) ✅ SELESAI
 
-Hanya runtime mandiri yang masih layak dibangun:
-
-| Phase | Runtime | Tujuan |
+| Phase | Runtime | Status |
 |-------|---------|--------|
-| XXI | **Policy Runtime** | Menyatukan seluruh policy lintas subsystem (saat ini tersebar) |
-| XXII | **Audit Runtime** | Immutable audit trail, provenance, traceability end-to-end |
-| XXIII | **Artifact Runtime** | Output SAM menjadi artifact resmi: manifest, versioning, signing |
-| XXIV (opsional) | **Simulation Runtime** | Simulasi pipeline tanpa menyentuh runtime lain |
+| XXI | **Policy Runtime** | ✅ v21.0.0 |
+| XXII | **Audit Runtime** | ✅ v22.0.0 |
+| XXIII | **Artifact Runtime** | ✅ v23.0.0 |
+| XXIV (opsional) | **Simulation Runtime** | 📋 tidak diprioritaskan |
 
-> **Maksimal 3–4 phase.** Setelah Phase XX, perkiraan arsitektur berada di ~85–90% perjalanan.
+> **Tahap 1 SELESAI di v23.0.0 (Architecture Complete).** Phase XXIV (Simulation) sengaja tidak diprioritaskan — seluruh runtime inti sudah siap dikonsumsi.
 
-### Tahap 2 — Integrasi Nyata (tanpa runtime baru)
+### Tahap 2 — Product Integration (Program A–H)
 
-Fokus beralih ke menghubungkan runtime yang ada dengan kemampuan nyata:
+Fokus: membuat runtime yang sudah ada **benar-benar bekerja bersama** untuk pekerjaan nyata. Menghubungkan Execution → Provider → Connector → provider nyata. Prinsip tetap: **approval dulu → preview dulu → baru execute**.
 
-- **OpenClaw** · **Docker** · **Filesystem** · **SQLite** · **GitHub**
-- **LLM Connector** · **Tool Registry** · **CLI** · **Desktop UI**
+#### Program A — External Connectors
 
-> Inilah yang membuat SAM benar-benar berguna — Runtime yang telah dibangun kini benar-benar berjalan.
+SAM benar-benar dapat berbicara dengan dunia luar. Implementasi bertahap: **OpenAI · Anthropic · Google Gemini · Ollama · OpenClaw · GitHub · Filesystem · SQLite · Docker · Terminal · REST API · MCP**. Semua memanfaatkan **Connector Runtime + Provider Runtime** yang sudah dibangun.
 
-### Tahap 3 — SAM Menjadi Produk
+#### Program B — Execution Integration
 
-Hampir tanpa penambahan arsitektur besar:
+Menghubungkan **Execution Runtime → Provider Runtime → Connector Runtime → provider nyata**, dengan prinsip **approval dahulu, preview dahulu, baru execute**.
 
-- **Dashboard operasional** · **Mission Designer** · **Workflow Designer**
-- **Approval Console** · **Monitoring Console**
-- **CLI** · **Desktop Application** · **API Server**
+#### Program C — Desktop Application
 
-> Setelah fondasi + integrasi, SAM mencapai **Architecture Complete** — menjadi produk yang memberikan nilai nyata bagi pengguna.
+Mengaktifkan UI yang sudah lama ada. Prioritas: **Mission Designer · Workflow Designer · Policy Viewer · Audit Explorer · Artifact Explorer · Runtime Explorer · Connector Explorer · Provider Explorer · Execution Preview**. Semua memakai subsystem yang sudah tersedia.
+
+#### Program D — Conversation
+
+Conversation Runtime menjadi benar-benar berguna: buat mission, tampilkan workflow, cari policy, lihat audit, preview artifact, jalankan approval, preview execution, ringkas knowledge, cari memory. **Bukan lagi sekadar bridge.**
+
+#### Program E — Dashboard
+
+Dashboard menjadi konsol operasional: **Mission · Workflow · Execution · Approval · Audit · Connector · Provider · Runtime · Health · Telemetry**.
+
+#### Program F — CLI
+
+Perintah seperti: `sam mission` · `sam workflow` · `sam policy` · `sam audit` · `sam artifact` · `sam connector` · `sam provider` · `sam execution` · `sam preview` · `sam dashboard`.
+
+#### Program G — REST API
+
+REST API untuk semua runtime, mis. `POST /missions` · `POST /workflow` · `POST /approval` · `POST /execution-preview` · `GET /audit` · `GET /artifact` · `GET /policy`.
+
+#### Program H — LLM Integration
+
+SAM memperoleh kemampuan AI nyata. Connector: **OpenAI · Anthropic · Gemini · Ollama · OpenClaw**. Tetap melalui **Connector Runtime → Provider Runtime → Agent Runtime** — bukan langsung memanggil provider.
+
+### Tahap 3 — Product Release
+
+Sesudah integrasi selesai: **SAM Desktop · SAM CLI · SAM Server · SAM SDK · SAM Python Package · SAM Documentation · SAM Examples · SAM Templates · SAM Tutorial · SAM Marketplace (opsional)**.
 
 ---
 
@@ -203,11 +224,43 @@ Dokumen lain cukup memperbarui versi dan merujuk ke roadmap induk.
 
 ## Catatan Arsitektur
 
-Dengan selesainya Phase XXIII, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi policy, audit, artifact, workflow & kognitif siap dikonsumsi reasoning engine masa depan.
+Dengan selesainya 1–XXIII, SAM mencapai **Architecture Complete (v23.0.0)** — **rantai runtime deterministik yang lengkap** dari Mission sampai representasi policy, audit, artifact, workflow & kognitif siap dikonsumsi reasoning engine masa depan.
 
-Setelah fondasi arsitektur lengkap (Phase XXIV, lihat bagian *3 Tahap Pembangunan*):
+**Arsitektur DIANGGAP SELESAI.** Keputusan dari Aster (2026-08-01):
 - **Tidak lagi menambah runtime / lapisan arsitektur baru.**
-- Pengembangan bergeser dari *menambah subsystem* menjadi *menghubungkan dan memperluas* apa yang sudah ada — melalui Tahap 2 (integrasi nyata: OpenClaw, Docker, Filesystem, SQLite, GitHub, LLM Connector, Tool Registry, CLI, Desktop UI) dan Tahap 3 (menjadi produk: dashboard, designer, console, API).
-- SAM mencapai **Architecture Complete** dan mulai memberikan **nilai nyata bagi pengguna**.
+- Roadmap bergeser dari *Architecture Development* ke *Product Integration & Operationalization*.
+- Nilai terbesar berikutnya bukan dari runtime baru, melainkan membuat semua runtime yang ada bekerja bersama untuk menyelesaikan pekerjaan nyata.
 
-Tujuan: menjaga arsitektur **stabil, dapat diprediksi**, dan menghindari **pertumbuhan kompleksitas yang tidak terkendali**.
+Tujuan: menjaga arsitektur **stabil, dapat diprediksi**, menghindari **pertumbuhan kompleksitas yang tidak terkendali**, dan mengalihkan energi ke **integrasi & produk**.
+
+---
+
+## Roadmap Produk (pasca v23.0.0)
+
+> Keputusan Aster (2026-08-01): **SAM Architecture v23.0.0 = Architecture Complete**.
+> Roadmap bergeser dari Architecture Development → **Product Integration & Operationalization**.
+
+```
+✓ Phase I–XXIII (v23.0.0)
+   Architecture Complete
+        ↓
+Program A — External Connectors
+        ↓
+Program B — Execution Integration
+        ↓
+Program C — Desktop Application
+        ↓
+Program D — Conversation Experience
+        ↓
+Program E — Operational Dashboard
+        ↓
+Program F — CLI
+        ↓
+Program G — REST API
+        ↓
+Program H — LLM Integration
+        ↓
+SAM v24+ — Operational Product
+```
+
+**Catatan status:** Semua Program (A–H) & Tahap 3 adalah **perencanaan** — belum dieksekusi. Eksekusi menunggu instruksi. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
