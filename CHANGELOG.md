@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## v22.0.0 (2026-08-01) - Audit Runtime (Phase XXII)
+
+### Added
+- New subsystem `src/sam/audit_runtime/` - Audit Runtime
+- 8 sprints (212-219), 66 files, 173 tests
+- Immutable audit / provenance source across pipeline
+- Immutable audit model (AuditRecord/Entry/Reference frozen) - no storage, no execute
+- NOT evaluate, NOT decision, no storage - representation only
+- Sprint 212 Foundation, 213 Model, 214 Builder, 215 Runtime
+- Sprint 216 Catalog, 217 Monitoring, 218 Certification, 219 Runtime Integration
+- Read-only integration: Mission->Agent->Skill->Workflow->Policy->Audit->Memory->Knowledge->Cognitive->Orchestrator->Connector->Provider
+- Interim tag v22.0.0-alpha1 after Sprint 212
+- Part of Tahap 1 (lengkapi fondasi) - Phase XXII of 3-tahap roadmap
+
 ## v21.0.0 (2026-08-01) - Policy Runtime (Phase XXI)
 
 ### Added
