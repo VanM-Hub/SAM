@@ -55,7 +55,7 @@ Karakteristik kunci:
 | XVIII | Knowledge Runtime | ✅ DONE |
 | XIX | Cognitive Runtime | ✅ DONE |
 | XX | Workflow Runtime | ✅ DONE |
-| XXI | Policy Runtime | 📋 PLANNED |
+| XXI | Policy Runtime | ✅ DONE |
 | XXII | Audit Runtime | 📋 PLANNED |
 | XXIII | Artifact Runtime | 📋 PLANNED |
 | XXIV | Simulation Runtime (opsional) | 📋 PLANNED |
@@ -66,7 +66,7 @@ Karakteristik kunci:
 
 ## Fase Detail (I–XXIV)
 
-### Fase Selesai (I–XX) — membangun seluruh "mesin"
+### Fase Selesai (I–XXI) — membangun seluruh "mesin"
 
 | Phase | Sprint | Versi | Komponen Inti |
 |-------|--------|-------|---------------|
@@ -90,6 +90,7 @@ Karakteristik kunci:
 | XVIII | 180-187 | v18.0.0 | Knowledge Runtime (8 sprints, 207 tests, 67 files) |
 | XIX | 188-195 | v19.0.0 | Cognitive Runtime (8 sprints, 201 tests, 8 folders) |
 | XX | 196-203 | v20.0.0 | Workflow Runtime (8 sprints, 210 tests, 66 files) |
+| XXI | 204-211 | v21.0.0 | Policy Runtime (8 sprints, 208 tests, 66 files) |
 
 ### Fase Terencana (XVI–XXIV)
 
@@ -100,10 +101,10 @@ Karakteristik kunci:
 | XVIII | Knowledge Runtime | Pengetahuan deterministik preview-only: foundation, model, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Memory→Knowledge→Orchestrator→Connector→Provider). No inference |
 | XIX | Cognitive Runtime | Konsolidasi output seluruh runtime (Mission/Agent/Skill/Memory/Knowledge) menjadi Cognitive Context deterministik siap dikonsumsi reasoning engine. Bukan LLM/AI, tanpa inferensi |
 | XX | Workflow Runtime | Penyusun workflow deterministik di atas Mission/Agent/Skill dan sebelum Memory/Knowledge/Cognitive: urutan langkah + dependensi + batasan. No scheduling, no reasoning, no runtime select |
-| XXI | Policy Runtime | Menyatukan seluruh policy lintas subsystem (saat ini policy masih tersebar): deskripsi, model policy, builder, katalog, monitoring, sertifikasi + integrasi read-only |
+| XXI | Policy Runtime | Menyatukan seluruh policy lintas subsystem (saat ini masih tersebar): deskripsi, model policy, builder, katalog, monitoring, sertifikasi + integrasi read-only. Tidak evaluasi/keputusan |
 | XXII | Audit Runtime | Immutable audit trail: provenance, traceability end-to-end, integritas log. Semua operasi terekam deterministik, tanpa bisa diubah |
 | XXIII | Artifact Runtime | Semua output SAM menjadi artifact resmi: manifest, versioning, signing. Representasi immutable artifact + siklus hidupnya |
-| XXIV | Simulation Runtime (opsional) | Menjalankan simulasi pipeline tanpa menyentuh runtime lain — dry-run end-to-end dalam mode preview |
+| XXIV | Simulation Runtime (opsional) | Menjalankan simulasi pipeline tanpa menyentuh runtime lain - dry-run end-to-end dalam mode preview |
 
 ---
 
@@ -200,7 +201,7 @@ Dokumen lain cukup memperbarui versi dan merujuk ke roadmap induk.
 
 ## Catatan Arsitektur
 
-Dengan selesainya Phase XX, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi workflow & kognitif siap dikonsumsi reasoning engine masa depan.
+Dengan selesainya Phase XXI, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi policy, workflow & kognitif siap dikonsumsi reasoning engine masa depan.
 
 Setelah fondasi arsitektur lengkap (Phase XXIV, lihat bagian *3 Tahap Pembangunan*):
 - **Tidak lagi menambah runtime / lapisan arsitektur baru.**
