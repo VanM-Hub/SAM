@@ -135,9 +135,18 @@ Fokus: membuat runtime yang sudah ada **benar-benar bekerja bersama** untuk peke
 
 SAM benar-benar dapat berbicara dengan dunia luar. Implementasi bertahap: **OpenAI · Anthropic · Google Gemini · Ollama · OpenClaw · GitHub · Filesystem · SQLite · Docker · Terminal · REST API · MCP**. Semua memanfaatkan **Connector Runtime + Provider Runtime** yang sudah dibangun.
 
-#### Program B — Execution Integration
+#### Program B — Model Runtime Integration ❌ DONE (v25.0.0)
 
-Menghubungkan **Execution Runtime → Provider Runtime → Connector Runtime → provider nyata**, dengan prinsip **approval dahulu, preview dahulu, baru execute**.
+Runtime model generik: **Model Foundation (239) · Generic Interface (240) · Chat (241) · Embedding (242) ·
+Reasoning (243) · Vision (244) · Tool Calling (245) · Model Runtime+pipeline (246) · Provider Mapping (247) ·
+Certification 7-dimensi (248) · Integration + pipeline akhir (249)**.
+
+Pipeline: Descriptor → Request → Validation → Preview → Report. All immutable, preview-only, no-network.
+Pipeline akhir: Mission→Agent→Workflow→Memory→Knowledge→Cognitive→Policy→Audit→Artifact→Connector→Provider→Model→Execution Preview.
+
+> Catatan: ROADMAP terdahulu menamai Program B sebagai **Execution Integration**. Nama resmi release ini,
+> sesuai keputusan pelaksanaan, adalah **Model Runtime Integration** (v25.0.0). Eksekusi provider-nyata
+> (approval→preview→execute) tetap menunggu instruksi lanjutan dan approval eksplisit + API key.
 
 #### Program C — Desktop Application
 
