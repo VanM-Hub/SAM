@@ -22,6 +22,8 @@
 | XI | 112-122 | v11.0.0 | DONE | Universal Connector Runtime (11 sprints, 220 tests, 77 files) |
 | XII | 123-133 | v12.0.0 | DONE | Orchestration Runtime (11 sprints, 172 tests, 78 files) |
 | XIII | 134-143 | v13.0.0 | DONE | Mission Runtime (10 sprints, 145 tests, 70 files) |
+| XIV | 144-155 | v14.0.0 | DONE | Provider Runtime (12 sprints, 164 tests, 10 folders) |
+| XV | 156-163 | v15.0.0 | DONE | Agent Runtime (8 sprints, 211 tests, 11 folders) |
 
 ## Planned
 
