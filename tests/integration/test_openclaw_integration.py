@@ -114,8 +114,16 @@ class TestOcCLIIntegration:
 
     @pytest.mark.asyncio
     async def test_telemetry_openclaw_event(self):
+        """OpenClaw discovery harus menghasilkan event telemetry (pola RuntimeCoordinator)."""
         from sam.telemetry.service import TelemetryService
         svc = TelemetryService()
-        event = svc.emit_openclaw_event("oc.discovered", workspace_path="/test")
-        assert event.component == "openclaw"
-        assert event.payload["workspace"] == "/test"
+        svc.emit_event(
+            "openclaw.discovered",
+            component="openclaw",
+            payload={"workspace": "/test"},
+        )
+        events = svc.query()
+        assert len(events) == 1
+        evt = events[0]
+        assert evt.metadata.get("component") == "openclaw" or "openclaw" in evt.message
+        assert evt.metadata.get("workspace") == "/test"
