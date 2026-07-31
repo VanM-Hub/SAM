@@ -5,11 +5,11 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v22.0.0 - Phase XXII (Audit Runtime)
-Next:         v23.0.0 - Artifact Runtime
+Current:      v23.0.0 - Phase XXIII (Artifact Runtime)
+Next:         v24.0.0 - Simulation Runtime (opsional)
 Framework:    Python
 Build:        setuptools
-Test:         pytest (unit 3554 + integration 48 + api 28 + e2e 110)
+Test:         pytest (unit 3689 + integration 48 + api 28 + e2e 110)
 Lint:         ruff
 CI:           GitHub Actions (core + server + desktop)
 ```
@@ -38,6 +38,7 @@ CI:           GitHub Actions (core + server + desktop)
 | Workflow Runtime | `src/sam/workflow_runtime/` | 66 | Preview-only |
 | Policy Runtime | `src/sam/policy_runtime/` | 66 | Preview-only |
 | Audit Runtime | `src/sam/audit_runtime/` | 66 | Preview-only |
+| Artifact Runtime | `src/sam/artifact_runtime/` | 66 | Preview-only |
 
 ## Dependencies
 
