@@ -67,6 +67,21 @@ from .catalog import (
     ConversationCatalogBridge,
     DashboardCatalogBridge,
 )
+from .monitoring import (
+    WorkflowMonitor,
+    WorkflowStatus,
+    WorkflowMetrics,
+    WorkflowMetricSample,
+    WorkflowMetricsCollector,
+    WorkflowHealth,
+    WorkflowHealthCheck,
+    WorkflowSnapshot,
+    WorkflowSnapshotter,
+    WorkflowReport,
+    WorkflowReporter,
+    ConversationMonitoringBridge,
+    DashboardMonitoringBridge,
+)
 
 __all__ = [
     "WorkflowCard",
@@ -120,4 +135,17 @@ __all__ = [
     "WorkflowHistoryEntry",
     "ConversationCatalogBridge",
     "DashboardCatalogBridge",
+    "WorkflowMonitor",
+    "WorkflowStatus",
+    "WorkflowMetrics",
+    "WorkflowMetricSample",
+    "WorkflowMetricsCollector",
+    "WorkflowHealth",
+    "WorkflowHealthCheck",
+    "WorkflowSnapshot",
+    "WorkflowSnapshotter",
+    "WorkflowReport",
+    "WorkflowReporter",
+    "ConversationMonitoringBridge",
+    "DashboardMonitoringBridge",
 ]
