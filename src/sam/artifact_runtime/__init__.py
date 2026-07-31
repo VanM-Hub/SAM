@@ -81,6 +81,25 @@ from ..artifact_runtime.catalog.conversation_catalog import (
 from ..artifact_runtime.catalog.dashboard_catalog import (
     DashboardCatalogBridge,
 )
+from ..artifact_runtime.monitoring import (
+    ArtifactMonitor,
+    ArtifactStatus,
+    ArtifactMetrics,
+    ArtifactMetricSample,
+    ArtifactMetricsCollector,
+    ArtifactHealth,
+    ArtifactHealthCheck,
+    ArtifactSnapshot,
+    ArtifactSnapshotter,
+    ArtifactReport,
+    ArtifactReporter,
+)
+from ..artifact_runtime.monitoring.conversation_monitoring import (
+    ConversationMonitoringBridge,
+)
+from ..artifact_runtime.monitoring.dashboard_monitoring import (
+    DashboardMonitoringBridge,
+)
 
 __all__ = [
     "ArtifactDescriptor",
@@ -131,4 +150,17 @@ __all__ = [
     "ArtifactRecorder",
     "ConversationCatalogBridge",
     "DashboardCatalogBridge",
+    "ArtifactMonitor",
+    "ArtifactStatus",
+    "ArtifactMetrics",
+    "ArtifactMetricSample",
+    "ArtifactMetricsCollector",
+    "ArtifactHealth",
+    "ArtifactHealthCheck",
+    "ArtifactSnapshot",
+    "ArtifactSnapshotter",
+    "ArtifactReport",
+    "ArtifactReporter",
+    "ConversationMonitoringBridge",
+    "DashboardMonitoringBridge",
 ]
