@@ -1,5 +1,18 @@
 ﻿# Changelog
 
+## v19.0.0 (2026-08-01) - Cognitive Runtime (Phase XIX)
+
+### Added
+- New subsystem `src/sam/cognitive_runtime/` - Cognitive Runtime
+- 8 sprints (188-195), 8 subfolders, 201 tests
+- Consolidates outputs of Mission/Agent/Skill/Memory/Knowledge into a deterministic Cognitive Context
+- NOT LLM, NOT AI, NO inference - only deterministic composition
+- Sprint 188 Foundation, 189 Context, 190 Builder, 191 Runtime
+- Sprint 192 Workspace, 193 Monitoring, 194 Certification, 195 Runtime Integration
+- Read-only integration: Mission->Agent->Skill->Memory->Knowledge->Cognitive->Orchestrator->Connector->Provider
+- Legacy `src/sam/cognitive/` subsystem left untouched (follows knowledge_runtime/ pattern)
+- Interim tag v19.0.0-alpha1 after Sprint 188
+
 ## v18.0.0 (2026-07-31) - Knowledge Runtime (Phase XVIII)
 
 ### Added

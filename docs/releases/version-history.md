@@ -2,6 +2,8 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v19.0.0 | 2026-08-01 | XIX (Cognitive Runtime) | 8 sprints, 8 folders, 201 tests |
+| v18.0.0 | 2026-07-31 | XVIII (Knowledge Runtime) | 8 sprints, 67 files, 207 tests |
 | v17.0.0 | 2026-07-31 | XVII (Memory Runtime) | 8 sprints, 67 files, 209 tests |
 | v16.0.0 | 2026-07-31 | XVI (Skill Runtime) | 8 sprints, 67 files, 192 tests |
 | v15.0.0 | 2026-07-31 | XV (Agent Runtime) | 8 sprints, 11 folders, 211 tests |
