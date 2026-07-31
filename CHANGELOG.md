@@ -1,5 +1,17 @@
 ﻿# Changelog
 
+## v17.0.0 (2026-07-31) - Memory Runtime (Phase XVII)
+
+### Added
+- New subsystem `src/sam/memory/` - Memory Runtime
+- 8 sprints (172-179), 67 files, 209 tests
+- Memory descriptors, models, builders, runtime, catalog, monitoring, certification
+- All preview-only and read-only; no filesystem/database write
+- Sprint 172 Foundation, 173 Model, 174 Builder, 175 Runtime
+- Sprint 176 Catalog, 177 Monitoring, 178 Certification, 179 Runtime Integration
+- Read-only integration: Mission->Agent->Skill->Memory->Orchestrator->Connector->Provider
+- Interim tag v17.0.0-alpha1 after Sprint 172
+
 ## v16.0.0 (2026-07-31) - Skill Runtime (Phase XVI)
 
 ### Added
