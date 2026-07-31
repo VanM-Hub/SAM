@@ -5,8 +5,8 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v23.0.0 - Phase XXIII (Artifact Runtime)
-Next:         v24.0.0 - Simulation Runtime (opsional)
+Current:      v24.0.0 - Program A (External Connector Integration)
+Next:         Program B - Execution Integration
 Framework:    Python
 Build:        setuptools
 Test:         pytest (unit 3689 + integration 48 + api 28 + e2e 110)
@@ -30,6 +30,17 @@ CI:           GitHub Actions (core + server + desktop)
 | Orchestration Runtime | `src/sam/orchestrator/` | 78 | Plan-only |
 | Mission Runtime | `src/sam/mission_runtime/` | 70 | Lifecycle-only |
 | Provider Runtime | `src/sam/providers/` | 71 | Preview-only |
+| Provider Interfaces | `src/sam/providers/interfaces/` (Program A) | 8 | Preview-only |
+| LLM Common Adapter | `src/sam/providers/llm/` (Program A) | 9 | Preview-only |
+| OpenAI Provider | `src/sam/providers/openai/` (Program A) | 4 | Preview-only |
+| Anthropic Provider | `src/sam/providers/anthropic/` (Program A) | 4 | Preview-only |
+| Gemini Provider | `src/sam/providers/gemini/` (Program A) | 4 | Preview-only |
+| DeepSeek Provider | `src/sam/providers/deepseek/` (Program A) | 4 | Preview-only |
+| Ollama Provider | `src/sam/providers/ollama/` (Program A) | 4 | Preview-only |
+| Provider Integration | `src/sam/providers/integration/` (Program A) | 2 | Preview-only |
+| Connector Bridge | `src/sam/providers/connector_bridge/` (Program A) | 1 | Preview-only |
+| Execution Preview | `src/sam/providers/execution/` (Program A) | 1 | Preview-only |
+| Provider Certification | `src/sam/providers/certification_program/` (Program A) | 1 | Preview-only |
 | Agent Runtime | `src/sam/agent/` | 67 | Lifecycle-only |
 | Skill Runtime | `src/sam/skills/` | 67 | Preview-only |
 | Memory Runtime | `src/sam/memory/` | 67 | Preview-only |
