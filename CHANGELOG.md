@@ -1,5 +1,17 @@
 ﻿# Changelog
 
+## v16.0.0 (2026-07-31) - Skill Runtime (Phase XVI)
+
+### Added
+- New subsystem `src/sam/skills/` - Skill Runtime
+- 8 sprints (164-171), 67 files, 192 tests
+- Skill descriptors, definitions, builders, runtime, catalog, monitoring, certification
+- All preview-only and read-only; no execution, no filesystem access
+- Sprint 164 Foundation, 165 Definition, 166 Builder, 167 Runtime
+- Sprint 168 Catalog, 169 Monitoring, 170 Certification, 171 Runtime Integration
+- Read-only integration: Mission->Agent->Skill->Orchestrator->Connector->Provider
+- Interim tag v16.0.0-alpha1 after Sprint 164
+
 ## v15.0.0 (2026-07-31) - Agent Runtime (Phase XV)
 
 ### Added
