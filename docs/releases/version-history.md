@@ -2,6 +2,7 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v12.0.0 | 2026-07-31 | XII (Orchestration Runtime) | 11 sprints, 78 files, 172 tests |
 | v11.0.0 | 2026-07-31 | XI (Connector Runtime) | 11 sprints, 77 files, 220 tests |
 | v10.2.2 | 2026-07-31 | Maintenance | Repo konsistensi, koreksi 91->69 |
 | v10.2.1 | 2026-07-31 | CI Recovery | Pipeline restructure |
