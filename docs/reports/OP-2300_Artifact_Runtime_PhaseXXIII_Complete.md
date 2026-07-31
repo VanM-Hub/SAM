@@ -6,7 +6,7 @@
 
 Phase XXIII membangun **Artifact Runtime** — **representasi resmi seluruh keluaran pipeline SAM dalam bentuk artifact deterministik tanpa melakukan penyimpanan ataupun publikasi.**
 
-> Ini fase ke-3 **Tahap 1 (lengkapi fondasi)** dari rencana 3 tahap Aster (XXI Policy ✅, XXII Audit ✅, XXIII Artifact ✅, XXIV Simulation opsional).
+> Ini fase ke-3 **Tahap 1 (lengkapi fondasi)** dari rencana 3 tahap (XXI Policy ✅, XXII Audit ✅, XXIII Artifact ✅, XXIV Simulation opsional).
 
 > **Lokasi folder:** dibangun di `src/sam/artifact_runtime/`. Tidak ada `src/sam/artifact/` lama yang bentrok. Test di `tests/artifact_runtime/`.
 

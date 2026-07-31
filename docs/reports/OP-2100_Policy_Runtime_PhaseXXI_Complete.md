@@ -6,7 +6,7 @@
 
 Phase XXI membangun **Policy Runtime** — **pusat representasi kebijakan (policy) deterministik** yang dipakai lintas pipeline, **menyatukan policy yang selama ini tersebar** di berbagai subsystem. Representasi kebijakan saja — **tidak mengevaluasi, tidak mengambil keputusan, tidak inferensi**.
 
-> Ini fase pertama **Tahap 1 (lengkapi fondasi)** dari rencana 3 tahap Aster (XXI Policy, XXII Audit, XXIII Artifact, XXIV Simulation).
+> Ini fase pertama **Tahap 1 (lengkapi fondasi)** dari rencana 3 tahap (XXI Policy, XXII Audit, XXIII Artifact, XXIV Simulation).
 
 > **Lokasi folder:** dibangun di `src/sam/policy_runtime/`. Tidak ada `src/sam/policy/` lama yang bentrok. Test di `tests/policy_runtime/`.
 

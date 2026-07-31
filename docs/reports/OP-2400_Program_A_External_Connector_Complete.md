@@ -6,7 +6,7 @@
 
 Program A membangun **External Connector Integration** — lapisan provider abstraction yang memungkinkan SAM terhubung ke penyedia LLM eksternal (OpenAI, Anthropic, Gemini, DeepSeek, Ollama) melalui **satu interface yang sama** (`LLMAdapter`), tanpa memunculkan provider-specific logic di Agent/Mission/Workflow.
 
-> Ini step pertama **Tahap 2 (Product Integration — Program A–H)** dari roadmap pasca Architecture Complete (v23.0.0, Aster 2026-08-01). Tahap 1 (Architecture Development) telah SELESAI.
+> Ini step pertama **Tahap 2 (Product Integration — Program A–H)** dari roadmap pasca Architecture Complete (v23.0.0, 2026-08-01). Tahap 1 (Architecture Development) telah SELESAI.
 
 > **Lokasi:** dibangun di `src/sam/providers/` (folder baru `interfaces/`, `llm/`, `openai/`, `anthropic/`, `gemini/`, `deepseek/`, `ollama/`, `integration/`, `connector_bridge/`, `execution/`, `certification_program/`). Tidak ada folder lama yang diubah (0 layer violations). Test di `tests/providers/`.
 
