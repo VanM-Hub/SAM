@@ -1,5 +1,18 @@
 ﻿# Changelog
 
+## v18.0.0 (2026-07-31) - Knowledge Runtime (Phase XVIII)
+
+### Added
+- New subsystem `src/sam/knowledge_runtime/` - Knowledge Runtime
+- 8 sprints (180-187), 67 files, 207 tests
+- Organizes facts, relations, contexts deterministically WITHOUT inference
+- Bridge between Memory Runtime (raw data) and future reasoning runtime (consumes Knowledge, not raw Memory)
+- Sprint 180 Foundation, 181 Model, 182 Builder, 183 Runtime
+- Sprint 184 Catalog, 185 Monitoring, 186 Certification, 187 Runtime Integration
+- Read-only integration: Mission->Agent->Skill->Memory->Knowledge->Orchestrator->Connector->Provider
+- Legacy `src/sam/knowledge/` subsystem left untouched (follows mission_runtime/ pattern)
+- Interim tag v18.0.0-alpha1 after Sprint 180
+
 ## v17.0.0 (2026-07-31) - Memory Runtime (Phase XVII)
 
 ### Added
