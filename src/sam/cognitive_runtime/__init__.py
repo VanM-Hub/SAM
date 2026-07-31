@@ -100,6 +100,19 @@ from .certification import (
     ConversationCertificationBridge,
     DashboardCertificationBridge,
 )
+from .integration import (
+    CognitiveRuntimePipeline,
+    CognitiveRuntimePipelineRun,
+    CognitiveIntegrationStage,
+    INTEGRATION_ROUTE,
+    CognitiveRuntimeReport,
+    CognitiveRuntimeReporter,
+    CognitiveRuntimeManifest,
+    CognitiveRuntimeCertification,
+    CognitiveRuntimeCertifier,
+    ConversationIntegrationBridge,
+    DashboardIntegrationBridge,
+)
 
 __all__ = [
     "ExecutionCard",
@@ -180,4 +193,15 @@ __all__ = [
     "CognitiveCertificationValidator",
     "ConversationCertificationBridge",
     "DashboardCertificationBridge",
+    "CognitiveRuntimePipeline",
+    "CognitiveRuntimePipelineRun",
+    "CognitiveIntegrationStage",
+    "INTEGRATION_ROUTE",
+    "CognitiveRuntimeReport",
+    "CognitiveRuntimeReporter",
+    "CognitiveRuntimeManifest",
+    "CognitiveRuntimeCertification",
+    "CognitiveRuntimeCertifier",
+    "ConversationIntegrationBridge",
+    "DashboardIntegrationBridge",
 ]
