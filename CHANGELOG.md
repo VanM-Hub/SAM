@@ -1,5 +1,25 @@
 ﻿# Changelog
 
+## v25.0.0 (2026-08-01) - Program B: Model Runtime Integration
+
+### Added
+- Program B (Tahap 2 Product Integration) - Model Runtime Integration
+- 11 sprints (239-249), 108 test baru di `tests/model_runtime/`
+- `src/sam/model_runtime/` - 89 modul (immutable `@dataclass(frozen=True)`)
+- Sprint 239 Model Foundation (descriptor, capability, contract, metadata, registry, builder)
+- Sprint 240 Generic Model Interface (request, response, message, context, parameters) - tanpa mengenal provider
+- Sprint 241 Chat Model (system/user/assistant/tool, preview-only)
+- Sprint 242 Embedding Model (representasi saja, tidak menghasilkan embedding asli)
+- Sprint 243 Reasoning Model (struktur reasoning saja, tidak melakukan reasoning)
+- Sprint 244 Vision Model (representasi image input, tidak inference)
+- Sprint 245 Tool Calling (generic, tidak mengeksekusi tool)
+- Sprint 246 Model Runtime + pipeline (Descriptor -> Request -> Validation -> Preview -> Report)
+- Sprint 247 Provider Mapping (OpenAI/Anthropic/Gemini/DeepSeek/Ollama, belum network)
+- Sprint 248 Certification 7 dimensi (Structure, Integrity, Consistency, Completeness, Determinism, Immutability, PreviewOnly)
+- Sprint 249 Integration + pipeline akhir (Mission->Agent->Workflow->Memory->Knowledge->Cognitive->Policy->Audit->Artifact->Connector->Provider->Model->Execution Preview), semua bridge read-only
+- 0 forbidden imports, 0 network, preview-only (external_calls=0)
+- Tidak mengubah subsystem lama / Program A
+
 ## v24.0.0 (2026-08-01) - Program A: External Connector Integration
 
 ### Added
