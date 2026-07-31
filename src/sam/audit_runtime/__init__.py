@@ -10,6 +10,17 @@ from .foundation import (
     DashboardAuditBridge,
 )
 from .dashboard import PolicyCard
+from .model import (
+    AuditRecord,
+    AuditEntry,
+    AuditReference,
+    AuditScope,
+    VALID_SCOPES,
+    AuditValidator,
+    AuditValidation,
+    ConversationModelBridge,
+    DashboardModelBridge,
+)
 
 __all__ = [
     "AuditDescriptor",
@@ -20,4 +31,13 @@ __all__ = [
     "ConversationAuditBridge",
     "DashboardAuditBridge",
     "PolicyCard",
+    "AuditRecord",
+    "AuditEntry",
+    "AuditReference",
+    "AuditScope",
+    "VALID_SCOPES",
+    "AuditValidator",
+    "AuditValidation",
+    "ConversationModelBridge",
+    "DashboardModelBridge",
 ]
