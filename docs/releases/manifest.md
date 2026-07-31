@@ -5,8 +5,8 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v24.0.0 - Program A (External Connector Integration)
-Next:         Program B - Execution Integration
+Current:      v25.0.0 - Program B (Model Runtime Integration)
+Next:         Program C - Desktop App
 Framework:    Python
 Build:        setuptools
 Test:         pytest (unit 3689 + integration 48 + api 28 + e2e 110)
