@@ -66,6 +66,21 @@ from .catalog import (
     ConversationCatalogBridge,
     DashboardCatalogBridge,
 )
+from .monitoring import (
+    PolicyMonitor,
+    PolicyStatus,
+    PolicyMetrics,
+    PolicyMetricSample,
+    PolicyMetricsCollector,
+    PolicyHealth,
+    PolicyHealthCheck,
+    PolicySnapshot,
+    PolicySnapshotter,
+    PolicyReport,
+    PolicyReporter,
+    ConversationMonitoringBridge,
+    DashboardMonitoringBridge,
+)
 
 __all__ = [
     "PolicyCard",
@@ -120,4 +135,17 @@ __all__ = [
     "PolicyHistoryEntry",
     "ConversationCatalogBridge",
     "DashboardCatalogBridge",
+    "PolicyMonitor",
+    "PolicyStatus",
+    "PolicyMetrics",
+    "PolicyMetricSample",
+    "PolicyMetricsCollector",
+    "PolicyHealth",
+    "PolicyHealthCheck",
+    "PolicySnapshot",
+    "PolicySnapshotter",
+    "PolicyReport",
+    "PolicyReporter",
+    "ConversationMonitoringBridge",
+    "DashboardMonitoringBridge",
 ]
