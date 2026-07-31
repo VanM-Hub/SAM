@@ -26,6 +26,17 @@ from .model import (
     ConversationModelBridge,
     DashboardModelBridge,
 )
+from .builder import (
+    WorkflowBuilder,
+    WorkflowBuildResult,
+    StepBuilder,
+    DependencyBuilder,
+    ConstraintBuilder,
+    PreviewBuilder,
+    WorkflowPreviewDTO,
+    ConversationBuilderBridge,
+    DashboardBuilderBridge,
+)
 
 __all__ = [
     "WorkflowCard",
@@ -44,4 +55,13 @@ __all__ = [
     "WorkflowValidation",
     "ConversationModelBridge",
     "DashboardModelBridge",
+    "WorkflowBuilder",
+    "WorkflowBuildResult",
+    "StepBuilder",
+    "DependencyBuilder",
+    "ConstraintBuilder",
+    "PreviewBuilder",
+    "WorkflowPreviewDTO",
+    "ConversationBuilderBridge",
+    "DashboardBuilderBridge",
 ]
