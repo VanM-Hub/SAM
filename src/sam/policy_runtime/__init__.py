@@ -96,6 +96,21 @@ from .certification import (
     ConversationCertificationBridge,
     DashboardCertificationBridge,
 )
+from .integration import (
+    PolicyRuntimePipeline,
+    PolicyRuntimePipelineRun,
+    PolicyIntegrationStage,
+    INTEGRATION_ROUTE,
+    PolicyRuntimeReport,
+    PolicyRuntimeReporter,
+    PolicyRuntimeManifest,
+    PolicyRuntimeCertification,
+    PolicyRuntimeCertifier,
+    PolicyRuntimeRegistry,
+    PolicyRuntimeRegistryEntry,
+    ConversationIntegrationBridge,
+    DashboardIntegrationBridge,
+)
 
 __all__ = [
     "PolicyCard",
@@ -176,4 +191,17 @@ __all__ = [
     "PolicyCertificationValidator",
     "ConversationCertificationBridge",
     "DashboardCertificationBridge",
+    "PolicyRuntimePipeline",
+    "PolicyRuntimePipelineRun",
+    "PolicyIntegrationStage",
+    "INTEGRATION_ROUTE",
+    "PolicyRuntimeReport",
+    "PolicyRuntimeReporter",
+    "PolicyRuntimeManifest",
+    "PolicyRuntimeCertification",
+    "PolicyRuntimeCertifier",
+    "PolicyRuntimeRegistry",
+    "PolicyRuntimeRegistryEntry",
+    "ConversationIntegrationBridge",
+    "DashboardIntegrationBridge",
 ]
