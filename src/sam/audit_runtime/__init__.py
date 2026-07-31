@@ -46,6 +46,20 @@ from .runtime import (
     ConversationRuntimeBridge,
     DashboardRuntimeBridge,
 )
+from .catalog import (
+    AuditCatalog,
+    AuditIndex,
+    AuditIndexer,
+    AuditLoader,
+    AuditLoadResult,
+    AuditVersionInfo,
+    AuditVersionProvider,
+    AuditHistory,
+    AuditHistoryEntry,
+    AuditHistoryRecorder,
+    ConversationCatalogBridge,
+    DashboardCatalogBridge,
+)
 
 __all__ = [
     "AuditDescriptor",
@@ -86,4 +100,16 @@ __all__ = [
     "AuditStatisticsCollector",
     "ConversationRuntimeBridge",
     "DashboardRuntimeBridge",
+    "AuditCatalog",
+    "AuditIndex",
+    "AuditIndexer",
+    "AuditLoader",
+    "AuditLoadResult",
+    "AuditVersionInfo",
+    "AuditVersionProvider",
+    "AuditHistory",
+    "AuditHistoryEntry",
+    "AuditHistoryRecorder",
+    "ConversationCatalogBridge",
+    "DashboardCatalogBridge",
 ]
