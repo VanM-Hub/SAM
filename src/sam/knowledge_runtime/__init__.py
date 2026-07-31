@@ -26,6 +26,17 @@ from .model import (
     ConversationModelBridge,
     DashboardModelBridge,
 )
+from .builder import (
+    KnowledgeBuilder,
+    KnowledgeBuildResult,
+    FactBuilder,
+    RelationBuilder,
+    ContextBuilder,
+    PreviewBuilder,
+    KnowledgePreviewDTO,
+    ConversationBuilderBridge,
+    DashboardBuilderBridge,
+)
 
 __all__ = [
     "KnowledgeDescriptor",
@@ -47,4 +58,13 @@ __all__ = [
     "KnowledgeValidation",
     "ConversationModelBridge",
     "DashboardModelBridge",
+    "KnowledgeBuilder",
+    "KnowledgeBuildResult",
+    "FactBuilder",
+    "RelationBuilder",
+    "ContextBuilder",
+    "PreviewBuilder",
+    "KnowledgePreviewDTO",
+    "ConversationBuilderBridge",
+    "DashboardBuilderBridge",
 ]
