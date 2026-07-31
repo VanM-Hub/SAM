@@ -21,14 +21,15 @@
 | X | 100-111 | v10.0.0 | DONE | Runtime Kernel (12 sprints, 1,719 tests, 69 files) |
 | XI | 112-122 | v11.0.0 | DONE | Universal Connector Runtime (11 sprints, 220 tests, 77 files) |
 | XII | 123-133 | v12.0.0 | DONE | Orchestration Runtime (11 sprints, 172 tests, 78 files) |
+| XIII | 134-143 | v13.0.0 | DONE | Mission Runtime (10 sprints, 145 tests, 70 files) |
 
 ## Planned
 
 | Phase | Target | Versi | Status | Komponen |
 |-------|--------|-------|--------|----------|
-| XIII | TBD | v13.0.0 | PLANNED | Real Connector Implementations — adapter provider |
-| XIV | TBD | v14.0.0 | PLANNED | Operational Intelligence Console |
-| XV | TBD | v15.0.0 | PLANNED | Autonomous Operation |
+| XIV | TBD | v14.0.0 | PLANNED | Real Connector Implementations — adapter provider |
+| XV | TBD | v15.0.0 | PLANNED | Operational Intelligence Console |
+| XVI | TBD | v16.0.0 | PLANNED | Autonomous Operation |
 
 ---
 
