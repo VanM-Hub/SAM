@@ -1,48 +1,156 @@
 # SAM Roadmap
 
-> Status: v10.0.0 — Phase X (Runtime Kernel) completed.
-> Repository Stabilization: v10.0.1 in progress.
+> **Sumber kebenaran tunggal (single source of truth) untuk seluruh fase SAM.**
+> Visi: **Deterministic Operational Intelligence Platform** — observasi, pemahaman, perencanaan, koordinasi, penyiapan, dan pengawasan operasi lintas sistem secara aman, dapat diaudit, provider-agnostic, dan dapat dipertanggungjawabkan.
 
 ---
 
-## Completed Phases
+## Visi Akhir (End-state)
 
-| Phase | Sprint | Versi | Status | Komponen |
-|-------|--------|-------|--------|----------|
-| I | 1-7 | v0.0.1 | DONE | Foundation: agent state, telemetry, contracts |
-| II | 8-17 | v2.0.0 | DONE | Operational Brain (plan, archive, monitor, visualize) |
-| III | 18-29 | v3.0.0 | DONE | Guardian Intelligence (observation, policies, event engine) |
-| IV | 30-42 | v4.0.0 | DONE | Guardian Runtime (dispatcher, reasoning, learning, dashboard) |
-| V | 43-58 | v5.0.0 | DONE | Guardian Live Runtime + Live Situation Intelligence |
-| VI | 59-75 | v6.0.0 | DONE | Decision Runtime (certification, finalization, lifecycle) |
-| VII | 76-81 | v7.0.0 | DONE | Operational Brain Full Integration |
-| VIII | 82-87 | v8.0.0 | DONE | Activation Runtime (pipeline lengkap) |
-| IX | 88-99 | v9.0.0 | DONE | Execution Runtime (12 sprints, ~1,600 tests) |
-| X | 100-111 | v10.0.0 | DONE | Runtime Kernel (12 sprints, 1,719 tests, 69 files) |
-| XI | 112-122 | v11.0.0 | DONE | Universal Connector Runtime (11 sprints, 220 tests, 77 files) |
-| XII | 123-133 | v12.0.0 | DONE | Orchestration Runtime (11 sprints, 172 tests, 78 files) |
-| XIII | 134-143 | v13.0.0 | DONE | Mission Runtime (10 sprints, 145 tests, 70 files) |
-| XIV | 144-155 | v14.0.0 | DONE | Provider Runtime (12 sprints, 164 tests, 10 folders) |
-| XV | 156-163 | v15.0.0 | DONE | Agent Runtime (8 sprints, 211 tests, 11 folders) |
+SAM adalah **Deterministic Operational Intelligence Platform** yang mampu:
 
-## Planned
+- **Mengobservasi** — melihat kondisi sistem
+- **Memahami** — memetakan konteks operasional
+- **Merencanakan** — menyusun urutan operasi
+- **Mengoordinasikan** — mengatur antar-runtime
+- **Menyiapkan** — membangun request/aksi
+- **Mengawasi** — memantau hingga selesai
 
-| Phase | Target | Versi | Status | Komponen |
-|-------|--------|-------|--------|----------|
-| XIV | TBD | v14.0.0 | PLANNED | Real Connector Implementations — adapter provider |
-| XV | TBD | v15.0.0 | PLANNED | Operational Intelligence Console |
-| XVI | TBD | v16.0.0 | PLANNED | Autonomous Operation |
+Karakteristik kunci:
+
+| Bukan | Melainkan |
+|-------|-----------|
+| Chatbot | Operational Intelligence Platform |
+| LLM | Deterministic engine |
+| Autonomous AI | Dapat diaudit & dapat dipertanggungjawabkan |
+| AGI | Provider-agnostic (AI hanyalah salah satu provider via Connector Runtime) |
+
+> **Identitas SAM tetap utuh** walaupun provider AI diganti atau dilepas.
 
 ---
 
-## Repository Stabilization
+## Ringkasan Fase (I–XX)
 
-| Hotfix | Status | Commit |
-|--------|--------|--------|
-| H1 - CI Recovery | DONE | main |
-| H2 - Test Structure | DONE | main |
-| H3 - Fixture Cleanup | DONE | main |
-| H4 - Documentation Refresh | IN PROGRESS | - |
-| H5 - Repository Hygiene | PENDING | - |
+| Phase | Nama | Status |
+|-------|------|--------|
+| I | Foundation | ✅ DONE |
+| II | Core Runtime | ✅ DONE |
+| III | Runtime Expansion | ✅ DONE |
+| IV | Guardian Runtime | ✅ DONE |
+| V | Decision Runtime | ✅ DONE |
+| VI | Approval Runtime | ✅ DONE |
+| VII | Operational Brain | ✅ DONE |
+| VIII | Activation Runtime | ✅ DONE |
+| IX | Execution Runtime | ✅ DONE |
+| X | Runtime Kernel | ✅ DONE |
+| XI | Universal Connector Runtime | ✅ DONE |
+| XII | Orchestration Runtime | ✅ DONE |
+| XIII | Mission Runtime | ✅ DONE |
+| XIV | Provider Runtime | ✅ DONE |
+| XV | Agent Runtime | ✅ DONE |
+| XVI | Real Provider Runtime | 📋 PLANNED |
+| XVII | Operational Intelligence Console | 📋 PLANNED |
+| XVIII | Execution Integration | 📋 PLANNED |
+| XIX | Knowledge Runtime | 📋 PLANNED |
+| XX | Platform Certification | 📋 PLANNED |
 
-Target: v10.0.1
+> **Total: 20 phase.** Phase XX adalah end-state. Sesudahnya bukan roadmap lagi, melainkan maintenance.
+
+---
+
+## Fase Detail (I–XX)
+
+### Fase Selesai (I–XV) — membangun seluruh "mesin"
+
+| Phase | Sprint | Versi | Komponen Inti |
+|-------|--------|-------|---------------|
+| I | 1-7 | v0.0.1 | Foundation: agent state, telemetry, contracts |
+| II | 8-17 | v2.0.0 | Core Runtime: operational brain, plan, archive, monitor |
+| III | 18-29 | v3.0.0 | Runtime Expansion: guardian intelligence, policies, event engine |
+| IV | 30-42 | v4.0.0 | Guardian Runtime: dispatcher, reasoning, learning, dashboard |
+| V | 43-58 | v5.0.0-v6.0.0 | Decision Runtime: guardian live, situation intelligence |
+| VI | 59-75 | v6.0.0-v7.0.0 | Approval Runtime: certification, finalization, lifecycle |
+| VII | 76-81 | v7.0.0-v8.0.0 | Operational Brain Full Integration |
+| VIII | 82-87 | v8.0.0-v8.5.0 | Activation Runtime (pipeline lengkap) |
+| IX | 88-99 | v9.0.0-v9.11.0 | Execution Runtime (12 sprints, ~1,600 tests) |
+| X | 100-111 | v10.0.0 | Runtime Kernel (12 sprints, 1,719 tests, 69 files) |
+| XI | 112-122 | v11.0.0 | Universal Connector Runtime (11 sprints, 220 tests, 77 files) |
+| XII | 123-133 | v12.0.0 | Orchestration Runtime (11 sprints, 172 tests, 78 files) |
+| XIII | 134-143 | v13.0.0 | Mission Runtime (10 sprints, 145 tests, 70 files) |
+| XIV | 144-155 | v14.0.0 | Provider Runtime (12 sprints, 164 tests, 10 folders) |
+| XV | 156-163 | v15.0.0 | Agent Runtime (8 sprints, 211 tests, 11 folders) |
+
+### Fase Terencana (XVI–XX)
+
+| Phase | Nama | Deskripsi |
+|-------|------|-----------|
+| XVI | Real Provider Runtime | Provider benar-benar bekerja (Filesystem, SQLite, Docker, Shell, OpenClaw) — bukan preview lagi |
+| XVII | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
+| XVIII | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider. Tetap manual approval. Belum autonomous |
+| XIX | Knowledge Runtime | Berbeda dari Learning Runtime: indexing, semantic registry, documentation graph, operational memory, artifact relationship — bukan LLM, melainkan knowledge layer |
+| XX | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification |
+
+---
+
+## Urutan Stack (konseptual)
+
+Membangun satu lapisan demi satu lapisan (dari bawah ke atas):
+
+```
+Guardian
+  ↓
+Decision
+  ↓
+Approval
+  ↓
+Operational Brain
+  ↓
+Activation
+  ↓
+Execution
+  ↓
+Runtime Kernel
+  ↓
+Connector
+  ↓
+Orchestrator
+  ↓
+Mission
+  ↓
+Provider
+  ↓
+Agent
+```
+
+> Fase I–XV tidak melakukan realignment — urutan yang berjalan memang membangun stack penuh. Yang diperbarui hanya dokumentasi agar mengikuti implementasi aktual.
+
+---
+
+## Kebijakan Sinkronisasi Dokumen (permanen)
+
+| Dokumen | Tanggung jawab |
+|---------|----------------|
+| **ROADMAP.md** | **Satu-satunya** sumber kebenaran fase proyek |
+| **README.md** | Hanya versi aktif, fase aktif, status proyek, + tautan ke ROADMAP.md |
+| **CHANGELOG.md** | Hanya histori perubahan rilis (tidak lagi memuat tabel fase) |
+| **docs/releases/manifest.md** | Hanya metadata rilis |
+| **docs/releases/version-history.md** | Hanya riwayat versi |
+
+**Aturan per fase baru:**
+Setiap fase baru hanya mengubah satu bagian pada ROADMAP.md:
+- Status fase berjalan → **DONE**
+- Status fase berikutnya → **IN PROGRESS**
+
+Dokumen lain cukup memperbarui versi dan merujuk ke roadmap induk.
+
+---
+
+## Catatan Arsitektur
+
+Dengan selesainya Phase XV, SAM telah memiliki **rantai runtime yang lengkap**.
+
+Setelah Phase XX (Platform Certification) selesai:
+- **Tidak lagi menambah runtime baru.**
+- Pengembangan bergeser dari *menambah subsystem* menjadi *memperluas kemampuan subsystem* yang sudah ada — melalui provider, plugin, dan integrasi.
+
+Tujuan: menjaga arsitektur **stabil, dapat diprediksi**, dan menghindari **pertumbuhan kompleksitas yang tidak terkendali**.
