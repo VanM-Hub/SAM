@@ -2,6 +2,7 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v20.0.0 | 2026-08-01 | XX (Workflow Runtime) | 8 sprints, 66 files, 210 tests |
 | v19.0.0 | 2026-08-01 | XIX (Cognitive Runtime) | 8 sprints, 8 folders, 201 tests |
 | v18.0.0 | 2026-07-31 | XVIII (Knowledge Runtime) | 8 sprints, 67 files, 207 tests |
 | v17.0.0 | 2026-07-31 | XVII (Memory Runtime) | 8 sprints, 67 files, 209 tests |

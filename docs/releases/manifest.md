@@ -5,11 +5,11 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v19.0.0 - Phase XIX (Cognitive Runtime)
-Next:         v20.0.0 - Operational Intelligence Console
+Current:      v20.0.0 - Phase XX (Workflow Runtime)
+Next:         v21.0.0 - Operational Intelligence Console
 Framework:    Python
 Build:        setuptools
-Test:         pytest (unit 2963 + integration 48 + api 28 + e2e 110)
+Test:         pytest (unit 3173 + integration 48 + api 28 + e2e 110)
 Lint:         ruff
 CI:           GitHub Actions (core + server + desktop)
 ```
@@ -35,6 +35,7 @@ CI:           GitHub Actions (core + server + desktop)
 | Memory Runtime | `src/sam/memory/` | 67 | Preview-only |
 | Knowledge Runtime | `src/sam/knowledge_runtime/` | 67 | Preview-only |
 | Cognitive Runtime | `src/sam/cognitive_runtime/` | 8 folders | Preview-only |
+| Workflow Runtime | `src/sam/workflow_runtime/` | 66 | Preview-only |
 
 ## Dependencies
 

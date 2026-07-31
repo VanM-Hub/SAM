@@ -1,5 +1,18 @@
 ﻿# Changelog
 
+## v20.0.0 (2026-08-01) - Workflow Runtime (Phase XX)
+
+### Added
+- New subsystem `src/sam/workflow_runtime/` - Workflow Runtime
+- 8 sprints (196-203), 66 files, 210 tests
+- Deterministic workflow composition above Mission/Agent/Skill and before Memory/Knowledge/Cognitive
+- NOT scheduling, NOT reasoning, no runtime selection, no inference
+- Sprint 196 Foundation, 197 Model, 198 Builder, 199 Runtime
+- Sprint 200 Catalog, 201 Monitoring, 202 Certification, 203 Runtime Integration
+- Read-only integration: Mission->Agent->Skill->Workflow->Memory->Knowledge->Cognitive->Orchestrator->Connector->Provider
+- Legacy `src/sam/workflow/` subsystem left untouched
+- Interim tag v20.0.0-alpha1 after Sprint 196
+
 ## v19.0.0 (2026-08-01) - Cognitive Runtime (Phase XIX)
 
 ### Added
