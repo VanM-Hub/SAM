@@ -1,5 +1,25 @@
 ﻿# Changelog
 
+## v24.0.0 (2026-08-01) - Program A: External Connector Integration
+
+### Added
+- Program A (Tahap 2 Product Integration) - External Connector Integration
+- 11 sprints (228-238), 160 tests baru di `tests/providers/`
+- `src/sam/providers/interfaces/` - Provider Interface (kontrak generik, immutable)
+- `src/sam/providers/llm/` - LLM Common Adapter (LLMAdapter ABC + DTO generik)
+- `src/sam/providers/openai/` - OpenAI Provider (gpt-4o, gpt-4o-mini, dsb)
+- `src/sam/providers/anthropic/` - Anthropic Provider (Claude series)
+- `src/sam/providers/gemini/` - Gemini Provider (generateContent)
+- `src/sam/providers/deepseek/` - DeepSeek Provider (OpenAI-compatible)
+- `src/sam/providers/ollama/` - Ollama Provider (model lokal)
+- `src/sam/providers/integration/` - ProviderIntegration runtime + OpenClawGateway
+- `src/sam/providers/connector_bridge/` - ConnectorProviderBridge (read-only ke Connector Runtime)
+- `src/sam/providers/execution/` - ExecutionPipeline (Preview -> Approval -> Execute)
+- `src/sam/providers/certification_program/` - ProgramCertifier (7 dimensi)
+- Semua provider melalui interface yang sama (LLMAdapter); tidak ada provider-specific logic di Agent/Mission/Workflow
+- Default external_calls = 0 di mode preview; approval-gated; immutable; deterministic
+- Regresi penuh: 2963 passed, 1 skipped (0 regresi, 0 layer violations)
+
 ## v23.0.0 (2026-08-01) - Artifact Runtime (Phase XXIII)
 
 ### Added
