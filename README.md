@@ -1,7 +1,7 @@
 ﻿# SAM Framework
 
 **The Autonomous Guardian Operating System for AI** 🔰  
-*Versi: v13.0.0 - Mission Runtime*
+*Versi: v14.0.0 - Provider Runtime*
 
 ---
 
@@ -26,6 +26,7 @@ SAM adalah platform guardian otonom — mengamati, melindungi, dan memulihkan si
 | **XI** | **112-122** | **v11.0.0** | **Universal Connector Runtime (11 sprints, 220 tests, 77 files)** |
 | **XII** | **123-133** | **v12.0.0** | **Orchestration Runtime (11 sprints, 172 tests, 78 files)** |
 | **XIII** | **134-143** | **v13.0.0** | **Mission Runtime (10 sprints, 145 tests, 70 files)** |
+| **XIV** | **144-155** | **v14.0.0** | **Provider Runtime (12 sprints, 164 tests, 10 folders)** |
 
 > **Phase XIV (menunggu):** Real Connector Implementations — adapter provider (OpenClaw, OpenAI, GitHub, Docker) sebagai plugin di atas fondasi yang sudah matang. Phase XV: Operational Intelligence Console.
 

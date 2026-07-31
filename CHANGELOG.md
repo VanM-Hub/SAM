@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## v14.0.0 (2026-07-31) - Provider Runtime (Phase XIV)
+
+### Added
+- New subsystem `src/sam/providers/` - Provider Runtime
+- 12 sprints (144-155), 10 folders, 164 tests
+- Adapter providers (preview-only) - filesystem, shell, sqlite, docker, openclaw
+- Infrastructure - discovery, session, routing, monitoring, runtime, certification
+- All providers build/validate/preview WITHOUT real execution
+- Sprint 144 Foundation (descriptor, capability, contract, protocol, base, registry, builder)
+- Sprint 145-149 Providers (filesystem, shell, sqlite, docker, openclaw)
+- Sprint 150 Discovery, 151 Session, 152 Routing, 153 Monitoring
+- Sprint 154 Provider Runtime (pipeline, report), 155 Certification
+- `src/sam/openclaw/` subsystem domain left untouched; openclaw provider is a separate adapter
+
 ## v13.0.0 (2026-07-31) - Mission Runtime (Phase XIII)
 
 ### Added
