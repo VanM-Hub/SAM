@@ -146,7 +146,21 @@ Pipeline akhir: Mission→Agent→Workflow→Memory→Knowledge→Cognitive→Po
 
 > Catatan: ROADMAP terdahulu menamai Program B sebagai **Execution Integration**. Nama resmi release ini,
 > sesuai keputusan pelaksanaan, adalah **Model Runtime Integration** (v25.0.0). Eksekusi provider-nyata
-> (approval→preview→execute) tetap menunggu instruksi lanjutan dan approval eksplisit + API key.
+> (approval→preview→execute) telah dilaksanakan sebagai **Real Execution Runtime** (v26.0.0) di bawah ini,
+> dengan approval eksplisit + API key dari environment (bukan hardcode).
+
+#### Real Execution Runtime  (dilaksanakan sebagai Program C, v26.0.0)
+
+Mengubah SAM dari preview-only menjadi eksekusi nyata lewat provider yang ada. **11 sprint (250–260)**:
+Execution Foundation (250) · Execution Request (251) · Approval Gate (252) · Provider Dispatcher (253) ·
+Execution Engine (254) · Rollback Runtime (255) · Monitoring (256) · Safety Runtime (257) ·
+Certification 7-dimensi (258) · Integration + pipeline akhir (259) · Real Provider Activation (260).
+
+Pipeline akhir: Mission→Workflow→Policy→Memory→Knowledge→Cognitive→Orchestrator→Connector→Provider→
+Model Runtime→Approval→Execution Runtime→Artifact. Preview-first; approval MANDATORY sebelum execute;
+execution cancellable; rollback metadata; full audit; deterministic sebelum execute; network HANYA di
+provider layer (`src/sam/providers/execution/`); synchronous runtime; immutable dataclass. 165 test baru,
+total suite modern 4154 passed. Provider-specific code & kredensial env terkunci di provider layer.
 
 #### Program C — Desktop Application
 
