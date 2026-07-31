@@ -18,6 +18,17 @@ from .foundation import (
     ConversationCognitiveBridge,
     DashboardCognitiveBridge,
 )
+from .context import (
+    CognitiveContext,
+    CognitiveSnapshot,
+    CognitiveScope,
+    VALID_SCOPES,
+    CognitiveReference,
+    CognitiveValidator,
+    CognitiveValidation,
+    ConversationContextBridge,
+    DashboardContextBridge,
+)
 
 __all__ = [
     "ExecutionCard",
@@ -28,4 +39,13 @@ __all__ = [
     "CognitiveRegistry",
     "ConversationCognitiveBridge",
     "DashboardCognitiveBridge",
+    "CognitiveContext",
+    "CognitiveSnapshot",
+    "CognitiveScope",
+    "VALID_SCOPES",
+    "CognitiveReference",
+    "CognitiveValidator",
+    "CognitiveValidation",
+    "ConversationContextBridge",
+    "DashboardContextBridge",
 ]
