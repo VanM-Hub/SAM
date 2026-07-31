@@ -111,7 +111,7 @@ Karakteristik kunci:
 
 ---
 
-## 3 Tahap Pembangunan (rencana Aster)
+## 3 Tahap Pembangunan (rencana strategis)
 
 Arsitektur SAM tidak akan terus menambah runtime tanpa batas. Setelah fondasi lengkap (v23.0.0 = **Architecture Complete**), prioritas bergeser dari membangun lapisan baru ke **Product Integration & Operationalization**.
 
@@ -276,7 +276,7 @@ Dokumen lain cukup memperbarui versi dan merujuk ke roadmap induk.
 
 Dengan selesainya 1–XXIII, SAM mencapai **Architecture Complete (v23.0.0)** — **rantai runtime deterministik yang lengkap** dari Mission sampai representasi policy, audit, artifact, workflow & kognitif siap dikonsumsi reasoning engine masa depan.
 
-**Arsitektur DIANGGAP SELESAI.** Keputusan dari Aster (2026-08-01):
+**Arsitektur DIANGGAP SELESAI.** Keputusan strategis (2026-08-01):
 - **Tidak lagi menambah runtime / lapisan arsitektur baru.**
 - Roadmap bergeser dari *Architecture Development* ke *Product Integration & Operationalization*.
 - Nilai terbesar berikutnya bukan dari runtime baru, melainkan membuat semua runtime yang ada bekerja bersama untuk menyelesaikan pekerjaan nyata.
@@ -287,7 +287,7 @@ Tujuan: menjaga arsitektur **stabil, dapat diprediksi**, menghindari **pertumbuh
 
 ## Roadmap Produk (pasca v23.0.0)
 
-> Keputusan Aster (2026-08-01): **SAM Architecture v23.0.0 = Architecture Complete**.
+> Keputusan strategis (2026-08-01): **SAM Architecture v23.0.0 = Architecture Complete**.
 > Roadmap bergeser dari Architecture Development → **Product Integration & Operationalization**.
 
 ```
