@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## v28.0.0 (2026-08-01) - Program E: Unified Intelligence Runtime
+
+### Sprint 261-268 (8 sprint, 40 file, 188 tes)
+- Foundation (261): descriptor, capability, contract, metadata, registry, builder, bridges
+- Runtime Registry (262): 23 runtime struktural, tanpa hardcode provider
+- Pipeline Graph (263): node/edge/graph/validator(DAG)/builder
+- Context Assembly (264): gabung Mission..Execution jadi Context
+- Intelligence Runtime (265): Registry->Graph->Context->Validation->Assembly->Report
+- Monitoring (266): monitor/metrics/snapshot/health/history
+- Certification (267): 7 dimensi deterministik
+- Integration read-only (268): pipeline final 17 tahap
+- Regression modern suite: **4617 passed, 1 skipped** (naik +188)
+- Constraint: 0 forbidden imports, 0 async/thread/socket/network, DTO frozen,
+  preview-only, external_calls==0, tanpa inference/LLM, bridge read-only
 ## v27.0.0 (2026-08-01) - Program D: Runtime Services & Deployment
 
 **Sprint 261-271 (11 sprint).** Menjadikan SAM sebagai layanan runtime nyata dengan lifecycle & kesiapan produksi.

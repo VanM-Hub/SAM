@@ -1,15 +1,15 @@
-# SAM Manifest
+﻿# SAM Manifest
 
 ```
 Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v27.0.0 - Program D (Runtime Services & Deployment)
-Next:         Program E - Desktop Application
+Current:      v28.0.0 - Program E (Unified Intelligence Runtime)
+Next:         Program F - Desktop Application
 Framework:    Python
 Build:        setuptools
-Test:         pytest (modern suite 4429 passed + 1 skipped; legacy folder excluded)
+Test:         pytest (modern suite 4617 passed + 1 skipped; legacy folder excluded)
 Lint:         ruff
 CI:           GitHub Actions (core + server + desktop)
 ```
@@ -53,6 +53,7 @@ CI:           GitHub Actions (core + server + desktop)
 | Model Runtime | `src/sam/model_runtime/` (Program B) | 106 | Preview-only |
 | Execution Runtime | `src/sam/execution_runtime/` (Program C) | 59 | Real Execution |
 | Runtime Service | `src/sam/runtime_service/` (Program D) | 53 | Runtime Service |
+| Unified Intelligence Runtime | `src/sam/intelligence_runtime/` (Program E) | 40 | Graph + Context + Certification |
 
 ## Dependencies
 
