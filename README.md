@@ -1,7 +1,7 @@
 ﻿# SAM Framework
 
 **The Autonomous Guardian Operating System for AI** 🔰
-*Versi: v24.0.0 - Program A (External Connector Integration)*
+*Versi: v25.0.0 - Program B (Model Runtime Integration)*
 
 ---
 
@@ -11,7 +11,7 @@ SAM adalah **Deterministic Operational Intelligence Platform** — mengobservasi
 
 AI hanyalah **salah satu provider** yang dapat dipasang melalui Connector Runtime — identitas SAM tetap utuh walaupun provider AI diganti.
 
-**Versi aktif:** v24.0.0 - Program A (External Connector Integration)
+**Versi aktif:** v25.0.0 - Program B (Model Runtime Integration)
 **Status:** Arsitektur SELESAI (v23.0.0) → Tahap 2 Product Integration (Program A–H)
 **Fase aktif:** Program A (External Connector) — selesai ✅
 

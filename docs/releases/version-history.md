@@ -2,6 +2,7 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v25.0.0 | 2026-08-01 | Program B (Model Runtime Integration) | 11 sprints 239-249, 89 files, 108 tests |
 | v24.0.0 | 2026-08-01 | Program A (External Connector) | 11 sprints 228-238, 160 tests |
 | v23.0.0 | 2026-08-01 | XXIII (Artifact Runtime) | 8 sprints, 66 files, 135 tests |
 | v22.0.0 | 2026-08-01 | XXII (Audit Runtime) | 8 sprints, 66 files, 173 tests |
