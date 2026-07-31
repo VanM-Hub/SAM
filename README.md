@@ -1,7 +1,7 @@
 ﻿# SAM Framework
 
 **The Autonomous Guardian Operating System for AI** 🔰  
-*Versi: v19.0.0 - Cognitive Runtime*
+*Versi: v20.0.0 - Workflow Runtime*
 
 ---
 
@@ -11,7 +11,7 @@ SAM adalah **Deterministic Operational Intelligence Platform** — mengobservasi
 
 AI hanyalah **salah satu provider** yang dapat dipasang melalui Connector Runtime — identitas SAM tetap utuh walaupun provider AI diganti.
 
-**Versi aktif:** v19.0.0 - Cognitive Runtime (Phase XIX)
+**Versi aktif:** v20.0.0 - Workflow Runtime (Phase XX)
 **Fase aktif terakhir:** XVII — selesai ✅
 **Status:** 17 dari 20 fase selesai (I–XVII).
 **Fase berikutnya:** XVIII — Execution Integration (PLANNED)

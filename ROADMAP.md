@@ -52,17 +52,18 @@ Karakteristik kunci:
 | XVII | Memory Runtime | ✅ DONE |
 | XVIII | Knowledge Runtime | ✅ DONE |
 | XIX | Cognitive Runtime | ✅ DONE |
-| XX | Operational Intelligence Console | 📋 PLANNED |
-| XXI | Execution Integration | 📋 PLANNED |
-| XXII | Platform Certification | 📋 PLANNED |
+| XX | Workflow Runtime | ✅ DONE |
+| XXI | Operational Intelligence Console | 📋 PLANNED |
+| XXII | Execution Integration | 📋 PLANNED |
+| XXIII | Platform Certification | 📋 PLANNED |
 
-> **Total: 22 phase.** Fase XXII adalah end-state. Sesudahnya bukan roadmap lagi, melainkan maintenance.
+> **Total: 23 phase.** Fase XXIII adalah end-state. Sesudahnya bukan roadmap lagi, melainkan maintenance.
 
 ---
 
 ## Fase Detail (I–XX)
 
-### Fase Selesai (I–XIX) — membangun seluruh "mesin"
+### Fase Selesai (I–XX) — membangun seluruh "mesin"
 
 | Phase | Sprint | Versi | Komponen Inti |
 |-------|--------|-------|---------------|
@@ -85,6 +86,7 @@ Karakteristik kunci:
 | XVII | 172-179 | v17.0.0 | Memory Runtime (8 sprints, 209 tests, 67 files) |
 | XVIII | 180-187 | v18.0.0 | Knowledge Runtime (8 sprints, 207 tests, 67 files) |
 | XIX | 188-195 | v19.0.0 | Cognitive Runtime (8 sprints, 201 tests, 8 folders) |
+| XX | 196-203 | v20.0.0 | Workflow Runtime (8 sprints, 210 tests, 66 files) |
 
 ### Fase Terencana (XVI–XXII)
 
@@ -94,9 +96,10 @@ Karakteristik kunci:
 | XVII | Memory Runtime | Memori preview-only: deskripsi, model, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Memory→Orchestrator→Connector→Provider) |
 | XVIII | Knowledge Runtime | Pengetahuan deterministik preview-only: foundation, model, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Memory→Knowledge→Orchestrator→Connector→Provider). No inference |
 | XIX | Cognitive Runtime | Konsolidasi output seluruh runtime (Mission/Agent/Skill/Memory/Knowledge) menjadi Cognitive Context deterministik siap dikonsumsi reasoning engine. Bukan LLM/AI, tanpa inferensi |
-| XX | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
-| XXI | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider (Real Provider Runtime: Filesystem, SQLite, Docker, Shell, OpenClaw aktif). Tetap manual approval. Belum autonomous |
-| XXII | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification |
+| XX | Workflow Runtime | Penyusun workflow deterministik di atas Mission/Agent/Skill dan sebelum Memory/Knowledge/Cognitive: urutan langkah + dependensi + batasan. No scheduling, no reasoning, no runtime select |
+| XXI | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
+| XXII | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider (Real Provider Runtime: Filesystem, SQLite, Docker, Shell, OpenClaw aktif). Tetap manual approval. Belum autonomous |
+| XXIII | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification |
 
 ---
 
@@ -155,9 +158,9 @@ Dokumen lain cukup memperbarui versi dan merujuk ke roadmap induk.
 
 ## Catatan Arsitektur
 
-Dengan selesainya Phase XIX, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi kognitif yang siap dikonsumsi reasoning engine masa depan.
+Dengan selesainya Phase XX, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi workflow & kognitif siap dikonsumsi reasoning engine masa depan.
 
-Setelah Phase XXII (Platform Certification) selesai:
+Setelah Phase XXIII (Platform Certification) selesai:
 - **Tidak lagi menambah runtime baru.**
 - Pengembangan bergeser dari *menambah subsystem* menjadi *memperluas kemampuan subsystem* yang sudah ada — melalui provider, plugin, dan integrasi.
 
