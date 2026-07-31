@@ -14,7 +14,16 @@ class TestHealthRoutes:
         assert health_router is not None
 
     def test_routes_registered(self):
-        routes = [r.path for r in health_router.routes]
+        routes = []
+        for r in health_router.routes:
+            if hasattr(r, "path"):
+                routes.append(getattr(r, "path"))
+            elif hasattr(r, "prefix"):
+                routes.append(getattr(r, "prefix"))
+            elif hasattr(r, "routes"):
+                for sub in getattr(r, "routes"):
+                    if hasattr(sub, "path"):
+                        routes.append(getattr(sub, "path"))
         assert "/" in routes
         assert "/ready" in routes
 
@@ -24,7 +33,16 @@ class TestRuntimeRoutes:
         assert runtime_router is not None
 
     def test_root_route(self):
-        routes = [r.path for r in runtime_router.routes]
+        routes = []
+        for r in runtime_router.routes:
+            if hasattr(r, "path"):
+                routes.append(getattr(r, "path"))
+            elif hasattr(r, "prefix"):
+                routes.append(getattr(r, "prefix"))
+            elif hasattr(r, "routes"):
+                for sub in getattr(r, "routes"):
+                    if hasattr(sub, "path"):
+                        routes.append(getattr(sub, "path"))
         assert "/" in routes
 
 
@@ -33,7 +51,16 @@ class TestEventsRoutes:
         assert events_router is not None
 
     def test_root_route(self):
-        routes = [r.path for r in events_router.routes]
+        routes = []
+        for r in events_router.routes:
+            if hasattr(r, "path"):
+                routes.append(getattr(r, "path"))
+            elif hasattr(r, "prefix"):
+                routes.append(getattr(r, "prefix"))
+            elif hasattr(r, "routes"):
+                for sub in getattr(r, "routes"):
+                    if hasattr(sub, "path"):
+                        routes.append(getattr(sub, "path"))
         assert "/" in routes
 
 
@@ -42,7 +69,16 @@ class TestMetricsRoutes:
         assert metrics_router is not None
 
     def test_root_route(self):
-        routes = [r.path for r in metrics_router.routes]
+        routes = []
+        for r in metrics_router.routes:
+            if hasattr(r, "path"):
+                routes.append(getattr(r, "path"))
+            elif hasattr(r, "prefix"):
+                routes.append(getattr(r, "prefix"))
+            elif hasattr(r, "routes"):
+                for sub in getattr(r, "routes"):
+                    if hasattr(sub, "path"):
+                        routes.append(getattr(sub, "path"))
         assert "/" in routes
 
 
