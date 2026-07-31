@@ -1,7 +1,7 @@
 ﻿# SAM Framework
 
-**The Autonomous Guardian Operating System for AI** 🔰  
-*Versi: v23.0.0 - Artifact Runtime*
+**The Autonomous Guardian Operating System for AI** 🔰
+*Versi: v24.0.0 - Program A (External Connector Integration)*
 
 ---
 
@@ -11,12 +11,11 @@ SAM adalah **Deterministic Operational Intelligence Platform** — mengobservasi
 
 AI hanyalah **salah satu provider** yang dapat dipasang melalui Connector Runtime — identitas SAM tetap utuh walaupun provider AI diganti.
 
-**Versi aktif:** v23.0.0 - Artifact Runtime (Phase XXIII)
-**Fase aktif terakhir:** XVII — selesai ✅
-**Status:** 17 dari 20 fase selesai (I–XVII).
-**Fase berikutnya:** XVIII — Execution Integration (PLANNED)
+**Versi aktif:** v24.0.0 - Program A (External Connector Integration)
+**Status:** Arsitektur SELESAI (v23.0.0) → Tahap 2 Product Integration (Program A–H)
+**Fase aktif:** Program A (External Connector) — selesai ✅
 
-> 📌 **Seluruh peta fase dari awal hingga akhir** (Phase I–XX) ada di [**ROADMAP.md**](ROADMAP.md) — sumber kebenaran tunggal.
+> 📌 **Peta fase dari awal hingga roadmap produk** ada di [**ROADMAP.md**](ROADMAP.md) — sumber kebenaran tunggal.
 
 ---
 
