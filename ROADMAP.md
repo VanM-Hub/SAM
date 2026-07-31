@@ -62,7 +62,7 @@ Karakteristik kunci:
 | XXIII | Artifact Runtime | ✅ DONE |
 | XXIV | Simulation Runtime (opsional) | 📋 PLANNED — TIDAK DIPRIORITASKAN |
 
-> **Total: 24 phase (XXIV opsional).** Fondasi arsitektur LENGKAP di v23.0.0. Fokus kini beralih ke **Product Integration & Operationalization** (Tahap 2: Program A–H; Tahap 3: Product Release) — lihat bagian *Roadmap Produk (pasca v23.0.0)* di bawah.
+> **Total: 24 phase (XXIV opsional).** Fondasi arsitektur LENGKAP di v23.0.0. Fokus kini beralih ke **Product Integration & Operationalization** (Tahap 2: Program A–J; Tahap 3: Product Release) — lihat bagian *Roadmap Produk (pasca v23.0.0)* di bawah.
 
 ---
 
@@ -127,7 +127,7 @@ Arsitektur SAM tidak akan terus menambah runtime tanpa batas. Setelah fondasi le
 
 > **Tahap 1 SELESAI di v23.0.0 (Architecture Complete).** Phase XXIV (Simulation) sengaja tidak diprioritaskan — seluruh runtime inti sudah siap dikonsumsi.
 
-### Tahap 2 — Product Integration (Program A–I)
+### Tahap 2 — Product Integration (Program A–J)
 
 Fokus: membuat runtime yang sudah ada **benar-benar bekerja bersama** untuk pekerjaan nyata. Menghubungkan Execution → Provider → Connector → provider nyata. Prinsip tetap: **approval dulu → preview dulu → baru execute**.
 
@@ -159,27 +159,40 @@ Pipeline akhir: Mission→Agent→Workflow→Memory→Knowledge→Cognitive→Po
 > Model Runtime→Approval→Execution Runtime→Artifact. Preview-first; approval MANDATORY sebelum execute;
 > execution cancellable; rollback metadata; full audit; network HANYA di provider layer; kredensial env.
 
-#### Program D — Desktop Application
+#### Program D — Runtime Services & Deployment
+
+> Dilaksanakan: **SELESAI (v27.0.0)**. Menjadikan SAM sebagai layanan runtime
+> nyata dengan lifecycle & kesiapan produksi. **11 sprint (261–271)**:
+> Runtime Service Foundation (261) · Configuration Runtime (262) · Secrets Runtime (263) ·
+> Runtime Lifecycle (264) · Dependency Injection (265) · Plugin Runtime (266) ·
+> Runtime API (267) · Server Runtime (268) · Monitoring (269) · Certification 7-dimensi (270) ·
+> Integration + pipeline akhir (271).
+> Pipeline akhir: Mission→Workflow→Policy→Agent→Skill→Memory→Knowledge→Cognitive→
+> Orchestrator→Connector→Provider→Execution Runtime→**Runtime Service**→External Provider.
+> Entry point resmi: `sam.runtime_service`. Kredensial HANYA dari environment,
+> tidak pernah hardcode. Semua DTO immutable, sync/deterministic, tanpa network di layer aplikasi.
+
+#### Program E — Desktop Application
 
 Mengaktifkan UI yang sudah lama ada. Prioritas: **Mission Designer · Workflow Designer · Policy Viewer · Audit Explorer · Artifact Explorer · Runtime Explorer · Connector Explorer · Provider Explorer · Execution Preview**. Semua memakai subsystem yang sudah tersedia.
 
-#### Program E — Conversation
+#### Program F — Conversation
 
 Conversation Runtime menjadi benar-benar berguna: buat mission, tampilkan workflow, cari policy, lihat audit, preview artifact, jalankan approval, preview execution, ringkas knowledge, cari memory. **Bukan lagi sekadar bridge.**
 
-#### Program F — Dashboard
+#### Program G — Dashboard
 
 Dashboard menjadi konsol operasional: **Mission · Workflow · Execution · Approval · Audit · Connector · Provider · Runtime · Health · Telemetry**.
 
-#### Program G — CLI
+#### Program H — CLI
 
 Perintah seperti: `sam mission` · `sam workflow` · `sam policy` · `sam audit` · `sam artifact` · `sam connector` · `sam provider` · `sam execution` · `sam preview` · `sam dashboard`.
 
-#### Program H — REST API
+#### Program I — REST API
 
 REST API untuk semua runtime, mis. `POST /missions` · `POST /workflow` · `POST /approval` · `POST /execution-preview` · `GET /audit` · `GET /artifact` · `GET /policy`.
 
-#### Program I — LLM Integration
+#### Program J — LLM Integration
 
 SAM memperoleh kemampuan AI nyata. Connector: **OpenAI · Anthropic · Gemini · Ollama · OpenClaw**. Tetap melalui **Connector Runtime → Provider Runtime → Agent Runtime** — bukan langsung memanggil provider.
 
