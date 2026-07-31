@@ -1,26 +1,23 @@
-name: Auto Rerun CI (triggered)
+name: Auto Rerun CI (manual)
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Target GitHub Actions run ID to rerun failed jobs'
+        required: true
+        type: string
 
 jobs:
   auto_rerun:
-    if: contains(github.event.head_commit.message, '[rerun-ci]')
     runs-on: ubuntu-latest
     steps:
-      - name: Show context
-        run: |
-          echo "Auto-rerun triggered by commit: ${{ github.event.head_commit.id }}"
-          echo "Commit message: ${{ github.event.head_commit.message }}"
-
       - name: Rerun failed jobs for target run
         env:
-          GHTOKEN: *** secrets.ZARA-TOKKEN }}
+          GHTOKEN: ${{ secrets.ZARA_RERUN_TOKEN }}
         run: |
           set -euo pipefail
-          # Ganti RUN_ID jika ingin target run lain
-          RUN_ID=30554633394
+          RUN_ID="${{ github.event.inputs.run_id }}"
           echo "Requesting rerun-failed-jobs for run $RUN_ID"
           http_code=$(curl -s -o /dev/stderr -w "%{http_code}" -X POST \
             -H "Authorization: Bearer $GHTOKEN" -H "Accept: application/vnd.github+json" \

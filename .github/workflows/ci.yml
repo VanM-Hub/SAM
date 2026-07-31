@@ -76,7 +76,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: CI diagnostics: show commit and test file
+      - name: "CI diagnostics: show commit and test file"
         run: |
           echo "CI DIAG: git HEAD=$(git rev-parse --short HEAD)"
           echo "CI DIAG: git status:"
@@ -98,7 +98,7 @@ jobs:
 
       - name: Run API / server tests
         run: |
-          # Server job runs only API tests — lower local coverage gate to avoid false negatives.
+          # Server job runs only API tests - lower local coverage gate to avoid false negatives.
           python -m pytest tests/api/ \
             --tb=short \
             --cov=src \
@@ -139,4 +139,4 @@ jobs:
     needs: [core, server, desktop]
     runs-on: ubuntu-latest
     steps:
-      - run: echo "SAM CI — jobs complete"
+      - run: echo "SAM CI - jobs complete"
