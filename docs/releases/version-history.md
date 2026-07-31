@@ -1,7 +1,8 @@
-# Version History
+﻿# Version History
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v28.0.0 | 2026-08-01 | Program E (Unified Intelligence Runtime) | 8 sprints 261-268, 40 files, 188 tests |
 | v27.0.0 | 2026-08-01 | Program D (Runtime Services & Deployment) | 11 sprints 261-271, 53 files, 187 tests |
 | v26.0.0 | 2026-08-01 | Program C (Real Execution Runtime) | 11 sprints 250-260, 59 files, 165 tests |
 | v24.0.0 | 2026-08-01 | Program A (External Connector) | 11 sprints 228-238, 160 tests |
