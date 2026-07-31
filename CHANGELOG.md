@@ -1,5 +1,37 @@
 ﻿# Changelog
 
+## v11.0.0 (2026-07-31) - Universal Connector Runtime (Phase XI)
+
+### Added
+- New subsystem `src/sam/connectors/` — Universal Connector Runtime
+- 11 sprint (112-122), 77 files, 220 tests
+- Provider-agnostic, preview-only connector framework
+- Sprint 112 Foundation (registry, descriptor, capability, contract, metadata)
+- Sprint 113 Discovery (locator, catalog, filter, validator)
+- Sprint 114 Capability (profile, matrix, validator, selector, report)
+- Sprint 115 Binding (registry, validator, history)
+- Sprint 116 Session (manager, registry, snapshot, summary)
+- Sprint 117 Routing (router, policy, validator, summary)
+- Sprint 118 Translation (internal DTO -> neutral DTO, not provider format)
+- Sprint 119 Preview (dry-run engine; external_calls always 0)
+- Sprint 120 Monitoring (metrics, health, statistics, snapshot, history)
+- Sprint 121 Runtime (runtime, pipeline, coordinator, status, report)
+- Sprint 122 Certification (certifier, score, validator, report, manifest)
+
+### Constraints upheld
+- No network call / no HTTP / no SDK / no API key / no OAuth
+- No async / no thread (AST scan 0 violations)
+- No cross-import to other subsystems (42 baseline unchanged)
+- 0 layer violations; DTO immutable (frozen)
+- Conversation & Dashboard bridges read-only; 100% preview-only
+
+### Docs
+- `docs/reports/OP-1100_Connector_Runtime_PhaseXI_Complete.md`
+- `docs/sprint-reports/sprint-122/Completion_Report.md`
+
+### Quality
+- Full suite green: unit 1421 / integration 48 / api 28 / e2e 110
+
 ## v10.2.2 (2026-07-31) - Repository Maintenance & Consistency
 
 ### Fixed (correctness)
