@@ -29,7 +29,9 @@ Karakteristik kunci:
 
 ---
 
-## Ringkasan Fase (I–XX)
+## Ringkasan Fase (I–XXIV)
+
+> **Arsitektur SAM kini berada di ~85–90% perjalanan.** Fase I–XX (fondasi runtime, 17 runtime inti + Workflow) SELESAI. Sisa pembangunan dibagi menjadi **3 Tahap**: lengkapi fondasi (XXI–XXIV), integrasi nyata, lalu produk.
 
 | Phase | Nama | Status |
 |-------|------|--------|
@@ -53,15 +55,16 @@ Karakteristik kunci:
 | XVIII | Knowledge Runtime | ✅ DONE |
 | XIX | Cognitive Runtime | ✅ DONE |
 | XX | Workflow Runtime | ✅ DONE |
-| XXI | Operational Intelligence Console | 📋 PLANNED |
-| XXII | Execution Integration | 📋 PLANNED |
-| XXIII | Platform Certification | 📋 PLANNED |
+| XXI | Policy Runtime | 📋 PLANNED |
+| XXII | Audit Runtime | 📋 PLANNED |
+| XXIII | Artifact Runtime | 📋 PLANNED |
+| XXIV | Simulation Runtime (opsional) | 📋 PLANNED |
 
-> **Total: 23 phase.** Fase XXIII adalah end-state. Sesudahnya bukan roadmap lagi, melainkan maintenance.
+> **Total: 24 phase (XXIV opsional).** Setelah fondasi arsitektur lengkap, fokus bergeser ke Tahap 2 (integrasi nyata) dan Tahap 3 (produk).
 
 ---
 
-## Fase Detail (I–XX)
+## Fase Detail (I–XXIV)
 
 ### Fase Selesai (I–XX) — membangun seluruh "mesin"
 
@@ -88,7 +91,7 @@ Karakteristik kunci:
 | XIX | 188-195 | v19.0.0 | Cognitive Runtime (8 sprints, 201 tests, 8 folders) |
 | XX | 196-203 | v20.0.0 | Workflow Runtime (8 sprints, 210 tests, 66 files) |
 
-### Fase Terencana (XVI–XXII)
+### Fase Terencana (XVI–XXIV)
 
 | Phase | Nama | Deskripsi |
 |-------|------|-----------|
@@ -97,9 +100,48 @@ Karakteristik kunci:
 | XVIII | Knowledge Runtime | Pengetahuan deterministik preview-only: foundation, model, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Memory→Knowledge→Orchestrator→Connector→Provider). No inference |
 | XIX | Cognitive Runtime | Konsolidasi output seluruh runtime (Mission/Agent/Skill/Memory/Knowledge) menjadi Cognitive Context deterministik siap dikonsumsi reasoning engine. Bukan LLM/AI, tanpa inferensi |
 | XX | Workflow Runtime | Penyusun workflow deterministik di atas Mission/Agent/Skill dan sebelum Memory/Knowledge/Cognitive: urutan langkah + dependensi + batasan. No scheduling, no reasoning, no runtime select |
-| XXI | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
-| XXII | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider (Real Provider Runtime: Filesystem, SQLite, Docker, Shell, OpenClaw aktif). Tetap manual approval. Belum autonomous |
-| XXIII | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification |
+| XXI | Policy Runtime | Menyatukan seluruh policy lintas subsystem (saat ini policy masih tersebar): deskripsi, model policy, builder, katalog, monitoring, sertifikasi + integrasi read-only |
+| XXII | Audit Runtime | Immutable audit trail: provenance, traceability end-to-end, integritas log. Semua operasi terekam deterministik, tanpa bisa diubah |
+| XXIII | Artifact Runtime | Semua output SAM menjadi artifact resmi: manifest, versioning, signing. Representasi immutable artifact + siklus hidupnya |
+| XXIV | Simulation Runtime (opsional) | Menjalankan simulasi pipeline tanpa menyentuh runtime lain — dry-run end-to-end dalam mode preview |
+
+---
+
+## 3 Tahap Pembangunan (rencana Aster)
+
+Arsitektur SAM tidak akan terus menambah runtime tanpa batas. Setelah fondasi ini lengkap, prioritas bergeser dari membangun lapisan baru ke **menghubungkan semua lapisan menjadi sistem yang benar-benar dapat digunakan**.
+
+### Tahap 1 — Lengkapi Fondasi (XXI–XXIV, 3–4 phase)
+
+Hanya runtime mandiri yang masih layak dibangun:
+
+| Phase | Runtime | Tujuan |
+|-------|---------|--------|
+| XXI | **Policy Runtime** | Menyatukan seluruh policy lintas subsystem (saat ini tersebar) |
+| XXII | **Audit Runtime** | Immutable audit trail, provenance, traceability end-to-end |
+| XXIII | **Artifact Runtime** | Output SAM menjadi artifact resmi: manifest, versioning, signing |
+| XXIV (opsional) | **Simulation Runtime** | Simulasi pipeline tanpa menyentuh runtime lain |
+
+> **Maksimal 3–4 phase.** Setelah Phase XX, perkiraan arsitektur berada di ~85–90% perjalanan.
+
+### Tahap 2 — Integrasi Nyata (tanpa runtime baru)
+
+Fokus beralih ke menghubungkan runtime yang ada dengan kemampuan nyata:
+
+- **OpenClaw** · **Docker** · **Filesystem** · **SQLite** · **GitHub**
+- **LLM Connector** · **Tool Registry** · **CLI** · **Desktop UI**
+
+> Inilah yang membuat SAM benar-benar berguna — Runtime yang telah dibangun kini benar-benar berjalan.
+
+### Tahap 3 — SAM Menjadi Produk
+
+Hampir tanpa penambahan arsitektur besar:
+
+- **Dashboard operasional** · **Mission Designer** · **Workflow Designer**
+- **Approval Console** · **Monitoring Console**
+- **CLI** · **Desktop Application** · **API Server**
+
+> Setelah fondasi + integrasi, SAM mencapai **Architecture Complete** — menjadi produk yang memberikan nilai nyata bagi pengguna.
 
 ---
 
@@ -160,8 +202,9 @@ Dokumen lain cukup memperbarui versi dan merujuk ke roadmap induk.
 
 Dengan selesainya Phase XX, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi workflow & kognitif siap dikonsumsi reasoning engine masa depan.
 
-Setelah Phase XXIII (Platform Certification) selesai:
-- **Tidak lagi menambah runtime baru.**
-- Pengembangan bergeser dari *menambah subsystem* menjadi *memperluas kemampuan subsystem* yang sudah ada — melalui provider, plugin, dan integrasi.
+Setelah fondasi arsitektur lengkap (Phase XXIV, lihat bagian *3 Tahap Pembangunan*):
+- **Tidak lagi menambah runtime / lapisan arsitektur baru.**
+- Pengembangan bergeser dari *menambah subsystem* menjadi *menghubungkan dan memperluas* apa yang sudah ada — melalui Tahap 2 (integrasi nyata: OpenClaw, Docker, Filesystem, SQLite, GitHub, LLM Connector, Tool Registry, CLI, Desktop UI) dan Tahap 3 (menjadi produk: dashboard, designer, console, API).
+- SAM mencapai **Architecture Complete** dan mulai memberikan **nilai nyata bagi pengguna**.
 
 Tujuan: menjaga arsitektur **stabil, dapat diprediksi**, dan menghindari **pertumbuhan kompleksitas yang tidak terkendali**.
