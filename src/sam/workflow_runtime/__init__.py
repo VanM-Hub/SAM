@@ -97,6 +97,21 @@ from .certification import (
     ConversationCertificationBridge,
     DashboardCertificationBridge,
 )
+from .integration import (
+    WorkflowRuntimePipeline,
+    WorkflowRuntimePipelineRun,
+    WorkflowIntegrationStage,
+    INTEGRATION_ROUTE,
+    WorkflowRuntimeReport,
+    WorkflowRuntimeReporter,
+    WorkflowRuntimeManifest,
+    WorkflowRuntimeCertification,
+    WorkflowRuntimeCertifier,
+    WorkflowRuntimeRegistry,
+    WorkflowRuntimeRegistryEntry,
+    ConversationIntegrationBridge,
+    DashboardIntegrationBridge,
+)
 
 __all__ = [
     "WorkflowCard",
@@ -176,4 +191,17 @@ __all__ = [
     "WorkflowCertificationValidator",
     "ConversationCertificationBridge",
     "DashboardCertificationBridge",
+    "WorkflowRuntimePipeline",
+    "WorkflowRuntimePipelineRun",
+    "WorkflowIntegrationStage",
+    "INTEGRATION_ROUTE",
+    "WorkflowRuntimeReport",
+    "WorkflowRuntimeReporter",
+    "WorkflowRuntimeManifest",
+    "WorkflowRuntimeCertification",
+    "WorkflowRuntimeCertifier",
+    "WorkflowRuntimeRegistry",
+    "WorkflowRuntimeRegistryEntry",
+    "ConversationIntegrationBridge",
+    "DashboardIntegrationBridge",
 ]
