@@ -40,8 +40,8 @@ temp_screenshot.png
 htmlcov/
 test-results.xml
 
-# Local runtime data
-workspace/
+# Local runtime data (root-level only; NOT src/sam/.../workspace subpackages)
+/workspace/
 approvals.json
 openclaw/status/
 memory/
