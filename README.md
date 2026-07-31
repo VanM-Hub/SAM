@@ -7,29 +7,16 @@
 
 ## Ringkasan
 
-SAM adalah platform guardian otonom - mengamati, melindungi, dan memulihkan sistem AI. Dikembangkan dari foundation hingga runtime kernel (10 fase) + Universal Connector Runtime (Phase XI) + Orchestration Runtime (Phase XII) + Mission Runtime (Phase XIII) + Provider Runtime (Phase XIV) + Agent Runtime (Phase XV).
+SAM adalah **Deterministic Operational Intelligence Platform** — mengobservasi, memahami, merencanakan, mengoordinasikan, menyiapkan, dan mengawasi operasi lintas sistem secara aman, dapat diaudit, provider-agnostic, dan dapat dipertanggungjawabkan.
 
-**Status: 15 fase selesai dari 15 fase terencana.**
+AI hanyalah **salah satu provider** yang dapat dipasang melalui Connector Runtime — identitas SAM tetap utuh walaupun provider AI diganti.
 
-| Fase | Sprint | Versi | Komponen Utama |
-|------|--------|-------|---------------|
-| I | 1–7 | v0.0.1 | Foundation: agent state, telemetry, contracts |
-| II | 8–17 | v2.0.0 | Operational Brain (plan, archive, monitor, visualize) |
-| III | 18–29 | v3.0.0 | Guardian Intelligence (observation, policies, event engine) |
-| IV | 30–42 | v4.0.0 | Guardian Runtime (dispatcher, reasoning, learning, dashboard) |
-| V | 43–58 | v5.0.0–v6.0.0 | Guardian Live Runtime + Live Situation Intelligence |
-| VI | 59–75 | v6.0.0–v7.0.0 | Decision Runtime (certification, finalization, lifecycle) |
-| VII | 76–81 | v7.0.0–v8.0.0 | Operational Brain Full Integration |
-| VIII | 82–87 | v8.0.0–v8.5.0 | Activation Runtime (6 sprints, ~48 files, pipeline lengkap) |
-| IX | 88–99 | v9.0.0–v9.11.0 | Execution Runtime (12 sprints, ~1,600 tests, 15 bridges) |
-| **X** | **100-111** | **v10.0.0** | **Runtime Kernel (12 sprints, 1,719 tests, 69 files, 60 cards)** |
-| **XI** | **112-122** | **v11.0.0** | **Universal Connector Runtime (11 sprints, 220 tests, 77 files)** |
-| **XII** | **123-133** | **v12.0.0** | **Orchestration Runtime (11 sprints, 172 tests, 78 files)** |
-| **XIII** | **134-143** | **v13.0.0** | **Mission Runtime (10 sprints, 145 tests, 70 files)** |
-| **XIV** | **144-155** | **v14.0.0** | **Provider Runtime (12 sprints, 164 tests, 10 folders)** |
-| **XV** | **156-163** | **v15.0.0** | **Agent Runtime (8 sprints, 211 tests, 11 folders)** |
+**Versi aktif:** v15.0.0 — Agent Runtime (Phase XV)
+**Fase aktif terakhir:** XV — selesai ✅
+**Status:** 15 dari 20 fase selesai (I–XV).
+**Fase berikutnya:** XVI — Real Provider Runtime (PLANNED)
 
-> **Phase XIV (menunggu):** Real Connector Implementations — adapter provider (OpenClaw, OpenAI, GitHub, Docker) sebagai plugin di atas fondasi yang sudah matang. Phase XV: Operational Intelligence Console.
+> 📌 **Seluruh peta fase dari awal hingga akhir** (Phase I–XX) ada di [**ROADMAP.md**](ROADMAP.md) — sumber kebenaran tunggal.
 
 ---
 
