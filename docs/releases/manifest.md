@@ -5,13 +5,13 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v10.0.0 — Phase X (Runtime Kernel)
-Next:         v10.0.1 — Repository Stabilization
+Current:      v11.0.0 — Phase XI (Universal Connector Runtime)
+Next:         v12.0.0 — Real Connector Implementations
 Framework:    Python
 Build:        setuptools
-Test:         pytest ~9,661 tests
+Test:         pytest (unit 1421 + integration 48 + api 28 + e2e 110)
 Lint:         ruff
-CI:           GitHub Actions (core + desktop)
+CI:           GitHub Actions (core + server + desktop)
 ```
 
 ## Subsystem Map
@@ -26,6 +26,7 @@ CI:           GitHub Actions (core + desktop)
 | Execution | `src/sam/execution/runtime/` | ~40 | Stable |
 | Approval | `src/sam/approval/` | ~50 | Stable |
 | Runtime Kernel | `src/sam/runtime_kernel/` | 69 | Preview-only |
+| Connector Runtime | `src/sam/connectors/` | 77 | Preview-only |
 
 ## Dependencies
 
