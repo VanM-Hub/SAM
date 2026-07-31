@@ -97,6 +97,19 @@ from .certification import (
     ConversationCertificationBridge,
     DashboardCertificationBridge,
 )
+from .integration import (
+    KnowledgeRuntimePipeline,
+    KnowledgeRuntimePipelineRun,
+    KnowledgeIntegrationStage,
+    INTEGRATION_ROUTE,
+    KnowledgeRuntimeReport,
+    KnowledgeRuntimeReporter,
+    KnowledgeRuntimeManifest,
+    KnowledgeRuntimeCertification,
+    KnowledgeRuntimeCertifier,
+    ConversationIntegrationBridge,
+    DashboardIntegrationBridge,
+)
 
 __all__ = [
     "KnowledgeDescriptor",
@@ -179,4 +192,15 @@ __all__ = [
     "KnowledgeCertificationValidator",
     "ConversationCertificationBridge",
     "DashboardCertificationBridge",
+    "KnowledgeRuntimePipeline",
+    "KnowledgeRuntimePipelineRun",
+    "KnowledgeIntegrationStage",
+    "INTEGRATION_ROUTE",
+    "KnowledgeRuntimeReport",
+    "KnowledgeRuntimeReporter",
+    "KnowledgeRuntimeManifest",
+    "KnowledgeRuntimeCertification",
+    "KnowledgeRuntimeCertifier",
+    "ConversationIntegrationBridge",
+    "DashboardIntegrationBridge",
 ]
