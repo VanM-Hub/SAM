@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sam-ops"
-version = "10.2.2"
+version = "11.0.0"
 description = "SAM — The Autonomous Guardian Operating System for AI"
 readme = "README.md"
 license = {text = "Apache-2.0"}
