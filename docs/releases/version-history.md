@@ -2,6 +2,7 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v27.0.0 | 2026-08-01 | Program D (Runtime Services & Deployment) | 11 sprints 261-271, 53 files, 187 tests |
 | v26.0.0 | 2026-08-01 | Program C (Real Execution Runtime) | 11 sprints 250-260, 59 files, 165 tests |
 | v24.0.0 | 2026-08-01 | Program A (External Connector) | 11 sprints 228-238, 160 tests |
 | v23.0.0 | 2026-08-01 | XXIII (Artifact Runtime) | 8 sprints, 66 files, 135 tests |
@@ -42,3 +43,4 @@
 | v1.0.0 | 2026-07-24 | I (Foundation) | Foundation |
 | v0.1.0 | 2026-07-24 | I | Phase I completion |
 | v0.0.1 | 2026-07-24 | I | Project bootstrap |
+

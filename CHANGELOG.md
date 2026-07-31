@@ -1,7 +1,27 @@
 ﻿# Changelog
 
-## v26.0.0 (2026-08-01) - Program C: Real Execution Runtime
+## v27.0.0 (2026-08-01) - Program D: Runtime Services & Deployment
 
+**Sprint 261-271 (11 sprint).** Menjadikan SAM sebagai layanan runtime nyata dengan lifecycle & kesiapan produksi.
+
+- **261 Runtime Service Foundation** - `src/sam/runtime_service/` (53 file): descriptor, metadata, contract, config, registry, runtime service, conversation/dashboard runtime service.
+- **262 Configuration Runtime** - env/yaml/json/override; ConfigSnapshot immutable (MappingProxyType).
+- **263 Secrets Runtime** - semua kredensial hanya dari environment, tidak pernah hardcode; SUPPORTED_SECRETS (OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, OpenClaw URL, Ollama Host).
+- **264 Runtime Lifecycle** - Created -> Initializing -> Ready -> Running -> Stopping -> Stopped|Failed; transition validator + history.
+- **265 Dependency Injection** - container (provider/runtime/service factory + resolver).
+- **266 Plugin Runtime** - OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, Ollama, OpenClaw; metadata only, tanpa execution call.
+- **267 Runtime API** - request/response/status/health; internal, belum HTTP.
+- **268 Server Runtime** - gabung Runtime+Connector+Provider+Execution layer; startup/shutdown/health.
+- **269 Monitoring** - metrics, service monitor, statistics, snapshot, report.
+- **270 Certification** - sertifikasi 7 dimensi (Configuration, Security, Lifecycle, Plugin, Determinism, Immutability, ProductionReadiness).
+- **271 Integration** - pipeline akhir 14 tahap; entry point resmi `sam.runtime_service`; RuntimeRegistry/Summary/Manifest/Report.
+
+Pipeline akhir: Mission->Workflow->Policy->Agent->Skill->Memory->Knowledge->Cognitive->Orchestrator->Connector->Provider->Execution Runtime->**Runtime Service**->External Provider.
+
+Kredensial HANYA dari environment. Semua DTO immutable, sync/deterministic, tanpa network di layer aplikasi. +187 test baru (total 4429 passed, 1 skipped).
+
+### Added
+## v26.0.0 (2026-08-01) - Program C: Real Execution Runtime
 ### Added
 - Program C (Tahap 2 Product Integration) - Real Execution Runtime
 - 11 sprints (250-260), 165 test baru di `tests/execution_runtime/`
