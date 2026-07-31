@@ -91,6 +91,21 @@ from .certification import (
     ConversationCertificationBridge,
     DashboardCertificationBridge,
 )
+from .integration import (
+    AuditRuntimePipeline,
+    AuditRuntimePipelineRun,
+    AuditIntegrationStage,
+    INTEGRATION_ROUTE,
+    AuditRuntimeReport,
+    AuditRuntimeReporter,
+    AuditRuntimeManifest,
+    AuditRuntimeCertification,
+    AuditRuntimeCertifier,
+    AuditRuntimeRegistry,
+    AuditRuntimeRegistryEntry,
+    ConversationIntegrationBridge,
+    DashboardIntegrationBridge,
+)
 
 __all__ = [
     "AuditDescriptor",
@@ -170,4 +185,17 @@ __all__ = [
     "AuditCertificationValidator",
     "ConversationCertificationBridge",
     "DashboardCertificationBridge",
+    "AuditRuntimePipeline",
+    "AuditRuntimePipelineRun",
+    "AuditIntegrationStage",
+    "INTEGRATION_ROUTE",
+    "AuditRuntimeReport",
+    "AuditRuntimeReporter",
+    "AuditRuntimeManifest",
+    "AuditRuntimeCertification",
+    "AuditRuntimeCertifier",
+    "AuditRuntimeRegistry",
+    "AuditRuntimeRegistryEntry",
+    "ConversationIntegrationBridge",
+    "DashboardIntegrationBridge",
 ]
