@@ -25,6 +25,9 @@ ACC/
 # Environment
 .env
 
+# uv lockfile root (project memakai uv.lock di src/)
+/uv.lock
+
 # Temp files
 *.log
 *.log.*

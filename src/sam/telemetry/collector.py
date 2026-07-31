@@ -42,11 +42,18 @@ class MetricsCollector:
         logger.info("metrics.collector.stopped")
 
     async def _collect(self):
-        import psutil
-
-        cpu = psutil.cpu_percent(interval=0.1)
-        mem = psutil.virtual_memory().percent
-        uptime = self._read_uptime()
+        try:
+            import psutil
+            cpu = psutil.cpu_percent(interval=0.1)
+            mem = psutil.virtual_memory().percent
+            uptime = self._read_uptime()
+            last_error = self._metrics.last_error
+        except Exception as e:
+            # Fallback jika psutil tidak tersedia — jangan crash collector.
+            cpu = 0.0
+            mem = 0.0
+            uptime = 0.0
+            last_error = str(e)
 
         self._metrics = RuntimeMetrics(
             cpu_percent=cpu,
@@ -54,7 +61,7 @@ class MetricsCollector:
             uptime_seconds=uptime,
             active_sessions=self._metrics.active_sessions,
             event_count=self._metrics.event_count,
-            last_error=self._metrics.last_error,
+            last_error=last_error,
         )
 
     def _read_uptime(self) -> float:

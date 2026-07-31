@@ -55,8 +55,10 @@ class TestServiceManager:
 
 @pytest.mark.asyncio
 async def test_desktop_launcher_imports():
+    """Modul desktop launcher (dirujuk Dockerfile) harus tersedia."""
     import sam.launcher.desktop
     assert hasattr(sam.launcher.desktop, "main")
+    assert callable(sam.launcher.desktop.main)
 
 
 class TestDeploymentFiles:
@@ -83,5 +85,14 @@ class TestDeploymentFiles:
         assert os.path.exists("scripts/launcher.sh")
 
     def test_sam_service_exists(self):
-        import os
-        assert os.path.exists("sam.service")
+        """Unit file systemd di-generate (bukan file statis di repo).
+        Verifikasi generator menghasilkan konten valid."""
+        import os, tempfile
+        from sam.service.systemd import generate_unit_file
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "sam.service")
+            generate_unit_file(path)
+            assert os.path.exists(path)
+            content = open(path).read()
+            assert "Description=SAM" in content
+            assert "ExecStart=" in content
