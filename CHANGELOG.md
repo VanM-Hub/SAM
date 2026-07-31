@@ -1,5 +1,38 @@
 ﻿# Changelog
 
+## v12.0.0 (2026-07-31) - Orchestration Runtime (Phase XII)
+
+### Added
+- New subsystem `src/sam/orchestrator/` - Orchestration Runtime
+- 11 sprint (123-133), 78 files, 172 tests
+- Coordinates all SAM runtimes - arranges and directs, never executes
+- Sprint 123 Foundation (context, request, descriptor, registry, builder)
+- Sprint 124 Runtime Discovery (catalog, locator, inventory, validator)
+- Sprint 125 Runtime Selection (selector, policy, score, summary, validator)
+- Sprint 126 Pipeline Builder (descriptor, builder, stage, validator, summary)
+- Sprint 127 Dependency Resolver (graph, resolver, validator, report, snapshot)
+- Sprint 128 Scheduling (request, plan, validator, registry, summary)
+- Sprint 129 Coordination (coordinator, state, report, validator, history)
+- Sprint 130 Synchronization (request, snapshot, state, validator, summary)
+- Sprint 131 Monitoring (metrics, health, history, statistics, report)
+- Sprint 132 Runtime Engine (engine, pipeline, status, report, snapshot)
+- Sprint 133 Certification (certifier, score, manifest, validator, summary)
+
+### Constraints upheld
+- No network / no HTTP / no socket / no connector provider
+- No async / no thread (AST scan 0 violations)
+- Does not modify any other runtime; 0 layer violations
+- DTO immutable (frozen); synchronous; deterministic
+- Conversation & Dashboard bridges read-only; orchestrator plans only (never executes)
+
+### Result
+- SAM pipeline unified: Guardian -> Decision -> Approval -> Operational Brain -> Activation -> Execution -> Runtime Kernel -> Connector -> **Orchestration**
+- 172 new tests (unit); full suite unit 1593 + integration 48 + api 28 + e2e 110 all green
+
+### Docs
+- `docs/reports/OP-1200_Orchestration_Runtime_PhaseXII_Complete.md`
+- `docs/sprint-reports/sprint-133/Completion_Report.md`
+
 ## v11.0.0 (2026-07-31) - Universal Connector Runtime (Phase XI)
 
 ### Added
