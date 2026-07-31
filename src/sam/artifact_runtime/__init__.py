@@ -16,6 +16,19 @@ from ..artifact_runtime.foundation.conversation_artifact import (
 from ..artifact_runtime.foundation.dashboard_artifact import (
     DashboardArtifactBridge,
 )
+from ..artifact_runtime.model import (
+    Artifact,
+    ArtifactReference,
+    ArtifactManifest,
+    ArtifactMetadata,
+    ArtifactValidator,
+)
+from ..artifact_runtime.model.conversation_model import (
+    ConversationModelBridge,
+)
+from ..artifact_runtime.model.dashboard_model import (
+    DashboardModelBridge,
+)
 
 __all__ = [
     "ArtifactDescriptor",
@@ -25,4 +38,11 @@ __all__ = [
     "ArtifactRegistry",
     "ConversationArtifactBridge",
     "DashboardArtifactBridge",
+    "Artifact",
+    "ArtifactReference",
+    "ArtifactManifest",
+    "ArtifactMetadata",
+    "ArtifactValidator",
+    "ConversationModelBridge",
+    "DashboardModelBridge",
 ]
