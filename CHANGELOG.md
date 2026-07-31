@@ -1,5 +1,37 @@
 ﻿# Changelog
 
+## v13.0.0 (2026-07-31) - Mission Runtime (Phase XIII)
+
+### Added
+- New subsystem `src/sam/mission_runtime/` - Mission Runtime
+- 10 sprint (134-143), 70 files, 145 tests
+- Makes the entire pipeline mission-oriented - all runtimes work toward one shared Mission object
+- Sprint 134 Foundation (context, descriptor, request, registry, builder)
+- Sprint 135 Definition (definition, scope, constraints, metadata, validator)
+- Sprint 136 Objectives (objective, builder, registry, validator, summary)
+- Sprint 137 Resources (descriptor, inventory, allocator, validator, summary)
+- Sprint 138 Timeline (timeline, builder, checkpoint, validator, summary)
+- Sprint 139 State (state, registry, transition, validator, history)
+- Sprint 140 Coordination (coordinator, plan, registry, validator, summary)
+- Sprint 141 Monitoring (metrics, health, history, statistics, report)
+- Sprint 142 Runtime (runtime, pipeline, snapshot, status, reporter)
+- Sprint 143 Certification (certifier, score, manifest, validator, summary)
+
+### Constraints upheld
+- No network / no HTTP / no socket / no connector/provider / no subprocess
+- No async / no thread (AST scan 0 violations)
+- Does not modify any other subsystem; 0 layer violations
+- DTO immutable (frozen); synchronous; deterministic
+- Conversation & Dashboard bridges read-only; mission runtime manages only definition, state, coordination, lifecycle (never executes)
+
+### Result
+- SAM pipeline unified: Guardian -> Decision -> Approval -> Operational Brain -> Activation -> Execution -> Runtime Kernel -> Connector -> Orchestration -> **Mission**
+- 145 new tests (unit); full suite unit 1738 + integration 48 + api 28 + e2e 110 all green
+
+### Docs
+- `docs/reports/OP-1300_Mission_Runtime_PhaseXIII_Complete.md`
+- `docs/sprint-reports/sprint-143/Completion_Report.md`
+
 ## v12.0.0 (2026-07-31) - Orchestration Runtime (Phase XII)
 
 ### Added
