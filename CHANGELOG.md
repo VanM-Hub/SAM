@@ -1,5 +1,35 @@
 ﻿# Changelog
 
+## v26.0.0 (2026-08-01) - Program C: Real Execution Runtime
+
+### Added
+- Program C (Tahap 2 Product Integration) - Real Execution Runtime
+- 11 sprints (250-260), 165 test baru di `tests/execution_runtime/`
+- `src/sam/execution_runtime/` - 59 modul (immutable `@dataclass(frozen=True)`)
+- Sprint 250 Execution Foundation (descriptor, capability, contract, metadata, registry)
+- Sprint 251 Execution Request (request, response, context, option, validation) + `approver` field
+- Sprint 252 Approval Gate (gate, validator, summary, report, pipeline)
+- Sprint 253 Provider Dispatcher (dispatcher, selector, history, summary, pipeline)
+- Sprint 254 Execution Engine (pipeline, runtime, engine, report, summary) - `_ProviderExecutor` abstraction
+- Sprint 255 Rollback Runtime (request, plan, runtime, summary, report) - metadata-only, external_calls=0
+- Sprint 256 Monitoring (metrics, health, history, snapshot, monitor)
+- Sprint 257 Safety Runtime (policy, guard, limits, rules, safety) - timeout/approval/provider/capability/retry
+- Sprint 258 Certification (score, validator, manifest, cert_report, certifier) - 7 dimensi
+- Sprint 259 Integration (runtime registry + full pipeline Mission->...->Artifact 13 tahap)
+- Sprint 260 Real Provider Activation (provider_executor, real_provider_activation, activation bridges)
+- Provider-specific code confined ke `src/sam/providers/execution/` (network & credentials) hanya di provider layer
+- `ProviderExecutor` - baca kredensial dari environment (TIDAK hardcode), `ProviderUnavailableError` bila tak ada kredensial
+- `ExecutionCertifier` - 7 dimensi sertifikasi (structure, integrity, consistency, determinism, approval, rollback, safety)
+- `ProviderActivationExecutor` - delegasi execute ke provider layer, approval-gated, cancellation-aware
+
+### Constraints
+- Preview-only default; approval MANDATORY sebelum execute
+- Deterministic before execute; synchronuous runtime
+- Network HANYA di provider layer (bukan preview)
+- Execution cancellable; rollback metadata; full audit
+- Immutable DTOs; tidak modifikasi subsystem legacy
+- Bridges ke runtime lain read-only
+
 ## v25.0.0 (2026-08-01) - Program B: Model Runtime Integration
 
 ### Added
