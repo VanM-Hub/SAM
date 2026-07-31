@@ -57,7 +57,7 @@ Karakteristik kunci:
 | XX | Workflow Runtime | ✅ DONE |
 | XXI | Policy Runtime | ✅ DONE |
 | XXII | Audit Runtime | ✅ DONE |
-| XXIII | Artifact Runtime | 📋 PLANNED |
+| XXIII | Artifact Runtime | ✅ DONE |
 | XXIV | Simulation Runtime (opsional) | 📋 PLANNED |
 
 > **Total: 24 phase (XXIV opsional).** Setelah fondasi arsitektur lengkap, fokus bergeser ke Tahap 2 (integrasi nyata) dan Tahap 3 (produk).
@@ -66,7 +66,7 @@ Karakteristik kunci:
 
 ## Fase Detail (I–XXIV)
 
-### Fase Selesai (I–XXII) — membangun seluruh "mesin"
+### Fase Selesai (I-XXIII) — membangun seluruh "mesin"
 
 | Phase | Sprint | Versi | Komponen Inti |
 |-------|--------|-------|---------------|
@@ -92,6 +92,7 @@ Karakteristik kunci:
 | XX | 196-203 | v20.0.0 | Workflow Runtime (8 sprints, 210 tests, 66 files) |
 | XXI | 204-211 | v21.0.0 | Policy Runtime (8 sprints, 208 tests, 66 files) |
 | XXII | 212-219 | v22.0.0 | Audit Runtime (8 sprints, 173 tests, 66 files) |
+| XXIII | 220-227 | v23.0.0 | Artifact Runtime (8 sprints, 135 tests, 66 files) |
 
 ### Fase Terencana (XVI–XXIV)
 
@@ -202,7 +203,7 @@ Dokumen lain cukup memperbarui versi dan merujuk ke roadmap induk.
 
 ## Catatan Arsitektur
 
-Dengan selesainya Phase XXII, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi policy, audit, workflow & kognitif siap dikonsumsi reasoning engine masa depan.
+Dengan selesainya Phase XXIII, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi policy, audit, artifact, workflow & kognitif siap dikonsumsi reasoning engine masa depan.
 
 Setelah fondasi arsitektur lengkap (Phase XXIV, lihat bagian *3 Tahap Pembangunan*):
 - **Tidak lagi menambah runtime / lapisan arsitektur baru.**

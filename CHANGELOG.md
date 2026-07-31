@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## v23.0.0 (2026-08-01) - Artifact Runtime (Phase XXIII)
+
+### Added
+- New subsystem `src/sam/artifact_runtime/` - Artifact Runtime
+- 8 sprints (220-227), 66 files, 135 tests
+- Representation resmi seluruh keluaran pipeline SAM sebagai artifact deterministik
+- Immutable artifact model (Artifact/Reference/Manifest/Metadata frozen) - no storage, no publish
+- NOT evaluate, NOT decision, no publish - representation only
+- Sprint 220 Foundation, 221 Model, 222 Builder, 223 Runtime
+- Sprint 224 Catalog, 225 Monitoring, 226 Certification, 227 Runtime Integration
+- Read-only integration: Mission->Agent->Skill->Workflow->Policy->Audit->Artifact->Memory->Knowledge->Cognitive->Orchestrator->Connector->Provider
+- Interim tag v23.0.0-alpha1 after Sprint 220
+- Part of Tahap 1 (lengkapi fondasi) - Phase XXIII of 3-tahap roadmap
+
 ## v22.0.0 (2026-08-01) - Audit Runtime (Phase XXII)
 
 ### Added
