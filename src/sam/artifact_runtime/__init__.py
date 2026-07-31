@@ -120,6 +120,21 @@ from ..artifact_runtime.certification.conversation_certification import (
 from ..artifact_runtime.certification.dashboard_certification import (
     DashboardCertificationBridge,
 )
+from ..artifact_runtime.integration import (
+    ArtifactRuntimePipeline,
+    ArtifactRuntimePipelineRun,
+    ArtifactIntegrationStage,
+    INTEGRATION_ROUTE,
+    ArtifactRuntimeRegistry,
+    ArtifactRuntimeRegistryEntry,
+    ArtifactRuntimeManifest,
+    ArtifactRuntimeReport,
+    ArtifactRuntimeReporter,
+    ArtifactRuntimeSummary,
+    ArtifactRuntimeSummarizer,
+    ConversationIntegrationBridge,
+    DashboardIntegrationBridge,
+)
 
 __all__ = [
     "ArtifactDescriptor",
@@ -197,4 +212,17 @@ __all__ = [
     "ArtifactCertificationValidation",
     "ConversationCertificationBridge",
     "DashboardCertificationBridge",
+    "ArtifactRuntimePipeline",
+    "ArtifactRuntimePipelineRun",
+    "ArtifactIntegrationStage",
+    "INTEGRATION_ROUTE",
+    "ArtifactRuntimeRegistry",
+    "ArtifactRuntimeRegistryEntry",
+    "ArtifactRuntimeManifest",
+    "ArtifactRuntimeReport",
+    "ArtifactRuntimeReporter",
+    "ArtifactRuntimeSummary",
+    "ArtifactRuntimeSummarizer",
+    "ConversationIntegrationBridge",
+    "DashboardIntegrationBridge",
 ]
