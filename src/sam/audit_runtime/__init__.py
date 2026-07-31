@@ -32,6 +32,20 @@ from .builder import (
     ConversationBuilderBridge,
     DashboardBuilderBridge,
 )
+from .runtime import (
+    AuditRuntime,
+    AuditRunResult,
+    AuditPipeline,
+    AuditPipelineRun,
+    AuditStage,
+    AuditEngine,
+    AuditSummary,
+    AuditSummarizer,
+    AuditStatistics,
+    AuditStatisticsCollector,
+    ConversationRuntimeBridge,
+    DashboardRuntimeBridge,
+)
 
 __all__ = [
     "AuditDescriptor",
@@ -60,4 +74,16 @@ __all__ = [
     "AuditPreviewDTO",
     "ConversationBuilderBridge",
     "DashboardBuilderBridge",
+    "AuditRuntime",
+    "AuditRunResult",
+    "AuditPipeline",
+    "AuditPipelineRun",
+    "AuditStage",
+    "AuditEngine",
+    "AuditSummary",
+    "AuditSummarizer",
+    "AuditStatistics",
+    "AuditStatisticsCollector",
+    "ConversationRuntimeBridge",
+    "DashboardRuntimeBridge",
 ]
