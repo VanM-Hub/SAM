@@ -21,6 +21,17 @@ from .model import (
     ConversationModelBridge,
     DashboardModelBridge,
 )
+from .builder import (
+    AuditBuilder,
+    AuditBuildResult,
+    EntryBuilder,
+    ReferenceBuilder,
+    ScopeBuilder,
+    PreviewBuilder,
+    AuditPreviewDTO,
+    ConversationBuilderBridge,
+    DashboardBuilderBridge,
+)
 
 __all__ = [
     "AuditDescriptor",
@@ -40,4 +51,13 @@ __all__ = [
     "AuditValidation",
     "ConversationModelBridge",
     "DashboardModelBridge",
+    "AuditBuilder",
+    "AuditBuildResult",
+    "EntryBuilder",
+    "ReferenceBuilder",
+    "ScopeBuilder",
+    "PreviewBuilder",
+    "AuditPreviewDTO",
+    "ConversationBuilderBridge",
+    "DashboardBuilderBridge",
 ]
