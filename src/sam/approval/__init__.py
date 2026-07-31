@@ -49,3 +49,54 @@ from .dashboard_engine import ApprovalDashboardEngine
 from .console import ConsoleCommand, ConsoleResponse
 from .console_engine import ConsoleEngine
 from .runtime_v1 import ApprovalRuntimeV1, ApprovalRuntimeResult
+
+__all__ = [
+    # Intake
+    "ApprovalIntakeRecord", "IntakeMetadata", "IntakeSource",
+    "IntakeValidator", "ValidationResult",
+    "IntakeNormalizer", "NormalizedApprovalRecord",
+    "IntakeRegistry",
+    "IntakeSummaryBuilder", "ApprovalIntakeSummary",
+    "ConversationIntakeBridge", "DashboardIntakeBridge",
+    # Workflow
+    "ApprovalWorkflow", "WorkflowPhase", "WorkflowTransition", "PHASE_TRANSITIONS",
+    "WorkflowEngine", "WorkflowTransitionError",
+    "WorkflowBuilder",
+    "WorkflowRules",
+    "ConversationWorkflowBridge", "DashboardWorkflowBridge",
+    # Policy
+    "ApprovalPolicy", "PolicyEffect", "PolicyCondition", "PolicyEvaluationResult",
+    "PolicyEngine",
+    "PolicyBuilder",
+    "PolicyValidator",
+    "ConversationPolicyBridge", "DashboardPolicyBridge",
+    # Multilevel
+    "ApprovalLevel", "MultiLevelApproval",
+    "MultiLevelEngine",
+    "MultiLevelBuilder",
+    "MultiLevelValidator",
+    "ConversationMultiLevelBridge", "DashboardMultiLevelBridge",
+    # Delegation
+    "DelegationRule",
+    "DelegationEngine",
+    "ConversationDelegationBridge", "DashboardDelegationBridge",
+    # Audit
+    "AuditEntry", "AuditLog",
+    "AuditEngine",
+    "ConversationAuditBridge", "DashboardAuditBridge",
+    # History
+    "HistoryEntry", "ApprovalHistory",
+    "HistoryEngine",
+    "ConversationHistoryBridge", "DashboardHistoryBridge",
+    # Analytics
+    "AnalyticsMetric", "AnalyticsReport",
+    "AnalyticsEngine",
+    "ConversationAnalyticsBridge", "DashboardAnalyticsBridge",
+    # Dashboard & Console
+    "DashboardWidget", "DashboardLayout",
+    "ApprovalDashboardEngine",
+    "ConsoleCommand", "ConsoleResponse",
+    "ConsoleEngine",
+    # Runtime
+    "ApprovalRuntimeV1", "ApprovalRuntimeResult",
+]

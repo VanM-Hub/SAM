@@ -7,7 +7,6 @@ from sam.evidence.models import Evidence
 from sam.knowledge.models import KnowledgeFact
 from sam.patterns.models import PatternDetection
 from sam.recommendations.models import Recommendation
-from sam.approval.models import ApprovalRequest
 import structlog
 
 
@@ -96,7 +95,12 @@ class ApprovalRepository:
     def __init__(self, db: Database):
         self._db = db
 
-    async def add(self, req: ApprovalRequest, correlation_id: Optional[str] = None) -> None:
+    async def add(self, req, correlation_id: Optional[str] = None) -> None:
+        """Persist an approval request.
+
+        `req` diterima sebagai objek generik (dari layer pemanggil) — repository
+        hanya membaca field, tidak bergantung pada tipe ApprovalRequest runtime
+        (menghindari cross-layer import persistence → approval)."""
         await self._db.execute(
             "INSERT OR REPLACE INTO approvals (id, recommendation_id, severity, title, description, action_hint, status, decision, decided_by, decided_at, metadata, timestamp, correlation_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [req.id, req.recommendation_id, req.severity, req.title, req.description, req.action_hint, req.status.value, req.decision.value if req.decision else None, req.decided_by, req.decided_at.isoformat() if req.decided_at else None, json.dumps(req.metadata), req.timestamp.isoformat(), correlation_id],
