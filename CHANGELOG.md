@@ -1,5 +1,30 @@
 ﻿# Changelog
 
+## v10.2.2 (2026-07-31) - Repository Maintenance & Consistency
+
+### Fixed (correctness)
+- `sam/telemetry/models.py`: compatibility shim only re-exported `TelemetrySeverity`; add `TelemetryEvent`, `EventCategory`, `RuntimeMetrics` so legacy imports no longer fail
+- `sam/telemetry/collector.py`: `_collect()` falls back gracefully when `psutil` is unavailable (design already intended fallback)
+- `sam/launcher/desktop.py`: NEW module referenced by Dockerfile `ENTRYPOINT` (`python -m sam.launcher.desktop`) but missing — Docker image would crash on start; wraps `desktop_main`
+- `sam/persistence/repositories.py`: removed cross-layer import `sam.approval.models` from `ApprovalRepository` (fixes the single layer violation; repository now consumes a generic object)
+
+### Added (governance)
+- `__all__` added to 4 subsystems missing it: `sam.approval`, `sam.runtime_kernel` (124), `sam.execution.runtime` (101), `sam.operations.brain.decision` (199)
+- CI: `tests/integration/` now run in the server job (previously not run in CI — integration bugs went undetected)
+- CI: server job installs `[dev,server,console]` (launcher imports `rich`, present only in console extra)
+
+### Docs (accuracy)
+- Corrected Runtime Kernel file count **91 → 69** across all docs (`OP-1000`, `sprint-111`, `README`, `CHANGELOG`, `ROADMAP`, `ADR-001..008`, `version-history`) — verified 69 files at tag `v10.0.0`
+
+### Repo hygiene
+- Removed runtime data from git tracking: `openclaw/status/` (`status.json`, `history.ndjson`) and `memory/` (sprint handoff)
+- `.gitignore`: added `openclaw/status/` and `memory/`
+
+### Quality
+- Unit 1201 / Integration 48 / API 28 / E2E 110 — all pass
+- CI fully green (validation, core 3.10/3.11/3.12, server, desktop, coverage)
+- `validate_layers` 0 violations; `validate_structure` & `validate_docs` PASS
+
 ## v10.2.1 (2026-07-31) - CI Recovery & Pipeline Restructure
 
 ### Changed
@@ -90,7 +115,7 @@ Phase X selesai. Runtime Kernel adalah lapisan koordinasi antar-subsystem yang b
 - **Kernel Final Assembly** — FinalInspector (11 component check), KernelReporter, FinalVerdict
 - **12 Conversation Bridges** — masing-masing subsystem dengan 6-8 queries
 - **12 Dashboard Bridges** — 60 ExecutionCards (5 per subsystem, frozen dataclass)
-- **91 file sumber** di `src/sam/runtime_kernel/`
+- **69 file sumber** di `src/sam/runtime_kernel/`
 - **1,719 tests** di sprint validation (sprint 100-111)
 
 ### Architecture

@@ -1,9 +1,7 @@
 ﻿# SAM Framework
 
 **The Autonomous Guardian Operating System for AI** 🔰  
-*Versi: v10.2.1 — Architecture Governance*
-
-> **⚠️ Peringatan:** README ini masih dalam proses update. CABANG `main` hanya menampilkan fase awal. Development aktif ada di branch `sprint-*`. Lihat [Pipeline](#pipeline) di bawah untuk peta pengembangan.
+*Versi: v10.2.2 — Maintenance Release*
 
 ---
 
@@ -24,7 +22,7 @@ SAM adalah platform guardian otonom — mengamati, melindungi, dan memulihkan si
 | VII | 76–81 | v7.0.0–v8.0.0 | Operational Brain Full Integration |
 | VIII | 82–87 | v8.0.0–v8.5.0 | Activation Runtime (6 sprints, ~48 files, pipeline lengkap) |
 | IX | 88–99 | v9.0.0–v9.11.0 | Execution Runtime (12 sprints, ~1,600 tests, 15 bridges) |
-| **X** | **100–111** | **v10.0.0** | **Runtime Kernel (12 sprints, 1,719 tests, 91 files, 60 cards)** |
+| **X** | **100-111** | **v10.0.0** | **Runtime Kernel (12 sprints, 1,719 tests, 69 files, 60 cards)** |
 
 ---
 
@@ -49,7 +47,7 @@ Runtime Kernel adalah lapisan koordinasi antar-subsystem. Preview-only, read-onl
 | Telemetry | TelemetryCollector, MetricsAggregator, TelemetryReporter | ConversationTelemetry + Dashboard |
 | Final Assembly | FinalInspector (11 components), KernelReporter | ConversationFinal + Dashboard |
 
-- **91 file** sumber di `src/sam/runtime_kernel/`
+- **69 file** sumber di `src/sam/runtime_kernel/`
 - **60 Dashboard Cards** (5 per subsystem, frozen ExecutionCards)
 - Semua DTO immutable (`frozen dataclass`) — **0 forbidden imports**
 - Synchronous, deterministic, rule-based

@@ -8,7 +8,7 @@
 
 ## Ringkasan
 
-Phase X (Runtime Kernel) berhasil diselesaikan dalam **12 sprint** (100–111) dengan **1,719 total tes** dan **91 file sumber**. Semua sprint lulus dengan target ≥130 tes per sprint, 0 forbidden imports, dan semua DTO immutable (`frozen dataclass`).
+Phase X (Runtime Kernel) berhasil diselesaikan dalam **12 sprint** (100–111) dengan **1,719 total tes** dan **69 file sumber**. Semua sprint lulus dengan target ≥130 tes per sprint, 0 forbidden imports, dan semua DTO immutable (`frozen dataclass`).
 
 | Sprint | Topik | Tes | Tag |
 |--------|-------|-----|-----|
@@ -114,7 +114,7 @@ src/sam/runtime_kernel/
 ├── conversation_final.py             # Bridge final (6 queries + 5 cards)
 ```
 
-**12 subsystem × 7 file = 84 file + 7 total = 91 file**
+**69 file** di `src/sam/runtime_kernel/` (diverifikasi tag v10.0.0)
 
 ---
 

@@ -43,6 +43,8 @@ test-results.xml
 # Local runtime data
 workspace/
 approvals.json
+openclaw/status/
+memory/
 
 # Database — jangan commit!
 *.db

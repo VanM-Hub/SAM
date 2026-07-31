@@ -25,7 +25,7 @@ CI:           GitHub Actions (core + desktop)
 | Activation | `src/sam/activation/` | ~48 | Stable |
 | Execution | `src/sam/execution/runtime/` | ~40 | Stable |
 | Approval | `src/sam/approval/` | ~50 | Stable |
-| Runtime Kernel | `src/sam/runtime_kernel/` | 91 | Preview-only |
+| Runtime Kernel | `src/sam/runtime_kernel/` | 69 | Preview-only |
 
 ## Dependencies
 
