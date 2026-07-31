@@ -2,6 +2,7 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v17.0.0 | 2026-07-31 | XVII (Memory Runtime) | 8 sprints, 67 files, 209 tests |
 | v16.0.0 | 2026-07-31 | XVI (Skill Runtime) | 8 sprints, 67 files, 192 tests |
 | v15.0.0 | 2026-07-31 | XV (Agent Runtime) | 8 sprints, 11 folders, 211 tests |
 | v14.0.0 | 2026-07-31 | XIV (Provider Runtime) | 12 sprints, 10 folders, 164 tests |
