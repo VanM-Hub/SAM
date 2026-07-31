@@ -99,6 +99,19 @@ from .certification import (
     ConversationCertificationBridge,
     DashboardCertificationBridge,
 )
+from .integration import (
+    SkillRuntimePipeline,
+    SkillRuntimePipelineRun,
+    IntegrationStage,
+    INTEGRATION_ROUTE,
+    SkillRuntimeReport,
+    SkillRuntimeReporter,
+    SkillRuntimeManifest,
+    SkillRuntimeCertification,
+    SkillRuntimeCertifier,
+    ConversationIntegrationBridge,
+    DashboardIntegrationBridge,
+)
 
 __all__ = [
     "SkillDescriptor",
@@ -183,4 +196,15 @@ __all__ = [
     "SkillValidation",
     "ConversationCertificationBridge",
     "DashboardCertificationBridge",
+    "SkillRuntimePipeline",
+    "SkillRuntimePipelineRun",
+    "IntegrationStage",
+    "INTEGRATION_ROUTE",
+    "SkillRuntimeReport",
+    "SkillRuntimeReporter",
+    "SkillRuntimeManifest",
+    "SkillRuntimeCertification",
+    "SkillRuntimeCertifier",
+    "ConversationIntegrationBridge",
+    "DashboardIntegrationBridge",
 ]
