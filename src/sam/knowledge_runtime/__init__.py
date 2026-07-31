@@ -52,6 +52,21 @@ from .runtime import (
     ConversationRuntimeBridge,
     DashboardRuntimeBridge,
 )
+from .catalog import (
+    KnowledgeCatalog,
+    KnowledgeCatalogEntry,
+    KnowledgeCatalogSearchResult,
+    KnowledgeIndex,
+    KnowledgeIndexer,
+    KnowledgeLoader,
+    KnowledgeLoadResult,
+    KnowledgeVersionInfo,
+    KnowledgeVersionProvider,
+    KnowledgeHistory,
+    KnowledgeHistoryEntry,
+    ConversationCatalogBridge,
+    DashboardCatalogBridge,
+)
 
 __all__ = [
     "KnowledgeDescriptor",
@@ -95,4 +110,17 @@ __all__ = [
     "KnowledgeStatisticsCollector",
     "ConversationRuntimeBridge",
     "DashboardRuntimeBridge",
+    "KnowledgeCatalog",
+    "KnowledgeCatalogEntry",
+    "KnowledgeCatalogSearchResult",
+    "KnowledgeIndex",
+    "KnowledgeIndexer",
+    "KnowledgeLoader",
+    "KnowledgeLoadResult",
+    "KnowledgeVersionInfo",
+    "KnowledgeVersionProvider",
+    "KnowledgeHistory",
+    "KnowledgeHistoryEntry",
+    "ConversationCatalogBridge",
+    "DashboardCatalogBridge",
 ]
