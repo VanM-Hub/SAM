@@ -50,17 +50,19 @@ Karakteristik kunci:
 | XV | Agent Runtime | ✅ DONE |
 | XVI | Skill Runtime | ✅ DONE |
 | XVII | Memory Runtime | ✅ DONE |
-| XVIII | Operational Intelligence Console | 📋 PLANNED |
-| XIX | Execution Integration | 📋 PLANNED |
-| XX | Platform Certification | 📋 PLANNED |
+| XVIII | Knowledge Runtime | ✅ DONE |
+| XIX | Cognitive Runtime | ✅ DONE |
+| XX | Operational Intelligence Console | 📋 PLANNED |
+| XXI | Execution Integration | 📋 PLANNED |
+| XXII | Platform Certification | 📋 PLANNED |
 
-> **Total: 20 phase.** Phase XX adalah end-state. Sesudahnya bukan roadmap lagi, melainkan maintenance.
+> **Total: 22 phase.** Fase XXII adalah end-state. Sesudahnya bukan roadmap lagi, melainkan maintenance.
 
 ---
 
 ## Fase Detail (I–XX)
 
-### Fase Selesai (I–XVII) — membangun seluruh "mesin"
+### Fase Selesai (I–XIX) — membangun seluruh "mesin"
 
 | Phase | Sprint | Versi | Komponen Inti |
 |-------|--------|-------|---------------|
@@ -81,16 +83,20 @@ Karakteristik kunci:
 | XV | 156-163 | v15.0.0 | Agent Runtime (8 sprints, 211 tests, 11 folders) |
 | XVI | 164-171 | v16.0.0 | Skill Runtime (8 sprints, 192 tests, 67 files) |
 | XVII | 172-179 | v17.0.0 | Memory Runtime (8 sprints, 209 tests, 67 files) |
+| XVIII | 180-187 | v18.0.0 | Knowledge Runtime (8 sprints, 207 tests, 67 files) |
+| XIX | 188-195 | v19.0.0 | Cognitive Runtime (8 sprints, 201 tests, 8 folders) |
 
-### Fase Terencana (XVI–XX)
+### Fase Terencana (XVI–XXII)
 
 | Phase | Nama | Deskripsi |
 |-------|------|-----------|
 | XVI | Skill Runtime | Skills preview-only: deskripsi, definisi, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Orchestrator→Connector→Provider) |
 | XVII | Memory Runtime | Memori preview-only: deskripsi, model, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Memory→Orchestrator→Connector→Provider) |
-| XVIII | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
-| XIX | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider (Real Provider Runtime: Filesystem, SQLite, Docker, Shell, OpenClaw aktif). Tetap manual approval. Belum autonomous |
-| XX | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification. (Knowledge Runtime: indexing, semantic registry, documentation graph, operational memory — diperkenalkan di sini) |
+| XVIII | Knowledge Runtime | Pengetahuan deterministik preview-only: foundation, model, builder, runtime, catalog, monitoring, sertifikasi + integrasi read-only (Mission→Agent→Skill→Memory→Knowledge→Orchestrator→Connector→Provider). No inference |
+| XIX | Cognitive Runtime | Konsolidasi output seluruh runtime (Mission/Agent/Skill/Memory/Knowledge) menjadi Cognitive Context deterministik siap dikonsumsi reasoning engine. Bukan LLM/AI, tanpa inferensi |
+| XX | Operational Intelligence Console | UI besar: visualisasi seluruh runtime (Mission, Approval, Execution, Health, Timeline, Pipeline, Reasoning, Audit) — berbeda dari dashboard kecil saat ini |
+| XXI | Execution Integration | Execution Runtime mulai benar-benar menjalankan provider (Real Provider Runtime: Filesystem, SQLite, Docker, Shell, OpenClaw aktif). Tetap manual approval. Belum autonomous |
+| XXII | Platform Certification | Fase stabilisasi, bukan fitur: architecture freeze, ADR final, performance benchmark, scalability, documentation, migration guide, SDK, API stability, plugin specification |
 
 ---
 
@@ -149,9 +155,9 @@ Dokumen lain cukup memperbarui versi dan merujuk ke roadmap induk.
 
 ## Catatan Arsitektur
 
-Dengan selesainya Phase XV, SAM telah memiliki **rantai runtime yang lengkap**.
+Dengan selesainya Phase XIX, SAM memiliki **rantai runtime deterministik yang lengkap** — dari Mission sampai representasi kognitif yang siap dikonsumsi reasoning engine masa depan.
 
-Setelah Phase XX (Platform Certification) selesai:
+Setelah Phase XXII (Platform Certification) selesai:
 - **Tidak lagi menambah runtime baru.**
 - Pengembangan bergeser dari *menambah subsystem* menjadi *memperluas kemampuan subsystem* yang sudah ada — melalui provider, plugin, dan integrasi.
 
