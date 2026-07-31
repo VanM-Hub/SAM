@@ -53,6 +53,20 @@ from .runtime import (
     ConversationRuntimeBridge,
     DashboardRuntimeBridge,
 )
+from .catalog import (
+    WorkflowCatalog,
+    WorkflowCatalogEntry,
+    WorkflowIndex,
+    WorkflowIndexer,
+    WorkflowLoader,
+    WorkflowLoadResult,
+    WorkflowVersionInfo,
+    WorkflowVersionProvider,
+    WorkflowHistory,
+    WorkflowHistoryEntry,
+    ConversationCatalogBridge,
+    DashboardCatalogBridge,
+)
 
 __all__ = [
     "WorkflowCard",
@@ -94,4 +108,16 @@ __all__ = [
     "WorkflowStatisticsCollector",
     "ConversationRuntimeBridge",
     "DashboardRuntimeBridge",
+    "WorkflowCatalog",
+    "WorkflowCatalogEntry",
+    "WorkflowIndex",
+    "WorkflowIndexer",
+    "WorkflowLoader",
+    "WorkflowLoadResult",
+    "WorkflowVersionInfo",
+    "WorkflowVersionProvider",
+    "WorkflowHistory",
+    "WorkflowHistoryEntry",
+    "ConversationCatalogBridge",
+    "DashboardCatalogBridge",
 ]
