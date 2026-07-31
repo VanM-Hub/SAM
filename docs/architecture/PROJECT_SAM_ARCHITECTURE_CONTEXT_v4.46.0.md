@@ -250,7 +250,7 @@ Setiap tahap menghasilkan DTO immutable yang dapat diaudit.
 | **Public API** | Belum ada REST API atau SDK publik yang stable |
 | **Plugin marketplace** | Registry ada, ekosistem belum matang |
 | **Async support** | Belum — sync only sesuai kontrak |
-| **Nama fiktif** | Aster/Axel sudah dibersihkan dari repo publik |
+| **Nama internal** | Nama persona internal sudah dibersihkan dari repo publik |
 
 ---
 
