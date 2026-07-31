@@ -25,6 +25,17 @@ from .model import (
     ConversationModelBridge,
     DashboardModelBridge,
 )
+from .builder import (
+    PolicyBuilder,
+    PolicyBuildResult,
+    RuleBuilder,
+    ScopeBuilder,
+    ConstraintBuilder,
+    PreviewBuilder,
+    PolicyPreviewDTO,
+    ConversationBuilderBridge,
+    DashboardBuilderBridge,
+)
 
 __all__ = [
     "PolicyCard",
@@ -44,4 +55,13 @@ __all__ = [
     "PolicyValidation",
     "ConversationModelBridge",
     "DashboardModelBridge",
+    "PolicyBuilder",
+    "PolicyBuildResult",
+    "RuleBuilder",
+    "ScopeBuilder",
+    "ConstraintBuilder",
+    "PreviewBuilder",
+    "PolicyPreviewDTO",
+    "ConversationBuilderBridge",
+    "DashboardBuilderBridge",
 ]
