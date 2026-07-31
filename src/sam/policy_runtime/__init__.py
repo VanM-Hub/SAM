@@ -52,6 +52,20 @@ from .runtime import (
     ConversationRuntimeBridge,
     DashboardRuntimeBridge,
 )
+from .catalog import (
+    PolicyCatalog,
+    PolicyCatalogEntry,
+    PolicyIndex,
+    PolicyIndexer,
+    PolicyLoader,
+    PolicyLoadResult,
+    PolicyVersionInfo,
+    PolicyVersionProvider,
+    PolicyHistory,
+    PolicyHistoryEntry,
+    ConversationCatalogBridge,
+    DashboardCatalogBridge,
+)
 
 __all__ = [
     "PolicyCard",
@@ -94,4 +108,16 @@ __all__ = [
     "PolicyStatisticsCollector",
     "ConversationRuntimeBridge",
     "DashboardRuntimeBridge",
+    "PolicyCatalog",
+    "PolicyCatalogEntry",
+    "PolicyIndex",
+    "PolicyIndexer",
+    "PolicyLoader",
+    "PolicyLoadResult",
+    "PolicyVersionInfo",
+    "PolicyVersionProvider",
+    "PolicyHistory",
+    "PolicyHistoryEntry",
+    "ConversationCatalogBridge",
+    "DashboardCatalogBridge",
 ]
