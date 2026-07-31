@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List
 
-from .audit_score import PolicyScorer
-
 
 @dataclass(frozen=True)
 class AuditCertificationCriterion:
@@ -44,12 +42,12 @@ class AuditCertification:
             AuditCertificationCriterion("Consistency", no_forbidden_imports),
             AuditCertificationCriterion("Completeness",
                                         modules_present == modules_expected),
-            AuditCertificationCriterion("Determinism", deterministic),
+            AuditCertificationCriterion("Determinism", deterministic and no_inference),
             AuditCertificationCriterion("Immutability", dto_frozen),
             AuditCertificationCriterion("PreviewOnly", preview_only and no_write),
         ]
         passed = sum(1 for c in criteria if c.passed)
-        score = PolicyScorer.compute(criteria)
+        score = passed / len(criteria) * 100.0
         certified = score >= 100.0
         return AuditCertificationResult(
             certified=certified, score=score, criteria=list(criteria))
