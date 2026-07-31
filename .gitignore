@@ -44,7 +44,7 @@ test-results.xml
 /workspace/
 approvals.json
 openclaw/status/
-memory/
+/memory/
 
 # Database — jangan commit!
 *.db
