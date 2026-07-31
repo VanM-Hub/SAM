@@ -82,7 +82,7 @@ jobs:
           echo "CI DIAG: git status:"
           git status --porcelain || true
           echo "CI DIAG: tests/api/test_api.py (first 200 lines):"
-          sed -n '1,200p' tests/api/test_api.py || true
+          if [ -f tests/api/test_api.py ]; then sed -n '1,200p' tests/api/test_api.py || true; else echo 'CI DIAG: tests/api/test_api.py not present' ; fi
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
