@@ -2,6 +2,8 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v15.0.0 | 2026-07-31 | XV (Agent Runtime) | 8 sprints, 11 folders, 211 tests |
+| v14.0.0 | 2026-07-31 | XIV (Provider Runtime) | 12 sprints, 10 folders, 164 tests |
 | v13.0.0 | 2026-07-31 | XIII (Mission Runtime) | 10 sprints, 70 files, 145 tests |
 | v12.0.0 | 2026-07-31 | XII (Orchestration Runtime) | 11 sprints, 78 files, 172 tests |
 | v11.0.0 | 2026-07-31 | XI (Connector Runtime) | 11 sprints, 77 files, 220 tests |

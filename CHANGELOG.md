@@ -1,5 +1,21 @@
 ﻿# Changelog
 
+## v15.0.0 (2026-07-31) - Agent Runtime (Phase XV)
+
+### Added
+- New subsystem `src/sam/agent/` - Agent Runtime
+- 8 sprints (156-163), 11 folders, 211 tests
+- Orchestrator behavior that connects all SAM runtimes; controls Mission lifecycle only
+- No business logic; preview-only, no runtime call, no execution
+- Sprint 156 Foundation (descriptor, capability, contract, metadata, registry)
+- Sprint 157 Mission Session (session, state, context, snapshot, registry)
+- Sprint 158 Lifecycle State Machine (7 states, no auto retry)
+- Sprint 159 Mission Planner (plan, step, route, dependency, builder)
+- Sprint 160 Runtime Coordinator (request, response, queue, registry, coordinator)
+- Sprint 161 Transition Monitor (monitor, status, progress, health, summary)
+- Sprint 162 Agent Runtime Engine (agent_runtime, pipeline, engine, report, statistics)
+- Sprint 163 Certification (7 score dimensions)
+
 ## v14.0.0 (2026-07-31) - Provider Runtime (Phase XIV)
 
 ### Added
