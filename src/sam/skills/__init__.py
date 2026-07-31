@@ -54,6 +54,21 @@ from .runtime import (
     ConversationRuntimeBridge,
     DashboardRuntimeBridge,
 )
+from .catalog import (
+    SkillCatalog,
+    CatalogEntry,
+    CatalogSearchResult,
+    SkillIndex,
+    SkillIndexer,
+    SkillLoader,
+    LoadResult,
+    SkillVersionInfo,
+    SkillVersionProvider,
+    SkillHistory,
+    SkillHistoryEntry,
+    ConversationCatalogBridge,
+    DashboardCatalogBridge,
+)
 
 __all__ = [
     "SkillDescriptor",
@@ -99,4 +114,17 @@ __all__ = [
     "SkillStatisticsCollector",
     "ConversationRuntimeBridge",
     "DashboardRuntimeBridge",
+    "SkillCatalog",
+    "CatalogEntry",
+    "CatalogSearchResult",
+    "SkillIndex",
+    "SkillIndexer",
+    "SkillLoader",
+    "LoadResult",
+    "SkillVersionInfo",
+    "SkillVersionProvider",
+    "SkillHistory",
+    "SkillHistoryEntry",
+    "ConversationCatalogBridge",
+    "DashboardCatalogBridge",
 ]
