@@ -1,7 +1,7 @@
 ﻿# SAM Framework
 
 **The Autonomous Guardian Operating System for AI** 🔰  
-*Versi: v22.0.0 - Audit Runtime*
+*Versi: v23.0.0 - Artifact Runtime*
 
 ---
 
@@ -11,7 +11,7 @@ SAM adalah **Deterministic Operational Intelligence Platform** — mengobservasi
 
 AI hanyalah **salah satu provider** yang dapat dipasang melalui Connector Runtime — identitas SAM tetap utuh walaupun provider AI diganti.
 
-**Versi aktif:** v22.0.0 - Audit Runtime (Phase XXII)
+**Versi aktif:** v23.0.0 - Artifact Runtime (Phase XXIII)
 **Fase aktif terakhir:** XVII — selesai ✅
 **Status:** 17 dari 20 fase selesai (I–XVII).
 **Fase berikutnya:** XVIII — Execution Integration (PLANNED)
