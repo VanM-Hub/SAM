@@ -3,7 +3,7 @@
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
 | v10.0.1 | 2026-07-30 | Stabilization | H1-H5 repository stabilization |
-| v10.0.0 | 2026-07-30 | X (Runtime Kernel) | 12 sprints, 91 files, 1,719 tests |
+| v10.0.0 | 2026-07-30 | X (Runtime Kernel) | 12 sprints, 69 files, 1,719 tests |
 | v9.11.0-final | 2026-07-29 | IX (Execution Runtime) | 12 sprints, ~1,600 tests |
 | v9.0.0 | 2026-07-29 | IX | Execution request + builder |
 | v8.5.0 | 2026-07-28 | VIII (Activation Runtime) | Pipeline lengkap, ~48 files |
