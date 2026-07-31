@@ -320,4 +320,4 @@ Program K — LLM Integration
 SAM Operational Product
 ```
 
-**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅) **sudah dieksekusi & dirilis**. Program F–K & Tahap 3 masih **perencanaan** — eksekusi menunggu instruksi. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
+**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅) **sudah dieksekusi & dirilis**. Program F–K & Tahap 3 masih **perencanaan**. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
