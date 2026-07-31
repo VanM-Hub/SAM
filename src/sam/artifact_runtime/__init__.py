@@ -63,6 +63,24 @@ from ..artifact_runtime.runtime.conversation_runtime import (
 from ..artifact_runtime.runtime.dashboard_runtime import (
     DashboardRuntimeBridge,
 )
+from ..artifact_runtime.catalog import (
+    ArtifactCatalog,
+    ArtifactIndex,
+    ArtifactIndexer,
+    ArtifactLoader,
+    ArtifactLoadResult,
+    ArtifactVersionProvider,
+    ArtifactVersionInfo,
+    ArtifactHistory,
+    ArtifactHistoryEntry,
+    ArtifactRecorder,
+)
+from ..artifact_runtime.catalog.conversation_catalog import (
+    ConversationCatalogBridge,
+)
+from ..artifact_runtime.catalog.dashboard_catalog import (
+    DashboardCatalogBridge,
+)
 
 __all__ = [
     "ArtifactDescriptor",
@@ -101,4 +119,16 @@ __all__ = [
     "ArtifactCollector",
     "ConversationRuntimeBridge",
     "DashboardRuntimeBridge",
+    "ArtifactCatalog",
+    "ArtifactIndex",
+    "ArtifactIndexer",
+    "ArtifactLoader",
+    "ArtifactLoadResult",
+    "ArtifactVersionProvider",
+    "ArtifactVersionInfo",
+    "ArtifactHistory",
+    "ArtifactHistoryEntry",
+    "ArtifactRecorder",
+    "ConversationCatalogBridge",
+    "DashboardCatalogBridge",
 ]
