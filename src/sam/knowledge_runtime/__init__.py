@@ -37,6 +37,21 @@ from .builder import (
     ConversationBuilderBridge,
     DashboardBuilderBridge,
 )
+from .runtime import (
+    KnowledgeRuntime,
+    KnowledgeRunResult,
+    KnowledgePipeline,
+    KnowledgePipelineRun,
+    KnowledgePipelineStage,
+    KnowledgeEngine,
+    KnowledgeEngineInfo,
+    KnowledgeSummary,
+    KnowledgeSummarizer,
+    KnowledgeStatistics,
+    KnowledgeStatisticsCollector,
+    ConversationRuntimeBridge,
+    DashboardRuntimeBridge,
+)
 
 __all__ = [
     "KnowledgeDescriptor",
@@ -67,4 +82,17 @@ __all__ = [
     "KnowledgePreviewDTO",
     "ConversationBuilderBridge",
     "DashboardBuilderBridge",
+    "KnowledgeRuntime",
+    "KnowledgeRunResult",
+    "KnowledgePipeline",
+    "KnowledgePipelineRun",
+    "KnowledgePipelineStage",
+    "KnowledgeEngine",
+    "KnowledgeEngineInfo",
+    "KnowledgeSummary",
+    "KnowledgeSummarizer",
+    "KnowledgeStatistics",
+    "KnowledgeStatisticsCollector",
+    "ConversationRuntimeBridge",
+    "DashboardRuntimeBridge",
 ]
