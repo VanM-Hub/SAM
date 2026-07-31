@@ -82,6 +82,21 @@ from .monitoring import (
     ConversationMonitoringBridge,
     DashboardMonitoringBridge,
 )
+from .certification import (
+    WorkflowCertification,
+    WorkflowCertificationCriterion,
+    WorkflowCertificationResult,
+    WorkflowScore,
+    WorkflowScoreDimension,
+    WorkflowScorer,
+    WorkflowManifest,
+    WorkflowCertificationReport,
+    WorkflowCertificationReporter,
+    WorkflowCertificationValidation,
+    WorkflowCertificationValidator,
+    ConversationCertificationBridge,
+    DashboardCertificationBridge,
+)
 
 __all__ = [
     "WorkflowCard",
@@ -148,4 +163,17 @@ __all__ = [
     "WorkflowReporter",
     "ConversationMonitoringBridge",
     "DashboardMonitoringBridge",
+    "WorkflowCertification",
+    "WorkflowCertificationCriterion",
+    "WorkflowCertificationResult",
+    "WorkflowScore",
+    "WorkflowScoreDimension",
+    "WorkflowScorer",
+    "WorkflowManifest",
+    "WorkflowCertificationReport",
+    "WorkflowCertificationReporter",
+    "WorkflowCertificationValidation",
+    "WorkflowCertificationValidator",
+    "ConversationCertificationBridge",
+    "DashboardCertificationBridge",
 ]
