@@ -15,6 +15,17 @@ from .foundation import (
     DashboardKnowledgeBridge,
 )
 from .dashboard import ExecutionCard
+from .model import (
+    KnowledgeRecord,
+    KnowledgeFact,
+    KnowledgeRelation,
+    KnowledgeContext,
+    KnowledgeTag,
+    KnowledgeValidator,
+    KnowledgeValidation,
+    ConversationModelBridge,
+    DashboardModelBridge,
+)
 
 __all__ = [
     "KnowledgeDescriptor",
@@ -27,4 +38,13 @@ __all__ = [
     "ConversationKnowledgeBridge",
     "DashboardKnowledgeBridge",
     "ExecutionCard",
+    "KnowledgeRecord",
+    "KnowledgeFact",
+    "KnowledgeRelation",
+    "KnowledgeContext",
+    "KnowledgeTag",
+    "KnowledgeValidator",
+    "KnowledgeValidation",
+    "ConversationModelBridge",
+    "DashboardModelBridge",
 ]
