@@ -50,3 +50,7 @@ approvals.json
 # Migrations dir tetap di-track
 !data/migrations/
 !data/migrations/*.sql
+
+# ZaraNote — catatan internal, bukan bagian project
+ZaraNote/
+ZN_*/
