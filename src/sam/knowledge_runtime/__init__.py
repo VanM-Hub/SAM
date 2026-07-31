@@ -67,6 +67,21 @@ from .catalog import (
     ConversationCatalogBridge,
     DashboardCatalogBridge,
 )
+from .monitor import (
+    KnowledgeMonitor,
+    KnowledgeStatus,
+    KnowledgeMetricSample,
+    KnowledgeMetrics,
+    KnowledgeMetricsCollector,
+    KnowledgeHealth,
+    KnowledgeHealthCheck,
+    KnowledgeSnapshot,
+    KnowledgeSnapshotter,
+    KnowledgeReport,
+    KnowledgeReporter,
+    ConversationMonitorBridge,
+    DashboardMonitorBridge,
+)
 
 __all__ = [
     "KnowledgeDescriptor",
@@ -123,4 +138,17 @@ __all__ = [
     "KnowledgeHistoryEntry",
     "ConversationCatalogBridge",
     "DashboardCatalogBridge",
+    "KnowledgeMonitor",
+    "KnowledgeStatus",
+    "KnowledgeMetricSample",
+    "KnowledgeMetrics",
+    "KnowledgeMetricsCollector",
+    "KnowledgeHealth",
+    "KnowledgeHealthCheck",
+    "KnowledgeSnapshot",
+    "KnowledgeSnapshotter",
+    "KnowledgeReport",
+    "KnowledgeReporter",
+    "ConversationMonitorBridge",
+    "DashboardMonitorBridge",
 ]
