@@ -82,6 +82,21 @@ from .monitor import (
     ConversationMonitorBridge,
     DashboardMonitorBridge,
 )
+from .certification import (
+    KnowledgeCertification,
+    KnowledgeCertificationCriterion,
+    KnowledgeCertificationResult,
+    KnowledgeScore,
+    KnowledgeScoreDimension,
+    KnowledgeScorer,
+    KnowledgeManifest,
+    KnowledgeCertificationReport,
+    KnowledgeCertificationReporter,
+    KnowledgeCertificationValidation,
+    KnowledgeCertificationValidator,
+    ConversationCertificationBridge,
+    DashboardCertificationBridge,
+)
 
 __all__ = [
     "KnowledgeDescriptor",
@@ -151,4 +166,17 @@ __all__ = [
     "KnowledgeReporter",
     "ConversationMonitorBridge",
     "DashboardMonitorBridge",
+    "KnowledgeCertification",
+    "KnowledgeCertificationCriterion",
+    "KnowledgeCertificationResult",
+    "KnowledgeScore",
+    "KnowledgeScoreDimension",
+    "KnowledgeScorer",
+    "KnowledgeManifest",
+    "KnowledgeCertificationReport",
+    "KnowledgeCertificationReporter",
+    "KnowledgeCertificationValidation",
+    "KnowledgeCertificationValidator",
+    "ConversationCertificationBridge",
+    "DashboardCertificationBridge",
 ]
