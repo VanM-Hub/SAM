@@ -5,11 +5,11 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v16.0.0 - Phase XVI (Skill Runtime)
-Next:         v17.0.0 - Operational Intelligence Console
+Current:      v17.0.0 - Phase XVII (Memory Runtime)
+Next:         v18.0.0 - Operational Intelligence Console
 Framework:    Python
 Build:        setuptools
-Test:         pytest (unit 2346 + integration 48 + api 28 + e2e 110)
+Test:         pytest (unit 2555 + integration 48 + api 28 + e2e 110)
 Lint:         ruff
 CI:           GitHub Actions (core + server + desktop)
 ```
@@ -32,6 +32,7 @@ CI:           GitHub Actions (core + server + desktop)
 | Provider Runtime | `src/sam/providers/` | 71 | Preview-only |
 | Agent Runtime | `src/sam/agent/` | 67 | Lifecycle-only |
 | Skill Runtime | `src/sam/skills/` | 67 | Preview-only |
+| Memory Runtime | `src/sam/memory/` | 67 | Preview-only |
 
 ## Dependencies
 
