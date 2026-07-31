@@ -1,5 +1,18 @@
 ﻿# Changelog
 
+## v21.0.0 (2026-08-01) - Policy Runtime (Phase XXI)
+
+### Added
+- New subsystem `src/sam/policy_runtime/` - Policy Runtime
+- 8 sprints (204-211), 66 files, 208 tests
+- Central deterministic policy representation used across pipeline - unifies scattered policies
+- NOT evaluate, NOT decision, no inference - representation only
+- Sprint 204 Foundation, 205 Model, 206 Builder, 207 Runtime
+- Sprint 208 Catalog, 209 Monitoring, 210 Certification, 211 Runtime Integration
+- Read-only integration: Mission->Agent->Skill->Workflow->Policy->Memory->Knowledge->Cognitive->Orchestrator->Connector->Provider
+- Interim tag v21.0.0-alpha1 after Sprint 204
+- Part of Tahap 1 (lengkapi fondasi) - Phase XXI of 3-tahap roadmap
+
 ## v20.0.0 (2026-08-01) - Workflow Runtime (Phase XX)
 
 ### Added
