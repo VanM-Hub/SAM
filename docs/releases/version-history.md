@@ -2,6 +2,11 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
+| v11.0.0 | 2026-07-31 | XI (Connector Runtime) | 11 sprints, 77 files, 220 tests |
+| v10.2.2 | 2026-07-31 | Maintenance | Repo konsistensi, koreksi 91->69 |
+| v10.2.1 | 2026-07-31 | CI Recovery | Pipeline restructure |
+| v10.2.0 | 2026-07-30 | X.2 | Architecture Governance, 109/120 |
+| v10.1.0 | 2026-07-30 | X.1 | Architecture Freeze v10 |
 | v10.0.1 | 2026-07-30 | Stabilization | H1-H5 repository stabilization |
 | v10.0.0 | 2026-07-30 | X (Runtime Kernel) | 12 sprints, 69 files, 1,719 tests |
 | v9.11.0-final | 2026-07-29 | IX (Execution Runtime) | 12 sprints, ~1,600 tests |
