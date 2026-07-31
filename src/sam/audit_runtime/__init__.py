@@ -60,6 +60,22 @@ from .catalog import (
     ConversationCatalogBridge,
     DashboardCatalogBridge,
 )
+from .monitoring import (
+    AuditMonitor,
+    AuditStatus,
+    AuditMetrics,
+    AuditMetricSample,
+    AuditMetricsCollector,
+    AuditHealth,
+    AuditHealthCheck,
+    AuditHealthMonitor,
+    AuditSnapshot,
+    AuditSnapshotter,
+    AuditReport,
+    AuditReporter,
+    ConversationMonitoringBridge,
+    DashboardMonitoringBridge,
+)
 
 __all__ = [
     "AuditDescriptor",
@@ -112,4 +128,18 @@ __all__ = [
     "AuditHistoryRecorder",
     "ConversationCatalogBridge",
     "DashboardCatalogBridge",
+    "AuditMonitor",
+    "AuditStatus",
+    "AuditMetrics",
+    "AuditMetricSample",
+    "AuditMetricsCollector",
+    "AuditHealth",
+    "AuditHealthCheck",
+    "AuditHealthMonitor",
+    "AuditSnapshot",
+    "AuditSnapshotter",
+    "AuditReport",
+    "AuditReporter",
+    "ConversationMonitoringBridge",
+    "DashboardMonitoringBridge",
 ]
