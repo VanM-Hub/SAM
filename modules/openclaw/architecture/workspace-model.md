@@ -1,4 +1,4 @@
-# Workspace Model
+﻿# Workspace Model
 
 Version: 1.0
 
@@ -27,7 +27,7 @@ Architecture
 
 Framework
 
-- docs/ARCHITECTURE.md
+- docs/architecture/SAM_ARCHITECTURE.md
 - docs/MODULE_INTERFACE.md
 
 ---
@@ -58,16 +58,16 @@ Instead, it provides the environment in which execution occurs.
 
 ```
                     Workspace
-                         │
- ┌───────────────────────┼────────────────────────┐
- │                       │                        │
- ▼                       ▼                        ▼
+                         â”‚
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+ â”‚                       â”‚                        â”‚
+ â–¼                       â–¼                        â–¼
 Configuration        Agent State           Operational Data
- │                       │                        │
- ▼                       ▼                        ▼
+ â”‚                       â”‚                        â”‚
+ â–¼                       â–¼                        â–¼
 Provider            Identity               Logs
- │
- ▼
+ â”‚
+ â–¼
 Model Selection
 ```
 
@@ -127,17 +127,17 @@ A Workspace progresses through a conceptual lifecycle.
 
 ```
 Created
-    │
-    ▼
+    â”‚
+    â–¼
 Initialized
-    │
-    ▼
+    â”‚
+    â–¼
 Active
-    │
-    ▼
+    â”‚
+    â–¼
 Inactive
-    │
-    ▼
+    â”‚
+    â–¼
 Archived
 ```
 

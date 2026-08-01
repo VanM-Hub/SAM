@@ -1,4 +1,4 @@
-# Components
+﻿# Components
 
 Version: 1.0
 
@@ -26,7 +26,7 @@ Architecture
 
 Framework
 
-- docs/ARCHITECTURE.md
+- docs/architecture/SAM_ARCHITECTURE.md
 - docs/DEPENDENCY_RULES.md
 
 ---
@@ -150,15 +150,15 @@ Dependency flows downward.
 
 ```
 CLI
- ↓
+ â†“
 Runtime
- ↓
+ â†“
 Workspace
- ↓
+ â†“
 Configuration
- ↓
+ â†“
 Provider
- ↓
+ â†“
 Model
 ```
 
@@ -174,43 +174,43 @@ Examples:
 
 CLI
 
-↓
+â†“
 
 Runtime
 
-✓
+âœ“
 
 Runtime
 
-↓
+â†“
 
 Provider
 
-✓
+âœ“
 
 Provider
 
-↓
+â†“
 
 CLI
 
-✗
+âœ—
 
 Workspace
 
-↓
+â†“
 
 Runtime
 
-✗
+âœ—
 
 Model
 
-↓
+â†“
 
 Configuration
 
-✗
+âœ—
 
 ---
 
