@@ -16,6 +16,50 @@ Last Updated: 2026-07-20
 
 
 
+Memory is modeled operationally within this document.
+
+
+The meanings of Memory, Knowledge, Context, Identity, and Governance remain authoritative in their respective documents.
+
+
+This model explains operational memory behavior and does not redefine those concepts.
+
+
+
+---
+
+
+
+# Authoritative Dependencies
+
+
+
+- MISSION
+
+- CONSTITUTION
+
+- GOVERNANCE
+
+- GLOSSARY
+
+
+
+# Operational Dependencies
+
+
+
+- TRUST_MODEL
+
+- RISK_MODEL
+
+- DECISION_MODEL
+
+
+
+---
+
+
+
 # Purpose
 
 
@@ -871,6 +915,30 @@ review,
 and lifecycle management
 
 must follow repository standards.
+
+
+
+---
+
+
+
+# Memory Boundaries
+
+
+
+Memory may reference Artifacts, but it does not replace them.
+
+
+Memory may reference Audits, but it does not replace them.
+
+
+Artifacts remain the governed outputs of a Mission.
+
+
+Audit remains the immutable record of what occurred.
+
+
+Memory provides operational experience; it is neither an Artifact nor an Audit.
 
 
 
