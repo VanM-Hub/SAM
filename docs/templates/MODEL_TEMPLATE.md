@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 
 ===============================================================================
 
@@ -58,7 +58,7 @@ See:
 
 \- WRITING\_GUIDELINES.md
 
-\- ARCHITECTURE.md
+\- SAM_ARCHITECTURE.md
 
 \- CONSTITUTION.md
 
@@ -356,7 +356,7 @@ Observe
 
 
 
-↓
+â†“
 
 
 
@@ -364,7 +364,7 @@ Interpret
 
 
 
-↓
+â†“
 
 
 
@@ -372,7 +372,7 @@ Evaluate
 
 
 
-↓
+â†“
 
 
 
@@ -380,7 +380,7 @@ Decision
 
 
 
-↓
+â†“
 
 
 
@@ -580,7 +580,7 @@ TRUST\_MODEL
 
 
 
-↓
+â†“
 
 
 
@@ -588,7 +588,7 @@ DECISION\_MODEL
 
 
 
-↓
+â†“
 
 
 

@@ -1,4 +1,4 @@
-# CONSTITUTION
+﻿# CONSTITUTION
 
 
 
@@ -10,7 +10,7 @@ Owner: SAM Framework
 
 Last Updated: 2026-07-20
 
-> **Document Status: Draft (Superseded)** — Bukan Constitution canonical.
+> **Document Status: Draft (Superseded)** â€” Bukan Constitution canonical.
 > Constitution canonical adalah `docs/CONSTITUTION.md` (v1.0). Dokumen ini sebagai riwayat desain.
 
 
@@ -67,7 +67,7 @@ Constitution
 
 
 
-↓
+â†“
 
 
 
@@ -75,7 +75,7 @@ Governance
 
 
 
-↓
+â†“
 
 
 
@@ -83,7 +83,7 @@ Architecture
 
 
 
-↓
+â†“
 
 
 
@@ -91,7 +91,7 @@ Framework Models
 
 
 
-↓
+â†“
 
 
 
@@ -99,7 +99,7 @@ Modules
 
 
 
-↓
+â†“
 
 
 
@@ -107,7 +107,7 @@ Knowledge
 
 
 
-↓
+â†“
 
 
 
@@ -115,7 +115,7 @@ Playbooks
 
 
 
-↓
+â†“
 
 
 
@@ -269,7 +269,7 @@ All Framework components shall respect the architectural boundaries defined by:
 
 
 
-ARCHITECTURE.md
+SAM_ARCHITECTURE.md
 
 
 
@@ -315,7 +315,7 @@ Observe
 
 
 
-↓
+â†“
 
 
 
@@ -323,7 +323,7 @@ Diagnose
 
 
 
-↓
+â†“
 
 
 
@@ -331,7 +331,7 @@ Recommend
 
 
 
-↓
+â†“
 
 
 
@@ -339,7 +339,7 @@ Simulate
 
 
 
-↓
+â†“
 
 
 
@@ -347,7 +347,7 @@ Execute
 
 
 
-↓
+â†“
 
 
 
@@ -355,7 +355,7 @@ Modify
 
 
 
-↓
+â†“
 
 
 

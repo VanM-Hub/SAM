@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 
 ===============================================================================
 
@@ -32,7 +32,7 @@ See:
 
 \- CONSTITUTION.md
 
-\- ARCHITECTURE.md
+\- SAM_ARCHITECTURE.md
 
 \- DECISION\_MODEL.md
 
@@ -48,7 +48,7 @@ See:
 
 
 
-# ADR-XXXX — <Decision Title>
+# ADR-XXXX â€” <Decision Title>
 
 
 

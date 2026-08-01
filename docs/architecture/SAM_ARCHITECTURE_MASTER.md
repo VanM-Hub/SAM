@@ -1,8 +1,12 @@
 # SAM Architecture Master
 
-**Version:** 1.0  
-**Status:** Final  
-**Date:** 2026-07-27  
+**Version:** 1.0
+**Status:** Historical Design Reference
+**Date:** 2026-07-27
+
+> **Document Status: Historical Design Reference (AD-028).**
+> Canonical Architecture of Project SAM adalah `docs/architecture/SAM_ARCHITECTURE.md`.
+> Dokumen ini memiliki nilai pada garis evolusi konsep arsitektur; dipertahankan sebagai referensi sejarah, bukan sebagai otoritas aktif.
 
 ---
 
