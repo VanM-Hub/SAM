@@ -117,18 +117,6 @@ Audit events: 6 captured
 
 ---
 
-## Rekomendasi untuk Sprint 12
-
-Sesuai roadmap Chief Architect → **Sprint 12: Knowledge Runtime**
-
-- `KnowledgeLoader` enhancements (incremental load, watch mode)
-- `KnowledgeQuery` / semantic search integration
-- `PatternMiner` untuk ekstraksi pola dari `AuditEvent` & `Execution`
-- `RecommendationEngine` berbasis `Pattern` + `Knowledge`
-- CLI: `sam knowledge query`, `sam pattern mine`, `sam recommend`
-
----
-
 ## File Lokasi
 
 ```

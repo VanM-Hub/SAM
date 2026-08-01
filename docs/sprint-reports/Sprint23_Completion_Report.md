@@ -1,4 +1,4 @@
-# Sprint 23 Completion Report — Graph Revision & Intent Evolution
+﻿# Sprint 23 Completion Report — Graph Revision & Intent Evolution
 
 **Date:** 2026-07-25
 **Branch:** `feature/sprint13-plugin-runtime`
@@ -121,9 +121,3 @@ ExecutionGraphEngine
 ```
 
 ---
-
-## Next Steps for Chief Architect's Review
-
-1. **Fase 3 code review** — verify revision/evolution models and engine integration
-2. **Migration validation** — fix pre-existing `010_add_knowledge_fts.sql` column bug (out of scope but blocking clean CI)
-3. **Sprint 24 planning** — Plugin Runtime (as previously directed by Chief Architect) or Observability/Monitoring layer

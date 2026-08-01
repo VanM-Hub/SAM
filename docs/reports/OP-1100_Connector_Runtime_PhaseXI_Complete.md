@@ -76,9 +76,3 @@ Connector Definition (112) → Registered
 
 - **77 file** di `src/sam/connectors/` (termasuk `__init__.py` dengan 116 public names)
 - Test: `tests/unit/test_sprint112.py` .. `test_sprint122.py`
-
----
-
-## Selanjutnya
-
-Phase XII — Real Connector Implementations (adapter provider di atas framework ini, tanpa mengubah inti Connector Runtime). Menunggu arahan.

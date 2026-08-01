@@ -66,4 +66,4 @@ Artifact, ArtifactReference, ArtifactManifest, ArtifactMetadata — semua frozen
 
 ## Hasil Akhir
 
-Artifact Runtime menjadi **representasi resmi seluruh keluaran pipeline SAM dalam bentuk artifact deterministik tanpa melakukan penyimpanan ataupun publikasi.** Fase ke-3 Tahap 1 selesai. Selanjutnya: lanjut ke Tahap 2 (integrasi nyata).
+Artifact Runtime menjadi **representasi resmi seluruh keluaran pipeline SAM dalam bentuk artifact deterministik tanpa melakukan penyimpanan ataupun publikasi.** Fase ke-3 Tahap 1 selesai.

@@ -1,4 +1,4 @@
-# Sprint 21 — Completion Report
+﻿# Sprint 21 — Completion Report
 
 **Tanggal:** 2026-07-25  
 **Branch:** `feature/sprint13-plugin-runtime`  
@@ -189,20 +189,3 @@ src/sam/governance/__init__.py           # Added GovernanceEngine export
 | **Total** | **296** | ✅ |
 
 ---
-
-## Next Up: Sprint 22 — Fase 4 (Integrasi Daemon + CLI)
-
-- Integrate `GovernanceEngine` into `RuntimeDaemon` as optional service (similar pattern to distributor/cluster_state/execution_engine)
-- Add `sam governance evaluate` CLI command
-- Add governance status to daemon `health()` endpoint
-- End-to-end governance gating test in daemon
-
----
-
-## Commit History
-
-```
-4723221 feat(governance): implement GovernanceEngine orchestrator with merge strategy and execution gating
-2e01a7c feat(governance): implement 7 concrete evaluators — Risk, Approval, Maintenance, Cluster, Resource, Capability, Policy
-9e0995c feat(governance): add Governance Models, Evaluator interface, and migration 020
-```

@@ -2,7 +2,6 @@
 
 **Version:** v8.0.0 → v8.5.0  
 **Date:** 2026-07-30  
-**Next:** Phase IX — Execution Runtime
 
 ---
 
@@ -149,26 +148,8 @@ Decision Runtime ──────┤
 Approval Runtime ──────┤
 Operational Brain ─────┤
 Activation Runtime ────┤── ✅ Activation Package Ready
-Execution Runtime ─────┘ (Phase IX — next)
+Execution Runtime ─────┘
 ```
-
----
-
-## 🚀 Next: Phase IX — Execution Runtime
-
-**Target:** 200+ tests, tag v9.0.0+
-**Lokasi:** `src/sam/execution/` (subsystem baru)
-
-### Sprint 88 — Execution Foundation
-- `execution_context.py` — frozen DTO
-- `execution_task.py` — frozen DTO task
-- `execution_plan.py` — execution plan
-- `execution_registry.py` — registry
-- `runtime.py` — entry point
-- Bridges (conversation, dashboard)
-
-### Sprint 89–93
-- Validation, Scheduling, Execution Pipeline, Monitoring, Finalization
 
 ---
 

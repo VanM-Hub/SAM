@@ -264,9 +264,6 @@ Setiap tahap menghasilkan DTO immutable yang dapat diaudit.
 | ✅ **Selesai** | External Integration, Plugin, SDK | ✅ |
 | 🔄 **Berlangsung** | Desktop pipeline integration | ⚠️ |
 | 🔄 **Berlangsung** | Real connector execution (Sprint 43+) | ❌ |
-| ⏳ **Berikutnya** | Execution engine → real adapter → real provider | 📅 |
-| ⏳ **Berikutnya** | Public REST API & SDK | 📅 |
-| 🔭 **Jangka Panjang** | Plugin marketplace, deployment runtime, async | 🔭 |
 
 ---
 
@@ -274,7 +271,7 @@ Setiap tahap menghasilkan DTO immutable yang dapat diaudit.
 
 SAM v4.46.0 mencapai tonggak arsitektur yang signifikan: **seluruh jalur dari observasi hingga eksekusi telah selesai secara arsitektur**. Semua layer (Learning, Execution, Dispatch, Connector, Engine, Adapter, Provider, Integration, Plugin, SDK) sudah memiliki fondasi yang solid.
 
-Yang belum: **eksekusi nyata ke sistem eksternal**. Semua masih dalam mode preview dan planning. Sprint berikutnya (43+) akan fokus pada menghubungkan pipeline ini ke connector/provider nyata.
+Yang belum: **eksekusi nyata ke sistem eksternal**. Pada versi ini semua masih dalam mode preview dan planning.
 
 ---
 

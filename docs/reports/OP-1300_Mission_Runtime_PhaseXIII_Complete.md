@@ -81,4 +81,4 @@ Mission Runtime   ← BARU (Phase XIII)
 
 ## Hasil Akhir
 
-Seluruh subsystem kini berbicara menggunakan entitas operasional yang sama — **Mission**. **Phase XIV** berikutnya dapat memperkenalkan provider connector nyata (OpenClaw, OpenAI, GitHub, Docker) sebagai plugin tanpa mengubah arsitektur inti.
+Seluruh subsystem kini berbicara menggunakan entitas operasional yang sama — **Mission**.

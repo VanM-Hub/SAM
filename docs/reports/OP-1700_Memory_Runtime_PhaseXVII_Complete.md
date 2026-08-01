@@ -6,7 +6,7 @@
 
 Phase XVII membangun **Memory Runtime** — subsystem yang mengelola deskripsi, model, builder, catalog, monitoring, dan sertifikasi memori. Semua **preview-only**, **read-only**, dan **tanpa write** (filesystem/database).
 
-> **Catatan fase:** Blueprint terbaru menamai Phase XVII = Memory Runtime (menggantikan "Operational Intelligence Console" dari keputusan ROADMAP sebelumnya). Blueprint terbaru menjadi otoritas.
+> **Catatan fase:** Fase ini diberi nama Memory Runtime.
 
 Subsystem baru: `src/sam/memory/` (67 file, 8 sprint, 209 tes baru).
 
@@ -62,4 +62,4 @@ Integrasi **read-only** — TIDAK mengubah runtime lain (0 layer violations).
 
 ## Hasil Akhir
 
-Memory Runtime siap sebagai lapisan memori preview yang dapat diintegrasikan ke pipeline penuh SAM tanpa mengubah subsystem lain. Fase berikutnya (XVIII) dapat membangun di atasnya.
+Memory Runtime siap sebagai lapisan memori preview yang dapat diintegrasikan ke pipeline penuh SAM tanpa mengubah subsystem lain.

@@ -24,14 +24,6 @@ Sprint 14 (Persistence & CLI Integration) menambahkan persistence untuk plugins 
 - Cache TTL + invalidation on update/delete
 - CLI commands: install, list, enable, disable, uninstall, discover, health
 
-## Rekomendasi untuk Sprint 15
-**Prioritas utama: Plugin Upgrade. Lainnya opsional untuk Sprint 15.**
-1. Implement `sam plugin upgrade` (upgrade workflow, version conflict handling, transactional updates).
-2. Add CI job to run the new integration tests (use temporary DB and ensure isolation).
-3. Improve migrations testing (apply migrations to temp DB in tests via MigrationManager) and add end-to-end DB migration tests.
-4. Consider adding YAML manifest storage column or keep manifest_json as source-of-truth explicitly documented.
-5. Add richer plugin discovery (remote registry, version constraints) and dependency resolver improvements.
-
 ## Known Issues
 - Belum ada migration rollback
 - Cache masih in-memory (hilang saat restart)

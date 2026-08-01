@@ -6,7 +6,7 @@
 
 Phase XVI membangun **Skill Runtime** — subsystem yang mengelola deskripsi, definisi, pembangunan, catalog, monitoring, dan sertifikasi skill. Semua **preview-only** dan **read-only**: tidak ada eksekusi, tidak ada akses filesystem, tidak ada panggilan provider/connector.
 
-> **Catatan fase:** Blueprint terbaru menamai Phase XVI = Skill Runtime (menggantikan "Real Provider Runtime" dari keputusan ROADMAP sebelumnya). Blueprint terbaru menjadi otoritas.
+> **Catatan fase:** Fase ini diberi nama Skill Runtime.
 
 Subsystem baru: `src/sam/skills/` (67 file, 8 sprint, 192 tes baru).
 
@@ -61,4 +61,4 @@ Integrasi **read-only** — TIDAK mengubah runtime lain (0 layer violations).
 
 ## Hasil Akhir
 
-Skill Runtime siap sebagai lapisan skill preview yang dapat diintegrasikan ke pipeline penuh SAM tanpa mengubah subsystem lain. Fase berikutnya (XVII) dapat membangun di atasnya.
+Skill Runtime siap sebagai lapisan skill preview yang dapat diintegrasikan ke pipeline penuh SAM tanpa mengubah subsystem lain.

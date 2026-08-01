@@ -92,7 +92,3 @@ Connector Definition → Registered
 | validate_layers | ✅ 0 violations |
 
 ---
-
-## Selanjutnya
-
-Phase XII — Real Connector Implementations (adapter provider di atas framework ini). Menunggu arahan.

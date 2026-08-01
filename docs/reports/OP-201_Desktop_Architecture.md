@@ -222,7 +222,7 @@ Adapter adalah **bridge** yang mengimplementasikan `RendererProtocol` dan menerj
 # Console mode
 python run.py --console
 
-# Desktop mode (future)
+# Desktop mode
 python run.py --desktop
 ```
 

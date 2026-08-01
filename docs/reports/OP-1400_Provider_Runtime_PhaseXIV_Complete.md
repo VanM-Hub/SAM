@@ -78,4 +78,4 @@ Provider Runtime   ← BARU (Phase XIV, adapter preview)
 
 ## Hasil Akhir
 
-Provider Runtime siap menjadi **plugin adapter** bagi dunia luar, 100% preview-only dan deterministik. Fase berikutnya dapat menghubungkan provider ini ke Connector Runtime tanpa mengubah arsitektur inti — setiap provider sudah menerapkan kontrak connector dan diverifikasi sertifikasi.
+Provider Runtime siap menjadi **plugin adapter** bagi dunia luar, 100% preview-only dan deterministik — setiap provider sudah menerapkan kontrak connector dan diverifikasi sertifikasi.

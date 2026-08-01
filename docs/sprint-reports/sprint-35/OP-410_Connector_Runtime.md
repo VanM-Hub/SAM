@@ -146,19 +146,7 @@ TIDAK ada network calls, TIDAK ada subprocess, TIDAK ada real execution.
 
 ---
 
-## 8. Future Real Connectors (Sprint 36)
-
-Setelah Sprint 35, real connectors bisa dibuat dengan:
-
-- Implement `ConnectorProtocol` or extend `BaseConnector`
-- Register with `ConnectorRegistry`
-- All operations go through `ConnectorIntegrationPipeline`
-- All operations require approval
-- No auto execution
-
----
-
-## 9. Files (ringkasan)
+## 8. Files (ringkasan)
 
 | File | Baris | Isi |
 |---|---|---|

@@ -1,4 +1,4 @@
-# OP-2400 — Program A: External Connector Integration
+﻿# OP-2400 — Program A: External Connector Integration
 
 **Versi:** v24.0.0 · **Tanggal:** 2026-08-01 · **Status:** ✅ SELESAI
 
@@ -6,7 +6,7 @@
 
 Program A membangun **External Connector Integration** — lapisan provider abstraction yang memungkinkan SAM terhubung ke penyedia LLM eksternal (OpenAI, Anthropic, Gemini, DeepSeek, Ollama) melalui **satu interface yang sama** (`LLMAdapter`), tanpa memunculkan provider-specific logic di Agent/Mission/Workflow.
 
-> Ini step pertama **Tahap 2 (Product Integration — Program A–H)** dari roadmap pasca Architecture Complete (v23.0.0, 2026-08-01). Tahap 1 (Architecture Development) telah SELESAI.
+> Ini bagian dari **Tahap 2 (Product Integration)** pasca Architecture Complete (v23.0.0, 2026-08-01). Tahap 1 (Architecture Development) telah SELESAI.
 
 > **Lokasi:** dibangun di `src/sam/providers/` (folder baru `interfaces/`, `llm/`, `openai/`, `anthropic/`, `gemini/`, `deepseek/`, `ollama/`, `integration/`, `connector_bridge/`, `execution/`, `certification_program/`). Tidak ada folder lama yang diubah (0 layer violations). Test di `tests/providers/`.
 
@@ -64,7 +64,3 @@ Semua 5 provider LLM (OpenAI, Anthropic, Gemini, DeepSeek, Ollama) lulus 100% (s
 - **Regresi penuh:** 2963 passed, 1 skipped (seluruh suite hijau, 0 regresi)
 - **Layer violations:** 0 (provider Program A tidak import agent/mission/workflow)
 - **Git:** 11 commit di branch `phase-xxiv`, tag `v24.0.0`
-
-## Menuju Program B
-
-Dengan Provider Abstraction Layer (Program A) selesai, langkah berikutnya **Program B — Execution Integration**: Execution → Provider → Connector → provider nyata, dengan alur approval → preview → execute sepenuhnya. Semua fondasi Provider (interfaces + llm + adapter + integration + execution + certification) sudah tersedia.

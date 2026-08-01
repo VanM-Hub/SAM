@@ -61,5 +61,3 @@ Keduanya di-export di `__init__`, tidak ada yang hilang. Ini adalah 1 dari 70 fi
 | XI | 112–122 | v11.0.0 | 77 | 220 |
 | XII | 123–133 | v12.0.0 | 78 | 172 |
 | XIII | 134–143 | v13.0.0 | 70 | 145 |
-
-**Fase berikutnya:** XIV — Real Connector Implementations (adapter provider).
