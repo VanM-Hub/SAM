@@ -44,7 +44,3 @@ Immutable FinalDecisionRecord
 - **Frozen DTOs**: Semua immutable.
 - **Synchronous**: Deterministik, tidak ada async/thread/network.
 - **In-memory**: Tidak ada persistence.
-
-## Future
-
-Sprint 65: Approval Workflow (v6.1.0)

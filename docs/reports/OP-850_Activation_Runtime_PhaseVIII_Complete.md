@@ -1,4 +1,4 @@
-# OP-850 — Phase VIII: Activation Runtime Complete (Sprint 82–87)
+﻿# OP-850 — Phase VIII: Activation Runtime Complete (Sprint 82–87)
 
 **Report:** Operational Plan #850  
 **Phase:** VIII — Activation Runtime  
@@ -122,19 +122,3 @@ Semua integrasi hanya melalui **bridge read-only**.
 - ✅ Tidak mengubah `guardian/`, `decision/`, `approval/`, `operational_brain/`
 
 ---
-
-## 🚀 Next: Phase IX — Execution Runtime
-
-Target: Sprint 88–93, v9.0.0+, 200+ tests
-
-Lokasi baru: `src/sam/execution/`
-
-### Sprint 88 — Execution Foundation
-- ExecutionContext, ExecutionTask, ExecutionPlan
-- ExecutionRegistry
-- Entry point runtime
-- Conversation + Dashboard bridges
-
----
-
-*Report generated 2026-07-30 by ZARA*

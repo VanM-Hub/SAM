@@ -1,4 +1,4 @@
-# OP-420 — Execution Engine (Sprint 36)
+﻿# OP-420 — Execution Engine (Sprint 36)
 
 Dokumentasi arsitektur Execution Engine untuk Sprint 36.
 
@@ -27,7 +27,7 @@ Guardian → Conversation → Dashboard
     ↓
 (Human Approval)
     ↓
-Connector Dispatch (Sprint 37)
+Connector Dispatch
 ```
 
 **Lokasi kode:** `src/sam/execution/engine/`
@@ -106,13 +106,7 @@ ExecutionPackageCard, TaskCard, ScheduleCard, RollbackCard, ValidationCard, Risk
 
 ---
 
-## 8. Future Connector Execution (Sprint 37)
-
-ExecutionPackage siap dikirim ke connector — semua validasi sudah lulus, approval sudah didapat, schedule sudah siap. Sprint berikutnya akan menghubungkan package ini dengan connector runtime untuk dispatch sungguhan.
-
----
-
-## 9. Files (ringkasan)
+## 8. Files (ringkasan)
 
 | File | Baris | Isi |
 |---|---|---|

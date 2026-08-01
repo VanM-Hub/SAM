@@ -1,4 +1,4 @@
-# Sprint 28 — Fase 1: Self-Optimization Engine
+﻿# Sprint 28 — Fase 1: Self-Optimization Engine
 
 **Status:** ✅ SELESAI  
 **Branch:** `feature/sprint13-plugin-runtime`  
@@ -101,11 +101,3 @@ src/sam/persistence/migrations/
 5 files changed: 4 source files + test file.
 
 ---
-
-## Next Steps
-
-| Fase | Target | Status |
-|------|--------|--------|
-| **Fase 2 – Self-Healing Loop** | Deteksi anomali, auto-recovery action, health degradation integration | ⏳ Planned |
-| **Fase 3 – Evolutionary Architecture** | Parameter evolution via genetic/crossover, A/B testing param variants | 📋 Planned |
-| **Fase 4 – Performance Autotuning** | Benchmark-driven tuning, adaptive thresholds, SLA-aware optimization | 📋 Planned |

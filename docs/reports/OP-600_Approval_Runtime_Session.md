@@ -76,7 +76,3 @@ Decision Runtime V3 Pipeline (Sprint 52→59)
 - Preview-only
 - Deterministic
 - Immutable DTOs
-
-## Future: Approval Runtime Connection
-
-Session ini akan menjadi input bagi Approval Runtime ketika nanti diintegrasikan — tugasnya hanya *mengelola representasi* proses approval.

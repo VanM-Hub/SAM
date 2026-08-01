@@ -53,5 +53,3 @@ Sprint 133 menyelesaikan subsystem **Certification** dan menutup seluruh Phase X
 | X | 100–111 | v10.0.0 | 69 | 1,719 |
 | XI | 112–122 | v11.0.0 | 77 | 220 |
 | XII | 123–133 | v12.0.0 | 78 | 172 |
-
-**Fase berikutnya:** XIII — Real Connector Implementations (adapter provider).

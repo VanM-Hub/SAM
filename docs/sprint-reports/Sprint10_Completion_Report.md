@@ -1,4 +1,4 @@
-# Sprint 10 Completion Report
+﻿# Sprint 10 Completion Report
 
 **Project:** SAM (Self-Aware Machine)  
 **Sprint:** 10 — Workflow Orchestration & Service Runtime  
@@ -165,39 +165,6 @@ src/sam/health/collector.py            # ASCII indicators fix
 | **datetime.utcnow()** | Deprecated di Python 3.12+. Perlu migrasi ke `datetime.now(timezone.utc)` di seluruh codebase. |
 | **Scheduler loop** | `SchedulerEngine.start()` / `stop()` untuk background processing. Belum terintegrasi ke entrypoint utama SAM (bisa ditambah di Sprint 11). |
 | **ReportGenerator defensive queries** | Sudah handle missing `execution_id` di tabel approvals. Dokumentasikan fallback behavior. |
-
----
-
-## Rekomendasi untuk Sprint 11 — Plugin Runtime
-
-Berdasarkan arahan **Chief Architect (Chief Architect)**, Sprint 11 fokus pada **Plugin Runtime**:
-
-### 1. Plugin Discovery & Loading
-- `PluginRegistry` — discover plugins dari entry points (`sam.plugins`) atau directory.
-- `PluginLoader` — dynamic import, version compatibility check, dependency resolution.
-- Sandbox/isolasi: proses terpisah atau subprocess dengan resource limits.
-
-### 2. Plugin Manifest & Contract
-- `pyproject.toml` / `plugin.yaml` manifest: name, version, capabilities, dependencies, permissions.
-- Capability contract validation saat load (reuse `WorkflowValidator` pattern).
-
-### 3. Plugin Lifecycle
-- Install / update / uninstall / enable / disable via CLI (`sam plugin ...`).
-- Health check per plugin (extend `HealthCollector`).
-- Hot-reload untuk development mode.
-
-### 4. Plugin Marketplace / Index
-- Local index cache, remote index fetch (GitHub releases, PyPI).
-- Signature verification (cosign/sigstore) untuk supply chain security.
-
-### 5. Integration Points
-- Plugins dapat register capabilities ke `CapabilityRegistry`.
-- Plugins dapat kontribusi workflow templates, health checks, patterns, recommendations.
-- Plugin events → EventBus (audit trail).
-
-### 6. Testing & CI
-- Integration test: load sample plugin, execute capability, verify correlation propagation.
-- CI pipeline: plugin build, test, sign, publish workflow.
 
 ---
 

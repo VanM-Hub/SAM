@@ -93,4 +93,4 @@ States: `Created → Preparing → Running → Waiting ⇄ Running → Completed
 
 ## Hasil Akhir
 
-Agent Runtime mampu **membangun dan melacak lifecycle sebuah Mission dari Created hingga Completed dalam mode preview**, tanpa menyentuh subsystem lain. Fase berikutnya dapat mengintegrasikan Agent Runtime ke eksekusi nyata tanpa mengubah arsitektur inti.
+Agent Runtime mampu **membangun dan melacak lifecycle sebuah Mission dari Created hingga Completed dalam mode preview**, tanpa menyentuh subsystem lain.

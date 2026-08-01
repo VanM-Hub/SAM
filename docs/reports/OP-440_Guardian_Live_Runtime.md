@@ -180,7 +180,7 @@ Observation        Guardian Live Runtime          Subscribers        Reasoning  
 
 ---
 
-## Future Integration
+## Event Source Mapping
 
 1. **Filesystem Event** → Source: `FILESYSTEM`, Type: `OBSERVATION_UPDATE`
 2. **Git Event** → Source: `GIT`, Type: `STATE_CHANGE`

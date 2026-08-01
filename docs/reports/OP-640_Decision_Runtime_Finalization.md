@@ -84,6 +84,6 @@ IMMUTABLE FINAL DECISION RECORD
 APPROVAL RUNTIME (belum disentuh — aktivasi manual)
 ```
 
-## Future Approval Runtime Handoff
+## Handoff ke Approval Runtime
 
 Final Decision Record siap dioper ke Approval Runtime kapan saja. Semua DTO immutable, semua status deterministik, semua referensi lengkap. Tidak ada side-effect.

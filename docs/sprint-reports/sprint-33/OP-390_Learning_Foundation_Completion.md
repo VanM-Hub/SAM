@@ -102,19 +102,7 @@ Semua DTO menggunakan `dataclass(frozen=True)` — immutable.
 
 ---
 
-## 5. Future Evolution
-
-Sprint 34 (Execution Connectors) akan menggunakan Learning Foundation sebagai dasar untuk:
-- Menyimpan history eksekusi connector
-- Mempelajari performa connector
-- Merekomendasikan optimalisasi connector routing
-- Mendeteksi pola kegagalan connector
-
-Learning Runtime tidak akan berubah signifikan — pipeline, DTO, dan constraints sudah final.
-
----
-
-## 6. Integration
+## 5. Integration
 
 | Modul | Cara integrasi |
 |---|---|

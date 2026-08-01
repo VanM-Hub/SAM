@@ -6,7 +6,6 @@ License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
 Current:      v28.0.0 - Program E (Unified Intelligence Runtime)
-Next:         Program F - Desktop Application
 Framework:    Python
 Build:        setuptools
 Test:         pytest (modern suite 4617 passed + 1 skipped; legacy folder excluded)

@@ -1,4 +1,4 @@
-# OP-800 Operational Brain Phase VII — Complete
+﻿# OP-800 Operational Brain Phase VII — Complete
 
 **Date:** 2026-07-30
 **Version:** v7.5.0 (Phase VII)
@@ -64,11 +64,3 @@ Context → Builder → Registry → Planner → Prioritizer → Scheduler → E
 | Bridges read-only | ✅ |
 
 ---
-
-## Next Phase
-
-**Phase VIII — Activation Runtime** (Sprint 82+)
-- Activation Engine
-- Activation History & Rules
-- Activation Validator
-- Conversation & Dashboard bridges for activation

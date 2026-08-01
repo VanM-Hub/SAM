@@ -50,5 +50,5 @@ melalui provider yang sudah ada. 11 sprint (250–260), 165 test baru.
 
 ## Catatan Transparan
 
-- ROADMAP menetapkan "Program C — Desktop Application". Program yang dikerjakan sebagai **Program C** adalah **Real Execution Runtime** (v26.0.0), ditulis di ROADMAP sebagai blok tambahan sejajar Program B, dengan Desktop Application tetap dijadwalkan berikutnya.
+- ROADMAP menetapkan "Program C — Desktop Application". Program yang dikerjakan sebagai **Program C** adalah **Real Execution Runtime** (v26.0.0), ditulis di ROADMAP sebagai blok tambahan sejajar Program B.
 - Executor nyata men-delegate ke provider layer; eksekusi HTTP nyata memerlukan API key di environment + approval eksplisit (belum diaktivasi otomatis).

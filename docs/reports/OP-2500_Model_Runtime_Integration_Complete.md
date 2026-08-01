@@ -82,9 +82,3 @@ Seluruh 11 sprint selesai, 108 test baru hijau, tanpa regresi, tanpa pelanggaran
 - Tidak mengubah Program A (`src/sam/providers/`).
 - Semua bridge read-only.
 - Layer validation = 0.
-
----
-
-## Selanjutnya
-
-Menunggu instruksi. Kandidat: Program C (Desktop Application), atau eksekusi provider-nyata (membutuhkan approval eksplisit + API key).

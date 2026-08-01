@@ -23,7 +23,7 @@ Conversation → Dashboard
     ↓
 (Human Approval)
     ↓
-External Connector (Sprint berikutnya)
+External Connector
 ```
 
 **Lokasi kode:** `src/sam/execution/`
@@ -138,17 +138,6 @@ Connector mendaftarkan capabilities via `add_capability(ConnectorCapability)`:
 ConnectorRegistry mendukung lookup by type, by action, dan capability search.
 
 ---
-
-## 8. Future Connector Examples (Sprint berikutnya)
-
-Setelah Sprint 34, connector nyata bisa diimplementasikan dengan:
-
-- FileConnector: membaca/menulis file, hanya proposal
-- APIConnector: membuat request API sebagai proposal
-- DBConnector: query DB sebagai proposal
-- CommandConnector: menjalankan command sebagai proposal
-
-Semua connector TIDAK akan execute — hanya membuat ExecutionRequest yang harus melalui approval pipeline.
 
 ---
 

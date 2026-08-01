@@ -39,7 +39,7 @@ SDK → Extension Validator → Compatibility → Conversation → Dashboard
 3. Check compatibility (SDK version, Python, SAM version)
 4. Generate report (CompatibilityReport)
 5. Preview (via Pipeline)
-6. Deploy (future)
+6. Deploy
 ```
 
 ---
