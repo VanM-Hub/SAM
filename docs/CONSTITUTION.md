@@ -10,6 +10,16 @@ Authority: Highest
 
 Scope: Entire Project SAM
 
+Canonical: true
+
+Supersedes: docs/architecture/SAM_CONSTITUTION.md (Historical Design Reference); docs/core/CONSTITUTION.md (Draft, Superseded)
+
+Mission Source: MISSION.md
+
+Depends On: MISSION.md (legitimacy)
+
+Owner: Project SAM
+
 
 
 \---
@@ -63,6 +73,46 @@ Everything else may evolve.
 
 
 The Constitution should not.
+
+
+
+\---
+
+
+
+\# Constitutional Foundation
+
+
+
+Mission is the reason SAM exists.
+
+
+
+The Constitution does not create the Mission.
+
+
+
+The Constitution derives its legitimacy from the Mission.
+
+
+
+The Constitution exists to preserve and fulfill the Mission.
+
+
+
+Mission is the highest authority.
+
+
+
+Everything else exists to preserve and fulfill the Mission.
+
+
+
+If implementation conflicts with the Constitution, the Constitution governs.
+
+
+
+If the Constitution must be amended, an amendment must never betray the Mission.
 
 
 
@@ -1040,7 +1090,11 @@ A Presentation Layer bypassing Runtime Service.
 
 
 
-Level 1
+Mission
+
+
+
+↓
 
 
 
@@ -1052,10 +1106,6 @@ Constitution
 
 
 
-Level 2
-
-
-
 Philosophy
 
 
@@ -1064,7 +1114,11 @@ Philosophy
 
 
 
-Level 3
+Governance
+
+
+
+↓
 
 
 
@@ -1076,19 +1130,11 @@ Architecture
 
 
 
-Level 4
-
-
-
-Specifications
+Specification
 
 
 
 ↓
-
-
-
-Level 5
 
 
 
@@ -1097,10 +1143,6 @@ Roadmap
 
 
 ↓
-
-
-
-Level 6
 
 
 
@@ -1117,6 +1159,26 @@ Implementation
 
 
 Every architectural proposal should answer:
+
+
+
+Does this change continue to serve the Mission?
+
+
+
+If the answer is "No",
+
+
+
+the proposal should be reconsidered.
+
+
+
+If the answer is "Yes",
+
+
+
+then evaluate:
 
 
 

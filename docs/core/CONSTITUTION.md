@@ -10,6 +10,9 @@ Owner: SAM Framework
 
 Last Updated: 2026-07-20
 
+> **Document Status: Draft (Superseded)** — Bukan Constitution canonical.
+> Constitution canonical adalah `docs/CONSTITUTION.md` (v1.0). Dokumen ini sebagai riwayat desain.
+
 
 
 ---

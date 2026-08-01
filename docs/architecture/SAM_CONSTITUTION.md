@@ -5,6 +5,9 @@
 **Date:** 2026-07-27  
 **Authority:** Chief Architect (Chief Architect)
 
+> **Document Status: Historical Design Reference** — Bukan Constitution canonical.
+> Constitution canonical adalah `docs/CONSTITUTION.md`. Dokumen ini adalah jejak evolusi desain (superseded).
+
 ---
 
 ## Preamble
