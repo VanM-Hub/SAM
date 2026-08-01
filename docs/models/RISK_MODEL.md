@@ -16,6 +16,38 @@ Last Updated: 2026-07-20
 
 
 
+Risk is defined operationally within this model.
+
+
+The meaning of Trust, Governance, and Identity remains authoritative only in the Identity Layer and Governance documents.
+
+
+This document explains operational risk behavior and does not redefine those concepts.
+
+
+
+---
+
+
+
+# Authoritative Dependencies
+
+
+
+MISSION
+
+CONSTITUTION
+
+GOVERNANCE
+
+TRUST_MODEL
+
+
+
+---
+
+
+
 # Purpose
 
 
@@ -788,7 +820,7 @@ Automation without risk assessment violates the Constitution.
 
 
 
-Trust evaluates evidence quality.
+Trust reflects confidence in governed conduct, as defined by the Identity Layer.
 
 Risk evaluates operational consequences.
 
