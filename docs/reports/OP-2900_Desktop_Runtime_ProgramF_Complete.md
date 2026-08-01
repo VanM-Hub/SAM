@@ -1,5 +1,10 @@
 # OP-2900 — Desktop Runtime (Program F) Complete
 
+> **ARSIP (2026-08-01).** Laporan ini merekam rencana awal Program F sebagai "Desktop Runtime"
+> (v29.0.0). Sesuai revisi arsitektur, Program F dieksekusi sebagai **Presentation Layer**
+> dan dirilis **v30.0.0** — lihat **`OP-3000_Presentation_Layer_ProgramF_Complete.md`**
+> untuk laporan hasil final. v29.0.0 di-*skip*.
+
 **Versi:** v29.0.0 · **Tanggal:** 2026-08-01 · **Status:** ✅ Released
 
 ## Ringkasan
