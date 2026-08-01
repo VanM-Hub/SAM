@@ -12,6 +12,12 @@ Last Updated: 2026-07-20
 
 
 
+> **Document Status: Superseded Architecture (AD-028).**
+> Canonical Architecture of Project SAM adalah `docs/architecture/SAM_ARCHITECTURE.md`.
+> Dokumen ini pernah menjadi acuan arsitektur, kini digantikan; dipertahankan sebagai riwayat evolusi.
+
+
+
 ---
 
 

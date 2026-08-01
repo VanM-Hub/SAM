@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 
 ===============================================================================
 
@@ -44,7 +44,7 @@ See:
 
 \- DEPENDENCY\_RULES.md
 
-\- ARCHITECTURE.md
+\- SAM_ARCHITECTURE.md
 
 \- CONSTITUTION.md
 
