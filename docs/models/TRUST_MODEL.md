@@ -17,6 +17,21 @@ It describes the mechanisms by which Trust is established, maintained, verified,
 
 ---
 
+# Authoritative Dependencies
+
+- MISSION
+- CONSTITUTION
+- GOVERNANCE
+- GLOSSARY
+
+# Operational Dependencies
+
+- RISK_MODEL
+- DECISION_MODEL
+- MEMORY_MODEL
+
+---
+
 # Trust Sources
 
 Trust is derived from the requirements of the Identity Layer and Governance:
