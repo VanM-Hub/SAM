@@ -16,6 +16,46 @@ Last Updated: 2026-07-20
 
 
 
+Decision is modeled operationally within this document.
+
+
+The meaning of Mission, Constitution, Governance, Approval, and Execution remains authoritative in their respective documents.
+
+
+This model explains how decisions are evaluated and handed off; it does not redefine those concepts.
+
+
+
+---
+
+
+
+# Authoritative Dependencies
+
+
+
+- MISSION
+
+- CONSTITUTION
+
+- GOVERNANCE
+
+
+
+# Operational Dependencies
+
+
+
+- TRUST_MODEL
+
+- RISK_MODEL
+
+
+
+---
+
+
+
 # Purpose
 
 
@@ -316,13 +356,16 @@ Its responsibility ends with recommendation.
 
 
 
+- Decision ends with recommendation.
+- Approval authorizes.
+- Execution performs.
+
+
 \- Trust answers "How reliable is available evidence?"
 
 \- Risk answers "What could happen?"
 
 \- Decision answers "What should be done?"
-
-\- Execution performs the action.
 
 \- Memory records the outcome.
 
