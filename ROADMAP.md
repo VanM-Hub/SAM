@@ -188,9 +188,17 @@ Pipeline akhir: Mission→Agent→Workflow→Memory→Knowledge→Cognitive→Po
 > keputusan pelaksanaan, Program E diisi Unified Intelligence Runtime (v28.0.0);
 > Desktop Runtime digeser menjadi **Program F**.
 
-> 🚧 **SEDANG BERJALAN (v29.0.0 — IN PROGRESS).**
+> 🚧 **SEDANG BERJALAN (v29.0.0 — IN PROGRESS, Sprint 272–279).**
 
-Mengaktifkan UI yang sudah lama ada. Prioritas: **Mission Designer · Workflow Designer · Policy Viewer · Audit Explorer · Artifact Explorer · Runtime Explorer · Connector Explorer · Provider Explorer · Execution Preview**. Semua memakai subsystem yang sudah tersedia.
+**Tujuan:** UI resmi SAM — murni komposisi (composition layer) yang menghubungkan seluruh subsystem. **Tidak ada business logic baru**, semua keputusan dari runtime yang sudah ada.
+
+**Hard Rules:** jangan ubah subsystem lama · bridge read-only · DTO immutable (frozen=True) · tanpa async/thread/multiprocessing/socket/requests/httpx/subprocess · tanpa filesystem write (kecuali konfigurasi desktop) · tanpa provider-specific logic · semua action → RuntimeService · semua execution tetap melalui Approval Gate.
+
+**Sprint plan:** Foundation (272) · Workspace (273) · Panels (274) · Dashboard (275) · Runtime (276) · Monitoring (277) · Certification 7-dimensi (278) · Integration (279). Minimal ±180 test baru di `tests/desktop_runtime/`.
+
+**Pipeline akhir (Sprint 279) — Desktop hanya visualisasi, tidak execute sendiri:** Mission→Agent→Workflow→Skill→Memory→Knowledge→Cognitive→Policy→Audit→Artifact→Intelligence→Orchestrator→Connector→Provider→Execution→RuntimeService→**Desktop**. Entry point: `sam.desktop_runtime`.
+
+**Target struktur:** `foundation/ workspace/ panels/ dashboard/ runtime/ monitoring/ certification/ integration/ conversation/ dashboard_bridge/`.
 
 #### Program G — Conversation
 
