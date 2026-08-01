@@ -182,11 +182,13 @@ Pipeline akhir: Mission→Agent→Workflow→Memory→Knowledge→Cognitive→Po
 > 0 async/thread/socket/network, DTO frozen, preview-only, external_calls==0,
 > tanpa inference/LLM, bridge read-only, tidak mengubah subsystem lama.
 
-#### Program F — Desktop Application
+#### Program F — Desktop Runtime
 
 > Catatan: Semula direncanakan sebagai Program E (Desktop Application). Sesuai
 > keputusan pelaksanaan, Program E diisi Unified Intelligence Runtime (v28.0.0);
-> Desktop Application digeser menjadi **Program F**.
+> Desktop Runtime digeser menjadi **Program F**.
+
+> 🚧 **SEDANG BERJALAN (v29.0.0 — IN PROGRESS).**
 
 Mengaktifkan UI yang sudah lama ada. Prioritas: **Mission Designer · Workflow Designer · Policy Viewer · Audit Explorer · Artifact Explorer · Runtime Explorer · Connector Explorer · Provider Explorer · Execution Preview**. Semua memakai subsystem yang sudah tersedia.
 
@@ -301,7 +303,7 @@ Program D — Runtime Services & Deployment (v27.0.0 ✅)
         ↓
 Program E — Unified Intelligence Runtime (v28.0.0 ✅)
         ↓
-Program F — Desktop Application
+Program F — Desktop Runtime (v29.0.0 🚧)
         ↓
 Program G — Conversation
         ↓
@@ -316,4 +318,4 @@ Program K — LLM Integration
 SAM Operational Product
 ```
 
-**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅) **sudah dieksekusi & dirilis**. Program F–K & Tahap 3 masih **perencanaan**. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
+**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅) **sudah dieksekusi & dirilis**. **Program F (Desktop Runtime v29.0.0) sedang berjalan (IN PROGRESS).** Program G–K & Tahap 3 masih **perencanaan**. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
