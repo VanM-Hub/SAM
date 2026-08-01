@@ -4,6 +4,10 @@ Version: 1.0
 Status: Foundational
 Authority: Constitutional Vocabulary
 
+> The Glossary provides authoritative vocabulary for Project SAM.
+> It does not define governance rules, constitutional principles, or architectural decisions.
+> Those remain authoritative only in their respective documents.
+
 ---
 
 # Purpose
@@ -93,9 +97,7 @@ analysis,
 
 or any governed output.
 
-Artifacts are never governance.
-
-Artifacts are governed.
+As established by the Constitution, Artifacts are governed outputs, never a source of governance themselves.
 
 ---
 
@@ -126,11 +128,13 @@ Bridges never own business logic.
 
 ## Definition
 
-The formal description of something a Citizen is able to perform.
+The formal description of a governed ability that a constitutional participant can perform.
 
 Capability is implementation independent.
 
 Capability is the universal language of SAM.
+
+Authoritative Source: CONSTITUTION
 
 ---
 
@@ -140,9 +144,7 @@ Capability is the universal language of SAM.
 
 The constitutional process verifying that a Citizen satisfies required governance principles.
 
-Certification evaluates constitutional compliance.
-
-Not usefulness.
+As established by the Constitution and Governance, Certification evaluates constitutional compliance rather than usefulness.
 
 ---
 
@@ -150,10 +152,9 @@ Not usefulness.
 
 ## Definition
 
-Any constitutional participant capable of publishing capabilities,
-obeying contracts,
-participating in governance,
-and being audited.
+Any constitutional participant that enjoys the rights and obligations of Project SAM.
+
+A Citizen publishes Capabilities, obeys Contracts, participates in governance, and remains auditable.
 
 Citizens include:
 
@@ -187,9 +188,7 @@ Citizen is the highest architectural abstraction.
 
 A Citizen responsible for connecting SAM to external systems through governed interfaces.
 
-Connector never contains governance.
-
-Connector implements communication.
+As established by the Constitution, a Connector implements communication; it does not itself hold governance.
 
 ---
 
@@ -202,6 +201,18 @@ An immutable agreement defining communication between Citizens.
 Contracts define expectations.
 
 Not implementation.
+
+---
+
+# Constitution
+
+## Definition
+
+The non-negotiable principles that define the identity of Project SAM and set what must never change.
+
+The Constitution derives its legitimacy from the Mission and exists to preserve and fulfill it. It is the highest authority.
+
+Authoritative Source: CONSTITUTION
 
 ---
 
@@ -233,9 +244,7 @@ Compatibility
 
 A user-facing interface to SAM.
 
-Desktop is not part of governance.
-
-Desktop consumes governance.
+As established by the Constitution, a Desktop consumes governance rather than being part of it.
 
 Other interfaces such as CLI,
 REST,
@@ -277,6 +286,18 @@ Approval authorizes it.
 
 ---
 
+# Governance
+
+## Definition
+
+The system by which authority is allocated, exercised, and audited within Project SAM.
+
+Governance determines who may do what and how authority is granted and revoked, in service of the Vision. It does not define identity.
+
+Authoritative Source: GOVERNANCE
+
+---
+
 # Health
 
 ## Definition
@@ -286,6 +307,18 @@ The current operational condition of a Citizen.
 Health reflects operational readiness.
 
 Not business success.
+
+---
+
+# Identity
+
+## Definition
+
+The enduring character of Project SAM that remains stable while technology changes.
+
+Identity is expressed through the Mission, Constitution, and Vision, and outlives any implementation.
+
+Authoritative Source: MISSION + CONSTITUTION + VISION
 
 ---
 
@@ -370,9 +403,7 @@ Not implementation.
 
 A computational intelligence implementation capable of providing reasoning or generation.
 
-Models implement intelligence.
-
-They do not define governance.
+As established by the Constitution, Models implement intelligence rather than define governance.
 
 ---
 
@@ -388,6 +419,18 @@ It does not control.
 
 ---
 
+# Philosophy
+
+## Definition
+
+The reasoning that guides thinking when the Constitution does not give an explicit answer.
+
+Philosophy explains how Project SAM approaches principled decisions; it is not the source of identity.
+
+Authoritative Source: CONSTITUTION
+
+---
+
 # Policy
 
 ## Definition
@@ -397,6 +440,18 @@ The formal rules governing permitted behavior.
 Policies determine what is allowed.
 
 Approval determines whether permission is granted.
+
+---
+
+# Presentation
+
+## Definition
+
+The user-facing layer through which humans interact with SAM.
+
+Presentation visualizes, configures, approves, and observes; it holds no business logic and communicates through Runtime Service.
+
+Authoritative Source: CONSTITUTION
 
 ---
 
@@ -418,9 +473,7 @@ container providers,
 
 future providers.
 
-Providers implement.
-
-They do not govern.
+As established by the Constitution, Providers implement capabilities rather than exercise governance.
 
 ---
 
