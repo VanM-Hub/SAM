@@ -1,75 +1,122 @@
-# SAM Framework
+# SAM
 
-**The Autonomous Guardian Operating System for AI** 🔰
-*Versi: v30.0.0 - Program F (Presentation Layer)*
+The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
----
-
-## Ringkasan
-
-SAM adalah **Deterministic Operational Intelligence Platform** - mengobservasi, memahami, merencanakan, mengoordinasikan, menyiapkan, dan mengawasi operasi lintas sistem secara aman, dapat diaudit, provider-agnostic, dan dapat dipertanggungjawabkan.
-
-AI hanyalah **salah satu provider** yang dapat dipasang melalui Connector Runtime - identitas SAM tetap utuh walaupun provider AI diganti.
-
-**Versi aktif:** v30.0.0 - Program F (Presentation Layer)
-**Status:** Arsitektur SELESAI (v23.0.0) → Tahap 2 Product Integration (Program A-K)
-**Fase aktif:** Program A (External Connectors) - selesai ✅ · Program B (Model Runtime) - selesai ✅ · Program C (Real Execution) - selesai ✅ · Program D (Runtime Services) - selesai ✅ · Program E (Intelligence Runtime) - selesai ✅ · Program F (Presentation Layer) - selesai ✅
-
-> 📌 **Peta fase dari awal hingga roadmap produk** ada di [**ROADMAP.md**](ROADMAP.md) - sumber kebenaran tunggal.
+**Versi:** v30.0.0 · Program F (Presentation Layer)
 
 ---
 
-## Fitur v10.0.0 - Runtime Kernel
+## 1. What is SAM?
 
-Runtime Kernel adalah lapisan koordinasi antar-subsystem. Preview-only, read-only, tidak memodifikasi subsystem lain.
+SAM is a governance platform for intelligent systems. It does not build intelligence; it governs how intelligence is discovered, selected, coordinated, approved, executed, audited, and evolved.
 
-**12 Subsystem:**
+SAM exists so that intelligent systems remain accountable — regardless of how models, providers, or technologies change.
 
-| Subsystem | Engine | Bridge |
-|-----------|--------|--------|
-| Context | IdentityBuilder, EnvironmentEngine, ProfileEngine, ConfigurationEngine | ConversationRuntimeContext + Dashboard |
-| Registry | RuntimeCatalog, Locator, DescriptorEngine, ManifestEngine | ConversationRegistry + Dashboard |
-| State | StateMachineEngine (FSM 7 states/8 transitions), SnapshotEngine, StateHistory | ConversationState + Dashboard |
-| Lifecycle | LifecycleManager (startup 6-phases, shutdown, restart) | ConversationLifecycle + Dashboard |
-| Bridge | AdapterRegistry, BridgeRouter, TransformEngine, ProtocolMapper | ConversationBridge + Dashboard |
-| Health | HealthChecker, HealthEngine (thresholds), ResourceMonitor | ConversationHealth + Dashboard |
-| Security | SecurityManager, AccessController, AuditLogger, VerdictEngine | ConversationSecurity + Dashboard |
-| Scheduler | SchedulerEngine, TaskScheduler, WindowScheduler, PriorityAllocator | ConversationScheduler + Dashboard |
-| Event Bus | EventBus (pub/sub), EventDispatcher, EventLogger, EventFilter | ConversationEvent + Dashboard |
-| Coordinator | CoordinationEngine, SyncCoordinator, Orchestrator | ConversationCoordinator + Dashboard |
-| Telemetry | TelemetryCollector, MetricsAggregator, TelemetryReporter | ConversationTelemetry + Dashboard |
-| Final Assembly | FinalInspector (11 components), KernelReporter | ConversationFinal + Dashboard |
-
-- **69 file** sumber di `src/sam/runtime_kernel/`
-- **60 Dashboard Cards** (5 per subsystem, frozen ExecutionCards)
-- Semua DTO immutable (`frozen dataclass`) - **0 forbidden imports**
-- Synchronous, deterministic, rule-based
+*Authority: MISSION.md*
 
 ---
 
-## Pipeline
+## Reading Order
+
+If you are new to Project SAM, read the documentation in the following order:
+
+1. Mission
+2. Constitution
+3. Philosophy
+4. Governance
+5. Canonical Architecture
+6. Repository Convention
+7. Roadmap
+8. ADR
+
+---
+
+## 2. Mission
+
+The mission of SAM is to provide a trustworthy governance platform for intelligent systems: governing intelligence rather than creating it.
+
+> See **[MISSION.md](MISSION.md)** — the highest authority and the reason SAM exists.
+
+---
+
+## 3. Constitution
+
+The Constitution defines what must never change, and derives its legitimacy from the Mission.
+
+> See **[docs/CONSTITUTION.md](docs/CONSTITUTION.md)** — the canonical Constitution of Project SAM.
+
+---
+
+## 4. Architecture
+
+The canonical architecture realizes Governance as a system: layers, responsibilities, dependencies, and deployment abstraction.
+
+> See **[docs/architecture/SAM_ARCHITECTURE.md](docs/architecture/SAM_ARCHITECTURE.md)** — the Canonical Architecture.
+
+---
+
+## 5. Documentation Guide
+
+To understand SAM, read the documents in dependency order. Each document inherits its authority from the one above it.
+
+Documents belong to a category. Categories indicate the role of a document in the governance structure:
+
+**Canonical · Foundational · Specification · Engineering · Historical**
+
+Historical documents are preserved as part of the evolution lineage and are not authoritative.
 
 ```
-Phase I     Foundation                           v0.0.1
-Phase II    Operational Brain                    v2.0.0
-Phase III   Guardian Intelligence                v3.0.0
-Phase IV    Guardian Runtime                     v4.0.0
-Phase V     Guardian Live Intelligence           v5.0.0-v6.0.0
-Phase VI    Decision Runtime                     v6.0.0-v7.0.0
-Phase VII   Operational Brain Integration        v7.0.0-v8.0.0
-Phase VIII  Activation Runtime                   v8.0.0-v8.5.0
-Phase IX    Execution Runtime                    v9.0.0-v9.11.0
-Phase X     Runtime Kernel                       v10.0.0
+MISSION
+  ↓
+CONSTITUTION
+  ↓
+PHILOSOPHY
+  ↓
+GOVERNANCE
+  ↓
+MODELS (TRUST, RISK, DECISION, MEMORY)
+  ↓
+CANONICAL ARCHITECTURE
+  ↓
+ROADMAP
+  ↓
+ADR
+  ↓
+IMPLEMENTATION
+```
 
-Pipeline Runtime Kernel:
-  Boot → Context → Registry → State → Lifecycle → Bridge
-  → Health → Security → Scheduler → Event Bus → Coordinator
-  → Telemetry → Final Assembly → **Runtime Kernel Ready**
+Key documents:
+
+- **Mission** — [MISSION.md](MISSION.md)
+- **Constitution** — [docs/CONSTITUTION.md](docs/CONSTITUTION.md)
+- **Philosophy** — [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md)
+- **Governance** — [GOVERNANCE.md](GOVERNANCE.md)
+- **Glossary** — [GLOSSARY.md](GLOSSARY.md)
+- **Canonical Architecture** — [docs/architecture/SAM_ARCHITECTURE.md](docs/architecture/SAM_ARCHITECTURE.md)
+
+---
+
+## 6. Repository Structure
+
+```
+SAM/
+├── src/sam/                 # Python source
+├── tests/                   # Test suite
+├── docs/                    # Documentation
+│   ├── CONSTITUTION.md      # Canonical Constitution
+│   ├── GOVERNANCE.md / GLOSSARY.md / PHILOSOPHY.md
+│   ├── architecture/        # Canonical Architecture
+│   ├── models/              # Model Layer (trust, risk, decision, memory)
+│   └── specifications/      # Specifications
+├── MISSION.md               # Mission
+├── VISION.md                # Vision
+├── ROADMAP.md               # Implementation evolution ordering
+└── .github/workflows/       # CI
 ```
 
 ---
 
-## Quick Start
+## 7. Quick Start
 
 ```bash
 # Clone
@@ -82,53 +129,41 @@ $env:PYTHONIOENCODING = "utf-8"
 
 # Install dependencies
 pip install -e ".[dev,console]"
-
-# Jalankan test
-python -m pytest tests/unit/ -q --tb=short
 ```
 
 ---
 
-## Testing
-
-**Test count: 1,719+** (sprint 100-111 validation tests)
-**Unit tests:** 1,282+ (lokal, berjalan normal)
+## 8. Development
 
 ```powershell
-# Semua test unit
-python -m pytest tests/unit/ -q --tb=short
-
-# Sprint validation (contoh: sprint 100)
-python -m pytest tests/sprint100/ -q --tb=short
+# Jalankan test
+python -m pytest tests/ -q --tb=short
 ```
+
+Contributions follow the repository conventions and the governance lifecycle. See **[REPOSITORY_CONVENTION.md](REPOSITORY_CONVENTION.md)** and **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 ---
 
-## Struktur Folder
+## 9. Testing
 
+```powershell
+# Semua test
+python -m pytest tests/ -q --tb=short
 ```
-SAM/
-├── src/sam/                  # Source code
-│   ├── activation/           # Phase VIII
-│   ├── approval/             # Phase VI
-│   ├── execution/runtime/    # Phase IX
-│   ├── guardian/live/        # Phase V
-│   ├── operational_brain/    # Phase II
-│   ├── operations/brain/decision/  # Phase VI
-    └── runtime_kernel/       # Phase X (baru)
-├── tests/
-│   ├── unit/                 # 1,282+ unit tests
-│   ├── sprint100/ - sprint111/  # 1,719 sprint validation
-├── docs/
-│   ├── reports/              # OP reports
-│   ├── sprint-reports/       # Per-sprint laporan
-│   └── architecture/         # Dokumentasi arsitektur
-├── data/                     # Database migrations
-└── .github/workflows/        # CI (core + desktop)
-```
+
+The test suite runs locally and in CI. See **[docs/reports/Repository_Metrics.md](docs/reports/Repository_Metrics.md)** for current metrics.
 
 ---
 
-## Lisensi
+## 10. Roadmap
 
-Apache-2.0 - lihat file LICENSE.
+The roadmap defines the ordering of implementation evolution that serves the Mission — not an independent statement of direction.
+
+> See **[ROADMAP.md](ROADMAP.md)** — the ordering of implementation phases.
+
+---
+
+## 11. License / Contribution
+
+- **License:** Apache-2.0 — see [LICENSE](LICENSE).
+- **Contribution:** see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/development/Contributor_Checklist.md](docs/development/Contributor_Checklist.md).
