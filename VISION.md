@@ -1,408 +1,165 @@
-﻿# VISION
+﻿SAM Vision
 
+Version:
+2.0.0
 
+Status:
+Accepted
 
-Version: 0.1.0
-
-Status: Draft
-
-Owner: SAM Framework
-
-Last Updated: 2026-07-20
-
-
+Owner:
+Project SAM
 
 ---
-
-
 
 # Vision Statement
 
+SAM exists to establish a universal governance model for intelligent systems.
 
+Rather than building another AI assistant, SAM defines how intelligence should be organized, coordinated, governed, approved, executed, audited, and evolved.
 
-SAM is an open, modular AI Operations Framework designed to help humans build trustworthy AI System Administrators.
+Its purpose is not to create intelligence.
 
-
-
-Rather than focusing on a single application or platform, SAM provides the architectural foundation, operational principles, and reusable knowledge required to support reliable AI-assisted system administration.
-
-
-
-OpenClaw is the first implementation module, not the final destination.
-
-
+Its purpose is to make intelligence trustworthy.
 
 ---
 
+# Core Vision
 
+Artificial Intelligence will continue to evolve.
 
-# Why SAM Exists
+Models will change.
 
+Providers will change.
 
+Programming languages will change.
 
-Modern software ecosystems have become increasingly complex.
+Deployment models will change.
 
+Hardware will change.
 
+What should remain stable is the governance that coordinates them.
 
-A single operational task may require:
-
-
-
-\- reading documentation
-
-\- comparing configuration files
-
-\- validating assumptions
-
-\- checking logs
-
-\- testing providers
-
-\- understanding APIs
-
-\- evaluating risks
-
-\- preparing rollback plans
-
-
-
-This work is repetitive, time-consuming, and highly dependent on accumulated experience.
-
-
-
-SAM exists to reduce that burden.
-
-
-
-Rather than replacing human administrators, SAM is designed to become an intelligent operational assistant capable of gathering evidence, organizing knowledge, evaluating risks, and proposing safe actions.
-
-
+SAM therefore aims to become a Universal Intelligence Governance Platform.
 
 ---
 
+# Long-term Vision
 
+In the future, SAM should become the constitutional operating layer for heterogeneous intelligence ecosystems.
 
-# Long-Term Vision
+Those ecosystems may contain:
 
+- Humans
+- AI Models
+- Agents
+- Providers
+- Connectors
+- Workflows
+- Runtime Components
+- Future Citizens
 
+SAM does not replace them.
 
-SAM aims to become a platform-independent framework for AI-assisted operations.
-
-
-
-Instead of creating one intelligent agent for one product, SAM establishes a reusable architecture that allows specialized operational modules to be developed independently while sharing the same operational philosophy.
-
-
-
-Future modules may include:
-
-
-
-\- OpenClaw
-
-\- Docker
-
-\- Linux
-
-\- Windows
-
-\- Kubernetes
-
-\- GitHub
-
-\- Cloud Platforms
-
-\- CI/CD Systems
-
-\- Databases
-
-\- Network Infrastructure
-
-
-
-Each module should inherit the same principles while maintaining domain-specific knowledge.
-
-
+SAM governs how they cooperate.
 
 ---
 
+# Governance Before Intelligence
 
+The central question of SAM is never:
 
-# What SAM Is
+"Which model is smarter?"
 
+Instead, it asks:
 
+"Can this intelligence be trusted?"
 
-SAM is:
-
-
-
-\- an AI Operations Framework
-
-\- a reusable architectural foundation
-
-\- a structured knowledge system
-
-\- a decision support system
-
-\- a governance model for AI-assisted operations
-
-
-
-SAM is not merely a chatbot.
-
-
-
-SAM is not merely a prompt collection.
-
-
-
-SAM is not a collection of scripts.
-
-
-
-SAM is a framework.
-
-
+Trust is therefore considered more valuable than raw intelligence.
 
 ---
 
+# Intelligence Is Replaceable
 
+Every model is replaceable.
 
-# Human-Centered Design
+Every provider is replaceable.
 
+Every connector is replaceable.
 
+Even every Runtime implementation is replaceable.
 
-SAM is built around one fundamental belief:
+The Constitution is not.
 
+The governance model is not.
 
-
-Human operators remain responsible for operational decisions.
-
-
-
-Automation exists to reduce operational burdenâ€”not to remove accountability.
-
-
-
-SAM therefore prioritizes:
-
-
-
-\- explainability
-
-\- transparency
-
-\- traceability
-
-\- reproducibility
-
-\- safety
-
-
-
-over blind automation.
-
-
+The architectural identity is not.
 
 ---
 
+# Universal Capability Language
 
+Every participant inside SAM communicates through capabilities rather than implementation.
 
-# Evidence-Based Operations
+Capability becomes the common language shared by every Citizen.
 
-
-
-SAM never treats assumptions as facts.
-
-
-
-Every recommendation should be supported by evidence whenever possible.
-
-
-
-Evidence may include:
-
-
-
-\- official documentation
-
-\- verified source code
-
-\- runtime observations
-
-\- reproducible experiments
-
-\- validated operational experience
-
-
-
-Evidence always carries more weight than assumptions.
-
-
+This enables evolution without architectural disruption.
 
 ---
 
+# Runtime Philosophy
 
+Runtime is the primary architectural unit.
 
-# Framework Before Automation
+Each Runtime owns one responsibility.
 
+Each Runtime publishes capabilities.
 
+Each Runtime remains independently governed.
 
-Automation without architecture creates fragile systems.
-
-
-
-Knowledge without structure becomes documentation debt.
-
-
-
-Before building automation, SAM first establishes:
-
-
-
-\- governance
-
-\- architecture
-
-\- operational principles
-
-\- knowledge organization
-
-\- decision models
-
-
-
-Automation is therefore considered the final stageâ€”not the first.
-
-
+Each Runtime may eventually become independently deployable without changing its contract.
 
 ---
 
+# Citizen Philosophy
 
+Everything participating in SAM should eventually become a Citizen.
 
-# Open Architecture
+Runtime is a Citizen.
 
+Agent is a Citizen.
 
+Provider is a Citizen.
 
-SAM is intentionally modular.
+Connector is a Citizen.
 
-
-
-The framework core should remain independent from any specific platform.
-
-
-
-Platform-specific behavior belongs inside modules.
-
-
-
-This separation allows new operational domains to be added without redesigning the framework itself.
-
-
+Future components should join the ecosystem by implementing the Citizen contract rather than introducing new architectural rules.
 
 ---
 
+# Human Authority
 
+Humans remain the final authority.
 
-# Success Criteria
+Approval always precedes execution.
 
+Automation never removes accountability.
 
-
-SAM succeeds when it enables AI systems to assist administrators by:
-
-
-
-\- reducing repetitive operational work
-
-\- improving decision quality
-
-\- increasing operational transparency
-
-\- reducing configuration mistakes
-
-\- documenting operational knowledge
-
-\- improving system reliability
-
-\- preserving human oversight
-
-
+Governance exists to preserve responsible human oversight.
 
 ---
 
+# Evolution
 
+SAM should evolve continuously.
 
-# Future Direction
+Its Constitution should evolve rarely.
 
+Its identity should remain stable.
 
-
-SAM is expected to evolve from an operational assistant into a complete AI Operations ecosystem consisting of:
-
-
-
-Framework
-
-
-
-â†“
-
-
-
-Knowledge
-
-
-
-â†“
-
-
-
-Modules
-
-
-
-â†“
-
-
-
-Playbooks
-
-
-
-â†“
-
-
-
-Diagnostics
-
-
-
-â†“
-
-
-
-Automation
-
-
-
-â†“
-
-
-
-Operational Intelligence
-
-
-
-Each layer builds upon the previous one.
-
-
+Implementation exists to realize the Constitution—not to redefine it.
 
 ---
-
-
 
 # Vision Summary
 
-
-
-Build a trustworthy AI Operations Framework that enables humans to manage increasingly complex systems through structured knowledge, transparent reasoning, and safe automation.
-
+SAM aims to become a Universal Intelligence Governance Platform that enables heterogeneous intelligent systems to cooperate through deterministic governance, immutable contracts, trusted capabilities, and constitutional architecture.

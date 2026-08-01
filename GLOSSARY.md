@@ -1,682 +1,545 @@
-﻿# GLOSSARY
+﻿# SAM Glossary
 
-
-
-Version: 0.1.0
-
-Status: Draft
-
-Owner: SAM Framework
-
-Last Updated: 2026-07-20
-
-
+Version: 1.0
+Status: Foundational
+Authority: Constitutional Vocabulary
 
 ---
-
-
 
 # Purpose
 
+This glossary defines the official meaning of the core concepts used throughout Project SAM.
 
+These definitions are normative.
 
-This document defines the official vocabulary of the SAM Framework.
+Architectural decisions,
+Runtime implementations,
+Specifications,
+Documentation,
+and future extensions should use these definitions consistently.
 
-
-
-Every architectural document, module, playbook, research paper, and implementation should use these terms consistently.
-
-
-
-When a term is defined here, its meaning should remain stable across the entire repository.
-
-
-
-If a term requires a different meaning, the change should be introduced through an Architecture Decision Record (ADR).
-
-
+If industry terminology conflicts with this glossary,
+the glossary takes precedence within Project SAM.
 
 ---
 
+# Agent
 
+## Definition
 
-# Why a Glossary Exists
+An autonomous Citizen responsible for performing one or more Missions through declared Capabilities.
 
+## Industry Difference
 
+An Agent is not an AI model.
 
-Large projects gradually develop their own language.
+An Agent is not an LLM.
 
+An Agent is not a chatbot.
 
+Within SAM, an Agent is a constitutional participant.
 
-Without a shared vocabulary:
+## Relationships
 
+Mission
+↓
 
+Workflow
+↓
 
-\- contributors interpret concepts differently,
+Agent
+↓
 
-\- documentation becomes inconsistent,
+Runtime
+↓
 
-\- architectural discussions become ambiguous,
-
-\- implementation slowly diverges from design.
-
-
-
-The glossary establishes one common language.
-
-
-
----
-
-
-
-# Framework
-
-
-
-The platform-independent core of SAM.
-
-
-
-The Framework defines how intelligent operational reasoning is performed.
-
-
-
-It owns:
-
-
-
-\- reasoning
-
-\- decision models
-
-\- governance
-
-\- architecture
-
-\- operational philosophy
-
-
-
-It never owns platform-specific knowledge.
-
-
+Provider
 
 ---
 
+# Approval
 
+## Definition
 
-# Module
+The constitutional process that authorizes an action before execution.
 
+Approval determines permission.
 
+Execution performs action.
 
-A self-contained operational domain implementing one specific platform.
-
-
-
-Examples include:
-
-
-
-\- OpenClaw
-
-\- Docker
-
-\- Linux
-
-\- Kubernetes
-
-
-
-Modules provide expertise.
-
-
-
-They do not define framework behavior.
-
-
+These are different responsibilities.
 
 ---
 
+# Artifact
 
+## Definition
 
-# Knowledge
+An immutable representation of the outcome of a Mission.
 
+Artifacts may represent:
 
+documents,
 
-Verified or observed information about one operational domain.
+code,
 
+reports,
 
+plans,
 
-Knowledge includes:
+execution results,
 
+analysis,
 
+or any governed output.
 
-\- documentation
+Artifacts are never governance.
 
-\- provider behavior
-
-\- known issues
-
-\- configuration
-
-\- research
-
-\- compatibility
-
-
-
-Knowledge answers:
-
-
-
-"What is true?"
-
-
+Artifacts are governed.
 
 ---
 
+# Audit
 
+## Definition
 
-# Reasoning
+The immutable record explaining why,
+how,
+when,
+and under which authority something occurred.
 
-
-
-The process of interpreting knowledge.
-
-
-
-Reasoning transforms evidence into conclusions.
-
-
-
-Reasoning belongs to the Framework.
-
-
+Audit transforms actions into evidence.
 
 ---
 
+# Bridge
 
+## Definition
 
-# Evidence
+A read-only translation layer that exposes Runtime information without exposing Runtime implementation.
 
-
-
-Information supporting a conclusion.
-
-
-
-Evidence may originate from:
-
-
-
-official documentation
-
-
-
-runtime observations
-
-
-
-configuration analysis
-
-
-
-diagnostic results
-
-
-
-reproducible experiments
-
-
-
-Evidence always carries a confidence level.
-
-
+Bridges never own business logic.
 
 ---
-
-
-
-# Trust
-
-
-
-The degree of confidence assigned to available evidence.
-
-
-
-Trust is not certainty.
-
-
-
-Trust represents the reliability of available information.
-
-
-
----
-
-
-
-# Risk
-
-
-
-The probability and potential impact of an undesirable outcome.
-
-
-
-Risk evaluation considers:
-
-
-
-likelihood
-
-
-
-severity
-
-
-
-recoverability
-
-
-
-operational impact
-
-
-
-Risk belongs to the Framework.
-
-
-
----
-
-
-
-# Playbook
-
-
-
-A documented operational procedure.
-
-
-
-Playbooks transform knowledge into repeatable actions.
-
-
-
-Knowledge explains.
-
-
-
-Playbooks instruct.
-
-
-
----
-
-
-
-# Automation
-
-
-
-The execution of approved operational procedures.
-
-
-
-Automation consumes:
-
-
-
-Framework
-
-
-
-Modules
-
-
-
-Knowledge
-
-
-
-Playbooks
-
-
-
-Automation should never replace reasoning.
-
-
-
----
-
-
-
-# Governance
-
-
-
-The rules governing how SAM evolves.
-
-
-
-Governance includes:
-
-
-
-principles
-
-
-
-repository conventions
-
-
-
-documentation standards
-
-
-
-decision process
-
-
-
-Governance protects architectural consistency.
-
-
-
----
-
-
-
-# Architecture
-
-
-
-The structural organization of the Framework.
-
-
-
-Architecture defines:
-
-
-
-layers
-
-
-
-boundaries
-
-
-
-dependencies
-
-
-
-interfaces
-
-
-
-Architecture explains structure.
-
-
-
-ADR explains why that structure exists.
-
-
-
----
-
-
-
-# Architecture Decision Record (ADR)
-
-
-
-A permanent record explaining an important architectural decision.
-
-
-
-Each ADR should document:
-
-
-
-the decision,
-
-
-
-its rationale,
-
-
-
-alternatives considered,
-
-
-
-consequences.
-
-
-
-ADR preserves architectural history.
-
-
-
----
-
-
-
-# Layer
-
-
-
-A responsibility boundary within the architecture.
-
-
-
-Each layer owns exactly one primary responsibility.
-
-
-
-Layers should remain independent.
-
-
-
----
-
-
-
-# Dependency
-
-
-
-A relationship where one component relies on another.
-
-
-
-Dependencies must always follow the architectural direction defined in DEPENDENCY\_RULES.md.
-
-
-
----
-
-
-
-# Interface
-
-
-
-A stable architectural contract between the Framework and Modules.
-
-
-
-Interfaces define communication.
-
-
-
-They do not expose implementation details.
-
-
-
----
-
-
 
 # Capability
 
+## Definition
 
+The formal description of something a Citizen is able to perform.
 
-A service provided by a Module.
+Capability is implementation independent.
 
-
-
-Examples:
-
-
-
-configuration validation,
-
-
-
-provider inspection,
-
-
-
-diagnostics,
-
-
-
-knowledge retrieval.
-
-
-
-Capabilities describe what a Module can do.
-
-
-
-Not how it does it.
-
-
+Capability is the universal language of SAM.
 
 ---
 
+# Certification
 
+## Definition
 
-# Operational Domain
+The constitutional process verifying that a Citizen satisfies required governance principles.
 
+Certification evaluates constitutional compliance.
 
-
-A distinct area of expertise represented by one Module.
-
-
-
-Each operational domain evolves independently.
-
-
-
-Examples:
-
-
-
-OpenClaw
-
-
-
-Docker
-
-
-
-GitHub
-
-
-
-Windows
-
-
+Not usefulness.
 
 ---
 
+# Citizen
 
+## Definition
 
-# Repository
+Any constitutional participant capable of publishing capabilities,
+obeying contracts,
+participating in governance,
+and being audited.
 
+Citizens include:
 
+Runtime
 
-The authoritative knowledge base of the SAM project.
+Agent
 
+Provider
 
+Connector
 
-Repository contents supersede temporary discussions.
+Model
 
+Skill
 
+Tool
 
-Accepted knowledge belongs in the repository.
+Workflow
 
+Mission
 
+and future constitutional entities.
 
----
-
-
-
-# Vocabulary
-
-
-
-The collection of officially defined terms used throughout SAM.
-
-
-
-Vocabulary enables precise communication between contributors, documentation, and implementations.
-
-
-
----
-
-
-
-# Cross References
-
-
-
-This glossary complements:
-
-
-
-\- VISION.md
-
-\- MISSION.md
-
-\- PRINCIPLES.md
-
-\- GOVERNANCE.md
-
-\- ARCHITECTURE.md
-
-\- LAYERS.md
-
-\- MODULE\_INTERFACE.md
-
-
-
-Future documents should reference this glossary rather than redefining existing terms.
-
-
+Citizen is the highest architectural abstraction.
 
 ---
 
+# Connector
 
+## Definition
 
-# Summary
+A Citizen responsible for connecting SAM to external systems through governed interfaces.
 
+Connector never contains governance.
 
+Connector implements communication.
 
-A shared vocabulary is a prerequisite for a shared architecture.
+---
 
+# Contract
 
+## Definition
 
-The glossary exists to ensure that every contributor, module, and document speaks the same language.
+An immutable agreement defining communication between Citizens.
 
+Contracts define expectations.
 
+Not implementation.
 
-As SAM evolves, new terms may be added, but existing definitions should change only through deliberate architectural decisions.
+---
 
+# Descriptor
+
+## Definition
+
+The immutable identity document describing a Citizen.
+
+A Descriptor typically includes:
+
+Identity
+
+Version
+
+Metadata
+
+Capabilities
+
+Certification
+
+Compatibility
+
+---
+
+# Desktop
+
+## Definition
+
+A user-facing interface to SAM.
+
+Desktop is not part of governance.
+
+Desktop consumes governance.
+
+Other interfaces such as CLI,
+REST,
+or IDE integrations have equivalent architectural status.
+
+---
+
+# Discovery
+
+## Definition
+
+The governed process of locating Citizens through Capabilities.
+
+Discovery never performs execution.
+
+---
+
+# DTO
+
+## Definition
+
+An immutable data transfer object.
+
+DTOs carry information.
+
+They never contain business behavior.
+
+---
+
+# Execution
+
+## Definition
+
+The constitutional act of applying an approved decision to the outside world.
+
+Execution changes reality.
+
+Approval authorizes it.
+
+---
+
+# Health
+
+## Definition
+
+The current operational condition of a Citizen.
+
+Health reflects operational readiness.
+
+Not business success.
+
+---
+
+# Intelligence
+
+## Definition
+
+The capability to produce reasoning,
+analysis,
+planning,
+or inference.
+
+Intelligence is governed by SAM.
+
+It does not govern SAM.
+
+---
+
+# Knowledge
+
+## Definition
+
+Structured information available to Citizens for governed decision making.
+
+Knowledge is descriptive.
+
+Not procedural.
+
+---
+
+# Lifecycle
+
+## Definition
+
+The governed sequence of states through which a Citizen progresses.
+
+Lifecycle provides predictable evolution.
+
+---
+
+# Memory
+
+## Definition
+
+Governed contextual information representing historical state.
+
+Memory preserves context.
+
+Not governance.
+
+---
+
+# Mission
+
+## Definition
+
+The highest-level declaration of desired business outcome.
+
+A Mission defines:
+
+objective,
+
+constraints,
+
+approval requirements,
+
+expected artifacts,
+
+success criteria,
+
+and governance expectations.
+
+Mission defines purpose.
+
+Not implementation.
+
+---
+
+# Model
+
+## Definition
+
+A computational intelligence implementation capable of providing reasoning or generation.
+
+Models implement intelligence.
+
+They do not define governance.
+
+---
+
+# Monitoring
+
+## Definition
+
+Continuous observation of Citizen state.
+
+Monitoring observes.
+
+It does not control.
+
+---
+
+# Policy
+
+## Definition
+
+The formal rules governing permitted behavior.
+
+Policies determine what is allowed.
+
+Approval determines whether permission is granted.
+
+---
+
+# Provider
+
+## Definition
+
+A Citizen implementing access to external computational capabilities.
+
+Examples include:
+
+LLM providers,
+
+database providers,
+
+filesystem providers,
+
+container providers,
+
+future providers.
+
+Providers implement.
+
+They do not govern.
+
+---
+
+# Registry
+
+## Definition
+
+The authoritative catalog of Citizens and Capabilities.
+
+Registry enables discovery.
+
+Registry never performs business logic.
+
+---
+
+# Runtime
+
+## Definition
+
+A constitutional unit responsible for governing one bounded capability domain.
+
+Runtime is not merely a software module.
+
+Runtime is the primary governance unit.
+
+---
+
+# Skill
+
+## Definition
+
+A reusable governed capability executable by an Agent.
+
+Skills describe how work is performed.
+
+Agents decide when to use them.
+
+---
+
+# Tool
+
+## Definition
+
+An executable external capability exposed to SAM through Providers or Connectors.
+
+Tools perform work.
+
+Governance controls access.
+
+---
+
+# Trust
+
+## Definition
+
+The measurable confidence that a governed decision complies with constitutional principles.
+
+Trust is the primary output of SAM.
+
+---
+
+# Workflow
+
+## Definition
+
+The governed sequence of activities required to complete a Mission.
+
+Workflow defines process.
+
+Not responsibility.
+
+---
+
+# Relationships
+
+Mission
+
+↓
+
+Workflow
+
+↓
+
+Agent
+
+↓
+
+Skill
+
+↓
+
+Runtime
+
+↓
+
+Capability
+
+↓
+
+Provider
+
+↓
+
+Execution
+
+↓
+
+Artifact
+
+↓
+
+Audit
+
+Governance surrounds every layer.
+
+---
+
+# Constitutional Rule
+
+If a future architectural concept cannot be defined using the vocabulary of this glossary,
+
+the glossary should evolve before the architecture does.

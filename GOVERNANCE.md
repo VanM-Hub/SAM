@@ -1,266 +1,347 @@
-﻿# GOVERNANCE
+﻿# SAM Governance
 
+Version: 2.0.0
 
+Status: Accepted
 
-Version: 0.1.0
+Owner: Project SAM
 
-Status: Draft
+Depends On:
 
-Owner: SAM Framework
-
-Last Updated: 2026-07-20
-
-
+- CONSTITUTION.md
+- VISION.md
+- MISSION.md
 
 ---
-
-
 
 # Purpose
 
+Governance defines how Project SAM preserves constitutional integrity while continuously evolving.
 
+Constitution defines what must never change.
 
-Governance defines how the SAM Framework evolves.
+Governance defines how change is allowed.
 
+Architecture defines how governance is implemented.
 
-
-The objective is not to slow development.
-
-
-
-The objective is to ensure that growth remains sustainable, transparent, and predictable.
-
-
+Implementation realizes the architecture.
 
 ---
-
-
-
-# Governance Objectives
-
-
-
-The governance model exists to ensure:
-
-
-
-\- architectural consistency
-
-\- documented decision making
-
-\- controlled evolution
-
-\- transparent collaboration
-
-\- long-term maintainability
-
-
-
----
-
-
-
-# Source of Truth
-
-
-
-The Git repository is the single source of truth.
-
-
-
-Knowledge should never exist only in:
-
-
-
-\- chat history
-
-\- temporary notes
-
-\- personal memory
-
-
-
-Every accepted decision should eventually become repository documentation.
-
-
-
----
-
-
-
-# Decision Process
-
-
-
-Significant architectural decisions require an Architecture Decision Record (ADR).
-
-
-
-Examples include:
-
-
-
-\- framework structure
-
-\- repository organization
-
-\- governance changes
-
-\- module boundaries
-
-\- core principles
-
-
-
-Minor editorial changes do not require an ADR.
-
-
-
----
-
-
-
-# Documentation First
-
-
-
-Documentation precedes implementation whenever practical.
-
-
-
-Before implementing a new capability, contributors should define:
-
-
-
-\- purpose
-
-\- scope
-
-\- expected behavior
-
-\- dependencies
-
-\- risks
-
-
-
-Implementation should follow documentation.
-
-
-
----
-
-
-
-# Scope Freeze
-
-
-
-Each sprint defines a fixed scope.
-
-
-
-New ideas discovered during a sprint should be recorded in the backlog rather than expanding the active sprint.
-
-
-
-This prevents uncontrolled scope growth.
-
-
-
----
-
-
-
-# Versioning
-
-
-
-Major changes should be traceable through repository history.
-
-
-
-Every release should include:
-
-
-
-\- updated documentation
-
-\- changelog entries
-
-\- reviewed ADRs
-
-\- version identifiers
-
-
-
----
-
-
-
-# Module Ownership
-
-
-
-Each module owns:
-
-
-
-\- knowledge
-
-\- diagnostics
-
-\- playbooks
-
-\- research
-
-\- implementation
-
-
-
-The framework owns only platform-independent concepts.
-
-
-
----
-
-
-
-# Quality Expectations
-
-
-
-Every accepted contribution should improve at least one of:
-
-
-
-\- clarity
-
-\- safety
-
-\- maintainability
-
-\- reliability
-
-\- documentation quality
-
-
-
----
-
-
 
 # Governance Philosophy
 
+The purpose of governance is not to slow innovation.
 
+The purpose is to ensure that innovation never destroys trust.
 
-The framework should evolve deliberately.
+Every architectural evolution should increase capability while preserving constitutional identity.
 
+Growth is encouraged.
 
+Uncontrolled growth is prohibited.
 
-Fast growth is acceptable.
+---
 
+# Governance Hierarchy
 
+The hierarchy of authority inside Project SAM is:
 
-Uncontrolled growth is not.
+Constitution
 
+↓
+
+Vision
+
+↓
+
+Mission
+
+↓
+
+Governance
+
+↓
+
+Architecture
+
+↓
+
+Roadmap
+
+↓
+
+ADR
+
+↓
+
+Implementation
+
+Lower layers shall never contradict higher layers.
+
+---
+
+# Governance Objectives
+
+Governance exists to ensure:
+
+- constitutional consistency
+- architectural integrity
+- deterministic evolution
+- transparent decision making
+- controlled extensibility
+- long-term maintainability
+- replaceable implementations
+- trustworthy operation
+
+---
+
+# Source of Truth
+
+The Git repository is the single source of truth.
+
+Accepted architectural knowledge shall eventually exist inside the repository.
+
+Knowledge shall never permanently exist only in:
+
+- conversations
+- temporary notes
+- personal memory
+- undocumented decisions
+
+Every accepted architectural decision should become repository documentation.
+
+---
+
+# Decision Levels
+
+Changes have different governance levels.
+
+Editorial
+
+Documentation
+
+Implementation
+
+Architecture
+
+Constitution
+
+Each level requires progressively stronger review.
+
+---
+
+# Constitutional Changes
+
+Changes affecting constitutional principles are exceptional.
+
+A constitutional change requires:
+
+- architectural justification
+- written proposal
+- compatibility analysis
+- migration strategy
+- explicit approval
+
+Constitution should evolve rarely.
+
+---
+
+# Architecture Decisions
+
+Architecture Decisions are documented using ADR.
+
+ADR should explain:
+
+- motivation
+- alternatives
+- trade-offs
+- consequences
+- compatibility
+
+Architecture exists to preserve constitutional principles.
+
+---
+
+# Runtime Governance
+
+Every Runtime shall:
+
+- own one bounded responsibility
+- publish capabilities
+- expose immutable contracts
+- support certification
+- expose health
+- participate in auditing
+
+Runtime independence is mandatory.
+
+---
+
+# Citizen Governance
+
+Every Citizen shall satisfy the constitutional requirements defined in the Citizen Specification.
+
+No Citizen possesses architectural privilege.
+
+Every Citizen participates under identical governance rules.
+
+Responsibilities differ.
+
+Governance does not.
+
+---
+
+# Capability Governance
+
+Capabilities are the official language of cooperation.
+
+Capabilities shall be:
+
+- explicitly published
+- versioned
+- discoverable
+- certifiable
+- backward compatible whenever practical
+
+Implementation details shall never be used as architectural contracts.
+
+---
+
+# Registry Governance
+
+Registry is the authoritative source for discovery.
+
+Citizens shall not depend directly on implementation details.
+
+Registry reduces architectural coupling.
+
+---
+
+# Approval Governance
+
+Execution affecting the external world should require governance approval.
+
+Approval exists to protect trust.
+
+Approval is a governance decision.
+
+Not an implementation detail.
+
+---
+
+# Audit Governance
+
+Every significant decision should be explainable.
+
+Every significant action should be attributable.
+
+Every significant execution should be auditable.
+
+Audit is mandatory.
+
+Not optional.
+
+---
+
+# Trust Governance
+
+The primary product of SAM is Trust.
+
+Governance decisions should always increase:
+
+predictability
+
+traceability
+
+reproducibility
+
+accountability
+
+replaceability
+
+Any architectural shortcut reducing trust should be rejected.
+
+---
+
+# Evolution Rules
+
+SAM evolves by extension.
+
+Not replacement.
+
+Existing constitutional contracts should remain valid whenever possible.
+
+Backward compatibility is preferred.
+
+Breaking compatibility requires explicit architectural justification.
+
+---
+
+# Runtime Creation Rules
+
+A new Runtime should exist only if:
+
+- it governs an independent capability domain
+- it owns a distinct responsibility
+- it can evolve independently
+- it benefits from constitutional isolation
+
+Otherwise, it should remain a Service or Capability.
+
+---
+
+# Governance Review
+
+Every major architectural proposal should answer:
+
+Does it preserve the Constitution?
+
+Does it increase Trust?
+
+Does it reduce coupling?
+
+Does it improve auditability?
+
+Does it preserve determinism?
+
+Does it maintain provider independence?
+
+If any answer is negative, the proposal should be reconsidered.
+
+---
+
+# Long-Term Governance
+
+The governance model should remain valid regardless of:
+
+programming language
+
+AI model
+
+provider
+
+deployment topology
+
+runtime distribution
+
+execution engine
+
+hardware platform
+
+Implementation evolves.
+
+Governance endures.
+
+---
+
+# Final Statement
+
+Governance is the mechanism that protects the identity of SAM.
+
+Without governance,
+
+SAM becomes software.
+
+With governance,
+
+SAM becomes a constitutional platform.
