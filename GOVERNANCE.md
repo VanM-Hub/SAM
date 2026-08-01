@@ -44,37 +44,13 @@ Uncontrolled growth is prohibited.
 
 # Governance Hierarchy
 
-The hierarchy of authority inside Project SAM is:
+Identity hierarchy is defined exclusively by the Identity Layer (MISSION → CONSTITUTION → PHILOSOPHY).
 
-Constitution
+Governance derives its authority from the Constitution and does not redefine the identity hierarchy.
 
-↓
+Governance allocates authority.
 
-Vision
-
-↓
-
-Mission
-
-↓
-
-Governance
-
-↓
-
-Architecture
-
-↓
-
-Roadmap
-
-↓
-
-ADR
-
-↓
-
-Implementation
+It does not define identity.
 
 Lower layers shall never contradict higher layers.
 
