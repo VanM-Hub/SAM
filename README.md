@@ -1,4 +1,4 @@
-﻿# SAM Framework
+# SAM Framework
 
 **The Autonomous Guardian Operating System for AI** 🔰
 *Versi: v29.0.0 - Program F (Desktop Runtime)*
@@ -7,19 +7,19 @@
 
 ## Ringkasan
 
-SAM adalah **Deterministic Operational Intelligence Platform** — mengobservasi, memahami, merencanakan, mengoordinasikan, menyiapkan, dan mengawasi operasi lintas sistem secara aman, dapat diaudit, provider-agnostic, dan dapat dipertanggungjawabkan.
+SAM adalah **Deterministic Operational Intelligence Platform** - mengobservasi, memahami, merencanakan, mengoordinasikan, menyiapkan, dan mengawasi operasi lintas sistem secara aman, dapat diaudit, provider-agnostic, dan dapat dipertanggungjawabkan.
 
-AI hanyalah **salah satu provider** yang dapat dipasang melalui Connector Runtime — identitas SAM tetap utuh walaupun provider AI diganti.
+AI hanyalah **salah satu provider** yang dapat dipasang melalui Connector Runtime - identitas SAM tetap utuh walaupun provider AI diganti.
 
 **Versi aktif:** v29.0.0 - Program F (Desktop Runtime)
-**Status:** Arsitektur SELESAI (v23.0.0) → Tahap 2 Product Integration (Program A–K)
-**Fase aktif:** Program A (External Connectors) — selesai ✅ · Program B (Model Runtime) — selesai ✅ · Program C (Real Execution) — selesai ✅ · Program D (Runtime Services) — selesai ✅ · Program E (Intelligence Runtime) — selesai ✅ · Program F (Desktop Runtime) — selesai ✅
+**Status:** Arsitektur SELESAI (v23.0.0) → Tahap 2 Product Integration (Program A-K)
+**Fase aktif:** Program A (External Connectors) - selesai ✅ · Program B (Model Runtime) - selesai ✅ · Program C (Real Execution) - selesai ✅ · Program D (Runtime Services) - selesai ✅ · Program E (Intelligence Runtime) - selesai ✅ · Program F (Desktop Runtime) - selesai ✅
 
-> 📌 **Peta fase dari awal hingga roadmap produk** ada di [**ROADMAP.md**](ROADMAP.md) — sumber kebenaran tunggal.
+> 📌 **Peta fase dari awal hingga roadmap produk** ada di [**ROADMAP.md**](ROADMAP.md) - sumber kebenaran tunggal.
 
 ---
 
-## Fitur v10.0.0 — Runtime Kernel
+## Fitur v10.0.0 - Runtime Kernel
 
 Runtime Kernel adalah lapisan koordinasi antar-subsystem. Preview-only, read-only, tidak memodifikasi subsystem lain.
 
@@ -42,7 +42,7 @@ Runtime Kernel adalah lapisan koordinasi antar-subsystem. Preview-only, read-onl
 
 - **69 file** sumber di `src/sam/runtime_kernel/`
 - **60 Dashboard Cards** (5 per subsystem, frozen ExecutionCards)
-- Semua DTO immutable (`frozen dataclass`) — **0 forbidden imports**
+- Semua DTO immutable (`frozen dataclass`) - **0 forbidden imports**
 - Synchronous, deterministic, rule-based
 
 ---
@@ -54,11 +54,11 @@ Phase I     Foundation                           v0.0.1
 Phase II    Operational Brain                    v2.0.0
 Phase III   Guardian Intelligence                v3.0.0
 Phase IV    Guardian Runtime                     v4.0.0
-Phase V     Guardian Live Intelligence           v5.0.0–v6.0.0
-Phase VI    Decision Runtime                     v6.0.0–v7.0.0
-Phase VII   Operational Brain Integration        v7.0.0–v8.0.0
-Phase VIII  Activation Runtime                   v8.0.0–v8.5.0
-Phase IX    Execution Runtime                    v9.0.0–v9.11.0
+Phase V     Guardian Live Intelligence           v5.0.0-v6.0.0
+Phase VI    Decision Runtime                     v6.0.0-v7.0.0
+Phase VII   Operational Brain Integration        v7.0.0-v8.0.0
+Phase VIII  Activation Runtime                   v8.0.0-v8.5.0
+Phase IX    Execution Runtime                    v9.0.0-v9.11.0
 Phase X     Runtime Kernel                       v10.0.0
 
 Pipeline Runtime Kernel:
@@ -91,7 +91,7 @@ python -m pytest tests/unit/ -q --tb=short
 
 ## Testing
 
-**Test count: 1,719+** (sprint 100–111 validation tests)
+**Test count: 1,719+** (sprint 100-111 validation tests)
 **Unit tests:** 1,282+ (lokal, berjalan normal)
 
 ```powershell
@@ -131,4 +131,4 @@ SAM/
 
 ## Lisensi
 
-Apache-2.0 — lihat file LICENSE.
+Apache-2.0 - lihat file LICENSE.
