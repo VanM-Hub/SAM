@@ -1,7 +1,7 @@
 # SAM Constitution
 
 **Version:** 1.0  
-**Status:** Ratified  
+**Status:** Historical Design Reference  
 **Date:** 2026-07-27  
 **Authority:** Chief Architect (Chief Architect)
 

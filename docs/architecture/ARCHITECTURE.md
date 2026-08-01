@@ -4,7 +4,7 @@
 
 Version: 0.1.0
 
-Status: Draft
+Status: Superseded
 
 Owner: SAM Framework
 
