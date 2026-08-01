@@ -188,13 +188,13 @@ Pipeline akhir: Mission→Agent→Workflow→Memory→Knowledge→Cognitive→Po
 > keputusan pelaksanaan, Program E diisi Unified Intelligence Runtime (v28.0.0);
 > Desktop Runtime digeser menjadi **Program F**.
 
-> 🚧 **SEDANG BERJALAN (v29.0.0 — IN PROGRESS, Sprint 272–279).**
+> ✅ **SELESAI (v29.0.0 — DIRILIS, Sprint 272–279, 189 test).**
 
 **Tujuan:** UI resmi SAM — murni komposisi (composition layer) yang menghubungkan seluruh subsystem. **Tidak ada business logic baru**, semua keputusan dari runtime yang sudah ada.
 
 **Hard Rules:** jangan ubah subsystem lama · bridge read-only · DTO immutable (frozen=True) · tanpa async/thread/multiprocessing/socket/requests/httpx/subprocess · tanpa filesystem write (kecuali konfigurasi desktop) · tanpa provider-specific logic · semua action → RuntimeService · semua execution tetap melalui Approval Gate.
 
-**Sprint plan:** Foundation (272) · Workspace (273) · Panels (274) · Dashboard (275) · Runtime (276) · Monitoring (277) · Certification 7-dimensi (278) · Integration (279). Minimal ±180 test baru di `tests/desktop_runtime/`.
+**Sprint plan (selesai):** Foundation (272) · Workspace (273) · Panels (274) · Dashboard (275) · Runtime (276) · Monitoring (277) · Certification 7-dimensi (278) · Integration (279). **189 test** ditulis & lulus di `tests/desktop_runtime/`.
 
 **Pipeline akhir (Sprint 279) — Desktop hanya visualisasi, tidak execute sendiri:** Mission→Agent→Workflow→Skill→Memory→Knowledge→Cognitive→Policy→Audit→Artifact→Intelligence→Orchestrator→Connector→Provider→Execution→RuntimeService→**Desktop**. Entry point: `sam.desktop_runtime`.
 
@@ -311,7 +311,7 @@ Program D — Runtime Services & Deployment (v27.0.0 ✅)
         ↓
 Program E — Unified Intelligence Runtime (v28.0.0 ✅)
         ↓
-Program F — Desktop Runtime (v29.0.0 🚧)
+Program F — Desktop Runtime (v29.0.0 ✅)
         ↓
 Program G — Conversation
         ↓
@@ -326,4 +326,4 @@ Program K — LLM Integration
 SAM Operational Product
 ```
 
-**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅) **sudah dieksekusi & dirilis**. **Program F (Desktop Runtime v29.0.0) sedang berjalan (IN PROGRESS).** Program G–K & Tahap 3 masih **perencanaan**. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
+**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅), F (v29.0.0 ✅) **sudah dieksekusi & dirilis**. Program G–K & Tahap 3 masih **perencanaan**. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
