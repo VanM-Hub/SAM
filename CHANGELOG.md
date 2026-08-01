@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## v29.0.0 (2026-08-01) - Program F: Desktop Runtime
+
+### Sprint 272-279 (8 sprint, 189 tes)
+- Foundation (272): contract, metadata, descriptor, capability, registry + Conversation & Dashboard Bridge + DesktopRuntimeBridge
+- Workspace (273): model, layout, state, session, validator, DockManager
+- Panels (274): 10 panel read-only (Mission, Runtime, Memory, Knowledge, Workflow, Policy, Audit, Artifact, Provider, Execution)
+- Dashboard (275): card, composer, layout, snapshot, runtime
+- Desktop Runtime (276): controller, coordinator, pipeline, summary, runtime utama
+- Monitoring (277): health, metrics, snapshot, report, monitor
+- Certification (278): 7 dimensi kepatuhan Program F
+- Integration (279): pipeline integrasi read-only + manifest
+- Regression modern suite: **189 passed** (Program F), struktur & import valid
+- Constraint: composition-only, preview-only, deterministic & synchronous, DTO frozen, 0 forbidden imports, 0 async/thread/socket/network/IO di desktop_runtime
+
 ## v28.0.0 (2026-08-01) - Program E: Unified Intelligence Runtime
 
 ### Sprint 261-268 (8 sprint, 40 file, 188 tes)
