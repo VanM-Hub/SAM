@@ -5,7 +5,7 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v29.0.0 - Program F (Desktop Runtime)
+Current:      v30.0.0 - Program F (Presentation Layer)
 Framework:    Python
 Build:        setuptools
 Test:         pytest (modern suite 189 Program F + existing; legacy folder excluded)
@@ -53,7 +53,7 @@ CI:           GitHub Actions (core + server + desktop)
 | Execution Runtime | `src/sam/execution_runtime/` (Program C) | 59 | Real Execution |
 | Runtime Service | `src/sam/runtime_service/` (Program D) | 53 | Runtime Service |
 | Unified Intelligence Runtime | `src/sam/intelligence_runtime/` (Program E) | 40 | Graph + Context + Certification |
-| Desktop Runtime | `src/sam/desktop_runtime/` (Program F) | 10 folders | Composition-only UI, 189 tests |
+| Presentation Layer | `src/sam/presentation/` (Program F) | 13 folders | Composition-only UI, no business logic, 189 tests |
 
 ## Dependencies
 

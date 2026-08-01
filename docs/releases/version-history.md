@@ -2,7 +2,8 @@
 
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
-| v29.0.0 | 2026-08-01 | Program F (Desktop Runtime) | 8 sprints 272-279, 189 tests |
+| v30.0.0 | 2026-08-01 | Program F (Presentation Layer) | Restrukturisasi desktop_runtime -> presentation, Article XVI, 189 tests |
+| ~~v29.0.0~~ | 2026-08-01 | ~~Program F (Desktop Runtime)~~ | **SKIP** - digabung menjadi v30.0.0 Presentation Layer |
 | v28.0.0 | 2026-08-01 | Program E (Unified Intelligence Runtime) | 8 sprints 261-268, 40 files, 188 tests |
 | v27.0.0 | 2026-08-01 | Program D (Runtime Services & Deployment) | 11 sprints 261-271, 53 files, 187 tests |
 | v26.0.0 | 2026-08-01 | Program C (Real Execution Runtime) | 11 sprints 250-260, 59 files, 165 tests |

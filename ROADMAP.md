@@ -182,23 +182,23 @@ Pipeline akhir: Mission→Agent→Workflow→Memory→Knowledge→Cognitive→Po
 > 0 async/thread/socket/network, DTO frozen, preview-only, external_calls==0,
 > tanpa inference/LLM, bridge read-only, tidak mengubah subsystem lama.
 
-#### Program F — Desktop Runtime
+#### Program F — Presentation Layer
 
 > Catatan: Semula direncanakan sebagai Program E (Desktop Application). Sesuai
 > keputusan pelaksanaan, Program E diisi Unified Intelligence Runtime (v28.0.0);
-> Desktop Runtime digeser menjadi **Program F**.
+> Desktop digeser menjadi **Program F — Presentation Layer**. v29.0.0 di-*skip*.
 
-> ✅ **SELESAI (v29.0.0 — DIRILIS, Sprint 272–279, 189 test).**
+> ✅ **SELESAI (v30.0.0 — Presentation Layer, Sprint 272–279, 189 test).**
 
-**Tujuan:** UI resmi SAM — murni komposisi (composition layer) yang menghubungkan seluruh subsystem. **Tidak ada business logic baru**, semua keputusan dari runtime yang sudah ada.
+**Tujuan:** Presentation Layer — human interface resmi SAM. Murni composition layer yang menyusun Command, ViewModel, Workspace, Navigation, dan Composition. **Tidak ada business logic, tidak ada engine, tidak ada pipeline, tidak ada runtime sendiri.** Semua operasi menuju RuntimeService.
 
 **Hard Rules:** jangan ubah subsystem lama · bridge read-only · DTO immutable (frozen=True) · tanpa async/thread/multiprocessing/socket/requests/httpx/subprocess · tanpa filesystem write (kecuali konfigurasi desktop) · tanpa provider-specific logic · semua action → RuntimeService · semua execution tetap melalui Approval Gate.
 
-**Sprint plan (selesai):** Foundation (272) · Workspace (273) · Panels (274) · Dashboard (275) · Runtime (276) · Monitoring (277) · Certification 7-dimensi (278) · Integration (279). **189 test** ditulis & lulus di `tests/desktop_runtime/`.
+**Implementasi:** di-rename dari `desktop_runtime` menjadi `presentation` sesuai **Presentation Principle** (Article XVI Constitution). Struktur: `foundation/ workspace/ panels/ dashboard/ navigation/ commands/ viewmodels/ composition/ monitoring/ certification/ integration/ conversation/ dashboard_bridge/`. Tidak ada folder `runtime/`. Class utama `PresentationLayer` (komposisi); `PresentationCommandDispatcher`, `PresentationNavigator`, `PresentationViewModel` menangani perintah/navigasi/model tampilan.
 
-**Pipeline akhir (Sprint 279) — Desktop hanya visualisasi, tidak execute sendiri:** Mission→Agent→Workflow→Skill→Memory→Knowledge→Cognitive→Policy→Audit→Artifact→Intelligence→Orchestrator→Connector→Provider→Execution→RuntimeService→**Desktop**. Entry point: `sam.desktop_runtime`.
+**Pipeline visualisasi (Desktop hanya entry point manusia, bukan bagian pipeline internal):** Desktop UI → PresentationController → RuntimeService → Unified Intelligence Runtime → Execution Runtime → Provider.
 
-**Target struktur:** `foundation/ workspace/ panels/ dashboard/ runtime/ monitoring/ certification/ integration/ conversation/ dashboard_bridge/`.
+**189 test** ditulis & lulus di `tests/presentation/`.
 
 #### Program G — Conversation
 
@@ -311,7 +311,13 @@ Program D — Runtime Services & Deployment (v27.0.0 ✅)
         ↓
 Program E — Unified Intelligence Runtime (v28.0.0 ✅)
         ↓
-Program F — Desktop Runtime (v29.0.0 ✅)
+v29.0.0 (skipped)
+        ↓
+Program F — Presentation Layer (v30.0.0 ✅)
+        ↓
+Operational Desktop
+        ↓
+Operational Console
         ↓
 Program G — Conversation
         ↓
@@ -323,7 +329,7 @@ Program J — REST API
         ↓
 Program K — LLM Integration
         ↓
-SAM Operational Product
+Production
 ```
 
-**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅), F (v29.0.0 ✅) **sudah dieksekusi & dirilis**. Program G–K & Tahap 3 masih **perencanaan**. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
+**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅), F (v30.0.0 ✅ — Presentation Layer; v29.0.0 di-*skip*) **sudah dieksekusi & dirilis**. Program G-K & Tahap 3 masih **perencanaan**. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.

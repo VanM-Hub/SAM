@@ -936,6 +936,106 @@ The Constitution must not.
 
 
 
+\# Article XVI — Presentation Principle
+
+
+
+\## Principle
+
+
+
+Human interfaces are Presentation Layers.
+
+
+
+Presentation Layers shall never contain business logic.
+
+
+
+Presentation Layers shall never become runtime coordinators.
+
+
+
+Presentation Layers communicate only through Runtime Service.
+
+
+
+All runtime orchestration belongs to Runtime Service.
+
+
+
+\## Meaning
+
+
+
+A Presentation Layer exists only to visualize, configure, approve, and observe.
+
+
+
+It does not own intelligence.
+
+
+
+It does not own execution.
+
+
+
+It does not own orchestration.
+
+
+
+It composes the user interface from information provided by Runtime Service and the runtime family.
+
+
+
+\## Architectural Impact
+
+
+
+Presentation Layer communicates exclusively through Runtime Service.
+
+
+
+Presentation Layer holds no business logic.
+
+
+
+Presentation Layer performs no approval decision.
+
+
+
+Presentation Layer performs no provider or connector dispatch.
+
+
+
+All execution remains in Execution Runtime, behind Approval.
+
+
+
+\## Violations
+
+
+
+A Presentation Layer becoming a runtime.
+
+
+
+A Presentation Layer owning an engine or pipeline.
+
+
+
+A Presentation Layer storing business state.
+
+
+
+A Presentation Layer bypassing Runtime Service.
+
+
+
+\---
+
+
+
 \# Constitutional Hierarchy
 
 

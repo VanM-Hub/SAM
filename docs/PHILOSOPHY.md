@@ -820,6 +820,62 @@ But because it remains the most trustworthy one.
 
 
 
+\# Why Presentation Exists
+
+
+
+SAM separates Intelligence from Presentation.
+
+
+
+Presentation exists only to visualize, configure, approve, and observe.
+
+
+
+Presentation never owns intelligence.
+
+
+
+A human interface is a Presentation Layer.
+
+
+
+It is not a Runtime.
+
+
+
+It holds no business logic.
+
+
+
+It runs no engine.
+
+
+
+It coordinates nothing.
+
+
+
+It communicates only through Runtime Service.
+
+
+
+All orchestration, approval, and execution belong to the runtime family.
+
+
+
+This separation keeps the human interface replaceable.
+
+
+
+It keeps intelligence governed.
+
+
+
+It keeps the boundary between presentation and governance explicit.
+
+
+
 \---
 
 
