@@ -34,13 +34,26 @@ This document explains operational risk behavior and does not redefine those con
 
 
 
-MISSION
+- MISSION
 
-CONSTITUTION
+- CONSTITUTION
 
-GOVERNANCE
+- GOVERNANCE
 
-TRUST_MODEL
+- GLOSSARY
+
+
+
+# Operational Dependencies
+
+
+
+- TRUST_MODEL
+
+- DECISION_MODEL
+
+- MEMORY_MODEL
+
 
 
 

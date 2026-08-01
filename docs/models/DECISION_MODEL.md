@@ -361,7 +361,7 @@ Its responsibility ends with recommendation.
 - Execution performs.
 
 
-\- Trust answers "How reliable is available evidence?"
+- Trust reflects confidence in governed conduct, as defined by TRUST_MODEL.
 
 \- Risk answers "What could happen?"
 
