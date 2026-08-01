@@ -1,5 +1,17 @@
 # Changelog
 
+## v30.0.0 (2026-08-01) - Program F: Presentation Layer
+
+### Restrukturisasi arsitektur (Sprint 272-279, 189 tes)
+- **Revisi keputusan arsitektur**: `desktop_runtime/` menjadi `presentation/` sebagai **Presentation Layer**, bukan runtime.
+- **Presentation Principle** ditambahkan ke `docs/CONSTITUTION.md` (Article XVI) dan `docs/PHILOSOPHY.md` (Why Presentation Exists): Presentation Layer tak pernah berisi business logic, tak pernah jadi runtime coordinator, dan berkomunikasi hanya lewat RuntimeService.
+- **Folder `runtime/` dihapus** — diganti folder fungsional: `commands/ navigation/ viewmodels/ composition/`.
+- **Rename class**: `DesktopRuntime/DesktopPipeline/DesktopCoordinator/DesktopController/DesktopSummary` → `PresentationLayer/PresentationPipeline/PresentationCoordinator/PresentationController/PresentationSummary`.
+- **54 file Python** (src + tests) dipertahankan penuh — tanpa tulis ulang, hanya rename lokasi & simbol; kode v29 reused maksimal.
+- **v29.0.0 di-skip** (bukan rilis terpisah).
+- Regression modern suite: **3338 passed, 1 skipped** (full), 189 tes presentation — **regression = 0**.
+- 0 forbidden imports (async/thread/socket/http/network/subprocess) di `presentation/`.
+
 ## v29.0.0 (2026-08-01) - Program F: Desktop Runtime
 
 ### Sprint 272-279 (8 sprint, 189 tes)
