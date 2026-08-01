@@ -1,4 +1,4 @@
-# Provider Model
+﻿# Provider Model
 
 
 
@@ -52,7 +52,7 @@ Framework
 
 \- docs/MODULE\_INTERFACE.md
 
-\- docs/ARCHITECTURE.md
+\- docs/architecture/SAM_ARCHITECTURE.md
 
 
 
@@ -108,21 +108,21 @@ This separation allows OpenClaw to evolve independently from external AI ecosyst
 
 &#x20;                Runtime
 
-&#x20;                   │
+&#x20;                   â”‚
 
-&#x20;                   ▼
+&#x20;                   â–¼
 
 &#x20;         Provider Interface
 
-&#x20;       ┌────────┼────────┐
+&#x20;       â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”
 
-&#x20;       ▼        ▼        ▼
+&#x20;       â–¼        â–¼        â–¼
 
 &#x20;   Provider A Provider B Provider C
 
-&#x20;       │        │        │
+&#x20;       â”‚        â”‚        â”‚
 
-&#x20;       ▼        ▼        ▼
+&#x20;       â–¼        â–¼        â–¼
 
 &#x20;    Models   Models   Models
 
@@ -372,21 +372,21 @@ The dependency hierarchy is:
 
 Runtime
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Provider Interface
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Provider Implementation
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 External AI Service
 

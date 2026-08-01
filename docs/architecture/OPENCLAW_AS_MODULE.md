@@ -1,4 +1,4 @@
-# OPENCLAW\_AS\_MODULE
+﻿# OPENCLAW\_AS\_MODULE
 
 
 
@@ -36,7 +36,7 @@ This document should be read together with:
 
 
 
-\- ARCHITECTURE.md
+\- SAM_ARCHITECTURE.md
 
 \- FRAMEWORK\_VS\_MODULE.md
 
@@ -758,7 +758,7 @@ SAM Framework
 
 
 
-↓
+â†“
 
 
 

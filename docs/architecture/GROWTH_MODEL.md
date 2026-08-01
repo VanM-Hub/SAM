@@ -1,4 +1,4 @@
-# GROWTH\_MODEL
+﻿# GROWTH\_MODEL
 
 
 
@@ -40,7 +40,7 @@ This document complements:
 
 
 
-\- ARCHITECTURE.md
+\- SAM_ARCHITECTURE.md
 
 \- LAYERS.md
 
@@ -136,7 +136,7 @@ Framework
 
 
 
-↓
+â†“
 
 
 
@@ -144,7 +144,7 @@ Module
 
 
 
-↓
+â†“
 
 
 
@@ -152,7 +152,7 @@ Knowledge
 
 
 
-↓
+â†“
 
 
 
@@ -160,7 +160,7 @@ Playbooks
 
 
 
-↓
+â†“
 
 
 
@@ -192,7 +192,7 @@ SAM
 
 
 
-↓
+â†“
 
 
 
@@ -200,7 +200,7 @@ Framework
 
 
 
-↓
+â†“
 
 
 
@@ -208,7 +208,7 @@ OpenClaw Module
 
 
 
-↓
+â†“
 
 
 
@@ -216,7 +216,7 @@ Docker Module
 
 
 
-↓
+â†“
 
 
 
@@ -224,7 +224,7 @@ GitHub Module
 
 
 
-↓
+â†“
 
 
 
@@ -232,7 +232,7 @@ Linux Module
 
 
 
-↓
+â†“
 
 
 
@@ -240,7 +240,7 @@ Windows Module
 
 
 
-↓
+â†“
 
 
 
@@ -248,7 +248,7 @@ Cloud Module
 
 
 
-↓
+â†“
 
 
 
@@ -372,7 +372,7 @@ OpenClaw Module
 
 
 
-↓
+â†“
 
 
 
@@ -560,7 +560,7 @@ Framework
 
 
 
-↓
+â†“
 
 
 
@@ -568,7 +568,7 @@ Reasoning
 
 
 
-↓
+â†“
 
 
 
@@ -576,7 +576,7 @@ Module
 
 
 
-↓
+â†“
 
 
 
@@ -584,7 +584,7 @@ Knowledge
 
 
 
-↓
+â†“
 
 
 
@@ -592,7 +592,7 @@ Playbook
 
 
 
-↓
+â†“
 
 
 
@@ -732,7 +732,7 @@ Framework
 
 
 
-↓
+â†“
 
 
 
@@ -740,7 +740,7 @@ Framework
 
 
 
-↓
+â†“
 
 
 
@@ -748,7 +748,7 @@ Thousands of Knowledge Documents
 
 
 
-↓
+â†“
 
 
 
@@ -756,7 +756,7 @@ Hundreds of Playbooks
 
 
 
-↓
+â†“
 
 
 
@@ -764,7 +764,7 @@ Large Research Collections
 
 
 
-↓
+â†“
 
 
 

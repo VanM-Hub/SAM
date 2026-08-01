@@ -1,4 +1,4 @@
-# OpenClaw Architecture
+﻿# OpenClaw Architecture
 
 Version: 1.0
 
@@ -16,7 +16,7 @@ Related Documents
 
 Framework References
 
-- docs/architecture/ARCHITECTURE.md
+- docs/architecture/SAM_ARCHITECTURE.md
 - docs/architecture/LAYERS.md
 - docs/architecture/MODULE_INTERFACE.md
 - docs/core/CONSTITUTION.md
@@ -56,17 +56,17 @@ rather than source code structure.
 
 ```
                  SAM Framework
-                       │
-                       ▼
+                       â”‚
+                       â–¼
               OpenClaw Module
-                       │
- ┌─────────────────────┼─────────────────────┐
- │                     │                     │
- ▼                     ▼                     ▼
+                       â”‚
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+ â”‚                     â”‚                     â”‚
+ â–¼                     â–¼                     â–¼
 Knowledge          Playbooks          Diagnostics
- │                     │                     │
- └───────────────┬─────┴───────────────┬─────┘
-                 ▼                     ▼
+ â”‚                     â”‚                     â”‚
+ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”˜
+                 â–¼                     â–¼
           OpenClaw Runtime        Operational Data
 ```
 
@@ -204,35 +204,35 @@ Operational information generally flows as follows:
 
 External Event
 
-↓
+â†“
 
 Runtime
 
-↓
+â†“
 
 Logs / State
 
-↓
+â†“
 
 Diagnostics
 
-↓
+â†“
 
 Knowledge
 
-↓
+â†“
 
 Playbooks
 
-↓
+â†“
 
 Operations
 
-↓
+â†“
 
 New Evidence
 
-↓
+â†“
 
 Knowledge
 
@@ -248,15 +248,15 @@ Allowed
 
 Framework
 
-↓
+â†“
 
 Module
 
-↓
+â†“
 
 Runtime
 
-↓
+â†“
 
 External Systems
 
@@ -264,13 +264,13 @@ Not Allowed
 
 Runtime
 
-↓
+â†“
 
 Framework
 
 Module
 
-↓
+â†“
 
 Framework
 
