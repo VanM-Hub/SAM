@@ -1,4 +1,4 @@
-﻿markdown
+markdown
 
 # REPOSITORY\_CONVENTION
 
@@ -599,73 +599,20 @@ This allows documentation to remain manageable over long development cycles.
 # Cross References
 
 
-
-Documents should reference related documents whenever appropriate.
-
+Hyperlinks help navigation. They are not a source of authority.
 
 
-Example:
+Foundation documents (Mission, Constitution, Governance) must remain readable without hyperlinks.
 
 
-
-VISION
-
+The README is the navigation entry point.
 
 
-â†“
-
-
-
-MISSION
-
-
-
-â†“
-
-
-
-PRINCIPLES
-
-
-
-â†“
-
-
-
-ARCHITECTURE
-
-
-
-â†“
-
-
-
-ADR
-
-
-
-â†“
-
-
-
-FRAMEWORK
-
-
-
-â†“
-
-
-
-MODULES
-
-
-
-This creates a navigable knowledge graph rather than isolated documents.
+Cross references should point to the correct authority; they do not create authority.
 
 
 
 ---
-
 
 
 # Source of Truth
@@ -768,52 +715,75 @@ Commit messages should describe intent rather than activity.
 
 
 
-# Documentation Lifecycle
+# Documentation Authority
 
 
-
-Documents evolve through four stages.
-
+Documentation has two independent dimensions:
 
 
-Draft
+**Lifecycle** (how a document matures): Draft -> Review -> Accepted -> Archived.
 
 
-
-â†“
-
+**Authority** (the role a document holds): Canonical, Historical, Superseded, Generated.
 
 
-Review
-
-
-
-â†“
-
-
-
-Accepted
-
-
-
-â†“
-
-
-
-Archived
-
-
-
-Historical documents should not be deleted.
-
-
-
-Instead, they should be archived to preserve project history.
+Lifecycle and Authority are independent. A document may be Accepted in lifecycle yet Historical in authority.
 
 
 
 ---
 
+
+# Documentation Lifecycle
+
+
+Documents evolve through their lifecycle stages: Draft -> Review -> Accepted -> Archived.
+
+
+Historical documents should not be deleted. They are archived to preserve project history.
+
+
+
+# Canonical Promotion
+
+
+A document becomes Canonical by passing the Canonical Promotion Protocol (Review, Stabilization, Promotion Audit, Promotion Decision).
+
+
+A Superseded document was once a reference but has been replaced. Superseded may become Historical.
+
+
+A Historical document is preserved as part of the evolution lineage; it is not authoritative.
+
+
+
+# Authority Chain
+
+
+The repository follows the authority chain:
+
+
+Mission -> Constitution -> Philosophy -> Governance -> Models -> Architecture -> README -> Roadmap -> ADR -> Implementation.
+
+
+Repository conventions follow this chain. They do not define it.
+
+
+
+# Canonical Reference Policy
+
+
+New implementation references the Canonical authority.
+
+
+Historical documents are referenced only for historical context.
+
+
+Superseded documents are not used as a basis for new implementation.
+
+
+
+---
 
 
 # Architectural Stability
