@@ -93,6 +93,7 @@ Key documents:
 - **Governance** — [GOVERNANCE.md](GOVERNANCE.md)
 - **Glossary** — [GLOSSARY.md](GLOSSARY.md)
 - **Canonical Architecture** — [docs/architecture/SAM_ARCHITECTURE.md](docs/architecture/SAM_ARCHITECTURE.md)
+- **Specification Layer (frozen)** — [docs/specifications/](docs/specifications/) · [Freeze Declaration](docs/SPECIFICATION_FREEZE.md)
 
 ---
 
