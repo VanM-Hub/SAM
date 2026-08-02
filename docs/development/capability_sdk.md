@@ -1,5 +1,8 @@
 # Capability SDK
 
+> **Document Type: Developer Documentation** (Implementation Guide).
+> This document is NOT a Domain Specification. The Capability domain is specified in `docs/specifications/CAPABILITY_SPECIFICATION.md`. This guide explains SDK usage only.
+
 > Panduan lengkap membuat capability baru untuk SAM.
 
 ## Daftar Isi

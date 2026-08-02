@@ -10,6 +10,11 @@ Status: Draft
 
 
 
+> **Document Type: Implementation Documentation.**
+> This document is NOT a Domain Specification. The Capability domain is specified in `docs/specifications/CAPABILITY_SPECIFICATION.md`.
+
+
+
 Document Type: Implementation Specification
 
 

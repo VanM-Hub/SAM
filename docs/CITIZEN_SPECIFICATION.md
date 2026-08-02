@@ -6,7 +6,27 @@ Version: 1.0
 
 Status: Foundational
 
-Authority: Constitutional Specification
+Authority: Derived from the Constitution
+
+Depends On: CONSTITUTION, GOVERNANCE, GLOSSARY
+
+
+
+\---
+
+
+
+# Scope
+
+
+
+Citizen is specified within this document as the constitutional participant of Project SAM.
+
+
+The meanings of Mission, Constitution, Governance, and the Model Layer remain authoritative in their respective documents.
+
+
+This document explains the Citizen domain and does not redefine those concepts.
 
 
 
@@ -18,7 +38,7 @@ Authority: Constitutional Specification
 
 
 
-This document defines the constitutional specification of a Citizen.
+This document defines the specification of the Citizen, derived from the Constitution.
 
 
 
@@ -366,31 +386,13 @@ Capabilities SHALL be immutable.
 
 
 
-Every interaction occurs through immutable Contracts.
-
+Every interaction occurs through immutable Contracts, as established by the Constitution and the Glossary.
 
 
 Citizens SHALL NOT communicate through implementation details.
 
 
-
-Contracts define:
-
-
-
-inputs
-
-
-
-outputs
-
-
-
-constraints
-
-
-
-compatibility
+This specification does not redefine the Contract; it only states how a Citizen relates to Contracts.
 
 
 
