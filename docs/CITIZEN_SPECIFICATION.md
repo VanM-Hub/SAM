@@ -8,7 +8,7 @@ Status: Foundational
 
 Authority: Derived from the Constitution
 
-Depends On: CONSTITUTION, GOVERNANCE, GLOSSARY
+Depends On: CONSTITUTION, GOVERNANCE, GLOSSARY, SAM_ARCHITECTURE.md
 
 
 
@@ -23,7 +23,7 @@ Depends On: CONSTITUTION, GOVERNANCE, GLOSSARY
 Citizen is specified within this document as the constitutional participant of Project SAM.
 
 
-The meanings of Mission, Constitution, Governance, and the Model Layer remain authoritative in their respective documents.
+The meanings of Mission, Constitution, Governance, the Canonical Architecture, and the Model Layer remain authoritative in their respective documents.
 
 
 This document explains the Citizen domain and does not redefine those concepts.

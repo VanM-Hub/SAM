@@ -11,6 +11,7 @@ Depends On:
 - CONSTITUTION.md
 - GLOSSARY.md
 - CITIZEN_SPECIFICATION.md
+- SAM_ARCHITECTURE.md
 
 ---
 
@@ -18,7 +19,7 @@ Depends On:
 
 Capability is specified within this document as the universal language of Project SAM.
 
-The meanings of Mission, Constitution, Governance, Citizen, and the Model Layer remain authoritative in their respective documents.
+The meanings of Mission, Constitution, Governance, the Canonical Architecture, and the Model Layer remain authoritative in their respective documents.
 
 This document explains the Capability domain and does not redefine those concepts.
 
