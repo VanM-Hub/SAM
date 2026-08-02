@@ -4,7 +4,7 @@ Version: 1.0
 
 Status: Foundational
 
-Authority: Constitutional Specification
+Authority: Derived from the Constitution
 
 Depends On:
 
@@ -14,9 +14,19 @@ Depends On:
 
 ---
 
+# Scope
+
+Capability is specified within this document as the universal language of Project SAM.
+
+The meanings of Mission, Constitution, Governance, Citizen, and the Model Layer remain authoritative in their respective documents.
+
+This document explains the Capability domain and does not redefine those concepts.
+
+---
+
 # Purpose
 
-This document defines the constitutional specification of Capabilities within Project SAM.
+This document defines the specification of Capabilities, derived from the Constitution.
 
 Capabilities are the universal language used by Citizens to describe what they can provide.
 
@@ -171,21 +181,9 @@ Patch changes fix implementation without modifying contract.
 
 # Capability Contracts
 
-Every Capability exposes exactly one public contract.
+Every Capability exposes exactly one public contract, as established by the Constitution and the Glossary.
 
-Contract defines:
-
-input DTO
-
-output DTO
-
-validation
-
-constraints
-
-failure conditions
-
-expected behavior
+This specification does not redefine the Contract; it states how a Capability relates to a Contract.
 
 Contract never exposes internal implementation.
 

@@ -2,9 +2,13 @@
 
 Version: 1.0
 
-Status: Baseline Specification
+Status: Superseded (Historical)
 
-Document Type: Architecture Specification
+Document Type: Historical Specification
+
+> **Document Status: Superseded (AD-028 Canonical Architecture).**
+> Canonical Architecture Project SAM adalah `docs/architecture/SAM_ARCHITECTURE.md`.
+> Dokumen ini adalah riwayat spesifikasi framework v1.0; tidak lagi menjadi authority aktif.
 
 Audience:
 - Framework Architects
