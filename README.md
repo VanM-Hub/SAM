@@ -70,6 +70,8 @@ MISSION
   ↓
 CONSTITUTION
   ↓
+CITIZEN SPECIFICATION
+  ↓
 PHILOSOPHY
   ↓
 GOVERNANCE
@@ -89,6 +91,7 @@ Key documents:
 
 - **Mission** — [MISSION.md](MISSION.md)
 - **Constitution** — [docs/CONSTITUTION.md](docs/CONSTITUTION.md)
+- **Citizen Specification** — [docs/CITIZEN_SPECIFICATION.md](docs/CITIZEN_SPECIFICATION.md) · jembatan konseptual antara Constitution dan seluruh Specification teknis
 - **Philosophy** — [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md)
 - **Governance** — [GOVERNANCE.md](GOVERNANCE.md)
 - **Glossary** — [GLOSSARY.md](GLOSSARY.md)
@@ -105,6 +108,7 @@ SAM/
 ├── tests/                   # Test suite
 ├── docs/                    # Documentation
 │   ├── CONSTITUTION.md      # Canonical Constitution
+│   ├── CITIZEN_SPECIFICATION.md  # Bridge Constitution -> Specifications
 │   ├── GOVERNANCE.md / GLOSSARY.md / PHILOSOPHY.md
 │   ├── architecture/        # Canonical Architecture
 │   ├── models/              # Model Layer (trust, risk, decision, memory)
