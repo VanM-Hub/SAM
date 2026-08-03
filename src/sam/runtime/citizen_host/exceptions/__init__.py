@@ -1,0 +1,1 @@
+"""Citizen Host domain exceptions."""
