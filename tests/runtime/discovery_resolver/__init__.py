@@ -1,1 +1,1 @@
-﻿
+"""Discovery Resolver tests."""
