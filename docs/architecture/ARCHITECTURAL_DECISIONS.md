@@ -1,150 +1,69 @@
-# Architectural Decisions
+# Architectural Decisions — Reference Index
 
-**Version:** v1.0.0  
-**Purpose:** Record the rationale behind major architectural decisions made during SAM development.
+**Version:** 2.0.0
+**Status:** REFERENCE (index only — NOT authority)
+**Purpose:** A single index over all Architecture Decision Records (ADRs). It does **not**
+contain unique decisions. Each decision lives in exactly one canonical ADR file under
+`docs/adr/`. This index maps every ADR to its file and status.
 
----
-
-## ADR-001: Standalone Python Process (No Framework Dependency)
-
-**Date:** Sprint 0  
-**Context:** SAM could have been built as an OpenClaw module or a standalone tool.  
-**Decision:** Standalone Python process with optional OpenClaw integration.  
-**Rationale:** Independence from any specific platform; easier to deploy, test, and distribute.  
-**Status:** ✅ Implemented  
+> **Canonical rule (from Van):** *Satu keputusan = Satu ADR = Satu sumber kebenaran.*
+> If a decision is active, it MUST have a file in `docs/adr/`. This index never holds
+> a decision that lives nowhere else.
 
 ---
 
-## ADR-002: sqlite3 as Primary Database
+## ADR Index
 
-**Date:** Sprint 0  
-**Context:** Needed a persistent store for executions, knowledge, and state.  
-**Decision:** Use sqlite3 (stdlib) — no external database dependency.  
-**Rationale:** Zero setup, portable, sufficient for single-node deployments; migration path to PostgreSQL exists if needed.  
-**Trade-off:** Single-writer limitation; not suitable for high-concurrency multi-node.  
-**Status:** ✅ Implemented; 47 migrations  
-
----
-
-## ADR-003: Layered Architecture with Strict Dependency Direction
-
-**Date:** Sprint 1  
-**Context:** Need to prevent circular dependencies and ensure modularity.  
-**Decision:** Four layers (CLI → Application → Domain → Persistence → Infra) with strict downward-only dependencies.  
-**Rationale:** Enforces separation of concerns; makes modules independently testable.  
-**Status:** ✅ Implemented; verified in architecture audit  
-
----
-
-## ADR-004: Async-First API Design
-
-**Date:** Sprint 1  
-**Context:** SAM needed to handle concurrent healing loops, monitoring, and event processing.  
-**Decision:** All I/O operations are async (using `asyncio`).  
-**Rationale:** No thread-safety issues; efficient concurrent operation.  
-**Trade-off:** Slightly more complex code (`async def` everywhere).  
-**Status:** ✅ Implemented  
+| ADR | Decision | Status | Canonical file |
+|-----|----------|--------|----------------|
+| ADR-000 | Deployment Topology | Accepted | `docs/adr/ADR-000_Deployment_Topology.md` |
+| ADR-001 | Approval Decision Model | Accepted | `docs/adr/ADR-001_Approval_Decision_Model.md` |
+| ADR-002 | Capability Resolution Policy | Accepted | `docs/adr/ADR-002_Capability_Resolution_Policy.md` |
+| ADR-003 | Idempotency Realization Model | Accepted | `docs/adr/ADR-003_Idempotency_Realization_Model.md` |
+| ADR-004 | Failure Propagation Model | Accepted | `docs/adr/ADR-004_Failure_Propagation_Model.md` |
+| ADR-005 | Execution Ordering Model | Accepted | `docs/adr/ADR-005_Execution_Ordering_Model.md` |
+| ADR-006 | External Access Boundaries | Accepted | `docs/adr/ADR-006_External_Access_Boundaries.md` |
+| ADR-007 | Verification Point Placement | Accepted | `docs/adr/ADR-007_Verification_Point_Placement.md` |
+| ADR-008 | Attention Manager Priority Rules | **Superseded** | (no canonical file — superseded) |
+| ADR-009 | Goal Arbitration — Weighted Scoring | **Superseded** | (no canonical file — superseded) |
+| ADR-010 | Five-Level Autonomy Model | **Superseded** | (no canonical file — superseded) |
+| ADR-011 | Trust-Based Federation (Not Identity-Based) | Accepted | `docs/adr/ADR-011_Trust_Based_Federation.md` |
+| ADR-012 | Knowledge Sovereignty (PUBLIC/INTERNAL/RESTRICTED) | Accepted | `docs/adr/ADR-012_Knowledge_Sovereignty.md` |
+| ADR-013 | Python 3.8+ Compatibility (with Polyfill) | Accepted | `docs/adr/ADR-013_Python_38_Compatibility.md` |
+| ADR-014 | CLI-First Interaction Model | **Superseded** | (no canonical file — superseded) |
 
 ---
 
-## ADR-005: In-Memory First, Database Optional
+## Superseded / Obsolete Decisions
 
-**Date:** Sprint 10  
-**Context:** Many subsystems (attention, working memory, context) need fast access.  
-**Decision:** Use in-memory data structures as primary storage; database as optional persistence layer.  
-**Rationale:** Performance (microsecond vs millisecond); simplicity.  
-**Status:** ✅ Implemented  
+The following decisions are recorded historically but are **no longer active**.
+They were superseded or proved obsolete by later architecture. Their rationale is
+preserved in git history (previous version of this index) for forensics only.
 
----
-
-## ADR-006: 9-Phase Self-Healing Loop
-
-**Date:** Sprint 28  
-**Context:** Needed a structured healing pipeline beyond simple detect-fix.  
-**Decision:** Nine phases: Observe → Diagnose → Reason → Plan → Govern → Execute → Verify → Reflect → Learn.  
-**Rationale:** Covers the full OODA loop with governance and reflection.  
-**Status:** ✅ Implemented  
+| ADR | Original decision | Why superseded/obsolete |
+|-----|-------------------|--------------------------|
+| ADR-008 | Attention Manager Priority Rules (first-match confidence→health→latency→cost) | Runtime certification (`P0-001`): "No priority mechanism in scheduler"; resolution follows compatibility + identity ordering, not priority rules. |
+| ADR-009 | Goal Arbitration Weighted Scoring | Replaced by ADR-005 Strict Linear Ordering (approval-arrival order, deterministic `ordering_validator.py`). No weighted-scoring arbitration remains. |
+| ADR-010 | Five-Level Autonomy (OBSERVE→...→AUTONOMOUS) | Replaced by approval-gated execution: "Nothing executes before explicit approval" (SAM_ARCHITECTURE). No autonomy scale remains. |
+| ADR-014 | CLI-First (no GUI, no REST) | Obsolete: SAM now has a Presentation layer (`src/sam/presentation/`) + web templates; CLI-first constraint is no longer held. |
 
 ---
 
-## ADR-007: Evolution Policy — No Auto-Approve
+## How to read this index
 
-**Date:** Sprint 28  
-**Context:** SelfOptimizer could automatically apply parameter changes.  
-**Decision:** All parameter changes go through EvolutionPolicy with PENDING status; manual or CLI approve required.  
-**Rationale:** Safety; prevents harmful automatic changes.  
-**Status:** ✅ Implemented  
-
----
-
-## ADR-008: Attention Manager Priority Rules
-
-**Date:** Sprint 29  
-**Context:** SAM needs to decide what to focus on when multiple issues compete.  
-**Decision:** First-match-wins priority rules (confidence → health → latency → cost → balanced).  
-**Rationale:** Deterministic, debuggable, predictable.  
-**Status:** ✅ Implemented  
+1. To find the authority for any architectural topic, start at the **CANONICAL** ADR
+   listed above, then follow `docs/adr/<file>`.
+2. Active decisions live **only** in `docs/adr/`.
+3. Superseded/obsolete decisions are historical; never implement from them.
+4. Full architecture authority: `docs/architecture/SAM_ARCHITECTURE.md`.
+5. Navigation across all repository documents: `ATLAS.md` (root).
 
 ---
 
-## ADR-009: Goal Arbitration — Weighted Scoring
+## Migration note
 
-**Date:** Sprint 29  
-**Context:** Multiple goals (HEAL, OPTIMIZE, DEPLOY, etc.) need prioritization.  
-**Decision:** Score = (priority × 0.3) + (urgency × 0.4) + (1 - resource/100) × 0.3, with context adjustments.  
-**Rationale:** Simple, configurable, explainable.  
-**Status:** ✅ Implemented  
-
----
-
-## ADR-010: Five-Level Autonomy Model
-
-**Date:** Sprint 32  
-**Context:** Needed graduated autonomy rather than binary on/off.  
-**Decision:** OBSERVE → RECOMMEND → ASSIST → SUPERVISE → AUTONOMOUS.  
-**Rationale:** Allows graceful transitions; maps to real-world ops maturity models.  
-**Status:** ✅ Implemented  
-
----
-
-## ADR-011: Trust-Based Federation (Not Identity-Based)
-
-**Date:** Sprint 31  
-**Context:** Clusters need to decide which peers to trust.  
-**Decision:** Dynamic trust scoring with decay (not static identity/ certificates).  
-**Rationale:** Adaptive; penalizes unreliable peers automatically.  
-**Status:** ✅ Implemented  
-
----
-
-## ADR-012: Knowledge Sovereignty (PUBLIC/INTERNAL/RESTRICTED)
-
-**Date:** Sprint 31  
-**Context:** Not all clusters want to share all knowledge.  
-**Decision:** Three-tier sovereignty with optional whitelist for RESTRICTED.  
-**Rationale:** Respects cluster autonomy; necessary for multi-tenant deployments.  
-**Status:** ✅ Implemented  
-
----
-
-## ADR-013: Python 3.8+ Compatibility (with Polyfill)
-
-**Date:** Sprint 28  
-**Context:** Development team uses Python 3.8; `asyncio.to_thread` is 3.9+.  
-**Decision:** Provide polyfill for `asyncio.to_thread` in `database.py`; support 3.8–3.12.  
-**Rationale:** Maximum compatibility; polyfill is trivial.  
-**Status:** ✅ Implemented  
-
----
-
-## ADR-014: CLI-First Interaction Model
-
-**Date:** Sprint 0  
-**Context:** SAM needs a user interface.  
-**Decision:** CLI-only for v1.0 (no REST API, no GUI).  
-**Rationale:** Simplest to implement and test; enough for ops use.  
-**Status:** ✅ Implemented; 10 sub-apps  
-
----
-
-*Document prepared for SAM v1.0.0 release.*
+This file was previously `v1.0.0` and held full ADR bodies for ADR-001..014. Under the
+one-decision-one-ADR rule, the active decisions ADR-011/012/013 were extracted to
+standalone canonical files in `docs/adr/` (Phase C0.5). The remaining non-canonical
+bodies (ADR-001..007, 014) were superseded/obsolete or already represented by the
+canonical ADR set, and their details are preserved in git history.
