@@ -40,6 +40,24 @@ REQUIRED_DIAGRAMS = [
     "09_runtime_kernel.html",
 ]
 
+def _has_adr_metadata(path):
+    """Check that an ADR file has the required metadata headers.
+
+    An ADR must at minimum declare its decision: either a **Status:** line
+    (typical) or a Decision section. Date and Deciders are encouraged but the
+    hard requirement is that the file is not an empty placeholder.
+    """
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+    except (OSError, UnicodeDecodeError):
+        return False
+    lower = text.lower()
+    has_status = "**status:**" in lower or "status:" in lower
+    has_decision = "## decision" in lower or "decision:" in lower
+    return has_status or has_decision
+
+
 def scan():
     errors = []
     warnings = []
@@ -77,17 +95,22 @@ def scan():
         if not adr_files:
             errors.append("NO ADR FILES in docs/adr/")
         else:
-            # Check ADR numbering is sequential
-            nums = set()
+            # Validate ADR consistency: unique numbers + required metadata.
+            # Per Van (C2): nominal numbers are NOT required to be sequential.
+            # In a living repository it is normal for ADRs to be superseded,
+            # withdrawn, or intentionally never published. The validator checks
+            # consistency (no duplicate numbers, valid metadata), not sequence.
+            seen = set()
             for f in adr_files:
                 m = re.search(r'ADR-(\d+)', f)
                 if m:
-                    nums.add(int(m.group(1)))
-            if nums:
-                expected = set(range(1, max(nums)+1))
-                missing_nums = expected - nums
-                if missing_nums:
-                    warnings.append(f"Missing ADR numbers: {sorted(missing_nums)}")
+                    num = int(m.group(1))
+                    if num in seen:
+                        errors.append(f"DUPLICATE ADR number {num} (two files claim ADR-{num})")
+                    seen.add(num)
+                path = os.path.join(adr_dir, f)
+                if not _has_adr_metadata(path):
+                    errors.append(f"INVALID ADR METADATA: {f} (missing Status/Date/Decision)")
 
     # 4. Check release docs
     for doc in REQUIRED_RELEASE_DOCS:

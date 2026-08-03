@@ -31,6 +31,20 @@ contain unique decisions. Each decision lives in exactly one canonical ADR file 
 | ADR-012 | Knowledge Sovereignty (PUBLIC/INTERNAL/RESTRICTED) | Accepted | `docs/adr/ADR-012_Knowledge_Sovereignty.md` |
 | ADR-013 | Python 3.8+ Compatibility (with Polyfill) | Accepted | `docs/adr/ADR-013_Python_38_Compatibility.md` |
 | ADR-014 | CLI-First Interaction Model | **Superseded** | (no canonical file — superseded) |
+| ADR-015 | Runtime Hosting Independence | Accepted | `docs/adr/ADR-015_Runtime_Hosting_Independence.md` |
+| ADR-016 | Headless Runtime | Accepted | `docs/adr/ADR-016_Headless_Runtime.md` |
+| ADR-017 | Runtime State Machine | Accepted | `docs/adr/ADR-017_Runtime_State_Machine.md` |
+| ADR-018 | Workspace Layout | Accepted | `docs/adr/ADR-018_Workspace_Layout.md` |
+| ADR-019 | Recovery Contract | Accepted | `docs/adr/ADR-019_Recovery_Contract.md` |
+| ADR-020 | Lifecycle Events | Accepted | `docs/adr/ADR-020_Lifecycle_Events.md` |
+| ADR-021 | Overall Architecture | Accepted | `docs/adr/ADR-021_Overall_Architecture.md` |
+| ADR-022 | Runtime Isolation | Accepted | `docs/adr/ADR-022_Runtime_Isolation.md` |
+| ADR-023 | Immutable DTO | Accepted | `docs/adr/ADR-023_Immutable_DTO.md` |
+| ADR-024 | Preview Only Execution | Accepted | `docs/adr/ADR-024_Preview_Only_Execution.md` |
+| ADR-025 | Approval Boundary | Accepted | `docs/adr/ADR-025_Approval_Boundary.md` |
+| ADR-026 | Subsystem Independence | Accepted | `docs/adr/ADR-026_Subsystem_Independence.md` |
+| ADR-027 | Repository Structure | Accepted | `docs/adr/ADR-027_Repository_Structure.md` |
+| ADR-028 | Runtime Kernel | Accepted | `docs/adr/ADR-028_Runtime_Kernel.md` |
 
 ---
 
