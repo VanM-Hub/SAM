@@ -26,6 +26,7 @@ from ..base.base_check import BaseComplianceCheck
 from . import l0_structural as _l0
 from . import source_required as _src
 from . import behavioral as _beh
+from . import system_level as _sys
 
 # -- L1 required symbols (derived from P1-004 catalog descriptions) -----------
 # Each L1 check verifies at least one of these concrete artifacts exists
@@ -223,6 +224,7 @@ class Builder:
         checks.update(self.build_l1())
         checks.update(self.build_l2())
         checks.update(self.build_l3())
+        checks.update(self.build_l4())
         return checks
 
     # -- L0 (12 checks) ------------------------------------------------------
@@ -304,4 +306,15 @@ class Builder:
         return out
 
     def build_l4(self) -> Dict[str, BaseComplianceCheck]:
-        raise NotImplementedError("batch L4 arrives in P1-008 Batch 5")
+        m = _md(self._catalog)
+        out: Dict[str, BaseComplianceCheck] = {
+            "L4-01": _new(_sys.TestSuitePassCheck, m["L4-01"]),
+            "L4-02": _new(_sys.NoSkippedTestsCheck, m["L4-02"]),
+            "L4-03": _new(_sys.TraceChainCheck, m["L4-03"]),
+            "L4-04": _new(_sys.InvariantCheck, m["L4-04"]),
+            "L4-05": _new(_sys.ConstraintCheck, m["L4-05"]),
+            "L4-06": _new(_sys.AcyclicDependencyCheck, m["L4-06"]),
+            "L4-07": _new(_sys.BoundaryEnforcementCheck, m["L4-07"]),
+            "L4-08": _new(_sys.LinearChainCheck, m["L4-08"]),
+        }
+        return out
