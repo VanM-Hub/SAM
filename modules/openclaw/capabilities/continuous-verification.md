@@ -1,4 +1,4 @@
-# Continuous Verification
+﻿# Continuous Verification
 
 
 
@@ -140,7 +140,7 @@ Framework
 
 \- docs/models/TRUST\_MODEL.md
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 
 
@@ -206,7 +206,7 @@ Execution Complete
 
 
 
-↓
+â†“
 
 
 
@@ -214,7 +214,7 @@ Immediate Verification
 
 
 
-↓
+â†“
 
 
 
@@ -222,7 +222,7 @@ Short Observation
 
 
 
-↓
+â†“
 
 
 
@@ -230,7 +230,7 @@ Health Monitoring
 
 
 
-↓
+â†“
 
 
 
@@ -238,7 +238,7 @@ Long Observation
 
 
 
-↓
+â†“
 
 
 

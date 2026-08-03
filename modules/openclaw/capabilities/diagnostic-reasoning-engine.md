@@ -1,4 +1,4 @@
-# Diagnostic Reasoning Engine
+﻿# Diagnostic Reasoning Engine
 
 
 
@@ -122,7 +122,7 @@ Framework
 
 \- docs/core/THINKING\_PROTOCOL.md
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/TRUST\_MODEL.md
 
@@ -228,7 +228,7 @@ Observation
 
 
 
-↓
+â†“
 
 
 
@@ -236,7 +236,7 @@ Evidence Collection
 
 
 
-↓
+â†“
 
 
 
@@ -244,7 +244,7 @@ Evidence Correlation
 
 
 
-↓
+â†“
 
 
 
@@ -252,7 +252,7 @@ Origin Isolation
 
 
 
-↓
+â†“
 
 
 
@@ -260,7 +260,7 @@ Hypothesis Generation
 
 
 
-↓
+â†“
 
 
 
@@ -268,7 +268,7 @@ Evidence Evaluation
 
 
 
-↓
+â†“
 
 
 
@@ -276,7 +276,7 @@ Confidence Scoring
 
 
 
-↓
+â†“
 
 
 
@@ -284,7 +284,7 @@ Reasoning Trace
 
 
 
-↓
+â†“
 
 
 
@@ -292,7 +292,7 @@ Conclusion
 
 
 
-↓
+â†“
 
 
 

@@ -1,50 +1,50 @@
-# R3-004 — Architecture Decision Layer Closure Certification
+﻿# R3-004 â€” Architecture Decision Layer Closure Certification
 
 Version: 0.1.0
-Status: Completed — Verdict A (Architecture Decision Layer Complete)
+Status: Completed â€” Verdict A (Architecture Decision Layer Complete)
 Audit Date: 2026-08-03
 Author: Chief Architect
-Mode: **READ-ONLY** — no modification, no new ADR, no proposal, no redesign, no implementation, no new terminology, no technology, no architecture invention.
+Mode: **READ-ONLY** â€” no modification, no new ADR, no proposal, no redesign, no implementation, no new terminology, no technology, no architecture invention.
 
 ---
 
 # Executive Summary
 
-R3-004 memverifikasi bahwa seluruh **Architecture Decision Layer** telah lengkap, konsisten, dan resmi layak menjadi **baseline Reference Runtime** — sebelum memasuki fase **Reference Runtime Architecture Design (R4)**.
+R3-004 memverifikasi bahwa seluruh **Architecture Decision Layer** telah lengkap, konsisten, dan resmi layak menjadi **baseline Reference Runtime** â€” sebelum memasuki fase **Reference Runtime Architecture Design (R4)**.
 
 Hasil 8 audit:
 
 | # | Audit | Hasil |
 |---|---|---|
-| 1 | ADR Coverage | **LULUS** — 8/8 (100%) Candidate Blueprint memiliki ADR Accepted |
-| 2 | Decision Completeness | **LULUS** — Open Decision Register kosong |
-| 3 | Cross ADR Consistency | **LULUS** — 28/28 pasangan konsisten, 0 finding |
-| 4 | Runtime Readiness | **LULUS** — Runtime dapat didesain penuh tanpa ADR tambahan |
-| 5 | Authority Integrity | **LULUS** — authority chain utuh |
-| 6 | Baseline Stability | **LULUS** — seluruh ADR valid pada skala 10/100/1000/10000 |
-| 7 | Future Evolution | **LULUS** — seluruh evolution paths terbuka |
-| 8 | Final Certification | **Verdict A** — Architecture Decision Layer Complete |
+| 1 | ADR Coverage | **LULUS** â€” 8/8 (100%) Candidate Blueprint memiliki ADR Accepted |
+| 2 | Decision Completeness | **LULUS** â€” Open Decision Register kosong |
+| 3 | Cross ADR Consistency | **LULUS** â€” 28/28 pasangan konsisten, 0 finding |
+| 4 | Runtime Readiness | **LULUS** â€” Runtime dapat didesain penuh tanpa ADR tambahan |
+| 5 | Authority Integrity | **LULUS** â€” authority chain utuh |
+| 6 | Baseline Stability | **LULUS** â€” seluruh ADR valid pada skala 10/100/1000/10000 |
+| 7 | Future Evolution | **LULUS** â€” seluruh evolution paths terbuka |
+| 8 | Final Certification | **Verdict A** â€” Architecture Decision Layer Complete |
 
 **STOP: TIDAK AKTIF.** Tidak ada Candidate tanpa ADR, tidak ada contradiction, tidak ada authority leakage, tidak ada dependency cycle, tidak ada kebutuhan mengubah Foundation atau Specification.
 
-**Verdict: A — Architecture Decision Layer Complete.** Lapisan keputusan dinyatakan **CLOSED** dan menjadi **baseline resmi** untuk memasuki fase **Reference Runtime Architecture Design (R4)**.
+**Verdict: A â€” Architecture Decision Layer Complete.** Lapisan keputusan dinyatakan **CLOSED** dan menjadi **baseline resmi** untuk memasuki fase **Reference Runtime Architecture Design (R4)**.
 
 ---
 
-# Audit 1 — ADR Coverage
+# Audit 1 â€” ADR Coverage
 
 ## 1.1 Coverage Matrix
 
 | # | Candidate (Blueprint G0-001) | Design Question | ADR | Status | Evidence |
 |---|---|---|---|---|---|
-| C-01 | Concurrency & Ordering | How Execution Scheduler sequences concurrent approved operations | **ADR-005 — Execution Ordering Model** | **Accepted** | `4c85c4c` |
-| C-02 | Capability Resolution Policy | How Discovery Resolver chooses when multiple Capabilities satisfy one request | **ADR-002 — Capability Resolution Policy** | **Accepted** | `de8aa48` |
-| C-03 | Approval Decision Computation | How Approval Coordinator produces a decision | **ADR-001 — Approval Decision Model** | **Accepted** | `c31e124` |
-| C-04 | Idempotency Realization | How an operation's idempotency is made observable | **ADR-003 — Idempotency Realization Model** | **Accepted** | `5bebaf4` |
-| C-05 | Failure Propagation | How a defined failure is surfaced to Audit preserving traceability | **ADR-004 — Failure Propagation Model** | **Accepted** | `6dd42f4` |
-| C-06 | Runtime Deployment Topology | Whether one Runtime hosts all components or distributable | **ADR-000 — Deployment Topology** | **Accepted** | `daabc54` |
-| C-07 | Reference Boundaries to External Access | Where Runtime positions Providers / Connectors relative to chain | **ADR-006 — External Access Boundaries** | **Accepted** | `589038a` |
-| C-08 | Verification Point Placement | Where "Verification" in Golden Rule sits as conceptual step | **ADR-007 — Verification Point Placement** | **Accepted** | `aec528c` |
+| C-01 | Concurrency & Ordering | How Execution Scheduler sequences concurrent approved operations | **ADR-005 â€” Execution Ordering Model** | **Accepted** | `4c85c4c` |
+| C-02 | Capability Resolution Policy | How Discovery Resolver chooses when multiple Capabilities satisfy one request | **ADR-002 â€” Capability Resolution Policy** | **Accepted** | `de8aa48` |
+| C-03 | Approval Decision Computation | How Approval Coordinator produces a decision | **ADR-001 â€” Approval Decision Model** | **Accepted** | `c31e124` |
+| C-04 | Idempotency Realization | How an operation's idempotency is made observable | **ADR-003 â€” Idempotency Realization Model** | **Accepted** | `5bebaf4` |
+| C-05 | Failure Propagation | How a defined failure is surfaced to Audit preserving traceability | **ADR-004 â€” Failure Propagation Model** | **Accepted** | `6dd42f4` |
+| C-06 | Runtime Deployment Topology | Whether one Runtime hosts all components or distributable | **ADR-000 â€” Deployment Topology** | **Accepted** | `daabc54` |
+| C-07 | Reference Boundaries to External Access | Where Runtime positions Providers / Connectors relative to chain | **ADR-006 â€” External Access Boundaries** | **Accepted** | `589038a` |
+| C-08 | Verification Point Placement | Where "Verification" in Golden Rule sits as conceptual step | **ADR-007 â€” Verification Point Placement** | **Accepted** | `aec528c` |
 
 ## 1.2 Coverage Metric
 
@@ -57,11 +57,11 @@ Hasil 8 audit:
 
 ## 1.3 Verdict Audit 1
 
-**LULUS.** Seluruh 8 Candidate Blueprint (C-01 s.d. C-08) telah memiliki ADR Accepted. ADR-007 (C-08) — yang sebelumnya missing pada R3-003 — telah ditulis dan diterima (status Accepted, decision Alternative B, commit `aec528c`). Tidak ada Candidate tanpa ADR.
+**LULUS.** Seluruh 8 Candidate Blueprint (C-01 s.d. C-08) telah memiliki ADR Accepted. ADR-007 (C-08) â€” yang sebelumnya missing pada R3-003 â€” telah ditulis dan diterima (status Accepted, decision Alternative B, commit `aec528c`). Tidak ada Candidate tanpa ADR.
 
 ---
 
-# Audit 2 — Decision Completeness
+# Audit 2 â€” Decision Completeness
 
 ## 2.1 Cakupan Keputusan Blueprint
 
@@ -73,16 +73,16 @@ Seluruh ruang keputusan yang didefinisikan Blueprint G0-001 telah ditutup:
 | C-02 | Capability resolution policy | Exact-match-preferred, compatible fallback, deterministic tie-break | ADR-002 |
 | C-03 | Approval decision computation | Accountable Decision Framework (automated-or-human) | ADR-001 |
 | C-04 | Idempotency realization | Contract-declared idempotency, Execution Layer observes | ADR-003 |
-| C-05 | Failure propagation | Linear propagation Registry→Approval→Execution→Audit | ADR-004 |
+| C-05 | Failure propagation | Linear propagation Registryâ†’Approvalâ†’Executionâ†’Audit | ADR-004 |
 | C-06 | Deployment topology | One cohesive Runtime unit, topology decoupled | ADR-000 |
 | C-07 | Reference boundaries external access | Contracts + Registry universal Citizen boundary | ADR-006 |
-| C-08 | Verification point placement | Audit-observed state transition (Recorded→Verified) | ADR-007 |
+| C-08 | Verification point placement | Audit-observed state transition (Recordedâ†’Verified) | ADR-007 |
 
 ## 2.2 Open Decision Register
 
 | # | Candidate | ADR | Status |
 |---|---|---|---|
-| — | — | — | **KOSONG** — tidak ada keputusan terbuka |
+| â€” | â€” | â€” | **KOSONG** â€” tidak ada keputusan terbuka |
 
 ## 2.3 Verdict Audit 2
 
@@ -90,7 +90,7 @@ Seluruh ruang keputusan yang didefinisikan Blueprint G0-001 telah ditutup:
 
 ---
 
-# Audit 3 — Cross ADR Consistency
+# Audit 3 â€” Cross ADR Consistency
 
 ## 3.1 Metode
 
@@ -113,50 +113,50 @@ Rincian temuan per kriteria:
 
 ## 3.3 Analisis Pairwise Terpilih (domain terdekat)
 
-### ADR-005 (Ordering) ↔ ADR-007 (Verification)
+### ADR-005 (Ordering) â†” ADR-007 (Verification)
 
 | Kriteria | Status |
 |---|---|
-| Contradiction | ✗ — ADR-007: Verification observasional, tidak mengubah ordering. ADR-005: Strict Linear Approval-arrival. Konsisten — verifikasi terjadi setelah hasil dihasilkan, tanpa mengubah urutan Approval→Execution. |
-| Responsibility conflict | ✗ — ADR-005 = ordering Execution; ADR-007 = observasi Audit. Tanggung jawab berbeda. |
-| Authority leakage | ✗ — ADR-007 tidak mengklaim authority ordering; ADR-005 tidak mengklaim authority verifikasi. |
+| Contradiction | âœ— â€” ADR-007: Verification observasional, tidak mengubah ordering. ADR-005: Strict Linear Approval-arrival. Konsisten â€” verifikasi terjadi setelah hasil dihasilkan, tanpa mengubah urutan Approvalâ†’Execution. |
+| Responsibility conflict | âœ— â€” ADR-005 = ordering Execution; ADR-007 = observasi Audit. Tanggung jawab berbeda. |
+| Authority leakage | âœ— â€” ADR-007 tidak mengklaim authority ordering; ADR-005 tidak mengklaim authority verifikasi. |
 
-### ADR-004 (Failure Propagation) ↔ ADR-007 (Verification)
-
-| Kriteria | Status |
-|---|---|
-| Contradiction | ✗ — ADR-004: Audit Recorder titik terminasi, "Audit does not feed back." ADR-007: Verification = fase observasi Audit (Recorded→Verified), tidak memberi umpan balik. Konsisten. |
-| Terminology conflict | ✗ — ADR-007 menggunakan state "Verified" dari AUDIT_SPEC lifecycle — bukan istilah baru; tidak mengubah terminologi Specification. |
-
-### ADR-006 (External Access Boundaries) ↔ ADR-007 (Verification)
+### ADR-004 (Failure Propagation) â†” ADR-007 (Verification)
 
 | Kriteria | Status |
 |---|---|
-| Contradiction | ✗ — ADR-006: boundary deterministik = Contracts + Registry. ADR-007: Verification mengamati melalui referensi Contract + Registry. Konsisten — keduanya menggunakan boundary yang sama. |
-| Dependency | ✗ — ADR-007 mengandalkan referensi dari ADR-006's boundary, bukan menciptakan boundary baru. |
+| Contradiction | âœ— â€” ADR-004: Audit Recorder titik terminasi, "Audit does not feed back." ADR-007: Verification = fase observasi Audit (Recordedâ†’Verified), tidak memberi umpan balik. Konsisten. |
+| Terminology conflict | âœ— â€” ADR-007 menggunakan state "Verified" dari AUDIT_SPEC lifecycle â€” bukan istilah baru; tidak mengubah terminologi Specification. |
 
-### ADR-001 (Approval) ↔ ADR-007 (Verification)
+### ADR-006 (External Access Boundaries) â†” ADR-007 (Verification)
 
 | Kriteria | Status |
 |---|---|
-| Contradiction | ✗ — ADR-001: Approval memutuskan otorisasi. ADR-007: Verification tidak memutuskan, hanya observasi. AUDIT_SPEC L30 "Audit does not decide." Konsisten — verifikasi tidak menggantikan Approval. |
-| Responsibility conflict | ✗ — Approval = keputusan; Verification = observasi. Domain berbeda. |
+| Contradiction | âœ— â€” ADR-006: boundary deterministik = Contracts + Registry. ADR-007: Verification mengamati melalui referensi Contract + Registry. Konsisten â€” keduanya menggunakan boundary yang sama. |
+| Dependency | âœ— â€” ADR-007 mengandalkan referensi dari ADR-006's boundary, bukan menciptakan boundary baru. |
+
+### ADR-001 (Approval) â†” ADR-007 (Verification)
+
+| Kriteria | Status |
+|---|---|
+| Contradiction | âœ— â€” ADR-001: Approval memutuskan otorisasi. ADR-007: Verification tidak memutuskan, hanya observasi. AUDIT_SPEC L30 "Audit does not decide." Konsisten â€” verifikasi tidak menggantikan Approval. |
+| Responsibility conflict | âœ— â€” Approval = keputusan; Verification = observasi. Domain berbeda. |
 
 ## 3.4 Dependency Cycle Check
 
 | Cek | Status |
 |---|---|
-| Seluruh ADR bergantung hanya pada Specification/Blueprint (bukan pada ADR lain sebagai validity) | ✓ — dependensi antar-ADR hanyalah konteks authoring (R2-002 L101), bukan validity dependency |
-| Tidak ada ADR yang mendefinisikan authority ADR lain | ✓ — authority diturunkan dari Specification |
+| Seluruh ADR bergantung hanya pada Specification/Blueprint (bukan pada ADR lain sebagai validity) | âœ“ â€” dependensi antar-ADR hanyalah konteks authoring (R2-002 L101), bukan validity dependency |
+| Tidak ada ADR yang mendefinisikan authority ADR lain | âœ“ â€” authority diturunkan dari Specification |
 | **Cycle?** | **Tidak ada.** R1-002: semua edge turun dari roots; strongly connected components = singletons. |
 
 ## 3.5 Verdict Audit 3
 
-**LULUS.** 28/28 pasangan ADR konsisten — 0 contradiction, 0 overlap, 0 dependency cycle, 0 authority leakage, 0 terminology conflict, 0 responsibility conflict. ADR-007 masuk ke lapisan yang sudah koheren tanpa memperkenalkan konflik apapun.
+**LULUS.** 28/28 pasangan ADR konsisten â€” 0 contradiction, 0 overlap, 0 dependency cycle, 0 authority leakage, 0 terminology conflict, 0 responsibility conflict. ADR-007 masuk ke lapisan yang sudah koheren tanpa memperkenalkan konflik apapun.
 
 ---
 
-# Audit 4 — Runtime Readiness
+# Audit 4 â€” Runtime Readiness
 
 ## 4.1 Pertanyaan
 
@@ -194,25 +194,25 @@ ADR-007 menutup celah terakhir: Verification kini memiliki posisi arsitektural y
 
 ---
 
-# Audit 5 — Authority Integrity
+# Audit 5 â€” Authority Integrity
 
 ## 5.1 Authority Chain
 
 ```
 MISSION
-  ↓
-CONSTITUTION (docs/core/CONSTITUTION.md)
-  ↓
+  â†“
+CONSTITUTION (docs/CONSTITUTION.md)
+  â†“
 GOVERNANCE (GOVERNANCE.md)
-  ↓
+  â†“
 ARCHITECTURE (docs/architecture/SAM_ARCHITECTURE.md)
-  ↓
+  â†“
 SPECIFICATION (6 frozen specs + CITIZEN_SPEC)
-  ↓
+  â†“
 ADR (ADR-000 s.d. ADR-007)
-  ↓
+  â†“
 REFERENCE RUNTIME (R-series design)
-  ↓
+  â†“
 IMPLEMENTATION
 ```
 
@@ -222,31 +222,31 @@ IMPLEMENTATION
 |---|---|---|---|
 | A-1 | ADR mengklaim authority bukan miliknya (leakage)? | **Tidak** | Setiap ADR menyatakan derivasi dari Specification (ADR_TEMPLATE: "Authority: Derived from the Constitution"). ADR-007: "tidak menambah authority" (Architectural Rationale). |
 | A-2 | Specification bergantung pada ADR (reverse dependency)? | **Tidak** | SPECIFICATION_FREEZE: Specification = baseline beku tidak berubah. ADR = decision sink di bawahnya. |
-| A-3 | ADR mengubah/timpa Specification? | **Tidak** | ADR-007 hanya menafsirkan state "Verified" yang sudah ada di AUDIT_SPEC — tidak mengubahnya. Seluruh ADR lain diverifikasi tidak ikut mengubah Specification. |
-| A-4 | Specification bertentangan dengan Constitution? | **Tidak** | R0-001 (A — Ready) dan R1-001 sudah memvalidasi konsistensi; tidak ada perubahan Specification sejak itu. |
+| A-3 | ADR mengubah/timpa Specification? | **Tidak** | ADR-007 hanya menafsirkan state "Verified" yang sudah ada di AUDIT_SPEC â€” tidak mengubahnya. Seluruh ADR lain diverifikasi tidak ikut mengubah Specification. |
+| A-4 | Specification bertentangan dengan Constitution? | **Tidak** | R0-001 (A â€” Ready) dan R1-001 sudah memvalidasi konsistensi; tidak ada perubahan Specification sejak itu. |
 | A-5 | ADR contradicting Constitution? | **Tidak** | Semua ADR menghormati prinsip konstitusional; ADR-007 memperkuat pemisahan tanggung jawab (Constitution). |
 | A-6 | Circular authority antar ADR? | **Tidak** | Authority diturunkan dari Specification, bukan dari ADR lain (R2-002). |
 
 ## 5.3 Verdict Audit 5
 
-**LULUS.** Authority chain Mission → Constitution → Governance → Architecture → Specification → ADR → Reference Runtime → Implementation tetap utuh. Tidak ada leakage, reverse dependency, perubahan baseline, atau circular authority.
+**LULUS.** Authority chain Mission â†’ Constitution â†’ Governance â†’ Architecture â†’ Specification â†’ ADR â†’ Reference Runtime â†’ Implementation tetap utuh. Tidak ada leakage, reverse dependency, perubahan baseline, atau circular authority.
 
 ---
 
-# Audit 6 — Baseline Stability
+# Audit 6 â€” Baseline Stability
 
 ## 6.1 Simulasi Skala
 
 | ADR | 10 | 100 | 1000 | 10000 | Assessment |
 |---|---|---|---|---|---|
-| ADR-000 — Deployment | ✓ | ✓ | ✓ | ✓ | Topology structural, tidak count-dependent |
-| ADR-001 — Approval | ✓ | ✓ | ✓ | ✓ | Accountable Decision per-Runtime, tanpa shared state |
-| ADR-002 — Resolution | ✓ | ✓ | ✓ | ✓ | Registry per-Runtime, determinism per-instance |
-| ADR-003 — Idempotency | ✓ | ✓ | ✓ | ✓ | Property per-operation, tidak scale-dependent |
-| ADR-004 — Failure Propagation | ✓ | ✓ | ✓ | ✓ | Linear per-Runtime, tidak cross-Runtime |
-| ADR-005 — Ordering | ✓ | ✓ | ✓ | ✓ | Ordering internal ke satu Execution Scheduler |
-| ADR-006 — External Access | ✓ | ✓ | ✓ | ✓ | Boundary = Contracts + Registry, invariant terhadap skala |
-| ADR-007 — Verification | ✓ | ✓ | ✓ | ✓ | Observasi Audit, konseptual, tidak scale-dependent |
+| ADR-000 â€” Deployment | âœ“ | âœ“ | âœ“ | âœ“ | Topology structural, tidak count-dependent |
+| ADR-001 â€” Approval | âœ“ | âœ“ | âœ“ | âœ“ | Accountable Decision per-Runtime, tanpa shared state |
+| ADR-002 â€” Resolution | âœ“ | âœ“ | âœ“ | âœ“ | Registry per-Runtime, determinism per-instance |
+| ADR-003 â€” Idempotency | âœ“ | âœ“ | âœ“ | âœ“ | Property per-operation, tidak scale-dependent |
+| ADR-004 â€” Failure Propagation | âœ“ | âœ“ | âœ“ | âœ“ | Linear per-Runtime, tidak cross-Runtime |
+| ADR-005 â€” Ordering | âœ“ | âœ“ | âœ“ | âœ“ | Ordering internal ke satu Execution Scheduler |
+| ADR-006 â€” External Access | âœ“ | âœ“ | âœ“ | âœ“ | Boundary = Contracts + Registry, invariant terhadap skala |
+| ADR-007 â€” Verification | âœ“ | âœ“ | âœ“ | âœ“ | Observasi Audit, konseptual, tidak scale-dependent |
 
 ## 6.2 Struktur yang Diuji
 
@@ -262,37 +262,37 @@ IMPLEMENTATION
 
 ## 6.3 Verdict Audit 6
 
-**LULUS.** Seluruh 8 ADR tetap berlaku pada skala 10/100/1000/10000 Runtime. Keputusan bersifat struktural dan per-instance, bukan global — invariant terhadap skala. ADR-007 (observasi, bukan gating) stabil pada semua skala.
+**LULUS.** Seluruh 8 ADR tetap berlaku pada skala 10/100/1000/10000 Runtime. Keputusan bersifat struktural dan per-instance, bukan global â€” invariant terhadap skala. ADR-007 (observasi, bukan gating) stabil pada semua skala.
 
 ---
 
-# Audit 7 — Future Evolution
+# Audit 7 â€” Future Evolution
 
 ## 7.1 Evolution Paths
 
 | Domain | Jalur | Status |
 |---|---|---|
-| **Architecture** | Berubah melalui ADR (new/superseding) | **Terbuka** — SPECIFICATION_FREEZE: evolution through ADR; tidak ada ADR yang mengklaim finalitas permanen |
-| **Runtime** | Berubah melalui Runtime Design (R-series) | **Terbuka** — Reference Runtime berevolusi di R4/R-series, bukan di ADR |
-| **Implementation** | Berubah melalui Implementation (tanpa ubah ADR selama tidak melanggar keputusan) | **Terbuka** — ADR adalah decision, bukan implementation spec |
-| **Foundation** | Tetap frozen | **Terjaga** — tidak ada ADR yang mengubah Mission/Constitution/Philosophy/Governance |
-| **Specification** | Tetap frozen | **Terjaga** — SPECIFICATION_FREEZE; ADR adalah decision sink, bukan perubahan baseline |
+| **Architecture** | Berubah melalui ADR (new/superseding) | **Terbuka** â€” SPECIFICATION_FREEZE: evolution through ADR; tidak ada ADR yang mengklaim finalitas permanen |
+| **Runtime** | Berubah melalui Runtime Design (R-series) | **Terbuka** â€” Reference Runtime berevolusi di R4/R-series, bukan di ADR |
+| **Implementation** | Berubah melalui Implementation (tanpa ubah ADR selama tidak melanggar keputusan) | **Terbuka** â€” ADR adalah decision, bukan implementation spec |
+| **Foundation** | Tetap frozen | **Terjaga** â€” tidak ada ADR yang mengubah Mission/Constitution/Philosophy/Governance |
+| **Specification** | Tetap frozen | **Terjaga** â€” SPECIFICATION_FREEZE; ADR adalah decision sink, bukan perubahan baseline |
 
 ## 7.2 Penyimpangan
 
 | Cek | Status |
 |---|---|
-| Ada ADR yang mengklaim final / tak bisa di-supersede? | Tidak — semua berstatus Accepted (dapat di-supersede) |
-| Ada implementasi yang dikunci ADR? | Tidak — setiap ADR memiliki Out of Scope / Implementation Notes |
-| Ada ADR yang memblokir evolusi? | Tidak — evolusi terbuka melalui jalur masing-masing |
+| Ada ADR yang mengklaim final / tak bisa di-supersede? | Tidak â€” semua berstatus Accepted (dapat di-supersede) |
+| Ada implementasi yang dikunci ADR? | Tidak â€” setiap ADR memiliki Out of Scope / Implementation Notes |
+| Ada ADR yang memblokir evolusi? | Tidak â€” evolusi terbuka melalui jalur masing-masing |
 
 ## 7.3 Verdict Audit 7
 
-**LULUS.** Seluruh jalur evolusi terbuka dan terpelihara: Architecture → ADR, Runtime → Runtime Design, Implementation → Implementation, Foundation & Specification → frozen. Tidak ada ADR yang mengklaim finalitas atau memblokir evolusi.
+**LULUS.** Seluruh jalur evolusi terbuka dan terpelihara: Architecture â†’ ADR, Runtime â†’ Runtime Design, Implementation â†’ Implementation, Foundation & Specification â†’ frozen. Tidak ada ADR yang mengklaim finalitas atau memblokir evolusi.
 
 ---
 
-# Audit 8 — Final Certification
+# Audit 8 â€” Final Certification
 
 ## 8.1 Kriteria Verdict
 
@@ -307,21 +307,21 @@ IMPLEMENTATION
 
 | Faktor | Status |
 |---|---|
-| ADR coverage | **100%** — 8/8 Accepted |
+| ADR coverage | **100%** â€” 8/8 Accepted |
 | Open Decision Register | **Kosong** |
-| Cross ADR consistency | **100%** — 28/28 pairs, 0 finding |
-| Runtime readiness | **Penuh** — dapat didesain tanpa ADR tambahan |
-| Authority integrity | **100%** — chain utuh |
-| Baseline stability | **100%** — valid pada 10/100/1000/10000 |
-| Future evolution | **100%** — paths terbuka |
+| Cross ADR consistency | **100%** â€” 28/28 pairs, 0 finding |
+| Runtime readiness | **Penuh** â€” dapat didesain tanpa ADR tambahan |
+| Authority integrity | **100%** â€” chain utuh |
+| Baseline stability | **100%** â€” valid pada 10/100/1000/10000 |
+| Future evolution | **100%** â€” paths terbuka |
 
 ## 8.3 Final Verdict
 
-**Verdict: A — Architecture Decision Layer Complete.**
+**Verdict: A â€” Architecture Decision Layer Complete.**
 
 Alasan:
 
-1. **Seluruh 8 Candidate Blueprint (C-01..C-08) memiliki ADR Accepted.** R3-003 sebelumnya menandai C-08 (ADR-007) missing dengan verdict D; **ADR-007 kini telah diterima** (status Accepted, commit `aec528c`) — menutup celah tersebut.
+1. **Seluruh 8 Candidate Blueprint (C-01..C-08) memiliki ADR Accepted.** R3-003 sebelumnya menandai C-08 (ADR-007) missing dengan verdict D; **ADR-007 kini telah diterima** (status Accepted, commit `aec528c`) â€” menutup celah tersebut.
 
 2. **Open Decision Register kosong.** Tidak ada keputusan arsitektural Blueprint yang belum dibuat.
 
@@ -337,10 +337,10 @@ Alasan:
 
 | Trigger | Hadir? |
 |---|---|
-| Candidate Blueprint belum memiliki ADR | **Tidak** — 8/8 Accepted |
-| Contradiction antar ADR | **Tidak** — 0/28 |
-| Authority leakage | **Tidak** — Audit 5 lulus |
-| Dependency cycle | **Tidak** — Audit 3 lulus |
+| Candidate Blueprint belum memiliki ADR | **Tidak** â€” 8/8 Accepted |
+| Contradiction antar ADR | **Tidak** â€” 0/28 |
+| Authority leakage | **Tidak** â€” Audit 5 lulus |
+| Dependency cycle | **Tidak** â€” Audit 3 lulus |
 | Kebutuhan mengubah Foundation | **Tidak** |
 | Kebutuhan mengubah Specification | **Tidak** |
 
@@ -358,7 +358,7 @@ Dengan Verdict **A**, **Architecture Decision Layer dinyatakan CLOSED** dan menj
 
 | Dokumen | Path |
 |---|---|
-| CONSTITUTION | docs/core/CONSTITUTION.md |
+| CONSTITUTION | docs/CONSTITUTION.md |
 | GOVERNANCE | GOVERNANCE.md |
 | SAM_ARCHITECTURE | docs/architecture/SAM_ARCHITECTURE.md |
 | SPECIFICATION_FREEZE | docs/SPECIFICATION_FREEZE.md |

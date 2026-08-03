@@ -1,4 +1,4 @@
-# Knowledge Standard
+﻿# Knowledge Standard
 
 
 
@@ -26,7 +26,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/core/THINKING\_PROTOCOL.md
 
@@ -498,7 +498,7 @@ Trust Model
 
 
 
-↓
+â†“
 
 
 
@@ -506,7 +506,7 @@ Evaluates Evidence
 
 
 
-↓
+â†“
 
 
 
@@ -514,7 +514,7 @@ Knowledge Standard
 
 
 
-↓
+â†“
 
 
 
@@ -554,7 +554,7 @@ Observation
 
 
 
-↓
+â†“
 
 
 
@@ -562,7 +562,7 @@ Evidence
 
 
 
-↓
+â†“
 
 
 
@@ -570,7 +570,7 @@ Validation
 
 
 
-↓
+â†“
 
 
 
@@ -578,7 +578,7 @@ Knowledge
 
 
 
-↓
+â†“
 
 
 
@@ -586,7 +586,7 @@ Operational Use
 
 
 
-↓
+â†“
 
 
 
@@ -594,7 +594,7 @@ Review
 
 
 
-↓
+â†“
 
 
 
@@ -980,31 +980,31 @@ A Knowledge document complies with this standard when it:
 
 
 
-✓ contains all required metadata,
+âœ“ contains all required metadata,
 
 
 
-✓ references related documents,
+âœ“ references related documents,
 
 
 
-✓ clearly identifies its Knowledge Type,
+âœ“ clearly identifies its Knowledge Type,
 
 
 
-✓ records evidence quality,
+âœ“ records evidence quality,
 
 
 
-✓ records confidence,
+âœ“ records confidence,
 
 
 
-✓ follows the Documentation Standards,
+âœ“ follows the Documentation Standards,
 
 
 
-✓ is understandable without requiring author explanation.
+âœ“ is understandable without requiring author explanation.
 
 
 
@@ -1020,5 +1020,5 @@ The Knowledge Standard establishes the rules by which knowledge is created, clas
 
 
 
-By treating every Knowledge document as a structured Knowledge Unit—with defined metadata, evidence quality, confidence, relationships, and lifecycle—the Framework transforms documentation into a durable Knowledge Operating System capable of supporting operational reasoning, continuous learning, and future automation.
+By treating every Knowledge document as a structured Knowledge Unitâ€”with defined metadata, evidence quality, confidence, relationships, and lifecycleâ€”the Framework transforms documentation into a durable Knowledge Operating System capable of supporting operational reasoning, continuous learning, and future automation.
 

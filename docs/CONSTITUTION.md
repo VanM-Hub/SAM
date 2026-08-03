@@ -1,4 +1,4 @@
-\# SAM Constitution
+﻿\# SAM Constitution
 
 
 
@@ -12,7 +12,7 @@ Scope: Entire Project SAM
 
 Canonical: true
 
-Supersedes: docs/history/architecture/SAM_CONSTITUTION.md (Historical Design Reference); docs/core/CONSTITUTION.md (Draft, Superseded)
+Supersedes: docs/history/architecture/SAM_CONSTITUTION.md (Historical Design Reference); docs/core/CONSTITUTION.md (Draft, Superseded, deleted in C1-C)
 
 Mission Source: MISSION.md
 
@@ -120,7 +120,7 @@ If the Constitution must be amended, an amendment must never betray the Mission.
 
 
 
-\# Article I — Governance over Intelligence
+\# Article I â€” Governance over Intelligence
 
 
 
@@ -188,7 +188,7 @@ contracts, approval, and audit.
 
 
 
-\# Article II — Trust is the Primary Output
+\# Article II â€” Trust is the Primary Output
 
 
 
@@ -262,7 +262,7 @@ Every Runtime must produce traceable outputs.
 
 
 
-\# Article III — Capability is the Universal Language
+\# Article III â€” Capability is the Universal Language
 
 
 
@@ -328,7 +328,7 @@ Runtime depending directly on implementation.
 
 
 
-\# Article IV — Registry over Direct Dependency
+\# Article IV â€” Registry over Direct Dependency
 
 
 
@@ -382,7 +382,7 @@ Workflow Runtime importing Memory Runtime directly.
 
 
 
-\# Article V — Approval before Execution
+\# Article V â€” Approval before Execution
 
 
 
@@ -422,7 +422,7 @@ Automatic execution after reasoning.
 
 
 
-\# Article VI — Immutable Contracts
+\# Article VI â€” Immutable Contracts
 
 
 
@@ -474,7 +474,7 @@ Runtime changing received contract.
 
 
 
-\# Article VII — Deterministic by Default
+\# Article VII â€” Deterministic by Default
 
 
 
@@ -534,7 +534,7 @@ Time-dependent logic without explicit contract.
 
 
 
-\# Article VIII — Provider Agnostic
+\# Article VIII â€” Provider Agnostic
 
 
 
@@ -592,7 +592,7 @@ Business logic depending on provider-specific APIs.
 
 
 
-\# Article IX — Runtime Independence
+\# Article IX â€” Runtime Independence
 
 
 
@@ -636,7 +636,7 @@ Circular Runtime dependency.
 
 
 
-\# Article X — Citizen Equality
+\# Article X â€” Citizen Equality
 
 
 
@@ -708,7 +708,7 @@ Special-case architecture.
 
 
 
-\# Article XI — Audit Everything
+\# Article XI â€” Audit Everything
 
 
 
@@ -776,7 +776,7 @@ Anonymous execution.
 
 
 
-\# Article XII — Separation of Responsibility
+\# Article XII â€” Separation of Responsibility
 
 
 
@@ -836,7 +836,7 @@ Execution modifying policy.
 
 
 
-\# Article XIII — Evolution without Breaking Foundation
+\# Article XIII â€” Evolution without Breaking Foundation
 
 
 
@@ -904,7 +904,7 @@ Architecture redesign requiring constitutional changes.
 
 
 
-\# Article XIV — Explainability before Optimization
+\# Article XIV â€” Explainability before Optimization
 
 
 
@@ -952,7 +952,7 @@ Opaque optimization.
 
 
 
-\# Article XV — Constitution over Implementation
+\# Article XV â€” Constitution over Implementation
 
 
 
@@ -986,7 +986,7 @@ The Constitution must not.
 
 
 
-\# Article XVI — Presentation Principle
+\# Article XVI â€” Presentation Principle
 
 
 
@@ -1094,7 +1094,7 @@ Mission
 
 
 
-↓
+â†“
 
 
 
@@ -1102,7 +1102,7 @@ Constitution
 
 
 
-↓
+â†“
 
 
 
@@ -1110,7 +1110,7 @@ Philosophy
 
 
 
-↓
+â†“
 
 
 
@@ -1118,7 +1118,7 @@ Governance
 
 
 
-↓
+â†“
 
 
 
@@ -1126,7 +1126,7 @@ Architecture
 
 
 
-↓
+â†“
 
 
 
@@ -1134,7 +1134,7 @@ Specification
 
 
 
-↓
+â†“
 
 
 
@@ -1142,7 +1142,7 @@ Roadmap
 
 
 
-↓
+â†“
 
 
 

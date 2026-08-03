@@ -1,4 +1,4 @@
-# Agent Model
+﻿# Agent Model
 
 
 
@@ -58,7 +58,7 @@ Framework
 
 \- docs/core/EXECUTION\_MODEL.md
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/MEMORY\_MODEL.md
 
@@ -118,25 +118,25 @@ They execute inside the Runtime.
 
 &#x20;            Identity
 
-&#x20;                │
+&#x20;                â”‚
 
-&#x20;                ▼
+&#x20;                â–¼
 
 &#x20;             Agent
 
-&#x20;                │
+&#x20;                â”‚
 
-&#x20;     ┌──────────┼──────────┐
+&#x20;     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
 
-&#x20;     ▼          ▼          ▼
+&#x20;     â–¼          â–¼          â–¼
 
 &#x20;Runtime     Workspace   Provider
 
-&#x20;     │                     │
+&#x20;     â”‚                     â”‚
 
-&#x20;     └──────────┬──────────┘
+&#x20;     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
-&#x20;                ▼
+&#x20;                â–¼
 
 &#x20;              Model
 
@@ -168,27 +168,27 @@ Every Agent progresses through a conceptual lifecycle.
 
 Defined
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Initialized
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Ready
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Executing
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Completed
 
@@ -204,17 +204,17 @@ Alternative transitions may include:
 
 Executing
 
-&#x20;    │
+&#x20;    â”‚
 
-&#x20;    ├────► Suspended
+&#x20;    â”œâ”€â”€â”€â”€â–º Suspended
 
-&#x20;    │
+&#x20;    â”‚
 
-&#x20;    ├────► Failed
+&#x20;    â”œâ”€â”€â”€â”€â–º Failed
 
-&#x20;    │
+&#x20;    â”‚
 
-&#x20;    └────► Cancelled
+&#x20;    â””â”€â”€â”€â”€â–º Cancelled
 
 ```
 

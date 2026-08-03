@@ -1,4 +1,4 @@
-# Approval Gate
+﻿# Approval Gate
 
 
 
@@ -104,7 +104,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/core/GOVERNANCE.md
 
@@ -394,7 +394,7 @@ Receive Execution Plan
 
 
 
-↓
+â†“
 
 
 
@@ -402,7 +402,7 @@ Validate Completeness
 
 
 
-↓
+â†“
 
 
 
@@ -410,7 +410,7 @@ Evaluate Risk
 
 
 
-↓
+â†“
 
 
 
@@ -418,7 +418,7 @@ Determine Approval Level
 
 
 
-↓
+â†“
 
 
 
@@ -426,7 +426,7 @@ Apply Governance Rules
 
 
 
-↓
+â†“
 
 
 
@@ -434,7 +434,7 @@ Issue Approval Decision
 
 
 
-↓
+â†“
 
 
 

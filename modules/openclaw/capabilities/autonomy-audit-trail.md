@@ -1,4 +1,4 @@
-# Autonomy Audit Trail
+﻿# Autonomy Audit Trail
 
 
 
@@ -128,7 +128,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/MEMORY\_MODEL.md
 
@@ -210,7 +210,7 @@ Observation
 
 
 
-↓
+â†“
 
 
 
@@ -218,7 +218,7 @@ Evidence
 
 
 
-↓
+â†“
 
 
 
@@ -226,7 +226,7 @@ Reasoning
 
 
 
-↓
+â†“
 
 
 
@@ -234,7 +234,7 @@ Decision
 
 
 
-↓
+â†“
 
 
 
@@ -242,7 +242,7 @@ Approval
 
 
 
-↓
+â†“
 
 
 
@@ -250,7 +250,7 @@ Execution
 
 
 
-↓
+â†“
 
 
 
@@ -258,7 +258,7 @@ Verification
 
 
 
-↓
+â†“
 
 
 
@@ -266,7 +266,7 @@ Recovery
 
 
 
-↓
+â†“
 
 
 
@@ -274,7 +274,7 @@ Learning
 
 
 
-↓
+â†“
 
 
 

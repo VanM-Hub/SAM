@@ -36,7 +36,7 @@ Supporting References
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/core/EXECUTION\_MODEL.md
 

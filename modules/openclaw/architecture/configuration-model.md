@@ -1,4 +1,4 @@
-# Configuration Model
+﻿# Configuration Model
 
 
 
@@ -56,7 +56,7 @@ Framework
 
 \- docs/core/EXECUTION\_MODEL.md
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/TRUST\_MODEL.md
 
@@ -114,27 +114,27 @@ This separation preserves deterministic execution and reduces hidden side effect
 
 Configuration Sources
 
-&#x20;         │
+&#x20;         â”‚
 
-&#x20;         ▼
+&#x20;         â–¼
 
 Validation
 
-&#x20;         │
+&#x20;         â”‚
 
-&#x20;         ▼
+&#x20;         â–¼
 
 Resolution
 
-&#x20;         │
+&#x20;         â”‚
 
-&#x20;         ▼
+&#x20;         â–¼
 
 Effective Configuration
 
-&#x20;         │
+&#x20;         â”‚
 
-&#x20;         ▼
+&#x20;         â–¼
 
 Runtime
 
@@ -350,27 +350,27 @@ Configuration progresses through the following conceptual lifecycle.
 
 Defined
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Validated
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Resolved
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Effective
 
-&#x20;   │
+&#x20;   â”‚
 
-&#x20;   ▼
+&#x20;   â–¼
 
 Consumed
 

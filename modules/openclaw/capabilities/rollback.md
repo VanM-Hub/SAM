@@ -1,4 +1,4 @@
-# Rollback
+﻿# Rollback
 
 
 
@@ -120,7 +120,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/core/EXECUTION\_MODEL.md
 
@@ -304,7 +304,7 @@ Rollback Requested
 
 
 
-↓
+â†“
 
 
 
@@ -312,7 +312,7 @@ Validate Rollback Preconditions
 
 
 
-↓
+â†“
 
 
 
@@ -320,7 +320,7 @@ Identify Recovery Target
 
 
 
-↓
+â†“
 
 
 
@@ -328,7 +328,7 @@ Preserve Current Evidence
 
 
 
-↓
+â†“
 
 
 
@@ -336,7 +336,7 @@ Restore Approved Backup
 
 
 
-↓
+â†“
 
 
 
@@ -344,7 +344,7 @@ Validate Restored State
 
 
 
-↓
+â†“
 
 
 
@@ -352,7 +352,7 @@ Execute Health Checks
 
 
 
-↓
+â†“
 
 
 
@@ -360,7 +360,7 @@ Run Post-Recovery Verification
 
 
 
-↓
+â†“
 
 
 
