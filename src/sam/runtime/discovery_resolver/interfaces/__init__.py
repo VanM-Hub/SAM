@@ -1,0 +1,1 @@
+"""Discovery Resolver interface package."""
