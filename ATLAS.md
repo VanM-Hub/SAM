@@ -60,6 +60,8 @@ Vision
    ↓
 Constitution          (docs/CONSTITUTION.md)
    ↓
+Citizen Specification (docs/CITIZEN_SPECIFICATION.md)
+   ↓
 Architecture          (docs/architecture/SAM_ARCHITECTURE.md)  + Philosophy (ref)
    ↓
 ADR                   (docs/adr/ADR-###_*.md)
@@ -72,6 +74,11 @@ Compliance            (docs/compliance/)
    ↓
 Engineering           (REPOSITORY_CONVENTION.md, CONTRIBUTING.md)
 ```
+
+> **Citizen Specification** adalah kontrak konseptual antara `Constitution` dan
+> seluruh Specification teknis. Ia *bukan* bagian dari kumpulan specification
+> teknis, tetapi menjadi landasan bagi semuanya — jembatan dari fondasi
+> proyek menuju seluruh spesifikasi turunan.
 
 Setiap dokumen diklasifikasikan sebagai salah satu dari tiga status:
 
@@ -91,6 +98,7 @@ Setiap dokumen diklasifikasikan sebagai salah satu dari tiga status:
 | Principles | `PRINCIPLES.md` |
 | Governance | `GOVERNANCE.md` |
 | Constitution | `docs/CONSTITUTION.md` |
+| Citizen Specification | `docs/CITIZEN_SPECIFICATION.md` |
 | Architecture | `docs/architecture/SAM_ARCHITECTURE.md` |
 | Philosophy | `docs/PHILOSOPHY.md` (Reference) |
 | Spesifikasi | `docs/specifications/` + `docs/SPECIFICATION_FREEZE.md` |
@@ -185,7 +193,9 @@ ADR_TEMPLATE  (docs/templates/ADR_TEMPLATE.md)
 ```
 ATLAS
   ↓
-Specification  (docs/specifications/)
+Citizen Specification  (docs/CITIZEN_SPECIFICATION.md)
+  ↓
+Specification         (docs/specifications/)
   ↓
 SAM_FRAMEWORK_v1.0_SPECIFICATION
 ```

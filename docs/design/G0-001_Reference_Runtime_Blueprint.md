@@ -181,7 +181,7 @@ The frozen documents provide sufficient authority and behavior for the conceptua
 
 | Area | Note |
 |---|---|
-| Specification residence | The Citizen Specification currently resides at `docs/CITIZEN_SPECIFICATION.md` (outside `docs/specifications/`) while the other six reside in `docs/specifications/`. This was already recorded during the Stabilization Review as a cosmetic location inconsistency and does not affect the behavior described here. |
+| Specification residence | The Citizen Specification resides at `docs/CITIZEN_SPECIFICATION.md` (outside `docs/specifications/`) by design: it is the conceptual bridge between the Constitution and the whole technical Specification set, not one specification among many. Other specification documents reside in `docs/specifications/` and all depend on it. |
 
 ---
 
