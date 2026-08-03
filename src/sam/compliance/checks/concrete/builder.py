@@ -24,6 +24,54 @@ from ..base.base_check import BaseComplianceCheck
 
 # Batch check modules
 from . import l0_structural as _l0
+from . import source_required as _src
+
+# -- L1 required symbols (derived from P1-004 catalog descriptions) -----------
+# Each L1 check verifies at least one of these concrete artifacts exists
+# in the source tree. Symbols are extracted from the catalog description
+# (the 'via X' artifact naming) — no checker hardcodes a path or authority.
+_L1_SYMBOLS = {
+    "L1-AP01": ("DecisionPolicy",),
+    "L1-AP02": ("decide",),
+    "L1-AP03": ("decision_reason",),
+    "L1-AP04": ("DecisionState",),
+    "L1-AP05": ("ApprovalState",),
+    "L1-AP06": ("approval_id",),
+    "L1-AU01": ("AuditIdentity",),
+    "L1-AU02": ("AuditRecord", "frozen"),
+    "L1-AU03": ("AuditRecordState",),
+    "L1-AU04": ("TraceabilityValidator",),
+    "L1-AU05": ("exception", "Error"),
+    "L1-AU06": ("verify",),
+    "L1-AU07": ("validate_no_feedback",),
+    "L1-C01": ("Certification",),
+    "L1-C02": ("accept_citizen",),
+    "L1-C03": ("CertificationService",),
+    "L1-C04": ("is_valid",),
+    "L1-C05": ("health", "identity"),
+    "L1-CA01": ("CapabilityDescriptor",),
+    "L1-CA02": ("CapabilityType",),
+    "L1-CA03": ("CapabilityState",),
+    "L1-CA04": ("CertificationValidator",),
+    "L1-CA05": ("preserve_semantics",),
+    "L1-CA06": ("can_transition",),
+    "L1-CO01": ("@dataclass", "frozen"),
+    "L1-CO02": ("NegotiatorService",),
+    "L1-CO03": ("CompatibilityValidator",),
+    "L1-CO04": ("Input", "Output"),
+    "L1-CO05": ("Idempotency",),
+    "L1-EX01": ("OrderingValidator",),
+    "L1-EX02": ("ExecutionState",),
+    "L1-EX03": ("IdempotencyValidator",),
+    "L1-EX04": ("exception",),
+    "L1-EX05": ("ApprovalGateValidator",),
+    "L1-EX06": ("SchedulerInterface",),
+    "L1-R01": ("register",),
+    "L1-R02": ("RegistryKey",),
+    "L1-R03": ("discover",),
+    "L1-R04": ("_match", "compat"),
+    "L1-R05": ("version", "sort"),
+}
 
 # -- Enum maps (catalog string -> engine enum) -------------------------------
 
@@ -103,6 +151,7 @@ class Builder:
     def build_all(self) -> Dict[str, BaseComplianceCheck]:
         checks: Dict[str, BaseComplianceCheck] = {}
         checks.update(self.build_l0())
+        checks.update(self.build_l1())
         return checks
 
     # -- L0 (12 checks) ------------------------------------------------------
@@ -129,7 +178,12 @@ class Builder:
         return out
 
     def build_l1(self) -> Dict[str, BaseComplianceCheck]:
-        raise NotImplementedError("batch L1 arrives in P1-008 Batch 2")
+        m = _md(self._catalog)
+        out: Dict[str, BaseComplianceCheck] = {}
+        for cid, symbols in _L1_SYMBOLS.items():
+            out[cid] = _new(_src.SourceSymbolPresenceCheck, m[cid],
+                            symbols=symbols)
+        return out
 
     def build_l2(self) -> Dict[str, BaseComplianceCheck]:
         raise NotImplementedError("batch L2 arrives in P1-008 Batch 3")

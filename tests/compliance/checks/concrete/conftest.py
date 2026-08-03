@@ -28,7 +28,7 @@ def context(baseline):
     """A CheckContext carrying the project baseline snapshot."""
     return CheckContext(
         target_path=r"D:\Project AI\SAM",
-        options={"baseline": baseline},
+        options={"baseline": baseline, "baseline_root": r"D:\Project AI\SAM"},
     )
 
 
