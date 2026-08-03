@@ -16,7 +16,7 @@
 
 > **Canonical via Canonical Promotion Protocol (AD-028, Stage 4).**
 > This document is the single authoritative source for the Architecture of Project SAM.
-> Earlier architecture documents (ARCHITECTURE.md, SAM_ARCHITECTURE_MASTER.md) are superseded / historical.
+> Earlier architecture documents (`ARCHITECTURE.md`, `SAM_ARCHITECTURE_MASTER.md`) are superseded / historical and are archived under `docs/history/architecture/`.
 
 ---
 
