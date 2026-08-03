@@ -73,6 +73,34 @@ _L1_SYMBOLS = {
     "L1-R05": ("version", "sort"),
 }
 
+# -- L2 required symbols (ADR checks, P1-008 Batch 3) ------------------------
+_L2_SYMBOLS = {
+    # SOURCE_CONTAINS — mechanism present (behavioral proxy names that
+    # exist in the runtime, not only the spec artifact name).
+    "L2-02": ("decision_reason", "decide"),
+    "L2-03": ("DecisionPolicy",),
+    "L2-04": ("resolve_exact", "_select_from_exact", "exact"),
+    "L2-05": ("resolve_compatible", "_select_from_compatible", "compatible"),
+    "L2-06": ("_tie_break_key", "sorted", "sort"),
+    "L2-07": ("RegistryKey",),
+    "L2-08": ("ContractIdempotency",),
+    "L2-09": ("IdempotencyValidator",),
+    "L2-10": ("error", "failure"),
+    "L2-11": ("validate_no_feedback",),
+    "L2-12": ("OrderingValidator", "order"),
+    "L2-14": ("BoundaryValidator",),
+    "L2-16": ("verify",),
+    "L2-17": ("RecorderService", "verify"),
+}
+
+# SOURCE_ABSENT / FILE_ABSENT — mechanisms that must NOT exist.
+_L2_ABSENT = {
+    "L2-01": ("multi_host", "distributed", "partition_key"),
+    "L2-13": ("priority", "PriorityQueue", "priority_order"),
+    "L2-15": ("grpc", "thrift", "zeromq", "RPC"),
+}
+
+
 # -- Enum maps (catalog string -> engine enum) -------------------------------
 
 _LV = {
@@ -152,6 +180,7 @@ class Builder:
         checks: Dict[str, BaseComplianceCheck] = {}
         checks.update(self.build_l0())
         checks.update(self.build_l1())
+        checks.update(self.build_l2())
         return checks
 
     # -- L0 (12 checks) ------------------------------------------------------
@@ -186,7 +215,17 @@ class Builder:
         return out
 
     def build_l2(self) -> Dict[str, BaseComplianceCheck]:
-        raise NotImplementedError("batch L2 arrives in P1-008 Batch 3")
+        m = _md(self._catalog)
+        out: Dict[str, BaseComplianceCheck] = {}
+        # SOURCE_CONTAINS checks (mechanism present).
+        for cid, symbols in _L2_SYMBOLS.items():
+            out[cid] = _new(_src.SourceSymbolPresenceCheck, m[cid],
+                            symbols=symbols)
+        # SOURCE_ABSENT / FILE_ABSENT checks (mechanism absent).
+        for cid, symbols in _L2_ABSENT.items():
+            out[cid] = _new(_src.SourceSymbolAbsentCheck, m[cid],
+                            symbols=symbols)
+        return out
 
     def build_l3(self) -> Dict[str, BaseComplianceCheck]:
         raise NotImplementedError("batch L3 arrives in P1-008 Batch 4")
