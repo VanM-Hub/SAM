@@ -12,7 +12,7 @@ Scope: Entire Project SAM
 
 Canonical: true
 
-Supersedes: docs/architecture/SAM_CONSTITUTION.md (Historical Design Reference); docs/core/CONSTITUTION.md (Draft, Superseded)
+Supersedes: docs/history/architecture/SAM_CONSTITUTION.md (Historical Design Reference); docs/core/CONSTITUTION.md (Draft, Superseded)
 
 Mission Source: MISSION.md
 

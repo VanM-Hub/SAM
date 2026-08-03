@@ -39,8 +39,8 @@
 - [ ] `docs/releases/manifest.md` → update manifest
 - [ ] `ROADMAP.md` → update roadmap (jika milestone tercapai)
 - [ ] `SPRINT_TRACKER.md` → update sprint tracker
-- [ ] `docs/reports/Architecture_Health.md` → update score
-- [ ] `docs/reports/Repository_Metrics.md` → update metrics
+- [ ] `docs/history/reports/Architecture_Health.md` → update score
+- [ ] `docs/history/reports/Repository_Metrics.md` → update metrics
 
 ## 4. Quality Gates
 
@@ -64,7 +64,7 @@
 
 - [ ] Verify release page: `https://github.com/VanM-Hub/SAM/releases/tag/vX.Y.Z`
 - [ ] Verify CI post-release (trigger re-run if needed)
-- [ ] Update sprint completion report di `docs/sprint-reports/`
+- [ ] Update sprint completion report di `docs/history/sprint-reports/`
 - [ ] Update `ZN_SAM/01_CURRENT_STATUS.md` dengan versi baru
 
 ## Quick Commands

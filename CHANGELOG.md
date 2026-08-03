@@ -293,8 +293,8 @@ Kredensial HANYA dari environment. Semua DTO immutable, sync/deterministic, tanp
 - 145 new tests (unit); full suite unit 1738 + integration 48 + api 28 + e2e 110 all green
 
 ### Docs
-- `docs/reports/OP-1300_Mission_Runtime_PhaseXIII_Complete.md`
-- `docs/sprint-reports/sprint-143/Completion_Report.md`
+- `docs/history/reports/OP-1300_Mission_Runtime_PhaseXIII_Complete.md`
+- `docs/history/sprint-reports/sprint-143/Completion_Report.md`
 
 ## v12.0.0 (2026-07-31) - Orchestration Runtime (Phase XII)
 
@@ -326,8 +326,8 @@ Kredensial HANYA dari environment. Semua DTO immutable, sync/deterministic, tanp
 - 172 new tests (unit); full suite unit 1593 + integration 48 + api 28 + e2e 110 all green
 
 ### Docs
-- `docs/reports/OP-1200_Orchestration_Runtime_PhaseXII_Complete.md`
-- `docs/sprint-reports/sprint-133/Completion_Report.md`
+- `docs/history/reports/OP-1200_Orchestration_Runtime_PhaseXII_Complete.md`
+- `docs/history/sprint-reports/sprint-133/Completion_Report.md`
 
 ## v11.0.0 (2026-07-31) - Universal Connector Runtime (Phase XI)
 
@@ -355,8 +355,8 @@ Kredensial HANYA dari environment. Semua DTO immutable, sync/deterministic, tanp
 - Conversation & Dashboard bridges read-only; 100% preview-only
 
 ### Docs
-- `docs/reports/OP-1100_Connector_Runtime_PhaseXI_Complete.md`
-- `docs/sprint-reports/sprint-122/Completion_Report.md`
+- `docs/history/reports/OP-1100_Connector_Runtime_PhaseXI_Complete.md`
+- `docs/history/sprint-reports/sprint-122/Completion_Report.md`
 
 ### Quality
 - Full suite green: unit 1421 / integration 48 / api 28 / e2e 110
