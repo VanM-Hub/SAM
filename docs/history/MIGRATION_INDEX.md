@@ -58,6 +58,59 @@ Format: **Old Path → New Path → Reason**
 | `docs/development/capability_sdk.md` | **CANONICAL** | Konsep, cara pakai, API publik, workflow — mudah dibaca |
 | `docs/implementation/capability-sdk.md` | **REFERENCE** | Detail implementasi, contoh engineering, keputusan teknis |
 
+## C2 — ADR Recap Split (commit C2) — 1 keputusan = 1 ADR = 1 file
+
+Dua file rekap ADR dipisah menjadi file individual canonical (ADR-015..028),
+lalu rekap dipindah ke `docs/history/adr/` sebagai Historical Summary (Not Authority).
+Nomor 008-010 dan 014 sengaja dibiarkan kosong (tidak pernah jadi ADR aktif, tidak didaur ulang).
+
+### File rekap → history
+
+| Old Path | New Path | Reason |
+|---|---|---|
+| `docs/adr/ADR-001_to_008.md` | `docs/history/adr/ADR-001_to_008.md` | Historical Summary — isi dipisah ke ADR-021..028 |
+| `docs/adr/ADR-015-020.md` | `docs/history/adr/ADR-015-020.md` | Historical Summary — isi dipisah ke ADR-015..020 |
+
+### ADR yang dipisah (file rekap → file individual canonical)
+
+**Dari `ADR-015-020.md` → `docs/adr/ADR-015..020`**
+
+| Old (rekap) | New (canonical) |
+|---|---|
+| ADR-015 (dalam rekap) | `docs/adr/ADR-015_Runtime_Hosting_Independence.md` |
+| ADR-016 (dalam rekap) | `docs/adr/ADR-016_Headless_Runtime.md` |
+| ADR-017 (dalam rekap) | `docs/adr/ADR-017_Runtime_State_Machine.md` |
+| ADR-018 (dalam rekap) | `docs/adr/ADR-018_Workspace_Layout.md` |
+| ADR-019 (dalam rekap) | `docs/adr/ADR-019_Recovery_Contract.md` |
+| ADR-020 (dalam rekap) | `docs/adr/ADR-020_Lifecycle_Events.md` |
+
+**Dari `ADR-001_to_008.md` → `docs/adr/ADR-021..028`**
+
+| Old (rekap) | New (canonical) |
+|---|---|
+| ADR-001 Overall Architecture (dalam rekap) | `docs/adr/ADR-021_Overall_Architecture.md` |
+| ADR-002 Runtime Isolation (dalam rekap) | `docs/adr/ADR-022_Runtime_Isolation.md` |
+| ADR-003 Immutable DTO (dalam rekap) | `docs/adr/ADR-023_Immutable_DTO.md` |
+| ADR-004 Preview-Only Execution (dalam rekap) | `docs/adr/ADR-024_Preview_Only_Execution.md` |
+| ADR-005 Approval Boundary (dalam rekap) | `docs/adr/ADR-025_Approval_Boundary.md` |
+| ADR-006 Subsystem Independence (dalam rekap) | `docs/adr/ADR-026_Subsystem_Independence.md` |
+| ADR-007 Repository Structure (dalam rekap) | `docs/adr/ADR-027_Repository_Structure.md` |
+| ADR-008 Runtime Kernel (dalam rekap) | `docs/adr/ADR-028_Runtime_Kernel.md` |
+
+### Validator (validate_docs.py) — perubahan logika
+
+- **Sebelum:** mengasumsikan semua nomor ADR harus kontinyu → mem-warning nomor hilang.
+- **Sesudah (keputusan Van):** hanya memeriksa konsistensi — no duplicate number, setiap ADR
+  punya metadata (Status/Date/Decision). Nomor yang hilang (008-010, 014) bukan error/warning,
+  karena normal ada ADR yang di-supersede, dibatalkan, atau sengaja tidak dipublikasikan.
+
+### Index diperbarui
+
+- `docs/architecture/ARCHITECTURAL_DECISIONS.md` — tabel index ditambah ADR-015..028
+  (semua Accepted, canonical file di `docs/adr/`).
+
+---
+
 ## Referensi yang Diperbarui (broken-link fix)
 
 Setiap move di atas diikuti pembaruan link yang terdampak pada dokumen aktif:
