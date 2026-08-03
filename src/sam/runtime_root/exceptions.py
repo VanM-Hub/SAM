@@ -1,37 +1,39 @@
-"""Composition exceptions for the Reference Runtime composition layer (E1-001).
+"""Composition exceptions for the Reference Runtime layer (E1-001).
 
-All composition errors derive from CompositionException so callers can catch
-a single base type. The hierarchy mirrors the validation domains:
+All composition errors derive from RuntimeCompositionError so callers can
+catch a single base type. The hierarchy mirrors the validation domains:
 
-- CompositionException        -- base
-  - CompositionDefinitionError -- builder/registry construction problems
-  - DependencyGraphError      -- cycle or invalid dependency edge
-  - LifecycleCompositionError -- invalid lifecycle transition at runtime level
-  - CompositionValidationError-- validator found a composition fault
+    RuntimeCompositionError      -- base; raised by build/validation failures
+      - CompositionValidationError -- validate() found a composition fault
+      - DependencyGraphError       -- cycle or invalid dependency edge
+      - LifecycleCompositionError  -- invalid lifecycle transition
 
-Authority: E1-001 Reference Runtime Composition | R5-001 | I0-001
+Authority: E1-001 COMPOSITION ROOT | R5-001 | I0-001
 """
 
 
-class CompositionException(Exception):
-    """Base exception for the runtime composition layer."""
+class RuntimeCompositionError(Exception):
+    """Base exception for the runtime composition layer (E1-001).
 
-
-class CompositionDefinitionError(CompositionException):
-    """Raised when the composition root cannot build the runtime.
-
-    E.g. a required unit is missing, a unit was registered twice, or an
-    invalid wire reference was requested.
+    Raised when the composition root cannot build a valid runtime or when a
+    lifecycle/hardening invariant is violated (missing/duplicate unit, cycle,
+    invalid pipeline or health, illegal state transition).
     """
 
 
-class DependencyGraphError(CompositionException):
+class CompositionValidationError(RuntimeCompositionError):
+    """Raised when composition validation detects a fault."""
+
+
+class DependencyGraphError(RuntimeCompositionError):
     """Raised when the dependency graph is invalid (cycle or bad edge)."""
 
 
-class LifecycleCompositionError(CompositionException):
-    """Raised when a runtime-level lifecycle transition is invalid."""
+class LifecycleCompositionError(RuntimeCompositionError):
+    """Raised when a runtime lifecycle transition is invalid."""
 
 
-class CompositionValidationError(CompositionException):
-    """Raised when CompositionValidator detects a composition fault."""
+# Backwards-compatible alias so callers migrating from the exploration layout
+# keep working: CompositionException == RuntimeCompositionError.
+CompositionException = RuntimeCompositionError
+CompositionDefinitionError = RuntimeCompositionError

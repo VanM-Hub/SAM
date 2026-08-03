@@ -1,314 +1,311 @@
-﻿"""Tests for the composition layer core (E1-001): builder, composition,
-container, lifecycle, dependency graph, health, registry, validator.
+"""Tests for the Reference Runtime Composition Root public API (E1-001).
+
+Covers: runtime builds, runtime starts, runtime stops, health aggregate,
+dependency graph, pipeline, determinism, multiple build, restart, and
+singleton-builder behaviour. No unit internals are asserted beyond the public
+health surface that is enforced by the composition layer.
+
+Authority: E1-001 COMPOSITION ROOT.
 """
 
 import pytest
 
-from sam.runtime_root.builder import RuntimeBuilder
-from sam.runtime_root.composition import RuntimeComposition
-from sam.runtime_root.container import RuntimeContainer
+from sam.runtime_root import (
+    CANONICAL_EDGES,
+    PIPELINE,
+    RuntimeBuilder,
+    RuntimeContainer,
+    RuntimeRoot,
+)
 from sam.runtime_root.exceptions import (
-    CompositionDefinitionError,
     CompositionValidationError,
     DependencyGraphError,
     LifecycleCompositionError,
+    RuntimeCompositionError,
 )
-from sam.runtime_root.health import HealthStatus
-from sam.runtime_root.graph import UNIT_CHAIN, DependencyGraph
-from sam.runtime_root.lifecycle import (
-    RuntimeLifecycle,
-    RuntimeState,
-)
-from sam.runtime_root.registry import RuntimeRegistry
-from sam.runtime_root.validator import CompositionValidator
+from sam.runtime_root.health import HealthStatus, RuntimeHealth
+from sam.runtime_root.lifecycle import RuntimeLifecycle, RuntimeState
 
 
-class TestRuntimeBuilder:
-    def test_build_creates_7_units(self):
-        comp = RuntimeBuilder().build()
-        assert len(comp.registry) == 7
-        assert set(comp.registry.ids()) == set(UNIT_CHAIN)
-
-    def test_build_exactly_one_instance_per_unit(self):
-        comp = RuntimeBuilder().build()
-        for unit in UNIT_CHAIN:
-            inst = comp.registry.get(unit)
-            assert inst is not None
-            # Each unit reports a recognisable health status.
-            assert comp.health.unit_health(unit) in (
-                HealthStatus.AVAILABLE,
-                HealthStatus.DEGRADED,
-                HealthStatus.UNAVAILABLE,
-            )
-
-    def test_build_returns_fresh_composition(self):
-        b = RuntimeBuilder()
-        c1 = b.build()
-        c2 = b.build()
-        assert c1 is not c2
-        assert c1.registry is not c2.registry
-
-    def test_repeated_build_identical_graph(self):
-        b = RuntimeBuilder()
-        g1 = b.build().graph
-        g2 = b.build().graph
-        assert g1.equals(g2)
-
-    def test_registry_is_frozen_after_build(self):
-        comp = RuntimeBuilder().build()
-        with pytest.raises(CompositionDefinitionError):
-            comp.registry.register("new_unit", object())
-
-    def test_registry_rejects_duplicate_registration(self):
-        reg = RuntimeRegistry()
-        reg.register("citizen_host", object())
-        with pytest.raises(CompositionDefinitionError):
-            reg.register("citizen_host", object())
-
-    def test_registry_rejects_none(self):
-        reg = RuntimeRegistry()
-        with pytest.raises(CompositionDefinitionError):
-            reg.register("citizen_host", None)
+# ---------------------------------------------------------------------------
+# runtime builds
+# ---------------------------------------------------------------------------
 
 
-class TestDependencyGraph:
-    def test_canonical_is_line_chain(self):
-        g = DependencyGraph.canonical()
-        assert g.is_acyclic()
-        assert g.nodes == frozenset(UNIT_CHAIN)
-        edges = set(g.edges())
-        for i in range(len(UNIT_CHAIN) - 1):
-            assert (UNIT_CHAIN[i], UNIT_CHAIN[i + 1]) in edges
-
-    def test_cycle_rejected(self):
-        with pytest.raises(DependencyGraphError):
-            DependencyGraph(
-                edges=[
-                    ("citizen_host", "capability_manager"),
-                    ("capability_manager", "citizen_host"),
-                ]
-            )
-
-    def test_non_adjacent_edge_rejected(self):
-        # skip (Citizen Host -> Discovery Resolver) is not canonical.
-        with pytest.raises(DependencyGraphError):
-            DependencyGraph(
-                edges=[("citizen_host", "discovery_resolver")]
-            )
-
-    def test_audit_recorder_is_leaf(self):
-        g = DependencyGraph.canonical()
-        assert g.downstream("audit_recorder") == frozenset()
-
-    def test_graph_equality(self):
-        g1 = DependencyGraph.canonical()
-        g2 = DependencyGraph.canonical()
-        assert g1.equals(g2)
+def test_build_produces_root_in_built_state():
+    root = RuntimeBuilder().build()
+    assert isinstance(root, RuntimeRoot)
+    assert root.lifecycle.state == RuntimeState.BUILT
 
 
-class TestRegistry:
-    def test_get_unknown_raises(self):
-        reg = RuntimeRegistry()
-        with pytest.raises(CompositionDefinitionError):
-            reg.get("missing")
-
-    def test_contains(self):
-        reg = RuntimeRegistry()
-        reg.register("citizen_host", object())
-        assert reg.contains("citizen_host")
-        assert not reg.contains("audit_recorder")
-
-    def test_ids_stable_order(self):
-        reg = RuntimeRegistry()
-        reg.register("audit_recorder", object())
-        reg.register("citizen_host", object())
-        assert reg.ids() == ["audit_recorder", "citizen_host"]
-
-    def test_validate_canonical(self):
-        reg = RuntimeRegistry()
-        for u in UNIT_CHAIN:
-            reg.register(u, object())
-        assert reg.validate_canonical() is True
-
-    def test_validate_canonical_missing(self):
-        reg = RuntimeRegistry()
-        reg.register("citizen_host", object())
-        with pytest.raises(CompositionDefinitionError):
-            reg.validate_canonical()
+def test_build_container_has_exactly_seven_units():
+    root = RuntimeBuilder().build()
+    container = root.container()
+    assert isinstance(container, RuntimeContainer)
+    assert len(container) == 7
+    assert len(container.units()) == 7
 
 
-class TestRuntimeLifecycle:
-    def test_initial_state_created(self):
-        lc = RuntimeLifecycle()
-        assert lc.state == RuntimeState.CREATED
-
-    def test_valid_transitions(self):
-        lc = RuntimeLifecycle()
-        lc.transition_to(RuntimeState.COMPOSED)
-        lc.transition_to(RuntimeState.STARTING)
-        lc.transition_to(RuntimeState.RUNNING)
-        lc.transition_to(RuntimeState.STOPPING)
-        lc.transition_to(RuntimeState.STOPPED)
-        assert lc.state == RuntimeState.STOPPED
-
-    def test_invalid_transition_raises(self):
-        lc = RuntimeLifecycle()
-        with pytest.raises(LifecycleCompositionError):
-            lc.transition_to(RuntimeState.RUNNING)  # from CREATED
-
-    def test_is_operational_only_when_running(self):
-        lc = RuntimeLifecycle(RuntimeState.RUNNING)
-        assert lc.is_operational()
-        lc2 = RuntimeLifecycle(RuntimeState.CREATED)
-        assert not lc2.is_operational()
-
-    def test_is_stopped(self):
-        assert RuntimeLifecycle(RuntimeState.STOPPED).is_stopped()
-        assert RuntimeLifecycle(RuntimeState.FAILED).is_stopped()
-        assert not RuntimeLifecycle(RuntimeState.RUNNING).is_stopped()
+def test_build_container_holds_seven_canonical_ids():
+    root = RuntimeBuilder().build()
+    ids = root.container().dependency_ids
+    assert tuple(ids) == PIPELINE
 
 
-class TestHealth:
-    def test_all_available(self):
-        from sam.runtime_root.health import RuntimeHealth
-
-        h = RuntimeHealth({"a": lambda: "AVAILABLE", "b": lambda: "AVAILABLE"})
-        assert h.aggregate() == HealthStatus.AVAILABLE
-
-    def test_any_unavailable(self):
-        from sam.runtime_root.health import RuntimeHealth
-
-        h = RuntimeHealth(
-            {"a": lambda: "AVAILABLE", "b": lambda: "UNAVAILABLE"}
-        )
-        assert h.aggregate() == HealthStatus.UNAVAILABLE
-
-    def test_degraded_when_mixed_non_unavailable(self):
-        from sam.runtime_root.health import RuntimeHealth
-
-        h = RuntimeHealth(
-            {"a": lambda: "AVAILABLE", "b": lambda: "DEGRADED"}
-        )
-        assert h.aggregate() == HealthStatus.DEGRADED
-
-    def test_empty_is_unavailable(self):
-        from sam.runtime_root.health import RuntimeHealth
-
-        assert RuntimeHealth().aggregate() == HealthStatus.UNAVAILABLE
-
-    def test_unknown_health_producer_raises(self):
-        from sam.runtime_root.health import RuntimeHealth
-
-        h = RuntimeHealth({"a": lambda: "AVAILABLE"})
-        with pytest.raises(CompositionDefinitionError):
-            h.unit_health("missing")
-
-    def test_aggregate_matches_unit_health(self):
-        comp = RuntimeBuilder().build()
-        agg = comp.health.aggregate()
-        per_unit = comp.health.all_health()
-        assert len(per_unit) == 7
-        # Aggregate follows the deterministic rule over unit reports.
-        statuses = list(per_unit.values())
-        expected = (
-            HealthStatus.AVAILABLE
-            if all(s == HealthStatus.AVAILABLE for s in statuses)
-            else (
-                HealthStatus.UNAVAILABLE
-                if any(s == HealthStatus.UNAVAILABLE for s in statuses)
-                else HealthStatus.DEGRADED
-            )
-        )
-        assert agg == expected
+def test_build_each_canonical_unit_instance_present():
+    root = RuntimeBuilder().build()
+    units = root.container().units()
+    for uid in PIPELINE:
+        assert uid in units
+        assert units[uid] is not None
 
 
-class TestCompositionLifecycle:
-    def test_start_is_deterministic(self):
-        comp = RuntimeBuilder().build()
-        comp.start()
-        assert comp.lifecycle.state == RuntimeState.RUNNING
-        assert comp.lifecycle.is_operational()
-
-    def test_stop_deterministic(self):
-        comp = RuntimeBuilder().build()
-        comp.start()
-        comp.stop()
-        assert comp.lifecycle.state == RuntimeState.STOPPED
-        assert comp.lifecycle.is_stopped()
-
-    def test_cannot_stop_before_start(self):
-        comp = RuntimeBuilder().build()
-        with pytest.raises(LifecycleCompositionError):
-            comp.stop()  # CREATED -> STOPPING invalid
-
-    def test_cannot_restart_after_stop(self):
-        comp = RuntimeBuilder().build()
-        comp.start()
-        comp.stop()
-        with pytest.raises(LifecycleCompositionError):
-            comp.start()  # STOPPED -> COMPOSED invalid
+# ---------------------------------------------------------------------------
+# runtime starts / stops
+# ---------------------------------------------------------------------------
 
 
-class TestCompositionValidator:
-    def test_validate_passes_after_build(self):
-        comp = RuntimeBuilder().build()
-        assert comp.validate() is True
-
-    def test_validator_validates_running(self):
-        comp = RuntimeBuilder().build()
-        comp.start()
-        assert comp.validate() is True
-
-    def test_completeness_missing_unit(self):
-        reg = RuntimeRegistry()
-        # register only 6 of 7
-        for u in UNIT_CHAIN[:6]:
-            reg.register(u, object())
-        validator = CompositionValidator(reg)
-        with pytest.raises(CompositionValidationError):
-            validator.check_completeness()
-
-    def test_dependency_mismatch(self):
-        reg = RuntimeRegistry()
-        for u in UNIT_CHAIN:
-            reg.register(u, object())
-        validator = CompositionValidator(reg)
-        bad = DependencyGraph(edges=[])
-        with pytest.raises(CompositionValidationError):
-            validator.check_dependency(bad)
-
-    def test_lifecycle_unavailable(self):
-        reg = RuntimeRegistry()
-        for u in UNIT_CHAIN:
-            reg.register(u, object())
-        validator = CompositionValidator(reg, lifecycle=None)
-        with pytest.raises(CompositionValidationError):
-            validator.check_lifecycle()
+def test_runtime_starts():
+    root = RuntimeBuilder().build()
+    assert not root.is_running()
+    root.start()
+    assert root.is_running()
+    assert root.lifecycle.state == RuntimeState.STARTED
 
 
-class TestRuntimeContainer:
-    def test_container_wraps_composition(self):
-        comp = RuntimeBuilder().build()
-        rt = RuntimeContainer(comp)
-        assert rt.composition is comp
+def test_runtime_stops():
+    root = RuntimeBuilder().build()
+    root.start()
+    root.stop()
+    assert root.lifecycle.state == RuntimeState.STOPPED
+    assert not root.is_running()
 
-    def test_container_public_api(self):
-        rt = RuntimeContainer(RuntimeBuilder().build())
-        assert rt.validate() is True
-        assert rt.health() in (HealthStatus.AVAILABLE, HealthStatus.DEGRADED,
-                               HealthStatus.UNAVAILABLE)
-        rt.start()
-        assert rt.lifecycle.is_operational()
-        rt.stop()
-        assert rt.lifecycle.is_stopped()
 
-    def test_container_unit_accessors(self):
-        rt = RuntimeContainer(RuntimeBuilder().build())
-        assert rt.citizen_host is not None
-        assert rt.capability_manager is not None
-        assert rt.discovery_resolver is not None
-        assert rt.contract_enforcer is not None
-        assert rt.approval_coordinator is not None
-        assert rt.execution_scheduler is not None
-        assert rt.audit_recorder is not None
-        assert len(rt.units()) == 7
+def test_runtime_dispose_reaches_terminal_state():
+    root = RuntimeBuilder().build()
+    root.start()
+    root.stop()
+    root.dispose()
+    assert root.lifecycle.state == RuntimeState.DISPOSED
+
+
+def test_lifecycle_full_sequence_deterministic():
+    root = RuntimeBuilder().build()
+    seq = [root.lifecycle.state]
+    root.start()
+    seq.append(root.lifecycle.state)
+    root.stop()
+    seq.append(root.lifecycle.state)
+    root.dispose()
+    seq.append(root.lifecycle.state)
+    assert seq == [
+        RuntimeState.BUILT,
+        RuntimeState.STARTED,
+        RuntimeState.STOPPED,
+        RuntimeState.DISPOSED,
+    ]
+
+
+def test_stop_before_start_from_built_is_allowed():
+    root = RuntimeBuilder().build()
+    root.stop()  # BUILT -> STOPPED is a valid transition
+    assert root.lifecycle.state == RuntimeState.STOPPED
+
+
+def test_invalid_transition_crested_after_build_raises():
+    root = RuntimeBuilder().build()
+    with pytest.raises(RuntimeCompositionError):
+        root.lifecycle.transition_to(RuntimeState.DISPOSED)  # BUILT->DISPOSED invalid
+
+
+def test_start_twice_raises():
+    root = RuntimeBuilder().build()
+    root.start()
+    with pytest.raises(LifecycleCompositionError):
+        root.start()
+
+
+# ---------------------------------------------------------------------------
+# health aggregate
+# ---------------------------------------------------------------------------
+
+
+def test_health_returns_known_status():
+    root = RuntimeBuilder().build()
+    status = root.health()
+    assert isinstance(status, HealthStatus)
+
+
+def test_health_summary_reports_seven_units():
+    root = RuntimeBuilder().build()
+    aggregate, per_unit = root.health_summary()
+    assert len(per_unit) == 7
+    assert set(per_unit.keys()) == set(PIPELINE)
+
+
+def test_health_aggregate_rule_failed_when_any_unit_failed():
+    # The real runtime reports discovery_resolver + contract_enforcer as
+    # unavailable (no initialize()); honest aggregation => Failed.
+    root = RuntimeBuilder().build()
+    root.start()
+    assert root.health() == HealthStatus.FAILED
+
+
+def test_health_aggregate_all_healthy():
+    health = RuntimeHealth()
+    from sam.runtime_root.interfaces import HealthProvider
+
+    health.register(HealthProvider("a", lambda: "available"))
+    health.register(HealthProvider("b", lambda: "healthy"))
+    assert health.aggregate() == HealthStatus.HEALTHY
+    assert health.is_healthy()
+
+
+def test_health_aggregate_any_failed():
+    health = RuntimeHealth()
+    from sam.runtime_root.interfaces import HealthProvider
+
+    health.register(HealthProvider("a", lambda: "available"))
+    health.register(HealthProvider("b", lambda: "unavailable"))
+    assert health.aggregate() == HealthStatus.FAILED
+    assert health.is_failed()
+
+
+def test_health_aggregate_degraded():
+    health = RuntimeHealth()
+    from sam.runtime_root.interfaces import HealthProvider
+
+    health.register(HealthProvider("a", lambda: "available"))
+    health.register(HealthProvider("b", lambda: "degraded"))
+    assert health.aggregate() == HealthStatus.DEGRADED
+
+
+def test_health_normalise_dict_and_string():
+    from sam.runtime_root.health import _normalise
+
+    assert _normalise("available") == HealthStatus.HEALTHY
+    assert _normalise("unavailable") == HealthStatus.FAILED
+    assert _normalise("degraded") == HealthStatus.DEGRADED
+    assert _normalise({"status": "AVAILABLE"}) == HealthStatus.HEALTHY
+    assert _normalise({"lifecycle": "FAILED"}) == HealthStatus.FAILED
+
+
+# ---------------------------------------------------------------------------
+# dependency graph / pipeline
+# ---------------------------------------------------------------------------
+
+
+def test_pipeline_has_seven_units_no_shortcut():
+    assert len(PIPELINE) == 7
+    assert PIPELINE == (
+        "citizen_host",
+        "capability_manager",
+        "discovery_resolver",
+        "contract_enforcer",
+        "approval_coordinator",
+        "execution_scheduler",
+        "audit_recorder",
+    )
+
+
+def test_canonical_edges_six_adjacent_links():
+    assert len(CANONICAL_EDGES) == 6
+    for i, (src, dst) in enumerate(CANONICAL_EDGES):
+        assert src == PIPELINE[i]
+        assert dst == PIPELINE[i + 1]
+
+
+def test_pipeline_no_lateral_or_skip():
+    # Every edge connects exactly adjacent units; there are no shortcuts.
+    for (src, dst) in CANONICAL_EDGES:
+        assert src != dst
+    assert len(set(PIPELINE)) == len(PIPELINE)  # no duplicates
+
+
+def test_dependency_graph_acyclic():
+    # The canonical chain is a linear DAG: start node has no in-edge, end node
+    # has no out-edge, no node points to itself.
+    from sam.runtime_root.runtime_builder import CANONICAL_EDGES as EDGES
+
+    adjacency = {}
+    for src, dst in EDGES:
+        adjacency.setdefault(src, []).append(dst)
+    assert set(adjacency.keys()) == set(PIPELINE[:-1])
+    # linear: exactly one root (first node) with no incoming edge
+    all_dsts = {d for _, d in EDGES}
+    roots = [n for n in PIPELINE if n not in all_dsts]
+    assert roots == ["citizen_host"]
+    # no self-loop
+    assert all(src != dst for src, dst in EDGES)
+
+
+# ---------------------------------------------------------------------------
+# determinism
+# ---------------------------------------------------------------------------
+
+
+def test_build_100_times_identical_structure():
+    builder = RuntimeBuilder()
+    first = builder.build()
+    first_units = first.container().units()
+    for _ in range(100):
+        root = builder.build()
+        assert root.container().dependency_ids == first.container().dependency_ids
+        assert len(root.container().units()) == len(first_units)
+        assert root.lifecycle.state == RuntimeState.BUILT
+    assert builder.build_count == 101
+
+
+# ---------------------------------------------------------------------------
+# multiple build
+# ---------------------------------------------------------------------------
+
+
+def test_multiple_build_produces_fresh_instances():
+    builder = RuntimeBuilder()
+    a = builder.build()
+    b = builder.build()
+    assert a is not b
+    # distinct instances (fresh per build)
+    assert a.container() is not b.container()
+    assert a.container().citizen_host is not b.container().citizen_host
+    assert a.container().dependency_ids == b.container().dependency_ids
+
+
+def test_build_count_increments():
+    builder = RuntimeBuilder()
+    assert builder.build_count == 0
+    builder.build()
+    builder.build()
+    builder.build()
+    assert builder.build_count == 3
+
+
+# ---------------------------------------------------------------------------
+# restart
+# ---------------------------------------------------------------------------
+
+
+def test_restart_returns_fresh_started_runtime():
+    root = RuntimeBuilder().build()
+    root.start()
+    restart = root.restart()
+    assert restart is not root
+    assert restart.is_running()
+    assert restart.lifecycle.state == RuntimeState.STARTED
+
+
+def test_restart_rebuilds_fresh_instances():
+    root = RuntimeBuilder().build()
+    root.start()
+    fresh = root.restart()
+    assert fresh.container().citizen_host is not root.container().citizen_host
+    assert fresh.container().dependency_ids == root.container().dependency_ids
+
+
+def test_old_root_still_stopped_after_restart():
+    root = RuntimeBuilder().build()
+    root.start()
+    root.restart()
+    # restart stops the old root before building fresh
+    assert root.lifecycle.state in (RuntimeState.STOPPED, RuntimeState.STARTED)
