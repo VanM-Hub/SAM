@@ -60,11 +60,28 @@ class TestConstruction:
             "audit_recorder",
         }
 
-        # Check sys.modules for forbidden imports
-        for mod_name in list(sys.modules.keys()):
-            for forbidden_mod in forbidden:
-                if f"src.sam.runtime.{forbidden_mod}" in mod_name:
-                    pytest.fail(
-                        f"approval_coordinator imports forbidden module: "
-                        f"{forbidden_mod}"
-                    )
+        # Scan approval_coordinator source files for forbidden imports
+        import os
+        import inspect as _inspect
+        pkg_dir = os.path.dirname(os.path.dirname(
+            _inspect.getfile(coordinator_service)
+        ))
+        violations = []
+        for root, _dirs, files in os.walk(pkg_dir):
+            for f in files:
+                if f.endswith('.py'):
+                    path = os.path.join(root, f)
+                    with open(path, 'r', encoding='utf-8') as fh:
+                        content = fh.read()
+                    for forbidden_mod in forbidden:
+                        # Check for import patterns
+                        if f'sam.runtime.{forbidden_mod}' in content:
+                            violations.append(
+                                f'{os.path.relpath(path, pkg_dir)}: '
+                                f'imports {forbidden_mod}'
+                            )
+        if violations:
+            pytest.fail(
+                f'approval_coordinator has forbidden imports: '
+                f'{violations}'
+            )
