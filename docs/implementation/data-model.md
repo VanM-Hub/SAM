@@ -38,7 +38,7 @@ Supporting References
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/MEMORY\_MODEL.md
 

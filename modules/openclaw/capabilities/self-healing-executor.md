@@ -1,4 +1,4 @@
-# Self-Healing Executor
+﻿# Self-Healing Executor
 
 
 
@@ -126,7 +126,7 @@ Framework
 
 \- docs/models/RISK\_MODEL.md
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 
 
@@ -226,7 +226,7 @@ Approved Decision
 
 
 
-↓
+â†“
 
 
 
@@ -234,7 +234,7 @@ Execution Plan
 
 
 
-↓
+â†“
 
 
 
@@ -242,7 +242,7 @@ Backup Verification
 
 
 
-↓
+â†“
 
 
 
@@ -250,7 +250,7 @@ Guardrails Validation
 
 
 
-↓
+â†“
 
 
 
@@ -258,7 +258,7 @@ Approval Verification
 
 
 
-↓
+â†“
 
 
 
@@ -266,7 +266,7 @@ Execute Action
 
 
 
-↓
+â†“
 
 
 
@@ -274,7 +274,7 @@ Immediate Verification
 
 
 
-↓
+â†“
 
 
 
@@ -282,7 +282,7 @@ Continuous Verification
 
 
 
-↓
+â†“
 
 
 

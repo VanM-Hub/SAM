@@ -1,4 +1,4 @@
-# Auto-Recovery Orchestrator
+﻿# Auto-Recovery Orchestrator
 
 
 
@@ -124,7 +124,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/EXECUTION\_MODEL.md
 
@@ -200,7 +200,7 @@ Observation
 
 
 
-↓
+â†“
 
 
 
@@ -208,7 +208,7 @@ Diagnostics
 
 
 
-↓
+â†“
 
 
 
@@ -216,7 +216,7 @@ Reasoning
 
 
 
-↓
+â†“
 
 
 
@@ -224,7 +224,7 @@ Decision
 
 
 
-↓
+â†“
 
 
 
@@ -232,7 +232,7 @@ Execution Planning
 
 
 
-↓
+â†“
 
 
 
@@ -240,7 +240,7 @@ Guardrails
 
 
 
-↓
+â†“
 
 
 
@@ -248,7 +248,7 @@ Approval
 
 
 
-↓
+â†“
 
 
 
@@ -256,7 +256,7 @@ Execution
 
 
 
-↓
+â†“
 
 
 
@@ -264,7 +264,7 @@ Verification
 
 
 
-↓
+â†“
 
 
 
@@ -272,23 +272,23 @@ Recovered?
 
 
 
-↓
+â†“
 
 
 
-YES → Learning
+YES â†’ Learning
 
 
 
-↓
+â†“
 
 
 
-NO → Rollback Evaluation
+NO â†’ Rollback Evaluation
 
 
 
-↓
+â†“
 
 
 
@@ -296,7 +296,7 @@ Rollback
 
 
 
-↓
+â†“
 
 
 
@@ -608,5 +608,5 @@ Auto-Recovery Orchestrator coordinates the complete autonomous recovery lifecycl
 
 
 
-The Orchestrator manages workflow—not operational authority.
+The Orchestrator manages workflowâ€”not operational authority.
 

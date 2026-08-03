@@ -1,4 +1,4 @@
-# Identity
+﻿# Identity
 
 Version: 1.0
 
@@ -23,7 +23,7 @@ Module
 Framework
 
 - docs/documentation/KNOWLEDGE_STANDARD.md
-- docs/core/CONSTITUTION.md
+- docs/CONSTITUTION.md
 - docs/models/MEMORY_MODEL.md
 
 ---

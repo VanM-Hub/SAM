@@ -1,4 +1,4 @@
-# Guardrails Engine
+﻿# Guardrails Engine
 
 
 
@@ -110,7 +110,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/RISK\_MODEL.md
 
@@ -348,7 +348,7 @@ Execution Request
 
 
 
-↓
+â†“
 
 
 
@@ -356,7 +356,7 @@ Policy Evaluation
 
 
 
-↓
+â†“
 
 
 
@@ -364,7 +364,7 @@ Risk Evaluation
 
 
 
-↓
+â†“
 
 
 
@@ -372,7 +372,7 @@ Dependency Validation
 
 
 
-↓
+â†“
 
 
 
@@ -380,7 +380,7 @@ Integrity Validation
 
 
 
-↓
+â†“
 
 
 
@@ -388,7 +388,7 @@ Decision
 
 
 
-↓
+â†“
 
 
 

@@ -19,7 +19,7 @@ Framework References
 - docs/architecture/SAM_ARCHITECTURE.md
 - docs/architecture/LAYERS.md
 - docs/architecture/MODULE_INTERFACE.md
-- docs/core/CONSTITUTION.md
+- docs/CONSTITUTION.md
 
 ---
 

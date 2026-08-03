@@ -1,4 +1,4 @@
-# Reasoning Trace
+﻿# Reasoning Trace
 
 
 
@@ -124,7 +124,7 @@ Framework
 
 \- docs/core/THINKING\_PROTOCOL.md
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/TRUST\_MODEL.md
 

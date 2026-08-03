@@ -1,4 +1,4 @@
-# Apply Provider
+﻿# Apply Provider
 
 
 
@@ -132,7 +132,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/core/GOVERNANCE.md
 
@@ -236,7 +236,7 @@ Receive Approved Plan
 
 
 
-↓
+â†“
 
 
 
@@ -244,7 +244,7 @@ Verify Preconditions
 
 
 
-↓
+â†“
 
 
 
@@ -252,7 +252,7 @@ Create Backup
 
 
 
-↓
+â†“
 
 
 
@@ -260,7 +260,7 @@ Lock Configuration
 
 
 
-↓
+â†“
 
 
 
@@ -268,7 +268,7 @@ Apply Provider Configuration
 
 
 
-↓
+â†“
 
 
 
@@ -276,7 +276,7 @@ Validate Configuration
 
 
 
-↓
+â†“
 
 
 
@@ -284,7 +284,7 @@ Verify Provider Connectivity
 
 
 
-↓
+â†“
 
 
 
@@ -292,7 +292,7 @@ Verify Model Availability
 
 
 
-↓
+â†“
 
 
 
@@ -300,7 +300,7 @@ Execute Post-Apply Verification
 
 
 
-↓
+â†“
 
 
 

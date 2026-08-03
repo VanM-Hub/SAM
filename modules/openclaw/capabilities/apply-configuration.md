@@ -1,4 +1,4 @@
-# Apply Configuration
+﻿# Apply Configuration
 
 
 
@@ -122,7 +122,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/core/GOVERNANCE.md
 
@@ -240,7 +240,7 @@ Receive Approved Plan
 
 
 
-↓
+â†“
 
 
 
@@ -248,7 +248,7 @@ Verify Preconditions
 
 
 
-↓
+â†“
 
 
 
@@ -256,7 +256,7 @@ Create Backup
 
 
 
-↓
+â†“
 
 
 
@@ -264,7 +264,7 @@ Lock Target Configuration
 
 
 
-↓
+â†“
 
 
 
@@ -272,7 +272,7 @@ Apply Changes
 
 
 
-↓
+â†“
 
 
 
@@ -280,7 +280,7 @@ Validate Written Configuration
 
 
 
-↓
+â†“
 
 
 
@@ -288,7 +288,7 @@ Release Lock
 
 
 
-↓
+â†“
 
 
 
@@ -296,7 +296,7 @@ Execute Verification
 
 
 
-↓
+â†“
 
 
 

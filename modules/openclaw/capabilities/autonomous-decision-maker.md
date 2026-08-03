@@ -1,4 +1,4 @@
-# Autonomous Decision Maker
+﻿# Autonomous Decision Maker
 
 
 
@@ -132,7 +132,7 @@ Framework
 
 
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/core/THINKING\_PROTOCOL.md
 
@@ -214,7 +214,7 @@ Observation
 
 
 
-↓
+â†“
 
 
 
@@ -222,7 +222,7 @@ Diagnostic Reasoning
 
 
 
-↓
+â†“
 
 
 
@@ -230,7 +230,7 @@ Evidence
 
 
 
-↓
+â†“
 
 
 
@@ -238,7 +238,7 @@ Risk Assessment
 
 
 
-↓
+â†“
 
 
 
@@ -246,7 +246,7 @@ Execution Planning
 
 
 
-↓
+â†“
 
 
 
@@ -254,7 +254,7 @@ Guardrails Validation
 
 
 
-↓
+â†“
 
 
 
@@ -262,7 +262,7 @@ Approval Evaluation
 
 
 
-↓
+â†“
 
 
 
@@ -270,7 +270,7 @@ Decision
 
 
 
-↓
+â†“
 
 
 
@@ -278,7 +278,7 @@ Execution
 
 
 
-↓
+â†“
 
 
 
@@ -286,7 +286,7 @@ Verification
 
 
 
-↓
+â†“
 
 
 
@@ -402,7 +402,7 @@ Low Risk
 
 
 
-→ Autonomous execution permitted.
+â†’ Autonomous execution permitted.
 
 
 
@@ -410,7 +410,7 @@ Medium Risk
 
 
 
-→ Autonomous execution permitted if all guardrails succeed.
+â†’ Autonomous execution permitted if all guardrails succeed.
 
 
 
@@ -418,7 +418,7 @@ High Risk
 
 
 
-→ Human approval required.
+â†’ Human approval required.
 
 
 
@@ -426,7 +426,7 @@ Critical Risk
 
 
 
-→ Autonomous execution prohibited.
+â†’ Autonomous execution prohibited.
 
 
 

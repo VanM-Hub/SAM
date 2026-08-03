@@ -1,4 +1,4 @@
-# OpenClaw Module
+﻿# OpenClaw Module
 
 
 
@@ -42,7 +42,7 @@ Related Framework Documents:
 
 \- docs/architecture/MODULE\_INTERFACE.md
 
-\- docs/core/CONSTITUTION.md
+\- docs/CONSTITUTION.md
 
 \- docs/models/DECISION\_MODEL.md
 
