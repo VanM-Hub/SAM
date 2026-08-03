@@ -6,11 +6,13 @@ Version: 1.0
 
 
 
-Status: Draft
+Status: REFERENCE (Implementation Documentation)
 
 
 
-> **Document Type: Implementation Documentation.**
+> **Document Type: Implementation Documentation** (REFERENCE).
+> Canonical documentation (konsep, cara penggunaan, API publik, workflow) ada di `docs/development/capability_sdk.md`.
+> Dokumen ini berisi detail implementasi internal, contoh kode engineering, dan keputusan teknis.
 > This document is NOT a Domain Specification. The Capability domain is specified in `docs/specifications/CAPABILITY_SPECIFICATION.md`.
 
 

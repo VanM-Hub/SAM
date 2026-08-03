@@ -9,7 +9,7 @@
 
 Starting with v1.0.0, the following aspects of SAM's architecture are **frozen** and will not change in a breaking way during the v1.x lifecycle:
 
-1. **Public API contracts** (see `docs/audit/public_contracts.md`) will remain backward compatible.
+1. **Public API contracts** (see `docs/history/audit/public_contracts.md`) will remain backward compatible.
 2. **Database schema** (migrations 001–047) — existing tables and columns will not be removed or renamed.
 3. **CLI command structure** — registered commands and their flags will not be removed.
 4. **Module exports** — public `__all__` exports will remain available.

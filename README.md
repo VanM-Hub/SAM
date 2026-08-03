@@ -152,7 +152,7 @@ Contributions follow the repository conventions and the governance lifecycle. Se
 python -m pytest tests/ -q --tb=short
 ```
 
-The test suite runs locally and in CI. See **[docs/reports/Repository_Metrics.md](docs/reports/Repository_Metrics.md)** for current metrics.
+The test suite runs locally and in CI. Metrics history was archived to **[docs/history/reports/Repository_Metrics.md](docs/history/reports/Repository_Metrics.md)**.
 
 ---
 

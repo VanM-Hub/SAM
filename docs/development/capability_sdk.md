@@ -1,6 +1,9 @@
 # Capability SDK
 
-> **Document Type: Developer Documentation** (Implementation Guide).
+> **Status: CANONICAL** (Developer Documentation / Implementation Guide)
+> Canonical source untuk konsep, cara penggunaan, API publik, dan workflow pengembangan capability.
+> Detail teknis implementasi internal lihat `docs/implementation/capability-sdk.md` (REFERENCE).
+
 > This document is NOT a Domain Specification. The Capability domain is specified in `docs/specifications/CAPABILITY_SPECIFICATION.md`. This guide explains SDK usage only.
 
 > Panduan lengkap membuat capability baru untuk SAM.
