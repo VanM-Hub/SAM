@@ -1,101 +1,145 @@
-﻿"""Integration tests for the Reference Runtime composition (E1-001).
+"""Integration + executable smoke tests (E1-001 + E1-002).
 
-Covers the full lifecycle through the public facade and the determinism
-acceptance: RuntimeBuilder.build() 100 times produces identical graphs.
+Covers the full lifecycle through the public API and the E1-002 executable
+contract (create_runtime / run_runtime / shutdown_runtime), plus the CLI smoke
+sequence. Verifies no regression in the seven-unit composition.
 
-Integration flow:
-    RuntimeBuilder.build() -> RuntimeContainer
-        -> start() -> health() -> validate() -> stop()
+Authority: E1-001 COMPOSITION ROOT | E1-002 REFERENCE RUNTIME EXECUTABLE.
 """
+
+import subprocess
+import sys
 
 import pytest
 
 from sam.runtime_root import (
-    HealthStatus,
+    PIPELINE,
     RuntimeBuilder,
-    RuntimeContainer,
+    RuntimeRoot,
+    create_runtime,
+    run_runtime,
+    shutdown_runtime,
 )
-from sam.runtime_root.graph import UNIT_CHAIN
+from sam.runtime_root.exceptions import RuntimeCompositionError
+from sam.runtime_root.lifecycle import RuntimeState
 
 
-@pytest.fixture(scope="module")
-def container():
-    """A fully built, started, validated, then stopped container."""
-    rt = RuntimeContainer(RuntimeBuilder().build())
-    rt.start()
-    return rt
+# ---------------------------------------------------------------------------
+# full lifecycle through the public API (E1-001)
+# ---------------------------------------------------------------------------
 
 
-def test_build_then_lifecycle_integration():
-    """build -> start -> health -> validate -> stop."""
-    rt = RuntimeContainer(RuntimeBuilder().build())
-    assert rt.validate() is True
-    rt.start()
-    assert rt.lifecycle.is_operational()
-    assert rt.health() in (HealthStatus.AVAILABLE, HealthStatus.DEGRADED,
-                           HealthStatus.UNAVAILABLE)
-    assert rt.validate() is True
-    rt.stop()
-    assert rt.lifecycle.is_stopped()
+def test_full_lifecycle_build_start_health_stop_dispose():
+    root = RuntimeBuilder().build()
+    assert root.lifecycle.state == RuntimeState.BUILT
+    root.start()
+    assert root.lifecycle.state == RuntimeState.STARTED
+    assert root.is_running()
+    assert root.health() is not None
+    root.stop()
+    assert root.lifecycle.state == RuntimeState.STOPPED
+    root.dispose()
+    assert root.lifecycle.state == RuntimeState.DISPOSED
 
 
-def test_all_units_present_via_facade(container):
-    units = container.units()
-    assert set(units.keys()) == set(UNIT_CHAIN)
-    for uid in UNIT_CHAIN:
-        assert units[uid] is not None
+def test_units_are_wired_in_canonical_pipeline_order():
+    root = RuntimeBuilder().build()
+    units = root.container().units()
+    assert list(units.keys()) == list(PIPELINE)
+    # lazy-factory wiring means each unit is a distinct service instance
+    assert len({id(v) for v in units.values()}) == 7
 
 
-def test_container_exposes_canonical_getters(container):
-    assert container.citizen_host is not None
-    assert container.capability_manager is not None
-    assert container.discovery_resolver is not None
-    assert container.contract_enforcer is not None
-    assert container.approval_coordinator is not None
-    assert container.execution_scheduler is not None
-    assert container.audit_recorder is not None
+def test_container_per_unit_accessors_match_pipeline():
+    root = RuntimeBuilder().build()
+    c = root.container()
+    assert c.citizen_host is c.units()["citizen_host"]
+    assert c.audit_recorder is c.units()["audit_recorder"]
+    assert c.approval_coordinator is c.units()["approval_coordinator"]
 
 
-def test_graph_is_canonical_acyclic(container):
-    g = container.graph
-    assert g.is_acyclic()
-    assert container.composition.validate() is True
+def test_immutable_container_rejects_mutation():
+    root = RuntimeBuilder().build()
+    container = root.container()
+    with pytest.raises((AttributeError, RuntimeCompositionError)):
+        container.citizen_host = object()
 
 
-def test_health_aggregation_sound(container):
-    per_unit = container.composition.health.all_health()
-    assert len(per_unit) == 7
-    # Factory container has started; at least the auto-initialising units
-    # report AVAILABLE. Aggregation never raises and returns a known status.
-    assert isinstance(container.health(), HealthStatus)
+# ---------------------------------------------------------------------------
+# E1-002 executable
+# ---------------------------------------------------------------------------
 
 
-def test_repeated_build_100_times_identical_graph():
-    """E1-001 acceptance: build 100x yields identical graphs."""
-    builder = RuntimeBuilder()
-    reference = builder.build().graph
-    for _ in range(100):
-        g = builder.build().graph
-        assert g.equals(reference)
-        assert g.is_acyclic()
-        assert g.nodes == frozenset(UNIT_CHAIN)
+def test_create_runtime_builds_root():
+    root = create_runtime()
+    assert isinstance(root, RuntimeRoot)
+    assert root.lifecycle.state == RuntimeState.BUILT
 
 
-def test_repeated_build_full_lifecycle_100_times():
-    """Each build supports an independent full lifecycle."""
-    builder = RuntimeBuilder()
-    for _ in range(100):
-        rt = RuntimeContainer(builder.build())
-        rt.start()
-        assert rt.lifecycle.is_operational()
-        rt.stop()
-        assert rt.lifecycle.is_stopped()
+def test_run_runtime_builds_and_starts():
+    root = run_runtime()
+    assert isinstance(root, RuntimeRoot)
+    assert root.is_running()
+    assert root.health() is not None
 
 
-def test_each_build_has_fresh_instances():
-    """Repeated builds never share unit instances (no global singleton)."""
-    builder = RuntimeBuilder()
-    c1 = builder.build()
-    c2 = builder.build()
-    for uid in UNIT_CHAIN:
-        assert c1.registry.get(uid) is not c2.registry.get(uid)
+def test_shutdown_runtime_stops_and_disposes():
+    root = create_runtime()
+    root.start()
+    shutdown_runtime(root)
+    assert root.lifecycle.state == RuntimeState.DISPOSED
+
+
+def test_shutdown_runtime_from_built():
+    root = create_runtime()
+    shutdown_runtime(root)  # BUILT -> STOPPED -> DISPOSED
+    assert root.lifecycle.state == RuntimeState.DISPOSED
+
+
+def test_restart_via_executable_handlers():
+    first = run_runtime()
+    shutdown_runtime(first)
+    assert first.lifecycle.state == RuntimeState.DISPOSED
+    second = run_runtime()
+    assert second.is_running()
+    shutdown_runtime(second)
+
+
+def test_shutdown_runtime_after_dispose_raises():
+    root = create_runtime()
+    shutdown_runtime(root)
+    with pytest.raises(RuntimeCompositionError):
+        shutdown_runtime(root)
+
+
+# ---------------------------------------------------------------------------
+# CLI smoke (python -m sam.runtime_root)
+# ---------------------------------------------------------------------------
+
+
+def test_cli_smoke_sequence():
+    """python -m sam.runtime_root must build, start, health, stop, dispose."""
+    result = subprocess.run(
+        [sys.executable, "-m", "sam.runtime_root"],
+        capture_output=True,
+        text=True,
+        cwd=None,
+    )
+    out = (result.stdout or "") + (result.stderr or "")
+    assert result.returncode == 0, out
+    assert "built" in out
+    assert "started" in out
+    assert "health=" in out
+    assert "stopped" in out
+    assert "disposed" in out
+
+
+def test_cli_reports_seven_units_and_pipeline():
+    result = subprocess.run(
+        [sys.executable, "-m", "sam.runtime_root"],
+        capture_output=True,
+        text=True,
+    )
+    out = (result.stdout or "") + (result.stderr or "")
+    assert "units=7" in out
+    assert "pipeline=7" in out

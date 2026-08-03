@@ -1,17 +1,16 @@
-"""Runtime-level lifecycle for the Reference Runtime composition (E1-001).
+"""Runtime lifecycle for the Reference Runtime root (E1-001).
 
-Tracks the composed runtime container through deterministic states:
+Tracks the composed runtime through deterministic states:
 
-    CREATED -> COMPOSED -> STARTING -> RUNNING -> STOPPING -> STOPPED
-                                                  |
-                                                  v
-                                                FAILED
+    CREATED -> BUILT -> STARTED -> STOPPED -> DISPOSED
 
-Startup is deterministic (fixed transition order); shutdown runs in reverse
-order. Any unexpected call path raises LifecycleCompositionError.
+Determinism is enforced by a fixed transition table: any invalid call path
+raises RuntimeCompositionError.
 
-Authority: E1-001 Reference Runtime Composition | I0-001 M32
+Authority: E1-001 COMPOSITION ROOT | I0-001 M32
 """
+
+from __future__ import annotations
 
 from enum import Enum
 from typing import Optional
@@ -23,28 +22,24 @@ class RuntimeState(str, Enum):
     """Deterministic runtime lifecycle states (E1-001)."""
 
     CREATED = "CREATED"
-    COMPOSED = "COMPOSED"
-    STARTING = "STARTING"
-    RUNNING = "RUNNING"
-    STOPPING = "STOPPING"
+    BUILT = "BUILT"
+    STARTED = "STARTED"
     STOPPED = "STOPPED"
-    FAILED = "FAILED"
+    DISPOSED = "DISPOSED"
 
 
 #: Valid forward transitions (deterministic).
 _TRANSITIONS = {
-    RuntimeState.CREATED: {RuntimeState.COMPOSED},
-    RuntimeState.COMPOSED: {RuntimeState.STARTING},
-    RuntimeState.STARTING: {RuntimeState.RUNNING, RuntimeState.FAILED},
-    RuntimeState.RUNNING: {RuntimeState.STOPPING, RuntimeState.FAILED},
-    RuntimeState.STOPPING: {RuntimeState.STOPPED, RuntimeState.FAILED},
-    RuntimeState.STOPPED: set(),
-    RuntimeState.FAILED: set(),
+    RuntimeState.CREATED: {RuntimeState.BUILT},
+    RuntimeState.BUILT: {RuntimeState.STARTED, RuntimeState.STOPPED},
+    RuntimeState.STARTED: {RuntimeState.STOPPED},
+    RuntimeState.STOPPED: {RuntimeState.STARTED, RuntimeState.DISPOSED},
+    RuntimeState.DISPOSED: set(),
 }
 
 
 class RuntimeLifecycle:
-    """State machine for the composed runtime container.
+    """State machine for the composed runtime root.
 
     Attributes:
         state: current RuntimeState.
@@ -71,35 +66,28 @@ class RuntimeLifecycle:
             )
         self._state = target
 
-    def is_operational(self) -> bool:
-        """True when the runtime accepts external traffic."""
-        return self._state == RuntimeState.RUNNING
-
-    def is_stopped(self) -> bool:
-        """True when the runtime is fully stopped (or failed)."""
-        return self._state in (RuntimeState.STOPPED, RuntimeState.FAILED)
-
     def transition_to_if(self, target: RuntimeState) -> None:
-        """Transition to a target only if it is valid; else no-op.
+        """Transition to a target only if valid; else no-op.
 
-        Used for defensive failure handling (e.g. force FAILED without
-        raising during error handling).
+        Used for defensive failure handling without raising mid-error.
         """
         if target in _TRANSITIONS[self._state]:
             self._state = target
 
+    def is_running(self) -> bool:
+        """True iff the runtime is in the STARTED state."""
+        return self._state == RuntimeState.STARTED
 
-#: Canonical startup order (deterministic).
-STARTUP_ORDER = (
+    def is_disposed(self) -> bool:
+        """True iff the runtime reached the terminal DISPOSED state."""
+        return self._state == RuntimeState.DISPOSED
+
+
+#: Canonical lifecycle order (deterministic).
+LIFECYCLE_ORDER = (
     RuntimeState.CREATED,
-    RuntimeState.COMPOSED,
-    RuntimeState.STARTING,
-    RuntimeState.RUNNING,
-)
-
-#: Canonical shutdown order (reverse of startup).
-SHUTDOWN_ORDER = (
-    RuntimeState.RUNNING,
-    RuntimeState.STOPPING,
+    RuntimeState.BUILT,
+    RuntimeState.STARTED,
     RuntimeState.STOPPED,
+    RuntimeState.DISPOSED,
 )
