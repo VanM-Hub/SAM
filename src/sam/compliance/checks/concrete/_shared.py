@@ -151,7 +151,15 @@ class SnapshotReader:
 
 
 class DiskReader:
-    """Reads file content from a target root path deterministically."""
+    """Reads file content from a target root path deterministically.
+
+    Reads are cached globally by (root, relative path) so a source file
+    is read from disk at most once per session regardless of how many
+    checks inspect it — essential for deterministic, fast execution
+    across the 99 checkers.
+    """
+
+    _CACHE: Dict[tuple, str] = {}
 
     def __init__(self, target: str) -> None:
         self._target = target or ""
@@ -159,29 +167,41 @@ class DiskReader:
     def read(self, rel: str) -> str:
         import os
         full = os.path.join(self._target, rel)
+        key = (self._target, rel)
+        if key in DiskReader._CACHE:
+            return DiskReader._CACHE[key]
         try:
             with open(full, "r", encoding="utf-8", errors="replace") as fh:
-                return fh.read()
+                content = fh.read()
         except (OSError, UnicodeDecodeError):
-            return ""
+            content = ""
+        DiskReader._CACHE[key] = content
+        return content
+
+    @classmethod
+    def clear_cache(cls) -> None:
+        cls._CACHE = {}
 
 
 class ContentIndex:
     """Lazily-built content index over source files in a snapshot.
 
-    Reads each candidate source file from disk once (memoized) and
-    answers containment queries deterministically. Used by L1/L2
-    SOURCE_CONTAINS / SOURCE_ABSENT checks so a symbol/predicate is
-    tested against all candidate files without per-file disk reads on
-    every check. Prefixes select which path roots are candidates.
+    Reads each candidate source file from disk once (memoized via
+    DiskReader cache) and answers containment queries deterministically.
+    Used by L1/L2 SOURCE_CONTAINS / SOURCE_ABSENT checks.
+
+    The read root is the baseline root (context.options["baseline_root"])
+    when injected, else context.target_path. Baseline paths are
+    project-root-relative, so reading must be relative to the same root
+    the snapshot was built from.
     """
 
     def __init__(self, resolver: BaselineResolver, context: CheckContext,
                  prefixes: Sequence[str] = ("src/sam/",)) -> None:
         self._resolver = resolver
-        self._target = context.target_path
         self._context = context
-        self._reader = DiskReader(self._target)
+        self._root = context.options.get("baseline_root") or context.target_path
+        self._reader = DiskReader(self._root)
         self._prefixes = tuple(prefixes)
 
     def _filenames(self) -> List[str]:

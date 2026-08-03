@@ -69,11 +69,16 @@ class TestL0Determinism:
             assert r1.evidence == r2.evidence
 
     def test_different_context_same_snapshot(self, all_checks, context):
+        # Same injected baseline + baseline_root => same reads regardless
+        # of target_path (which may point at a sub-tree).
         c2 = CheckContext(
             target_path=r"D:\Project AI\SAM\src",
-            options={"baseline": context.options["baseline"]},
+            options={
+                "baseline": context.options["baseline"],
+                "baseline_root": r"D:\Project AI\SAM",
+            },
         )
         for cid in sorted(all_checks):
             r1 = all_checks[cid].execute(context)
             r2 = all_checks[cid].execute(c2)
-            assert r1.passed == r2.passed
+            assert r1.passed == r2.passed, cid
