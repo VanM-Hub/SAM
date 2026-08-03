@@ -97,12 +97,16 @@ class SourceSymbolAbsentCheck(BaseComplianceCheck):
 
     Config fields:
         symbols: literal substrings that must be absent everywhere.
+        prefixes: source path roots to search. Defaults to the runtime
+                  subtree (src/sam/runtime/) — ADR SOURCE_ABSENT checks
+                  constrain the reference runtime, not the compliance
+                  tooling or unrelated subsystems.
     """
 
     def __init__(
         self,
         symbols: Sequence[str],
-        prefixes: Sequence[str] = ("src/sam/",),
+        prefixes: Sequence[str] = ("src/sam/runtime/",),
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
