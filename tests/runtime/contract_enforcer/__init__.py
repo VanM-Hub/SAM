@@ -1,1 +1,1 @@
-﻿
+"""Contract Enforcer unit tests."""
