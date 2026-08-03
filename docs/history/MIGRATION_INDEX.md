@@ -44,6 +44,13 @@ Format: **Old Path → New Path → Reason**
 | `docs/release/RC2_linux_guide.md` | `docs/releases/history/RC2_linux_guide.md` | Historical (RC checklist artifact) |
 | `docs/release/release_checklist.md` (v1.0.0) | `docs/releases/history/release_checklist_v1.0.md` | Historical (checklist satu-kali rilis v1.0) |
 
+## C1-C — Obsolete Cleanup (commit `b79ac24`)
+
+| Old Path | New Path | Reason |
+|---|---|---|
+| `docs/core/CONSTITUTION.md` | *(deleted)* | OBSOLETE — superseded oleh `docs/CONSTITUTION.md` (canonical v1.0); self-flag Draft/Superseded. 27 referensi dialihkan ke canonical |
+| `docs/install.md` | `docs/history/install.md` | OBSOLETE di root — 0 referensi; panduan EN Desktop Qt unik dipertahankan di arsip |
+
 ## Status Dokumen — Capability SDK (bukan move, merupakan re-classification)
 
 | Path | Status Baru | Reason |
