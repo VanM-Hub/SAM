@@ -15,6 +15,7 @@ import uvicorn
 
 from ..runtime.coordinator import RuntimeCoordinator
 from ..runtime_service import WebRuntimeService
+from ..presentation import PresentationLayer
 from ..runtime_service.api import (
     RuntimeAPI,
     PreviewRequestView,
@@ -55,6 +56,10 @@ templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
 # BUKAN executor/coordinator; data runtime nyata tetap dari coordinator.
 runtime_service = WebRuntimeService()
 runtime_service.initialize()  # lifecycle -> ready
+# --- Session 04 (AD-S04): Presentation Layer menerima RuntimeService via DI ---
+# Desktop = Presentation pertama. Presentation HANYA membaca kontrak RuntimeService
+# (lifecycle/status/descriptor/metadata/contract), tidak tahu coordinator/execution.
+presentation_layer = PresentationLayer(runtime_service=runtime_service)
 coordinator = RuntimeCoordinator()
 telemetry = TelemetryService()
 incident_detector = IncidentDetector(coordinator.workspace_path)
@@ -119,6 +124,8 @@ async def index(request: Request):
     health_str = "HEALTHY" if healthy else "DEGRADED"
     # WebRuntimeService: status lifecycle service (consumer RuntimeService).
     service_status = runtime_service.status_dict()
+    # Session 04: Presentation Layer memakai jalur resmi (Runtime Status via DI).
+    presentation_status = presentation_layer.runtime_status()
     metrics = telemetry.get_metrics()
 
     loop = asyncio.get_event_loop()
@@ -132,6 +139,7 @@ async def index(request: Request):
         "health": health_str,
         "healthy": healthy,
         "runtime_service": service_status,
+        "presentation": presentation_status,
         "metrics": metrics,
         "incidents": incidents[:6],
         "incident_count": len(incidents),
@@ -151,12 +159,15 @@ async def runtime_page(request: Request):
     adapter_name = coordinator.adapter_name
     # WebRuntimeService: lifecycle & contract untuk Runtime endpoint.
     service_status = runtime_service.status_dict()
+    # Session 04: Presentation Layer Runtime Status via jalur resmi.
+    presentation_status = presentation_layer.runtime_status()
 
     return templates.TemplateResponse("runtime.html", {
         "request": request,
         "state": state.upper(),
         "hosting": adapter_name,
         "runtime_service": service_status,
+        "presentation": presentation_status,
         "metrics": metrics,
         "workspace": coordinator.workspace_path,
         "autonomous": coordinator.autonomous_enabled,
