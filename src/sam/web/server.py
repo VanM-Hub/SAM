@@ -36,6 +36,10 @@ from ..artifact_runtime.foundation.artifact_registry import ArtifactRegistry
 from ..runtime_service.api import ArtifactPreviewConsumer
 from ..memory.foundation.memory_registry import MemoryRegistry
 from ..runtime_service.api import MemoryPreviewConsumer
+from ..policy_runtime.foundation.policy_registry import PolicyRegistry
+from ..runtime_service.api import PolicyPreviewConsumer
+from ..audit_runtime.foundation.audit_registry import AuditRegistry
+from ..runtime_service.api import AuditPreviewConsumer
 from ..telemetry.service import TelemetryService
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
@@ -153,6 +157,15 @@ artifact_consumer = ArtifactPreviewConsumer(registry=_artifact_registry)
 # MEMORY JADI CAPABILITY MANDIRI (bukan lagi namespace payload / hook pasif S05).
 _memory_registry = MemoryRegistry()
 memory_consumer = MemoryPreviewConsumer(registry=_memory_registry)
+
+# --- Session 09 (AD-S09): Policy & Audit consumer via Activation Pattern Std ---
+# Policy -> PolicyRegistry -> ConversationPolicyBridge -> STOP.
+# Audit  -> AuditRegistry  -> ConversationAuditBridge  -> STOP. (AD-ENG-002)
+# Policy & Audit tetap INDEPENDEN (tidak saling tahu implementasi).
+_policy_registry = PolicyRegistry()
+policy_consumer = PolicyPreviewConsumer(registry=_policy_registry)
+_audit_registry = AuditRegistry()
+audit_consumer = AuditPreviewConsumer(registry=_audit_registry)
 
 
 @app.get("/")

@@ -29,6 +29,8 @@ from .knowledge_preview import KnowledgePreviewConsumer
 from .workflow_preview import WorkflowPreviewConsumer
 from .artifact_preview import ArtifactPreviewConsumer
 from .memory_preview import MemoryPreviewConsumer
+from .policy_preview import PolicyPreviewConsumer
+from .audit_preview import AuditPreviewConsumer
 
 
 @dataclass(frozen=True)
@@ -200,6 +202,48 @@ class ConversationPreviewGateway:
         return {
             "execution": result.as_dict(),
             "memory": memory.as_dict(),
+        }
+
+    def preview_with_policy(
+        self,
+        context: "ConversationExecutionContext",
+        policy_consumer: "PolicyPreviewConsumer",
+        policy_id: str,
+        execution_id: str,
+    ) -> dict:
+        """Conversation preview + Policy via activation path (AD-S09).
+
+        Conversation->RuntimeService->ExecutionRuntime (preview) via preview(),
+        lalu Policy di-resolve lewat bridge yg sudah ada (PolicyRegistry ->
+        ConversationPolicyBridge -> ConversationIntegrationBridge).
+        Policy = capability governance aktif (AD-ENG-002). Tanpa governance/engine baru.
+        """
+        result = self.preview(context, execution_id=execution_id)
+        policy = policy_consumer.resolve_policy(policy_id)
+        return {
+            "execution": result.as_dict(),
+            "policy": policy.as_dict(),
+        }
+
+    def preview_with_audit(
+        self,
+        context: "ConversationExecutionContext",
+        audit_consumer: "AuditPreviewConsumer",
+        audit_id: str,
+        execution_id: str,
+    ) -> dict:
+        """Conversation preview + Audit via activation path (AD-S09).
+
+        Conversation->RuntimeService->ExecutionRuntime (preview) via preview(),
+        lalu Audit di-resolve lewat bridge yg sudah ada (AuditRegistry ->
+        ConversationAuditBridge -> ConversationIntegrationBridge).
+        Audit = capability governance aktif, immutable, no-execute (AD-ENG-002).
+        """
+        result = self.preview(context, execution_id=execution_id)
+        audit = audit_consumer.resolve_audit(audit_id)
+        return {
+            "execution": result.as_dict(),
+            "audit": audit.as_dict(),
         }
 
 
