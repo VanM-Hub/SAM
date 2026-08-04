@@ -896,3 +896,43 @@ Every directory should have a clear purpose.
 
 Every change should move the framework toward greater clarity, reliability, and maintainability.
 
+
+
+---
+
+# Engineering Process Convention (docs/engineering)
+
+Sesuai prinsip "Once accepted, knowledge belongs in the repository":
+keputusan, laporan, dan catatan kerja engineering DISIMPAN di repo, bukan di catatan pribadi.
+
+## Struktur
+
+\\\
+docs/engineering/
+├── decisions/    ← keputusan engineering/arsitektur implementasi (AD-ENG-001..003, AD-S*)
+├── reports/      ← laporan sesi/release yang masih relevan
+├── journals/     ← catatan kerja per-sesi/area (aktif, ringkas)
+└── templates/    ← format baku laporan/ADR/keputusan
+\\\
+
+## Aturan (peran dokumen)
+
+- \decisions/\ = record keputusan. JANGAN edit; tambah AD baru bila berubah.
+- \eports/\ = hasil akhir yang masih dirujuk. Yang selesai permanen & tak lagi dirujuk
+  → pindah ke \docs/history/\.
+- \journals/\ = kerja aktif lintas sesi (ringkas: tujuan → kerja → hasil → blocker → handoff).
+  Yang selesai → report/history.
+- \	emplates/\ = format baku.
+
+## Batas status
+
+- \docs/engineering/*\ = dokumen HIDUP (Live/active).
+- \docs/history/*\ = ARSIP (non-aktif; bukan authority).
+- Catatan pribadi engineer (jika ada) TIDAK di-commit. Yang bernilai jangka panjang
+  → pindah ke sini (bersih dari jejak internal).
+
+## Navigasi
+
+Laporan sesi → \docs/engineering/reports/\ · Keputusan → \docs/engineering/decisions/\ ·
+Catatan kerja → \docs/engineering/journals/\ · Template → \docs/engineering/templates/\ ·
+Arsip lama → \docs/history/\.

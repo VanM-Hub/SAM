@@ -70,6 +70,8 @@
 - **Klik "bagaimana membangun runtime?"** → `docs/runtime/` (R4→R5→I-series)
 - **Klik "sudah sesuai?"** → `docs/compliance/`
 - **Klik "masa lalu?"** → `docs/history/` — baca saja, jangan dipakai utk keputusan baru
+- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (decisions/reports/journals/templates)
+- **Klik "sudah jadi arsip non-aktif?"** → `docs/history/`
 
 ---
 
@@ -160,8 +162,8 @@
 
 ```
  MAU TAMBAH RUNTIME CAPABILITY?
-   → AD-ENG-001/002/003 → sudah ada Registry+Bridge+DI? → ENGINEERING
-   → belum? → ARCHITECTURE BACKLOG
+   → AD-ENG-001/002/003 (docs/engineering/decisions/) → sudah ada Registry+Bridge+DI?
+   → → ENGINEERING; belum → ARCHITECTURE BACKLOG
 
  MAU BUAT PROVIDER?
    → ADR-006 → src/sam/providers/ → ConnectionRuntime → preview (ADR-024)
@@ -210,7 +212,7 @@
  perbaiki UI       → Article XVI → presentation → runtime_service
  paham citizen     → docs/CITIZEN_SPECIFICATION → SAM_ARCHITECTURE (Citizen)
  paham compliance  → docs/compliance P1-001 → src/sam/compliance
- paham engineering → docs/design → AD-ENG → reports (histori)
+ paham engineering → docs/engineering/ (decisions/reports/journals) → EC-025 → docs/history
 ```
 
 ---
@@ -220,7 +222,7 @@
 ```
  ROOT
    ├── Identity      (MISSION, VISION, CHARTER, PRINCIPLES, GOVERNANCE)
-   ├── Documentation (docs/ — authority + history)
+   ├── Documentation (docs/ — authority + engineering(docs/engineering) + history)
    ├── Source        (src/sam/ — implementasi: world/legacy/backlog/infra)
    ├── Tests         (tests/ — unit/integration/presentation/e2e)
    ├── Tools         (scripts/ — validasi; data/ — migrasi)
