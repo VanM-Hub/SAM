@@ -19,6 +19,7 @@ from ..runtime_service.api import (
     RuntimeAPI,
     PreviewRequestView,
     wire_execution_preview,
+    ConversationPreviewGateway,
 )
 from ..execution_runtime.execution_engine import ExecutionEngine
 from ..execution_runtime.execution_request import ExecutionRequest
@@ -86,6 +87,14 @@ preview_gateway = wire_execution_preview(
     build_request=_build_preview_request,
     execute=_execute_preview,
 )
+
+# --- Session 02: Conversation -> RuntimeService -> ExecutionRuntime (preview) ---
+# ConversationPreviewGateway memakai RuntimeAPI(execution.preview) yang sama
+# (reuse Session 01). Builder ConversationExecutionContext -> ExecutionRequest
+# mode=preview; payload HANYA namespace 'conversation' (AD-S02-001).
+# Provider TIDAK dieksekusi (ADR-024 preview-only).
+conversation_preview_gateway = ConversationPreviewGateway(runtime_api)
+conversation_preview_gateway.configure(provider_id="filesystem")
 
 
 @app.get("/")
