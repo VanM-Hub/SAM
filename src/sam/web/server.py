@@ -23,6 +23,10 @@ from ..runtime_service.api import (
 )
 from ..execution_runtime.execution_engine import ExecutionEngine
 from ..execution_runtime.execution_request import ExecutionRequest
+from ..execution_runtime.execution_runtime import ExecutionRuntime
+from ..execution_runtime.execution_pipeline import ExecutionPipeline
+from ..execution_runtime.provider_activation import ProviderActivationExecutor
+from ..providers.execution.provider_executor import ProviderExecutor as RealProviderExecutor
 from ..telemetry.service import TelemetryService
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
@@ -64,7 +68,17 @@ openclaw_health = OpenClawHealthCollector()
 # Producer menghasilkan ExecutionRequest(mode="preview") dan memanggil
 # ExecutionEngine.execute(). Provider TIDAK dieksekusi (preview, ADR-024).
 runtime_api = RuntimeAPI()
-_execution_engine = ExecutionEngine()
+# --- Session 03: Provider Resolution (AD-S03-001) ---
+# Hubungkan jalur resmi preview ke provider layer VIA mekanisme resmi
+# (ProviderActivationExecutor -> RealProviderExecutor). Provider dapat
+# di-resolve/di-select (identity & metadata tersedia), TETAPI execute()
+# TIDAK dipanggil: mode preview => external_calls=0, executed=false.
+# Tidak ada executor/provider/pipeline baru; hanya dependency injection.
+_provider_executor = ProviderActivationExecutor(real=RealProviderExecutor())
+_provider_pipeline = ExecutionPipeline(executor=_provider_executor)
+_execution_engine = ExecutionEngine(
+    runtime=ExecutionRuntime(pipeline=_provider_pipeline)
+)
 
 
 def _build_preview_request(view: PreviewRequestView):
