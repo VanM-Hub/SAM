@@ -28,6 +28,8 @@ from ..execution_runtime.execution_runtime import ExecutionRuntime
 from ..execution_runtime.execution_pipeline import ExecutionPipeline
 from ..execution_runtime.provider_activation import ProviderActivationExecutor
 from ..providers.execution.provider_executor import ProviderExecutor as RealProviderExecutor
+from ..runtime_service.api import KnowledgePreviewConsumer
+from ..knowledge_runtime.foundation.knowledge_registry import KnowledgeRegistry
 from ..telemetry.service import TelemetryService
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
@@ -114,6 +116,18 @@ preview_gateway = wire_execution_preview(
 # Provider TIDAK dieksekusi (ADR-024 preview-only).
 conversation_preview_gateway = ConversationPreviewGateway(runtime_api)
 conversation_preview_gateway.configure(provider_id="filesystem")
+
+# --- Session 05 (AD-S05): Knowledge consumer pertama via jalur resmi ---
+# A: Wire Knowledge consumer di entry, pakai KnowledgeRegistry + Conversation
+# KnowledgeBridge yang SUDAH ADA (tanpa ubah ExecutionRuntime/RuntimeService).
+# B: Conversation meminta knowledge dgn namespace 'knowledge' di payload
+# (AD-S02-001 forward compat). Memory diaktifkan bila registry didukung.
+_knowledge_registry = KnowledgeRegistry()
+knowledge_consumer = KnowledgePreviewConsumer(
+    knowledgeregistry=_knowledge_registry,
+)
+# consumer memakai runtime_api (jalur resmi) utk preview; knowledge di-resolve
+# via bridge di layer consumer (BUKAN pipeline internal).
 
 
 @app.get("/")

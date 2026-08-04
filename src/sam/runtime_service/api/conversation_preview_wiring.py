@@ -25,6 +25,7 @@ from .conversation_execution_builder import (
     ConversationExecutionContext,
     ConversationExecutionRequestBuilder,
 )
+from .knowledge_preview import KnowledgePreviewConsumer
 
 
 @dataclass(frozen=True)
@@ -102,6 +103,31 @@ class ConversationPreviewGateway:
             mode=str(data.get("mode", "preview")),
             status=str(data.get("status", "preview")),
         )
+
+    def preview_with_knowledge(
+        self,
+        context: "ConversationExecutionContext",
+        knowledge_consumer: KnowledgePreviewConsumer,
+        knowledge_id: str,
+        execution_id: str,
+        memory_id: str = "",
+    ) -> dict:
+        """Conversation preview + Knowledge resolution via activation path.
+
+        AD-S05 kombinasi A+B: Conversation->RuntimeService->ExecutionRuntime
+        (preview) via `preview()`, lalu Knowledge di-resolve lewat bridge yang
+        sudah ada (layer consumer, BUKAN pipeline). Memory di-resolve bila id
+        diberikan & didukung. Tidak ada retriever/embedding/index baru.
+        """
+        result = self.preview(context, execution_id=execution_id)
+        knowledge = knowledge_consumer.resolve_knowledge(knowledge_id)
+        memory = knowledge_consumer.resolve_memory(memory_id) if memory_id else None
+        return {
+            "execution": result.as_dict(),
+            "knowledge": knowledge.as_dict(),
+            "memory": memory.as_dict() if memory is not None else None,
+        }
+
 
 
 def wire_conversation_preview(api: RuntimeAPI,
