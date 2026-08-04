@@ -32,6 +32,8 @@ from ..runtime_service.api import KnowledgePreviewConsumer
 from ..knowledge_runtime.foundation.knowledge_registry import KnowledgeRegistry
 from ..workflow_runtime.foundation.workflow_registry import WorkflowRegistry
 from ..runtime_service.api import WorkflowPreviewConsumer
+from ..artifact_runtime.foundation.artifact_registry import ArtifactRegistry
+from ..runtime_service.api import ArtifactPreviewConsumer
 from ..telemetry.service import TelemetryService
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
@@ -136,6 +138,12 @@ knowledge_consumer = KnowledgePreviewConsumer(
 # ConversationIntegrationBridge yg SUDAH ADA (tanpa ubah ExecutionRuntime/Service).
 _workflow_registry = WorkflowRegistry()
 workflow_consumer = WorkflowPreviewConsumer(registry=_workflow_registry)
+
+# --- Session 07 (AD-S07): Artifact consumer pertama via Activation Pattern Std ---
+# Conversation -> RuntimeService -> ExecutionRuntime(preview) -> ArtifactPreviewConsumer
+# -> ArtifactRegistry -> ConversationArtifactBridge -> STOP (AD-ENG-002).
+_artifact_registry = ArtifactRegistry()
+artifact_consumer = ArtifactPreviewConsumer(registry=_artifact_registry)
 
 
 @app.get("/")

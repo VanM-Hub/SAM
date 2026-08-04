@@ -38,6 +38,10 @@ from .workflow_preview import (
     WorkflowPreviewConsumer,
     WorkflowPreview,
 )
+from .artifact_preview import (
+    ArtifactPreviewConsumer,
+    ArtifactPreview,
+)
 
 API_VERSION = "27.0.0"
 
@@ -64,4 +68,6 @@ __all__ = [
     "MemoryPreview",
     "WorkflowPreviewConsumer",
     "WorkflowPreview",
+    "ArtifactPreviewConsumer",
+    "ArtifactPreview",
 ]
