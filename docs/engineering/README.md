@@ -23,7 +23,11 @@ docs/engineering/
 - `AD-ENG-001_Activation_Readiness_Rule.md`
 - `AD-ENG-002_Activation_Pattern_Standard.md`
 - `AD-ENG-003_Engineering_Session_Eligibility.md`
-- (AD-S02..S09 keputusan sesi — lihat `docs/engineering/decisions/`)
+- `AD-S02-001_Payload_Execution_Context.md`
+- `AD-S03-001_Provider_Preview_Integration.md`
+- `AD-S04_Presentation_RuntimeService_DI.md`
+- `AD-S05_Knowledge_Memory_Activation.md`
+- (keputusan sesi lain: lihat isi folder)
 
 ## Navigasi
 - Ingin laporan sesi → `docs/engineering/reports/`
