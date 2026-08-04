@@ -15,6 +15,13 @@ import uvicorn
 
 from ..runtime.coordinator import RuntimeCoordinator
 from ..runtime_service import WebRuntimeService
+from ..runtime_service.api import (
+    RuntimeAPI,
+    PreviewRequestView,
+    wire_execution_preview,
+)
+from ..execution_runtime.execution_engine import ExecutionEngine
+from ..execution_runtime.execution_request import ExecutionRequest
 from ..telemetry.service import TelemetryService
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
@@ -49,6 +56,36 @@ incident_detector = IncidentDetector(coordinator.workspace_path)
 action_executor = ActionExecutor(coordinator)
 openclaw_discovery = OpenClawDiscovery()
 openclaw_health = OpenClawHealthCollector()
+
+# --- Session 01: RuntimeAPI -> ExecutionRuntime (producer preview pertama) ---
+# Routing/composition dilakukan di entry (web), bukan di dalam RuntimeService,
+# agar RuntimeService tetap gateway (tidak mengetahui provider/execution).
+# Producer menghasilkan ExecutionRequest(mode="preview") dan memanggil
+# ExecutionEngine.execute(). Provider TIDAK dieksekusi (preview, ADR-024).
+runtime_api = RuntimeAPI()
+_execution_engine = ExecutionEngine()
+
+
+def _build_preview_request(view: PreviewRequestView):
+    """Bangun ExecutionRequest(mode='preview'). Provider tidak dieksekusi."""
+    return ExecutionRequest(
+        execution_id=view.execution_id,
+        provider_id=view.provider_id,
+        operation=view.operation,
+        mode="preview",  # preview-only (ADR-024); bukan execute
+    )
+
+
+def _execute_preview(request: ExecutionRequest):
+    """Eksekusi preview via ExecutionRuntime (tidak execute nyata)."""
+    return _execution_engine.execute(request)
+
+
+preview_gateway = wire_execution_preview(
+    runtime_api,
+    build_request=_build_preview_request,
+    execute=_execute_preview,
+)
 
 
 @app.get("/")
