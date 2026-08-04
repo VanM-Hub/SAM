@@ -29,6 +29,11 @@ from .conversation_preview_wiring import (
     wire_conversation_preview,
     build_conversation_preview_gateway,
 )
+from .knowledge_preview import (
+    KnowledgePreviewConsumer,
+    KnowledgePreview,
+    MemoryPreview,
+)
 
 API_VERSION = "27.0.0"
 
@@ -50,4 +55,7 @@ __all__ = [
     "ConversationPreviewResult",
     "wire_conversation_preview",
     "build_conversation_preview_gateway",
+    "KnowledgePreviewConsumer",
+    "KnowledgePreview",
+    "MemoryPreview",
 ]
