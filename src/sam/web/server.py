@@ -34,6 +34,8 @@ from ..workflow_runtime.foundation.workflow_registry import WorkflowRegistry
 from ..runtime_service.api import WorkflowPreviewConsumer
 from ..artifact_runtime.foundation.artifact_registry import ArtifactRegistry
 from ..runtime_service.api import ArtifactPreviewConsumer
+from ..memory.foundation.memory_registry import MemoryRegistry
+from ..runtime_service.api import MemoryPreviewConsumer
 from ..telemetry.service import TelemetryService
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
@@ -144,6 +146,13 @@ workflow_consumer = WorkflowPreviewConsumer(registry=_workflow_registry)
 # -> ArtifactRegistry -> ConversationArtifactBridge -> STOP (AD-ENG-002).
 _artifact_registry = ArtifactRegistry()
 artifact_consumer = ArtifactPreviewConsumer(registry=_artifact_registry)
+
+# --- Session 08 (AD-S08): Memory consumer mandiri via Activation Pattern Std ---
+# Conversation -> RuntimeService -> ExecutionRuntime(preview) -> MemoryPreviewConsumer
+# -> MemoryRegistry -> ConversationMemoryBridge -> STOP (AD-ENG-002).
+# MEMORY JADI CAPABILITY MANDIRI (bukan lagi namespace payload / hook pasif S05).
+_memory_registry = MemoryRegistry()
+memory_consumer = MemoryPreviewConsumer(registry=_memory_registry)
 
 
 @app.get("/")

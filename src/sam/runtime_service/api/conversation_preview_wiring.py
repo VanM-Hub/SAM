@@ -28,6 +28,7 @@ from .conversation_execution_builder import (
 from .knowledge_preview import KnowledgePreviewConsumer
 from .workflow_preview import WorkflowPreviewConsumer
 from .artifact_preview import ArtifactPreviewConsumer
+from .memory_preview import MemoryPreviewConsumer
 
 
 @dataclass(frozen=True)
@@ -177,6 +178,28 @@ class ConversationPreviewGateway:
         return {
             "execution": result.as_dict(),
             "artifact": artifact.as_dict(),
+        }
+
+    def preview_with_memory(
+        self,
+        context: "ConversationExecutionContext",
+        memory_consumer: "MemoryPreviewConsumer",
+        memory_id: str,
+        execution_id: str,
+    ) -> dict:
+        """Conversation preview + Memory via activation path (AD-S08).
+
+        Conversation->RuntimeService->ExecutionRuntime (preview) via preview(),
+        lalu Memory di-resolve lewat bridge yg sudah ada (MemoryRegistry ->
+        ConversationMemoryBridge -> ConversationIntegrationBridge).
+        Memory = capability MANDIRI (bukan lagi cuma namespace payload), AD-ENG-002.
+        Tanpa storage/engine/retrieval/embedding/architecture baru.
+        """
+        result = self.preview(context, execution_id=execution_id)
+        memory = memory_consumer.resolve_memory(memory_id)
+        return {
+            "execution": result.as_dict(),
+            "memory": memory.as_dict(),
         }
 
 
