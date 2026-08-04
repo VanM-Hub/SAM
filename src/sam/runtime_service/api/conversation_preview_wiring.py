@@ -27,6 +27,7 @@ from .conversation_execution_builder import (
 )
 from .knowledge_preview import KnowledgePreviewConsumer
 from .workflow_preview import WorkflowPreviewConsumer
+from .artifact_preview import ArtifactPreviewConsumer
 
 
 @dataclass(frozen=True)
@@ -154,6 +155,28 @@ class ConversationPreviewGateway:
             "execution": result.as_dict(),
             "workflow": workflow.as_dict(),
             "knowledge": knowledge.as_dict() if knowledge is not None else None,
+        }
+
+    def preview_with_artifact(
+        self,
+        context: "ConversationExecutionContext",
+        artifact_consumer: "ArtifactPreviewConsumer",
+        artifact_name: str,
+        execution_id: str,
+    ) -> dict:
+        """Conversation preview + Artifact via activation path (AD-S07).
+
+        Conversation->RuntimeService->ExecutionRuntime (preview) via preview(),
+        lalu Artifact di-resolve lewat bridge yg sudah ada (ArtifactRegistry ->
+        ConversationArtifactBridge -> ConversationIntegrationBridge).
+        Pattern Standard AD-ENG-002. Tanpa generate/engine/architecture baru;
+        tanpa integrasi Mission/Contract/Dashboard/Intelligence.
+        """
+        result = self.preview(context, execution_id=execution_id)
+        artifact = artifact_consumer.resolve_artifact(artifact_name)
+        return {
+            "execution": result.as_dict(),
+            "artifact": artifact.as_dict(),
         }
 
 
