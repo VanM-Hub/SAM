@@ -10,6 +10,7 @@ docs/engineering/
 ├── decisions/    ← Keputusan engineering/arsitektur implementasi (AD-ENG-001..003, AD-S*)
 ├── reports/      ← Laporan sesi/release yang masih relevan (Engineering Session Report)
 ├── journals/     ← Catatan kerja per-sesi/area (aktif; ringkas)
+├── references/   ← Referensi engineering yang tidak lapuk (EC-001..025, format laporan)
 └── templates/    ← Template laporan/ADR/keputusan (format baku)
 ```
 
@@ -17,6 +18,7 @@ docs/engineering/
 - **`decisions/`** = keputusan yang menjadi dasar implementasi (record; jangan edit, tambah AD baru).
 - **`reports/`** = hasil akhir yang masih dirujuk. Yang **selesai permanen & tak lagi dirujuk** → pindah ke `docs/history/`.
 - **`journals/`** = kerja aktif lintas sesi; ringkas (tujuan → kerja → hasil → blocker → handoff). Yang selesai → report/history.
+- **`references/`** = pengetahuan engineering bernilai tetap (aturan, pola, kosakata, direktori status capability) — bukan keputusan, bukan journal.
 - **`templates/`** = format baku utk laporan/ADR/keputusan baru.
 
 ## Dokumen Keputusan (decisions/)
@@ -29,9 +31,15 @@ docs/engineering/
 - `AD-S05_Knowledge_Memory_Activation.md`
 - (keputusan sesi lain: lihat isi folder)
 
+## Referensi (references/)
+- `README.md` (indeks)
+- `EC-001..EC-025` — konteks engineering (peta/aturan/pola/kosakata/readiness) dari fase engineering
+- `Format_Laporan_Engineer.md` — format baku laporan sesi
+
 ## Navigasi
 - Ingin laporan sesi → `docs/engineering/reports/`
 - Ingin keputusan → `docs/engineering/decisions/`
 - Ingin catatan kerja → `docs/engineering/journals/`
+- Ingin referensi/konteks → `docs/engineering/references/`
 - Ingin template → `docs/engineering/templates/`
 - Ingin arsip lama → `docs/history/`
