@@ -1,0 +1,126 @@
+"""Conversation Preview Wiring (Session 02 - Conversation Capability).
+
+Menghubungkan Conversation -> RuntimeAPI(execution.preview) -> ExecutionRuntime
+(preview), REUSE PreviewGateway/ExecutionRuntime yang dibangun Session 01.
+
+AD-S02-001: hanya namespace 'conversation' diisi di payload; tidak menambah
+file DTO; tidak mengubah ExecutionRuntime/RuntimeService.
+Pendekatan: wiring/komposisi di jalur entry (bukan di dalam RuntimeService),
+dengan dependency injection — memakai builder ConversationExecutionRequestBuilder.
+
+Alur:
+  Conversation -> ConversationExecutionRequestBuilder.build(context)
+  -> ExecutionRequest(mode='preview', payload={'conversation': {...}})
+  -> RuntimeAPI(action='execution.preview') -> PreviewGateway -> ExecutionRuntime.
+"""
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Callable
+
+from .request import APIRequest
+from .runtime_api import RuntimeAPI
+from .preview_gateway import PreviewGateway, PreviewRequestView
+from .execution_preview_wiring import wire_execution_preview
+from .conversation_execution_builder import (
+    ConversationExecutionContext,
+    ConversationExecutionRequestBuilder,
+)
+
+
+@dataclass(frozen=True)
+class ConversationPreviewResult:
+    """Hasil preview dari Conversation perspective (immutable)."""
+    executed: bool = False
+    approved: bool = False
+    external_calls: int = 0
+    mode: str = "preview"
+    status: str = "preview"
+
+    def as_dict(self) -> dict:
+        return {
+            "executed": self.executed,
+            "approved": self.approved,
+            "external_calls": self.external_calls,
+            "mode": self.mode,
+            "status": self.status,
+        }
+
+
+class ConversationPreviewGateway:
+    """Gateway Conversation -> RuntimeService -> ExecutionRuntime preview.
+
+    Penerima context conversation (immutable) dan mengirim Action preview via
+    APIRequest(action='execution.preview'). Menggunakan builder utk membentuk
+    ExecutionRequest(mode='preview') dengan payload namespace 'conversation'.
+    """
+
+    def __init__(self, api: RuntimeAPI) -> None:
+        self._api = api
+        self._builder = ConversationExecutionRequestBuilder()
+        # provider default di-pass dari wiring (bukan logic di sini).
+        # Gunakan provider yang dikenali KNOWN_PROVIDERS (preview tidak eksekusi).
+        self._provider_id: str = "filesystem"
+        self._operation: str = "conversation.preview"
+
+    @property
+    def api(self) -> RuntimeAPI:
+        return self._api
+
+    def configure(self, provider_id: str = "filesystem",
+                  operation: str = "conversation.preview") -> None:
+        self._provider_id = provider_id
+        self._operation = operation
+
+    def preview(self, context: ConversationExecutionContext,
+                execution_id: str) -> ConversationPreviewResult:
+        """Jalankan preview via RuntimeAPI(action='execution.preview')."""
+        # BANGUN request sesuai desain (builder), lalu kirim lewat jalur resmi
+        request = self._builder.build(
+            context=context,
+            provider_id=self._provider_id,
+            operation=self._operation,
+            execution_id=execution_id,
+        )
+        api_req = APIRequest(
+            action="execution.preview",
+            request_id=execution_id,
+            payload={
+                "execution_id": request.execution_id,
+                "provider_id": request.provider_id,
+                "operation": request.operation,
+                "payload": request.payload,
+            },
+        )
+        resp = self._api.handle(api_req)
+        if not resp.is_ok():
+            return ConversationPreviewResult(status="error")
+        data = resp.data
+        return ConversationPreviewResult(
+            executed=bool(data.get("executed", False)),
+            approved=bool(data.get("approved", False)),
+            external_calls=int(data.get("external_calls", 0)),
+            mode=str(data.get("mode", "preview")),
+            status=str(data.get("status", "preview")),
+        )
+
+
+def wire_conversation_preview(api: RuntimeAPI,
+                              build_request: Callable[[PreviewRequestView], object],
+                              execute: Callable[[object], object]) -> PreviewGateway:
+    """Wiring Conversation -> RuntimeAPI -> ExecutionRuntime preview.
+
+    Menerima build_request/execute (dependency injection) yang sudah mengikat
+    ke ExecutionEngine. Menghasilkan PreviewGateway + ConversationPreviewGateway
+    (melalui 2 objek yang berbagi RuntimeAPI yang sama).
+    """
+    gateway = wire_execution_preview(
+        api,
+        build_request=build_request,
+        execute=execute,
+    )
+    return gateway
+
+
+def build_conversation_preview_gateway(api: RuntimeAPI) -> ConversationPreviewGateway:
+    """Buat ConversationPreviewGateway di atas RuntimeAPI (tanpa execution wiring)."""
+    return ConversationPreviewGateway(api)

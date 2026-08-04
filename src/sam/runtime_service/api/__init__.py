@@ -19,6 +19,16 @@ from .execution_preview_wiring import (
     ExecutionPreviewProducer,
     wire_execution_preview,
 )
+from .conversation_execution_builder import (
+    ConversationExecutionContext,
+    ConversationExecutionRequestBuilder,
+)
+from .conversation_preview_wiring import (
+    ConversationPreviewGateway,
+    ConversationPreviewResult,
+    wire_conversation_preview,
+    build_conversation_preview_gateway,
+)
 
 API_VERSION = "27.0.0"
 
@@ -34,4 +44,10 @@ __all__ = [
     "PreviewOutcomeView",
     "ExecutionPreviewProducer",
     "wire_execution_preview",
+    "ConversationExecutionContext",
+    "ConversationExecutionRequestBuilder",
+    "ConversationPreviewGateway",
+    "ConversationPreviewResult",
+    "wire_conversation_preview",
+    "build_conversation_preview_gateway",
 ]
