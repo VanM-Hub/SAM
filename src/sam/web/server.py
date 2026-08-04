@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from ..runtime.coordinator import RuntimeCoordinator
+from ..runtime_service import WebRuntimeService
 from ..telemetry.service import TelemetryService
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
@@ -37,6 +38,11 @@ app.mount("/static", StaticFiles(directory=str(WEB_DIR / "static")), name="stati
 templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
 
 # Services (singleton)
+# WebRuntimeService = consumer produksi pertama RuntimeService (Session 01).
+# Gateway kontrak & lifecycle untuk Web Runtime/Lifecycle/Status endpoint.
+# BUKAN executor/coordinator; data runtime nyata tetap dari coordinator.
+runtime_service = WebRuntimeService()
+runtime_service.initialize()  # lifecycle -> ready
 coordinator = RuntimeCoordinator()
 telemetry = TelemetryService()
 incident_detector = IncidentDetector(coordinator.workspace_path)
@@ -51,6 +57,8 @@ async def index(request: Request):
     state = coordinator.state.value
     healthy = state in ("ready", "running", "healthy")
     health_str = "HEALTHY" if healthy else "DEGRADED"
+    # WebRuntimeService: status lifecycle service (consumer RuntimeService).
+    service_status = runtime_service.status_dict()
     metrics = telemetry.get_metrics()
 
     loop = asyncio.get_event_loop()
@@ -63,6 +71,7 @@ async def index(request: Request):
         "state": state.upper(),
         "health": health_str,
         "healthy": healthy,
+        "runtime_service": service_status,
         "metrics": metrics,
         "incidents": incidents[:6],
         "incident_count": len(incidents),
@@ -80,11 +89,14 @@ async def runtime_page(request: Request):
     state = coordinator.state.value
     metrics = telemetry.get_metrics()
     adapter_name = coordinator.adapter_name
+    # WebRuntimeService: lifecycle & contract untuk Runtime endpoint.
+    service_status = runtime_service.status_dict()
 
     return templates.TemplateResponse("runtime.html", {
         "request": request,
         "state": state.upper(),
         "hosting": adapter_name,
+        "runtime_service": service_status,
         "metrics": metrics,
         "workspace": coordinator.workspace_path,
         "autonomous": coordinator.autonomous_enabled,
