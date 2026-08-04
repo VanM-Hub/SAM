@@ -15,7 +15,7 @@ from __future__ import annotations
 import asyncio
 import json
 import structlog
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 import typer
 
@@ -24,7 +24,6 @@ from sam.autonomy.models import AutonomyLevel
 from sam.autonomy.guardrails import Guardrails
 from sam.autonomy.escalation import EscalationManager
 from sam.autonomy.degradation import GracefulDegradation
-from sam.autonomy.assessment import SelfAssessment
 
 logger = structlog.get_logger()
 

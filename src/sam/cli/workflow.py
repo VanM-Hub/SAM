@@ -3,7 +3,6 @@ sam workflow — Workflow Engine status dan daftar workflow.
 """
 
 import typer
-from sam.runtime.coordinator import RuntimeCoordinator
 
 app = typer.Typer()
 

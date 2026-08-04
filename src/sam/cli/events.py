@@ -3,10 +3,6 @@ sam events — Event stream (live dan history).
 """
 
 import typer
-import time
-import asyncio
-from typing import Optional
-from sam.runtime.coordinator import RuntimeCoordinator
 
 app = typer.Typer()
 

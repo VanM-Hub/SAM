@@ -7,10 +7,9 @@ Captures snapshots of subsystem availability and health.
 """
 
 import os
-import sys
 import time
 import sqlite3
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 
 class DiagnosticsSummary:

@@ -21,7 +21,6 @@ from sam.launcher.runtime_bootstrap import RuntimeBootstrapOrchestrator
 from sam.launcher.runtime_registry import RuntimeRegistry, RuntimeType, RuntimeDescriptor
 from sam.launcher.host_launcher import HostLauncher, HostLaunchResult
 from sam.launcher.host_manager import HostType
-from sam.launcher.safe_mode import SafeModeManager
 from sam.launcher.startup_report import StartupReport, StageResult, StartupIssue, IssueSeverity
 
 

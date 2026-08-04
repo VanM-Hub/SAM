@@ -22,7 +22,6 @@ from typing import Optional
 from sam.launcher.startup_pipeline import StartupPipeline, PipelineResult
 from sam.launcher.recovery_startup import RecoveryStartup
 from sam.launcher.host_manager import HostType
-from sam.launcher.safe_mode import SafeMode
 
 
 def _ensure_path() -> None:

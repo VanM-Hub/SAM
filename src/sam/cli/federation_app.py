@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 import structlog
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 import typer
 
