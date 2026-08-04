@@ -34,6 +34,10 @@ from .knowledge_preview import (
     KnowledgePreview,
     MemoryPreview,
 )
+from .workflow_preview import (
+    WorkflowPreviewConsumer,
+    WorkflowPreview,
+)
 
 API_VERSION = "27.0.0"
 
@@ -58,4 +62,6 @@ __all__ = [
     "KnowledgePreviewConsumer",
     "KnowledgePreview",
     "MemoryPreview",
+    "WorkflowPreviewConsumer",
+    "WorkflowPreview",
 ]

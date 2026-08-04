@@ -30,6 +30,8 @@ from ..execution_runtime.provider_activation import ProviderActivationExecutor
 from ..providers.execution.provider_executor import ProviderExecutor as RealProviderExecutor
 from ..runtime_service.api import KnowledgePreviewConsumer
 from ..knowledge_runtime.foundation.knowledge_registry import KnowledgeRegistry
+from ..workflow_runtime.foundation.workflow_registry import WorkflowRegistry
+from ..runtime_service.api import WorkflowPreviewConsumer
 from ..telemetry.service import TelemetryService
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
@@ -128,6 +130,12 @@ knowledge_consumer = KnowledgePreviewConsumer(
 )
 # consumer memakai runtime_api (jalur resmi) utk preview; knowledge di-resolve
 # via bridge di layer consumer (BUKAN pipeline internal).
+
+# --- Session 06 (AD-S06): Workflow consumer pertama via jalur resmi ---
+# Wire Workflow di entry, pakai WorkflowRegistry + ConversationWorkflowBridge /
+# ConversationIntegrationBridge yg SUDAH ADA (tanpa ubah ExecutionRuntime/Service).
+_workflow_registry = WorkflowRegistry()
+workflow_consumer = WorkflowPreviewConsumer(registry=_workflow_registry)
 
 
 @app.get("/")
