@@ -39,10 +39,12 @@ def health(ctx: typer.Context):
     except Exception as e:
         typer.echo(f"  DOS:         ❌ Not loaded ({e})")
 
-    # 3. Runtime check
-    from sam.runtime.coordinator import RuntimeCoordinator
-    coord = RuntimeCoordinator()
-    typer.echo(f"  Runtime:     ✅ state={coord.state.value}")
+    # 3. Runtime check (S10: pindah dari direct-wiring RuntimeCoordinator ke jalur resmi)
+    from sam.runtime_service import WebRuntimeService
+    service = WebRuntimeService()
+    service.initialize()
+    runtime_state = service.status_dict()["status"]
+    typer.echo(f"  Runtime:     ✅ state={runtime_state}")
 
     # 4. Summary
     typer.echo("")

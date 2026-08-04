@@ -9,7 +9,7 @@ No side effects to Domain/Repository/Guardian.
 
 import enum
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 class BootstrapStep(enum.Enum):

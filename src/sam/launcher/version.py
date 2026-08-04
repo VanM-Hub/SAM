@@ -10,7 +10,7 @@ import os
 import sys
 import platform
 import subprocess
-from typing import Any, Dict, List, Optional
+from typing import Dict, List
 
 
 class SamVersion:

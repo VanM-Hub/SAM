@@ -12,13 +12,12 @@ from __future__ import annotations
 import asyncio
 import json
 import structlog
-from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import typer
 
 from sam.evolution.policy import EvolutionPolicy, EvolutionProposal, ProposalStatus, ProposalType
-from sam.evolution.params import ParamManager, OptimizableParam
+from sam.evolution.params import OptimizableParam
 from sam.evolution.optimizer import SelfOptimizer
 
 
@@ -70,7 +69,6 @@ class _InMemoryParamManager:
     async def set(self, name: str, value: Any) -> None:
         # Optimizer calls set with suggested_value directly
         # We need to update the current_value of the existing param
-        from sam.evolution.params import OptimizableParam
         param = self._params.get(name)
         if param is not None:
             param.current_value = value

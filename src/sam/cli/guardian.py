@@ -5,7 +5,6 @@ sam guardian — Guardian Kernel status dan decision history.
 import typer
 import asyncio
 from sam.guardian.pipeline import GuardianPipeline
-from sam.guardian.decision import GuardianDecision
 from sam.runtime.coordinator import RuntimeCoordinator
 from sam.contracts import DesiredOperationalState
 

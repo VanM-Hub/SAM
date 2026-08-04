@@ -10,11 +10,11 @@ Semua downgrade dicatat. Tidak boleh crash — selalu akhiri dengan status.
 
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 from enum import Enum
 
 from sam.launcher.host_manager import HostType
-from sam.launcher.host_launcher import HostLauncher, HostLaunchResult
+from sam.launcher.host_launcher import HostLauncher
 from sam.launcher.safe_mode import SafeModeManager, SafeMode
 from sam.launcher.startup_report import StartupIssue, IssueSeverity
 

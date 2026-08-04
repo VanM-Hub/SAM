@@ -3,7 +3,6 @@ sam plugins — Daftar dan status plugin runtime.
 """
 
 import typer
-from sam.runtime.coordinator import RuntimeCoordinator
 
 app = typer.Typer()
 

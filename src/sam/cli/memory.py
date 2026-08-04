@@ -3,7 +3,6 @@ sam memory — Memory Store status dan operasi.
 """
 
 import typer
-from sam.runtime.coordinator import RuntimeCoordinator
 
 app = typer.Typer()
 

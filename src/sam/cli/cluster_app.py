@@ -14,25 +14,21 @@ from __future__ import annotations
 import asyncio
 import json
 import structlog
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 import typer
 
 from sam.cluster.knowledge_share import (
     ClusterKnowledgeShare,
-    SharedKnowledge,
 )
-from sam.cluster.insight_broker import InsightBroker, Insight
+from sam.cluster.insight_broker import InsightBroker
 from sam.cluster.strategy_sync import (
     ClusterStrategySync,
-    StrategyProposal,
     VOTE_APPROVE,
     VOTE_REJECT,
 )
 from sam.cluster.cognitive_state import (
     ClusterCognitiveStateManager,
-    ClusterCognitiveState,
 )
 from sam.cluster.learning_aggregator import LearningAggregator
 

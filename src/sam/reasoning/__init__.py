@@ -1,4 +1,8 @@
 """
+[DEPRECATED - S10] World lama. Reasoning ini terikat `sam.execution` (legacy).
+Dipertahankan utk kompatibilitas; utk capability baru gunakan Activation Pattern
+Standard (AD-ENG-002) tanpa menambah ketergantungan ke execution/ world lama.
+
 SAM Reasoning Runtime – Sprint 22
 
 Intent → Plan → Execution Graph → Governance → Execute

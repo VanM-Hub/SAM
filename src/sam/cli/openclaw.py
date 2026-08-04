@@ -7,7 +7,6 @@ import asyncio
 import time
 from ..openclaw.discovery import OpenClawDiscovery
 from ..openclaw.health import OpenClawHealthCollector
-from ..openclaw.logs import OpenClawLogAnalyzer
 
 app = typer.Typer()
 

@@ -8,7 +8,7 @@ All configuration objects are immutable.
 
 import os
 import json
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 
 class LauncherConfig:
