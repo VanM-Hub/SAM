@@ -26,6 +26,7 @@ from .conversation_execution_builder import (
     ConversationExecutionRequestBuilder,
 )
 from .knowledge_preview import KnowledgePreviewConsumer
+from .workflow_preview import WorkflowPreviewConsumer
 
 
 @dataclass(frozen=True)
@@ -126,6 +127,33 @@ class ConversationPreviewGateway:
             "execution": result.as_dict(),
             "knowledge": knowledge.as_dict(),
             "memory": memory.as_dict() if memory is not None else None,
+        }
+
+    def preview_with_workflow(
+        self,
+        context: "ConversationExecutionContext",
+        workflow_consumer: "WorkflowPreviewConsumer",
+        workflow_id: str,
+        execution_id: str,
+        knowledge_consumer: "KnowledgePreviewConsumer",
+        knowledge_id: str = "",
+    ) -> dict:
+        """Conversation preview + Workflow via activation path (AD-S06).
+
+        Conversation->RuntimeService->ExecutionRuntime (preview) via preview(),
+        lalu Workflow di-resolve lewat bridge yg sudah ada. Knowledge diteruskan
+        ke Workflow sebagai input bila knowledge_id diberikan (knowledge ada di
+        INTEGRATION_ROUTE workflow). Tanpa scheduler/planner/orchestration baru.
+        """
+        result = self.preview(context, execution_id=execution_id)
+        workflow = workflow_consumer.resolve_workflow(workflow_id)
+        knowledge = None
+        if knowledge_id and knowledge_consumer is not None:
+            knowledge = knowledge_consumer.resolve_knowledge(knowledge_id)
+        return {
+            "execution": result.as_dict(),
+            "workflow": workflow.as_dict(),
+            "knowledge": knowledge.as_dict() if knowledge is not None else None,
         }
 
 
