@@ -41,6 +41,7 @@ from ..runtime_service.api import PolicyPreviewConsumer
 from ..audit_runtime.foundation.audit_registry import AuditRegistry
 from ..runtime_service.api import AuditPreviewConsumer
 from ..telemetry.service import TelemetryService
+from ..telemetry.collector import MetricsCollector
 from ..intelligence.detector import IncidentDetector
 from ..autonomous.executor import ActionExecutor
 from ..autonomous.models import AutonomousActionStatus
@@ -72,6 +73,26 @@ runtime_service.initialize()  # lifecycle -> ready
 # Desktop = Presentation pertama. Presentation HANYA membaca kontrak RuntimeService
 # (lifecycle/status/descriptor/metadata/contract), tidak tahu coordinator/execution.
 presentation_layer = PresentationLayer(runtime_service=runtime_service)
+# --- Session 10 fix: web metrics (bug pre-existing) ---
+# Template index/runtime memakai metrics.cpu_percent/memory_mb/uptime_seconds/
+# workflow_count/plugin_count/health_score. TelemetryService TIDAK punya get_metrics;
+# MetricsCollector.metrics menyediakan cpu/uptime; field lain diberi nilai aman.
+_metrics_collector = MetricsCollector()
+
+
+def _web_metrics() -> dict:
+    """Bangun dict metrics yg kompatibel dgn template web (bugfix pre-existing)."""
+    m = _metrics_collector.metrics
+    return {
+        "cpu_percent": round(m.cpu_percent, 1),
+        "memory_mb": round(m.memory_percent, 0),
+        "uptime_seconds": round(m.uptime_seconds, 0),
+        "workflow_count": 0,
+        "plugin_count": 0,
+        "health_score": 100.0 if m.last_error is None else 0.0,
+    }
+
+
 coordinator = RuntimeCoordinator()
 telemetry = TelemetryService()
 incident_detector = IncidentDetector(coordinator.workspace_path)
@@ -178,7 +199,8 @@ async def index(request: Request):
     service_status = runtime_service.status_dict()
     # Session 04: Presentation Layer memakai jalur resmi (Runtime Status via DI).
     presentation_status = presentation_layer.runtime_status()
-    metrics = telemetry.get_metrics()
+    # Fix (S10): web metrics kompatibel template (bugfix pre-existing).
+    metrics = _web_metrics()
 
     loop = asyncio.get_event_loop()
     incidents = await incident_detector.detect()
@@ -207,7 +229,8 @@ async def index(request: Request):
 async def runtime_page(request: Request):
     """Runtime detail."""
     state = coordinator.state.value
-    metrics = telemetry.get_metrics()
+    # Fix (S10): TelemetryService tidak punya get_metrics; gunakan get_stats.
+    metrics = _web_metrics()
     adapter_name = coordinator.adapter_name
     # WebRuntimeService: lifecycle & contract untuk Runtime endpoint.
     service_status = runtime_service.status_dict()
