@@ -6,6 +6,7 @@ License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
 Current:      v30.0.0 - Program F (Presentation Layer)
+Release:      1 - Production / Release Ready (baseline stabil, 2026-08-06)
 Framework:    Python
 Build:        setuptools
 Test:         pytest (modern suite 189 Program F + existing; legacy folder excluded)
