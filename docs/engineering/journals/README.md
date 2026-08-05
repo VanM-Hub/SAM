@@ -5,13 +5,17 @@ Peran: mencatat konteks lintas sesi ("kenapa X", apa yang dicoba/gagal, blocker,
 yang tidak tertangkap laporan/resume.
 
 ## Format (ringkas per sesi/area)
+Contoh yang dipakai saat ini:
 ```
-Tujuan: ...
-Kerja:  ...
-Hasil:  ...
-Blocker: ...
-Handoff: ...
+# Journal — YYYY-MM-DD
+## yang dikerjakan (terkait project)
+...
+## blocker
+...
+## handoff
+...
 ```
+(Format fleksibel; yang penting ringkas & struktural: kerja → blocker → handoff.)
 
 ## Aturan
 - Ringkas & struktural; bukan diary panjang.
@@ -20,7 +24,8 @@ Handoff: ...
 
 ## Isi (saat ini)
 - `README.md` (ini)
-- (journal per-sesi/area ditambahkan saat kerja berlangsung)
+- `2026-08-06_ringkasan-sesi.md` — ringkasan kerja sesi (posisi engineering, status gap, tata letak)
+- (journal per-sesi/area lain ditambahkan saat kerja berlangsung)
 
 ## Navigasi
 Catatan kerja → di sini · Hasil akhir → `docs/engineering/reports/` · Arsip → `docs/history/`
