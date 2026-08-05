@@ -1,76 +1,42 @@
-# ROADMAP ENGINEERING — Rencana Kerja Engineering (Sprint 1–7)
+# ROADMAP ENGINEERING
 
-**Status:** Engineering Plan (disetujui)
-**Disetujui oleh:** Software Architect · Guardian Mission (2026-08-06)
-**Jenis dokumen:** Engineering Plan — **BUKAN** Source of Truth arsitektur.
-**Batas:** Dokumen ini tidak mengubah / tidak menambah ADR, tidak merevisi Specification, tidak mengubah boundary, dependency, ownership, maupun runtime model.
+**Status:** Disetujui (Software Architect + Guardian Mission, 2026-08-06)
+**Isi:** Rencana kerja Engineering. Bukan sumber aturan arsitektur.
 
 ---
 
-## Konteks
+## Prinsip kerja
 
-Engineering beroperasi di atas **baseline Architecture yang sudah final**. Peran Engineering: menyelaraskan implementasi dengan Architecture yang ditetapkan, tanpa membuat keputusan arsitektur baru.
+Engineering mengerjakan yang sudah diputuskan, tidak memutuskan yang arsitektural.
 
-- Engineering **tidak menetapkan** Architecture Drift, perubahan Architecture/ADR, perubahan Runtime Model/Boundary/Dependency/Ownership.
-- Bila selama implementasi ditemukan konflik nyata terhadap Source of Truth, Engineering **menghentikan pekerjaan** pada area tersebut, mengumpulkan evidence, dan **mengesklasikannya ke Software Architect**.
+Boleh: implementasi, refactor, test, integrasi, observability, performa, CI/CD, kurangi utang teknis, tutup kesenjangan implementasi.
 
----
+Tidak boleh: menetapkan arsitektur, ADR, spesifikasi, batasan, dependensi, kepemilikan, atau model runtime.
 
-## Rencana Sprint
-
-### Sprint 1 — Implementation Gap Closure ✅ Disetujui
-- Sesuai keputusan Architecture: **L1 ditutup**; **L2 dan L6 adalah implementation gap**.
-- Tidak mengubah Architecture.
-
-### Sprint 2 — Architecture Compliance ✅ Disetujui
-- Bila ditemukan **dugaan** Architecture Drift, Engineering tidak memutuskan sendiri.
-- Wajib menyertakan:
-  - Klausul Source of Truth
-  - Evidence repository
-  - Analisis konflik
-- Selanjutnya diekskalasikan ke Software Architect.
-
-### Sprint 3 — Code Quality ✅ Disetujui
-- Batas: tidak mengubah public behavior, tidak mengubah dependency rule, tidak mengubah ownership, tidak mengubah boundary.
-
-### Sprint 4 — Testing ✅ Disetujui
-- Testing adalah **validasi implementasi**, bukan validasi Architecture.
-
-### Sprint 5 — Compliance ✅ Disetujui
-- Checker digunakan untuk **memverifikasi implementasi terhadap baseline Architecture**, bukan sebagai sumber keputusan Architecture.
-
-### Sprint 6 — Technical Debt ✅ Disetujui
-- Batas: tidak menghapus compatibility layer apabila masih merupakan bagian dari Architecture.
-- Penghapusan hanya untuk komponen yang benar-benar tidak lagi memiliki fungsi dan tidak dilindungi oleh Architecture.
-
-### Sprint 7 — Release Readiness ✅ Disetujui
-- Kriteria: **tidak ada Architecture Drift yang telah dikonfirmasi oleh Software Architect**.
-- Penentuan Architecture Drift bukan kewenangan Engineering.
+Kalau nemu hal yang terasa melanggar aturan arsitektur: **berhenti, kumpulkan bukti, lapor, serahkan ke Software Architect.**
 
 ---
 
-## Kewenangan Engineering
+## Rencana 7 Sprint
 
-**Engineering bertanggung jawab atas:** implementasi, refactoring, testing, integration, observability, performance, CI/CD, technical debt reduction, implementation gap closure.
-
-**Engineering TIDAK menetapkan:** Architecture Drift, perubahan Architecture, perubahan ADR, perubahan Runtime Model, perubahan Boundary, perubahan Dependency, perubahan Ownership.
-
----
-
-## Aturan Eskalasi
-
-Jika implementasi menemukan fakta yang bertentangan dengan Source of Truth:
-1. Hentikan pekerjaan pada area tersebut.
-2. Kumpulkan evidence.
-3. Buat laporan: fakta · evidence · dampak · area implementasi terdampak.
-4. Eskalasikan ke Software Architect.
-
-Tidak ada keputusan arsitektur yang diambil di level Engineering.
+| # | Sprint | Catatan |
+|---|---|---|
+| 1 | Tutup kesenjangan implementasi | L1 ditutup. L2 & L6 dianggap kesenjangan implementasi. |
+| 2 | Kepatuhan arsitektur | Ada dugaan pelanggaran? Jangan putuskan sendiri. Sertakan klausul aturan, bukti, analisis → eskalasi. |
+| 3 | Kualitas kode | Jangan ubah perilaku publik, aturan dependensi, kepemilikan, atau batasan. |
+| 4 | Testing | Testing membuktikan implementasi, bukan arsitektur. |
+| 5 | Compliance | Checker dipakai untuk cek implementasi vs baseline, bukan untuk memutuskan arsitektur. |
+| 6 | Utang teknis | Hapus hanya yang benar-benar tak terpakai dan tak dilindungi arsitektur. Jangan sentuh compatibility layer yang masih bagian arsitektur. |
+| 7 | Siap rilis | Kondisi: tidak ada pelanggaran arsitektur yang dikonfirmasi. (Penentuan pelanggaran = wewenang Architect.) |
 
 ---
 
-## Status
+## Aturan eskalasi
 
-Rencana Engineering disetujui dengan satu penyesuaian pada kriteria Sprint 7 mengenai kewenangan penetapan Architecture Drift. Fokus selanjutnya: menuntaskan implementation gap, menjaga kepatuhan terhadap baseline Architecture, serta mempertahankan hasil compliance dan pengujian.
+Temuan yang dianggap melanggar aturan arsitektur:
+1. Berhenti.
+2. Kumpulkan bukti.
+3. Lapor: fakta · bukti · dampak · area yang terdampak.
+4. Serahkan ke Software Architect.
 
-*Dokumen ini adalah Engineering Plan dan tidak mengubah maupun menambah Source of Truth arsitektur.*
+*Dokumen ini rencana kerja Engineering dan tidak mengubah aturan arsitektur apa pun.*
