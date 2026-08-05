@@ -5,7 +5,10 @@ Laporan sesi yang sudah selesai fase & menjadi histori → diarsipkan di `docs/h
 
 ## Isi (saat ini)
 - `README.md` (ini) — pointer & navigasi laporan.
-- `ENGINEERING_ESCALATION_REPORT_v1.md` — laporan eskalasi Engineering (L2 & L6) ke Software Architect (aktif).
+- `ENGINEERING_ESCALATION_REPORT_v1.md` — laporan eskalasi Engineering (L2 & L6) ke Software Architect.
+- `L2_Completion_Report.md` — penyelesaian gap L2 (endpoint /workflow dari Registry).
+- `L6_Completion_Report.md` — penyelesaian gap L6 (Preview → Audit, pendekatan C).
+- `EP001_WP1_Repository_Stabilization.md` — WP-1 Implementation Package EP-001.
 
 ## Laporan histori (fase S01-S10, sudah non-aktif)
 Session Report S01..S10 & RSR → `docs/history/reports/`:
