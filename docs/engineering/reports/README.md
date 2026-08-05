@@ -16,6 +16,7 @@ Session Report S01..S10 & RSR → `docs/history/reports/`:
 - Laporan yang **masih dirujuk / menjelaskan kondisi aktif sekarang** → simpan di sini.
 - Laporan yang **selesai & hanya jadi catatan masa lalu** → pindah ke `docs/history/reports/`.
 - Jangan duplikasi: `docs/engineering/reports/` menunjuk, `docs/history/reports/` menyimpan arsip.
+- **Format metadata:** laporan cukup memuat **tanggal** saja (tanpa Dari/Untuk/Per/Sifat) — mulai 2026-08-06.
 
 ## Navigasi
 Ingin laporan sesi lama → `docs/history/reports/`
