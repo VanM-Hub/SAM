@@ -5,6 +5,7 @@ Laporan sesi yang sudah selesai fase & menjadi histori → diarsipkan di `docs/h
 
 ## Isi (saat ini)
 - `README.md` (ini) — pointer & navigasi laporan.
+- `ENGINEERING_ESCALATION_REPORT_v1.md` — laporan eskalasi Engineering (L2 & L6) ke Software Architect (aktif).
 
 ## Laporan histori (fase S01-S10, sudah non-aktif)
 Session Report S01..S10 & RSR → `docs/history/reports/`:
