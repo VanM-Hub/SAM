@@ -70,7 +70,8 @@
 - **Klik "bagaimana membangun runtime?"** → `docs/runtime/` (R4→R5→I-series)
 - **Klik "sudah sesuai?"** → `docs/compliance/`
 - **Klik "masa lalu?"** → `docs/history/` — baca saja, jangan dipakai utk keputusan baru
-- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (decisions/reports/journals/templates)
+- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (decisions/reports/journals/templates/roadmap)
+- **Klik "rencana kerja engineering?"** → `docs/engineering/roadmap/ROADMAP_ENGINEERING.md` (Engineering Plan — bukan Source of Truth)
 - **Klik "sudah jadi arsip non-aktif?"** → `docs/history/`
 
 ---
