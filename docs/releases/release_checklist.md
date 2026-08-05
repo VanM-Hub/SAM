@@ -1,6 +1,21 @@
 # Release Checklist
 
-> **SAM v10.2.0** — Wajib dicek SEBELUM release baru.
+> **SAM v30.0.0 — Baseline Stabil (Production / Release Ready, 2026-08-06)**
+> Quality gates berikut terverifikasi pada v30.0.0 pasca-engineering (L1/L2/L6, EP-001/EP-002):
+
+---
+
+## Status kesiapan v30.0.0 Baseline
+
+- [x] CI GREEN (ci.yml 7/7: validation, server, desktop, core 3.10/3.11/3.12, coverage)
+- [x] Regression hijau (unit + runtime_service + presentation + api + e2e + integration + runtime)
+- [x] Compliance 99/99 PASS, verdict A, 0 deviation
+- [x] Build reproducible (whl + tar.gz)
+- [x] Repository bersih
+- [x] Tidak ada implementation gap (L1 Closed, L2 Completed, L6 Completed)
+- [x] Baseline Architecture stabil (tidak ada perubahan Architecture/ADR/Spec)
+
+---
 
 ---
 
