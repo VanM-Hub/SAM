@@ -251,13 +251,18 @@ async def runtime_page(request: Request):
 
 @app.get("/workflow")
 async def workflow_page(request: Request):
-    """Workflow monitor."""
-    workflows = [
-        {"id": "wf-001", "name": "Health Check Cycle", "status": "running", "progress": 60},
-        {"id": "wf-002", "name": "Provider Connectivity Test", "status": "pending", "progress": 0},
-        {"id": "wf-003", "name": "Knowledge Import", "status": "completed", "progress": 100},
-        {"id": "wf-004", "name": "Plugin Discovery", "status": "running", "progress": 35},
-    ]
+    """Workflow monitor — data dari WorkflowRegistry via consumer (bukan hardcode)."""
+    workflow_ids = workflow_consumer.list_workflows()
+    workflows = []
+    for wf_id in workflow_ids:
+        preview = workflow_consumer.resolve_workflow(wf_id)
+        data = preview.as_dict()
+        workflows.append({
+            "id": data["workflow_id"],
+            "name": data["name"],
+            "status": data["status"] or "registered",
+            "progress": 0,  # bukan bagian contract preview; nilai tampilan
+        })
     return templates.TemplateResponse("workflow.html", {
         "request": request,
         "workflows": workflows,
