@@ -1,21 +1,5 @@
 # ROADMAP ENGINEERING
 
-**Status:** Disetujui (Software Architect + Guardian Mission, 2026-08-06)
-**Isi:** Rencana kerja Engineering. Bukan sumber aturan arsitektur.
-
----
-
-## Prinsip kerja
-
-Engineering mengerjakan yang sudah diputuskan, tidak memutuskan yang arsitektural.
-
-Boleh: implementasi, refactor, test, integrasi, observability, performa, CI/CD, kurangi utang teknis, tutup kesenjangan implementasi.
-
-Tidak boleh: menetapkan arsitektur, ADR, spesifikasi, batasan, dependensi, kepemilikan, atau model runtime.
-
-Kalau nemu hal yang terasa melanggar aturan arsitektur: **berhenti, kumpulkan bukti, lapor, serahkan ke Software Architect.**
-
----
 
 ## Rencana 7 Sprint
 
@@ -31,12 +15,3 @@ Kalau nemu hal yang terasa melanggar aturan arsitektur: **berhenti, kumpulkan bu
 
 ---
 
-## Aturan eskalasi
-
-Temuan yang dianggap melanggar aturan arsitektur:
-1. Berhenti.
-2. Kumpulkan bukti.
-3. Lapor: fakta · bukti · dampak · area yang terdampak.
-4. Serahkan ke Software Architect.
-
-*Dokumen ini rencana kerja Engineering dan tidak mengubah aturan arsitektur apa pun.*
