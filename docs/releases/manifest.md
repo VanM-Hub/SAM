@@ -7,6 +7,9 @@ Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
 Current:      v30.0.0 - Program F (Presentation Layer)
 Release:      1 - Production / Release Ready (baseline stabil, 2026-08-06)
+Baseline:     v30.0.0 - Engineering Stabilized Baseline (HEAD f4edb87; hasil EP-001 & EP-002,
+              dalam garis keturunan release v30.0.0. Versi arsitektural tetap v30.0.0;
+              tag v30.0.0 menunjuk commit Program F. Tidak membentuk versi baru.)
 Framework:    Python
 Build:        setuptools
 Test:         pytest (modern suite 189 Program F + existing; legacy folder excluded)
