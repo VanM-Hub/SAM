@@ -1,6 +1,6 @@
 # EP-001 — WP-1 Repository Stabilization: Engineering Report
 
-**Owner:** Lead Engineer · **Executor:** ZARA · **Date:** 2026-08-06 · **Status: ✅ Completed**
+**Date:** 2026-08-06 · **Status: ✅ Completed**
 
 ## Tujuan
 Memastikan repository bersih setelah seluruh implementation gap (L1/L2/L6) selesai — tanpa temporary/experimental/PoC/debug/script/merge artifact, tanpa dead branch code, tanpa perubahan Architecture.
