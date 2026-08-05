@@ -7,6 +7,10 @@ Yang selesai permanen → report/history.
 
 | Dokumen | Lokasi | Nilai |
 |---|---|---|
+| **Ringkasan Sesi 2026-08-06** (posisi engineering, status gap, tata letak) | `journals/2026-08-06_ringkasan-sesi.md` | konteks lanjutan (tanpa file audit internal) |
+
+| Dokumen | Lokasi | Nilai |
+|---|---|---|
 | **RSR-A01** Activation Inventory Study | `docs/history/reports/RSR-A01_...md` | arsip (fase) |
 | **RSR-I01** Intelligence Activation Study | `docs/history/reports/RSR-I01_...md` | arsip (fase) |
 | **RSR-S10** Final Activation Decision | `docs/engineering/decisions/` (ringkasan); asli di catatan internal | keputusan S10 = TDR |
