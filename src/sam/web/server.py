@@ -19,9 +19,11 @@ from ..presentation import PresentationLayer
 from ..runtime_service.api import (
     RuntimeAPI,
     PreviewRequestView,
+    PreviewOutcomeView,
     wire_execution_preview,
     ConversationPreviewGateway,
 )
+from ..runtime_service.api.audit_recording import AuditRegistryRef
 from ..execution_runtime.execution_engine import ExecutionEngine
 from ..execution_runtime.execution_request import ExecutionRequest
 from ..execution_runtime.execution_runtime import ExecutionRuntime
@@ -134,10 +136,41 @@ def _execute_preview(request: ExecutionRequest):
     return _execution_engine.execute(request)
 
 
+# --- L6 (pendekatan C): Composition Root Holder ---
+# Holder AuditRegistryRef di entry; mencatat SATU record audit terminal dari outcome
+# preview (di wiring entry, BUKAN di execution_runtime). Registry tetap immutable;
+# referensi holder di-swap ke instance hasil register. Tanpa ubah consumer/bridge/registry.
+_audit_registry_holder = AuditRegistryRef(AuditRegistry())
+# Registry yang sama juga dipakai audit_consumer (Session 09) — holder dan consumer
+# berbagi registry awal; record preview dibaca via holder (titik baca registry terbaru).
+_audit_registry = _audit_registry_holder.get()
+audit_consumer = AuditPreviewConsumer(registry=_audit_registry_holder.get())
+
+
+def _execute_preview_audited(request: ExecutionRequest):
+    """Wrapper preview (di wiring entry): jalankan preview lalu catat record audit terminal.
+
+    Hanya memetakan outcome -> PreviewOutcomeView & mencatat audit; tidak mengubah
+    execution_runtime / activation flow. Execution tetap tidak mengenal Audit.
+    """
+    outcome = _execution_engine.execute(request)
+    data = getattr(outcome, "as_dict", lambda: {})()
+    view = PreviewOutcomeView(
+        runtime_id=str(data.get("runtime_id", "")),
+        approved=bool(data.get("approved", False)),
+        executed=bool(data.get("executed", False)),
+        external_calls=int(data.get("external_calls", 0)),
+        mode="preview",
+        status="preview",
+    )
+    _audit_registry_holder.record_from_outcome(view)
+    return outcome
+
+
 preview_gateway = wire_execution_preview(
     runtime_api,
     build_request=_build_preview_request,
-    execute=_execute_preview,
+    execute=_execute_preview_audited,
 )
 
 # --- Session 02: Conversation -> RuntimeService -> ExecutionRuntime (preview) ---
@@ -183,10 +216,11 @@ memory_consumer = MemoryPreviewConsumer(registry=_memory_registry)
 # Policy -> PolicyRegistry -> ConversationPolicyBridge -> STOP.
 # Audit  -> AuditRegistry  -> ConversationAuditBridge  -> STOP. (AD-ENG-002)
 # Policy & Audit tetap INDEPENDEN (tidak saling tahu implementasi).
+# audit_consumer memakai registry awal dari holder (L6); record preview terminal
+# dibaca via holder (_audit_registry_holder.get()), bukan merecreate consumer.
 _policy_registry = PolicyRegistry()
 policy_consumer = PolicyPreviewConsumer(registry=_policy_registry)
-_audit_registry = AuditRegistry()
-audit_consumer = AuditPreviewConsumer(registry=_audit_registry)
+audit_consumer = AuditPreviewConsumer(registry=_audit_registry_holder.get())
 
 
 @app.get("/")
