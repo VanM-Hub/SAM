@@ -11,6 +11,7 @@ docs/engineering/
 ├── reports/      ← Laporan sesi/release yang masih relevan (Engineering Session Report)
 ├── journals/     ← Catatan kerja per-sesi/area (aktif; ringkas)
 ├── references/   ← Referensi engineering yang tidak lapuk (EC-001..025, format laporan)
+├── roadmap/      ← Rencana kerja Engineering (Engineering Plan; bukan Source of Truth)
 └── templates/    ← Template laporan/ADR/keputusan (format baku)
 ```
 
@@ -19,6 +20,7 @@ docs/engineering/
 - **`reports/`** = hasil akhir yang masih dirujuk. Yang **selesai permanen & tak lagi dirujuk** → pindah ke `docs/history/`.
 - **`journals/`** = kerja aktif lintas sesi; ringkas (tujuan → kerja → hasil → blocker → handoff). Yang selesai → report/history.
 - **`references/`** = pengetahuan engineering bernilai tetap (aturan, pola, kosakata, direktori status capability) — bukan keputusan, bukan journal.
+- **`roadmap/`** = rencana kerja Engineering (Engineering Plan). Bukan Source of Truth arsitektur; tidak berisi keputusan ADR/spesifikasi/boundary.
 - **`templates/`** = format baku utk laporan/ADR/keputusan baru.
 
 ## Dokumen Keputusan (decisions/)
@@ -37,6 +39,7 @@ docs/engineering/
 - `Format_Laporan_Engineer.md` — format baku laporan sesi
 
 ## Navigasi
+- Ingin rencana kerja → `docs/engineering/roadmap/ROADMAP_ENGINEERING.md`
 - Ingin laporan sesi → `docs/engineering/reports/`
 - Ingin keputusan → `docs/engineering/decisions/`
 - Ingin catatan kerja → `docs/engineering/journals/`
