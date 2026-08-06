@@ -75,7 +75,6 @@ python -m pytest tests/unit/ tests/integration/ -v --tb=short
 ### Test Structure
 - `tests/unit/` — unit tests (tanpa dependency eksternal)
 - `tests/integration/` — integration tests (antar modul)
-- `tests/legacy/` — test warisan v1.0 (tidak termasuk dalam suite utama)
 
 ### Test Naming
 - Class: `Test<NamaModul>`
