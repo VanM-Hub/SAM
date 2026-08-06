@@ -5,12 +5,20 @@
 ### Restrukturisasi arsitektur (Sprint 272-279, 189 tes)
 - **Revisi keputusan arsitektur**: `desktop_runtime/` menjadi `presentation/` sebagai **Presentation Layer**, bukan runtime.
 - **Presentation Principle** ditambahkan ke `docs/CONSTITUTION.md` (Article XVI) dan `docs/PHILOSOPHY.md` (Why Presentation Exists): Presentation Layer tak pernah berisi business logic, tak pernah jadi runtime coordinator, dan berkomunikasi hanya lewat RuntimeService.
-- **Folder `runtime/` dihapus** — diganti folder fungsional: `commands/ navigation/ viewmodels/ composition/`.
-- **Rename class**: `DesktopRuntime/DesktopPipeline/DesktopCoordinator/DesktopController/DesktopSummary` → `PresentationLayer/PresentationPipeline/PresentationCoordinator/PresentationController/PresentationSummary`.
-- **54 file Python** (src + tests) dipertahankan penuh — tanpa tulis ulang, hanya rename lokasi & simbol; kode v29 reused maksimal.
+- **Folder `runtime/` dihapus** â€” diganti folder fungsional: `commands/ navigation/ viewmodels/ composition/`.
+- **Rename class**: `DesktopRuntime/DesktopPipeline/DesktopCoordinator/DesktopController/DesktopSummary` â†’ `PresentationLayer/PresentationPipeline/PresentationCoordinator/PresentationController/PresentationSummary`.
+- **54 file Python** (src + tests) dipertahankan penuh â€” tanpa tulis ulang, hanya rename lokasi & simbol; kode v29 reused maksimal.
 - **v29.0.0 di-skip** (bukan rilis terpisah).
-- Regression modern suite: **3338 passed, 1 skipped** (full), 189 tes presentation — **regression = 0**.
+- Regression modern suite: **3338 passed, 1 skipped** (full), 189 tes presentation â€” **regression = 0**.
 - 0 forbidden imports (async/thread/socket/http/network/subprocess) di `presentation/`.
+
+### Program G/H/I/J (capability presentation host, tetap v30.0.0)
+Program ini menambahkan Presentation Capability host, tanpa bump versi (kompatibel v30.0.0, tanpa perubahan baseline Architecture).
+
+- **Program G - Conversation** (2026-08-06, commit `bda9313`): `presentation/conversation/` (viewmodel, composition, wiring, integration) - 14 test; regression scope 526 passed.
+- **Program H - Dashboard** (2026-08-06, commit `fe0956a`): `presentation/dashboard/` (viewmodel, composition, wiring, integration) - 18 test; area Mission/Provider/Connector/Telemetry = Escalation (STOP); regression scope 544 passed.
+- **Program I - CLI** (2026-08-06, commit `f5bd184`): `presentation/cli/` (application, commands, formatter, wiring, integration) - 21 test; Mission = Deferred (no activation path); regression scope 565 passed.
+- **Program J - REST API as Presentation Host** (2026-08-06, commit `210dcd0`): `sam/api/presentation_rest/` (RESTApplication, RESTRouter, RESTEndpoint, RESTSerializer) + `sam/api/wiring.py` (composition root); rewire `/runtime` & `/health` ke `runtime_service.api`; 19 test + test_api lama 11; Telemetry & Mission = Deferred by Architecture; regression scope 584 passed.
 
 ## v29.0.0 (2026-08-01) - Program F: Desktop Runtime
 
@@ -375,7 +383,7 @@ Kredensial HANYA dari environment. Semua DTO immutable, sync/deterministic, tanp
 - CI: server job installs `[dev,server,console]` (launcher imports `rich`, present only in console extra)
 
 ### Docs (accuracy)
-- Corrected Runtime Kernel file count **91 → 69** across all docs (`OP-1000`, `sprint-111`, `README`, `CHANGELOG`, `ROADMAP`, `ADR-001..008`, `version-history`) - verified 69 files at tag `v10.0.0`
+- Corrected Runtime Kernel file count **91 â†’ 69** across all docs (`OP-1000`, `sprint-111`, `README`, `CHANGELOG`, `ROADMAP`, `ADR-001..008`, `version-history`) - verified 69 files at tag `v10.0.0`
 
 ### Repo hygiene
 - Removed runtime data from git tracking: `openclaw/status/` (`status.json`, `history.ndjson`) and `memory/` (sprint handoff)

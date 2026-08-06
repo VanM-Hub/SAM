@@ -2,7 +2,7 @@
 
 The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
-**Versi:** v30.0.0 · Program F (Presentation Layer)
+**Versi:** v30.0.0 · Program J (REST API as Presentation Host)
 
 ---
 
