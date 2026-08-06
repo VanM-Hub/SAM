@@ -65,6 +65,8 @@ Documents belong to a category. Categories indicate the role of a document in th
 
 Historical documents are preserved as part of the evolution lineage and are not authoritative.
 
+> **Non-authoritative docs:** Everything under **[docs/history/](docs/history/)** (legacy sprints, archived reports) is history — it records what **was**, not what **is**. Documents marked **`Status: Draft`** or **`Status: Deprecated`** (e.g. exploratory architecture concepts like `docs/architecture/OPENCLAW_AS_MODULE.md`) are proposals/ideas, not the current state of SAM. Authoritative current state lives in the canonical documents (Mission, Constitution, Canonical Architecture, ROADMAP) plus the tagged release notes.
+
 ```
 MISSION
   ↓

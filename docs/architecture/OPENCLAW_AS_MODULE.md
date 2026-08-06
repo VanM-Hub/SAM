@@ -12,6 +12,10 @@ Last Updated: 2026-07-20
 
 
 
+> **NOT AUTHORITATIVE — Draft concept.** This document is a historical/exploratory architecture idea (a proposed way SAM *could* relate to OpenClaw). It is **not** a description of SAM's current state and is **not** authoritative. See the current canonical docs (README, Mission, Constitution, Canonical Architecture, ROADMAP) for the authoritative state.
+
+
+
 ---
 
 

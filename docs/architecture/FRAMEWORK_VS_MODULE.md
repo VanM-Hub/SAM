@@ -12,6 +12,10 @@ Last Updated: 2026-07-20
 
 
 
+> **NOT AUTHORITATIVE — Draft concept.** This document is a historical/exploratory architecture idea (proposed placement of functionality as Framework vs Module). It is **not** a description of SAM's current state and is **not** authoritative. See the current canonical docs for the authoritative state.
+
+
+
 ---
 
 
