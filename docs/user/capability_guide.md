@@ -141,10 +141,10 @@ class TestMyCapability:
 
 ---
 
-## Capability Bawaan Sistem (v30.0.0, Program G-K)
+## Capability Bawaan Sistem (SAM 1.0, Program G-K)
 
 Selain membuat capability plugin sendiri, SAM menyediakan **capability bawaan**
-yang diaktifkan pada rilis v30.0.0 (Program G-K). Semuanya berjalan melalui
+yang diaktifkan pada rilis SAM 1.0 (Program G-K). Semuanya berjalan melalui
 jalur resmi `runtime_service.api` (tanpa bypass).
 
 ### Presentation Hosts (Program G-J)

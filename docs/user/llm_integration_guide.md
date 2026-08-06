@@ -1,6 +1,6 @@
 # LLM Integration Guide
 
-> Panduan integrasi jalur runtime LLM SAM (Program K, v30.0.0 - Capability
+> Panduan integrasi jalur runtime LLM SAM (Program K, SAM 1.0 Foundation).
 > Release).
 
 Program K mengaktifkan jalur runtime LLM:

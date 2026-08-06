@@ -1,6 +1,6 @@
 # REST API Guide
 
-> Panduan penggunaan REST API SAM (Program J, v30.0.0 - Capability Release).
+> Panduan penggunaan REST API SAM (Program J, SAM 1.0 Foundation).
 
 REST API SAM adalah **presentation host** yang mengekspos capability sistem
 melalui HTTP/JSON. Seluruh endpoint berjalan melalui jalur resmi

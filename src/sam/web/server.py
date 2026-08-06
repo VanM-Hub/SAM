@@ -251,8 +251,7 @@ async def index(request: Request):
     pending = action_executor.get_pending_actions()
     workspaces = await openclaw_discovery.discover()
 
-    return templates.TemplateResponse("index.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "index.html", {
         "state": state.upper(),
         "health": health_str,
         "healthy": healthy,
@@ -281,8 +280,7 @@ async def runtime_page(request: Request):
     # Session 04: Presentation Layer Runtime Status via jalur resmi.
     presentation_status = presentation_layer.runtime_status()
 
-    return templates.TemplateResponse("runtime.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "runtime.html", {
         "state": state.upper(),
         "hosting": adapter_name,
         "runtime_service": service_status,
@@ -307,8 +305,7 @@ async def workflow_page(request: Request):
             "status": data["status"] or "registered",
             "progress": 0,  # bukan bagian contract preview; nilai tampilan
         })
-    return templates.TemplateResponse("workflow.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "workflow.html", {
         "workflows": workflows,
     })
 
@@ -317,8 +314,7 @@ async def workflow_page(request: Request):
 async def incidents_page(request: Request):
     """Incident dashboard."""
     incidents = await incident_detector.detect()
-    return templates.TemplateResponse("incidents.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "incidents.html", {
         "incidents": incidents,
         "total": len(incidents),
         "critical": len([i for i in incidents if i.severity.value == "critical"]),
@@ -337,8 +333,7 @@ async def autonomous_page(request: Request):
     failed = action_executor.get_actions_by_status(AutonomousActionStatus.FAILED)
     denied = action_executor.get_actions_by_status(AutonomousActionStatus.DENIED)
 
-    return templates.TemplateResponse("autonomous.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "autonomous.html", {
         "pending": pending,
         "history": history,
         "completed_count": len(completed),
@@ -356,8 +351,7 @@ async def openclaw_page(request: Request):
     if workspaces:
         health = await openclaw_health.collect(workspaces[0].path)
 
-    return templates.TemplateResponse("openclaw.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "openclaw.html", {
         "workspaces": workspaces,
         "health": health,
     })
@@ -374,8 +368,7 @@ async def knowledge_page(request: Request, q: str = ""):
     else:
         items = await lookup.search("")
 
-    return templates.TemplateResponse("knowledge.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "knowledge.html", {
         "knowledge": items,
         "query": q,
     })
@@ -405,8 +398,7 @@ async def settings_page(request: Request):
         except Exception:
             mission_content = "Error reading Mission"
 
-    return templates.TemplateResponse("settings.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "settings.html", {
         "dos": dos_content,
         "mission": mission_content,
     })

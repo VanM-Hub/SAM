@@ -1,6 +1,6 @@
 # Panduan Instalasi SAM
 
-> SAM Framework v30.0.0 (Capability Release - Program G-K)
+> SAM Framework 1.0.0 (SAM 1.0 Foundation)
 
 ## Prasyarat
 
@@ -75,7 +75,7 @@ sam health
 
 ## Jalur Runtime Aktif
 
-Rilis v30.0.0 (Program G-K) mengaktifkan jalur runtime berikut:
+Rilis SAM 1.0 (Foundation) mengaktifkan jalur runtime berikut:
 
 - **Presentation Hosts** (Program G-J): Conversation, Dashboard, CLI, REST API
   - semuanya melalui `runtime_service.api` (tidak ada bypass).
