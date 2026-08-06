@@ -11,17 +11,17 @@ Yang selesai permanen → report/history.
 
 | Dokumen | Lokasi | Nilai |
 |---|---|---|
-| **RSR-A01** Activation Inventory Study | `docs/history/reports/RSR-A01_...md` | arsip (fase) |
-| **RSR-I01** Intelligence Activation Study | `docs/history/reports/RSR-I01_...md` | arsip (fase) |
+| **RSR-A01** Activation Inventory Study | backup eksternal (arsip) | arsip (fase) |
+| **RSR-I01** Intelligence Activation Study | backup eksternal (arsip) | arsip (fase) |
 | **RSR-S10** Final Activation Decision | `docs/engineering/decisions/` (ringkasan); asli di catatan internal | keputusan S10 = TDR |
 | RSR-S01..S09 (riset per-sesi) | catatan internal (referensi audit; sudah digantikan laporan sesi) | referensi audit; sudah digantikan laporan sesi |
 
 ## Prinsip isi journal
 - Ringkas & struktural: Tujuan → Kerja → Hasil → Blocker → Handoff.
-- Bukan diary/steno. Yang selesai permanen → `docs/engineering/reports/` / `docs/history/`.
+- Bukan diary/steno. Yang selesai permanen → `docs/engineering/reports/` / arsip eksternal.
 - Catatan yang murni proses transient (plan sesi) tetap di luar repo (tidak di-commit).
 
 ## Navigasi
 - Riset/keputusan bernilai → `docs/engineering/decisions/` + `docs/engineering/journals/`
-- Laporan sesi final → `docs/history/reports/`
+- Laporan sesi final → `docs/engineering/reports/` / arsip eksternal
 - Catatan kerja aktif per-sesi → tambahkan di folder ini (ringkas, bersih).

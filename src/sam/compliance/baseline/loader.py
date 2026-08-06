@@ -37,16 +37,12 @@ _DOC_DIR_TYPES = {
 }
 
 # Files at repo root -> document_type
-_ROOT_FILE_TYPES = {
-    "MISSION.md": "foundation",
-    "VISION.md": "foundation",
-    "CHARTER.md": "foundation",
-    "CONSTITUTION.md": "foundation",
-    "GOVERNANCE.md": "foundation",
-    "PHILOSOPHY.md": "foundation",
-    "PRINCIPLES.md": "foundation",
-    "GLOSSARY.md": "foundation",
-}
+# Note: CONSTITUTION.md, PHILOSOPHY.md, CITIZEN_SPECIFICATION.md, MISSION.md,
+# VISION.md, CHARTER.md, GOVERNANCE.md, PRINCIPLES.md, and GLOSSARY.md were moved
+# to docs/foundation/ (2026-08-07) and are now scanned via
+# _DOC_DIR_TYPES["docs/foundation"]. They are intentionally absent from this root
+# map to keep compliance aligned with the actual repository layout.
+_ROOT_FILE_TYPES = {}
 
 # Package tree files (repo root / config files)
 _PACKAGE_TYPES = {

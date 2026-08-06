@@ -8,7 +8,7 @@ Dokumen di sini = peran **Engineering**; pisah dari Architecture (aturan) & Hist
 ```
 docs/engineering/
 ├── decisions/    ← Keputusan engineering/arsitektur implementasi (AD-ENG-001..003, AD-S*)
-├── reports/      ← Laporan sesi/release yang masih relevan (Engineering Session Report)
+├── reports/      ← Laporan sesi/release yang masih relevan (kosong; akan terisi laporan ringkas baru)
 ├── journals/     ← Catatan kerja per-sesi/area (aktif; ringkas)
 ├── references/   ← Referensi engineering yang tidak lapuk (EC-001..025, format laporan)
 ├── roadmap/      ← Rencana kerja Engineering (Engineering Plan; bukan Source of Truth)
@@ -17,7 +17,7 @@ docs/engineering/
 
 ## Aturan
 - **`decisions/`** = keputusan yang menjadi dasar implementasi (record; jangan edit, tambah AD baru).
-- **`reports/`** = hasil akhir yang masih dirujuk. Yang **selesai permanen & tak lagi dirujuk** → pindah ke `docs/history/`.
+- **`reports/`** = hasil akhir yang masih dirujuk. Yang **selesai permanen & tak lagi dirujuk** → diarsipkan (backup eksternal) / `docs/history/`.
 - **`journals/`** = kerja aktif lintas sesi; ringkas (tujuan → kerja → hasil → blocker → handoff). Yang selesai → report/history.
 - **`references/`** = pengetahuan engineering bernilai tetap (aturan, pola, kosakata, direktori status capability) — bukan keputusan, bukan journal.
 - **`roadmap/`** = rencana kerja Engineering (Engineering Plan). Bukan Source of Truth arsitektur; tidak berisi keputusan ADR/spesifikasi/boundary.
@@ -40,7 +40,7 @@ docs/engineering/
 
 ## Navigasi
 - Ingin rencana kerja → `docs/engineering/roadmap/ROADMAP_ENGINEERING.md`
-- Ingin laporan sesi → `docs/engineering/reports/`
+- Ingin laporan sesi baru → `docs/engineering/reports/` (akan terisi laporan ringkas); laporan EP/OP/L2/L6 masa lalu diarsipkan ke backup eksternal
 - Ingin keputusan → `docs/engineering/decisions/`
 - Ingin catatan kerja → `docs/engineering/journals/`
 - Ingin referensi/konteks → `docs/engineering/references/`

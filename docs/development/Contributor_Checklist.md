@@ -1,6 +1,6 @@
 # Contributor Checklist
 
-> **SAM v10.2.0** — Wajib dicek SEBELUM merge ke main.
+> **SAM 1.0 Foundation** - Wajib dicek SEBELUM merge ke main.
 
 ---
 

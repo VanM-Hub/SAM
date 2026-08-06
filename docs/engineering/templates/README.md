@@ -3,7 +3,7 @@
 Folder ini = template/format baku utk laporan, keputusan, & journal — agar konsisten.
 
 ## Template
-- Laporan sesi: lihat format `ENGINEERING SESSION REPORT` (histori di `docs/history/reports/*`).
+- Laporan sesi: lihat format ENGINEERING SESSION REPORT (contoh historis diarsek ke backup eksternal).
 - Keputusan: lihat `AD-ENG-001..003` di `docs/engineering/decisions/` (format metadata + keputusan).
 
 ## Peran

@@ -107,4 +107,3 @@ None detected.
 
 ---
 
-*Baseline prepared by ZARA 🦋*

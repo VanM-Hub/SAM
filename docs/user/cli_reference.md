@@ -1,6 +1,6 @@
 # CLI Reference
 
-> Semua cara menjalankan SAM dari command line (v30.0.0, Program G-K).
+> Semua cara menjalankan SAM dari command line (SAM 1.0, Program G-K).
 
 Project SAM menyediakan **dua jalur CLI**. Pastikan Anda tahu mana yang Anda
 gunakan, karena keduanya berbeda:
