@@ -2,7 +2,7 @@
 
 The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
-**Versi:** v30.0.0 · Program J (REST API as Presentation Host)
+**Versi:** v30.0.0 - Capability Release (Program G-K: Conversation/Dashboard/CLI/REST hosts + aktivasi jalur LLM)
 
 ---
 

@@ -3,6 +3,7 @@
 | Versi | Tanggal | Phase | Catatan |
 |-------|---------|-------|---------|
 | v30.0.0 | 2026-08-01 | Program F (Presentation Layer) | Restrukturisasi desktop_runtime -> presentation, Article XVI, 189 tests |
+| ^ (capability release R-001) | 2026-08-06 | Program G-K (activation & presentation) | Conversation/Dashboard/CLI/REST hosts + jalur LLM Connector->Provider->Agent; tetap v30.0.0, 35 test Program K, regression 3541 passed |
 | ~~v29.0.0~~ | 2026-08-01 | ~~Program F (Desktop Runtime)~~ | **SKIP** - digabung menjadi v30.0.0 Presentation Layer |
 | v28.0.0 | 2026-08-01 | Program E (Unified Intelligence Runtime) | 8 sprints 261-268, 40 files, 188 tests |
 | v27.0.0 | 2026-08-01 | Program D (Runtime Services & Deployment) | 11 sprints 261-271, 53 files, 187 tests |

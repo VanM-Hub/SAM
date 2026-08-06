@@ -138,3 +138,53 @@ class TestMyCapability:
         errors = await cap.validate_inputs({"name": 123})
         assert len(errors) > 0
 ```
+
+---
+
+## Capability Bawaan Sistem (v30.0.0, Program G-K)
+
+Selain membuat capability plugin sendiri, SAM menyediakan **capability bawaan**
+yang diaktifkan pada rilis v30.0.0 (Program G-K). Semuanya berjalan melalui
+jalur resmi `runtime_service.api` (tanpa bypass).
+
+### Presentation Hosts (Program G-J)
+
+Penyaji yang mengekspos capability sistem ke pengguna:
+
+| Host | Program | Lokasi | Sifat |
+|---|---|---|---|
+| Conversation | G | `src/sam/presentation/conversation/` | Activity-host via runtime_service |
+| Dashboard | H | `src/sam/presentation/dashboard/` | Activity-host via runtime_service |
+| CLI | I | `src/sam/presentation/cli/` | Activity-host via runtime_service |
+| REST API | J | `src/sam/api/presentation_rest/` | REST endpoint via runtime_service.api |
+
+Semua host TIDAK mengandung business logic; hanya menghubungkan permintaan ke
+jalur resmi RuntimeService.
+
+### Capability REST (Program J)
+
+Endpoint capability yang tersedia via REST (semua GET, preview-only):
+`/workflow`, `/policy`, `/audit`, `/preview/{execution_id}`, `/knowledge`,
+`/memory`, `/artifact`, `/approval/{execution_id}`, `/status`, plus `/health`,
+`/runtime`, `/metrics`, `/events`.
+
+Lihat panduan lengkap: `docs/user/rest_api_guide.md`.
+
+### Capability LLM (Program K)
+
+Jalur runtime LLM dengan tipe capability `connector.llm.chat`:
+
+- Connector `llm_chat` terdaftar di ConnectorRegistry (`LLMConnectorLayer`).
+- Provider dieksekusi oleh `ProviderExecutor` via HTTP (`httpx`).
+- 5 provider LLM active (OpenAI, Anthropic, Gemini, DeepSeek, Ollama) melalui
+  `LLMAdapter`; 5 non-LLM terdokumentasi (deferred).
+- Aktivasi lewat wiring composition root `sam/api/llm_wiring.py`.
+
+Provider akan aktif/available setelah lingkungan memiliki kredensial provider
+(mis. env `OPENAI_API_KEY`) - lihat `docs/user/llm_integration_guide.md`.
+
+### Jalur Resmi vs Bypass
+
+Setiap host dan capability WAJIB memanggil `runtime_service.api`; tidak boleh
+mengimpor Runtime/Registry/Provider/Connector/ExecutionRuntime secara langsung.
+Pengecekan compliance memastikan **0 bypass** pada Program G-J dan K.

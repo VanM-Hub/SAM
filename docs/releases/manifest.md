@@ -5,14 +5,15 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v30.0.0 - Program F (Presentation Layer)
+Current:      v30.0.0 - Capability release (Program G-K: Conversation/Dashboard/CLI/
+              REST presentation hosts + jalur LLM Connector->Provider->Agent)
 Release:      1 - Production / Release Ready (baseline stabil, 2026-08-06)
-Baseline:     v30.0.0 - Engineering Stabilized Baseline (HEAD f4edb87; hasil EP-001 & EP-002,
+Baseline:     v30.0.0 - Capability release R-001 (HEAD e0c52f3; Program G-K activation
               dalam garis keturunan release v30.0.0. Versi arsitektural tetap v30.0.0;
               tag v30.0.0 menunjuk commit Program F. Tidak membentuk versi baru.)
 Framework:    Python
 Build:        setuptools
-Test:         pytest (modern suite 189 Program F + existing; legacy folder excluded)
+Test:         pytest (modern suite; regression 3541 passed, 42 skipped; legacy folder eksklusif)
 Lint:         ruff
 CI:           GitHub Actions (core + server + desktop)
 ```
@@ -58,6 +59,11 @@ CI:           GitHub Actions (core + server + desktop)
 | Runtime Service | `src/sam/runtime_service/` (Program D) | 53 | Runtime Service |
 | Unified Intelligence Runtime | `src/sam/intelligence_runtime/` (Program E) | 40 | Graph + Context + Certification |
 | Presentation Layer | `src/sam/presentation/` (Program F) | 13 folders | Composition-only UI, no business logic, 189 tests |
+| Conversation Host | `src/sam/presentation/conversation/` (Program G) | 4 | Activity presentation host via runtime_service |
+| Dashboard Host | `src/sam/presentation/dashboard/` (Program H) | 4 | Activity presentation host via runtime_service |
+| CLI Host | `src/sam/presentation/cli/` (Program I) | 5 | Activity presentation host via runtime_service |
+| REST Presentation | `src/sam/api/presentation_rest/` (Program J) | 4 | REST host; /runtime & /health rewire ke runtime_service.api |
+| LLM Wiring | `src/sam/api/llm_wiring.py` (Program K) | 1 | Composition root aktivasi jalur LLM Connector->Provider->Agent |
 
 ## Dependencies
 

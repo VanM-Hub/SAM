@@ -1,8 +1,80 @@
 # CLI Reference
 
-> Semua perintah yang tersedia di SAM Framework.
+> Semua cara menjalankan SAM dari command line (v30.0.0, Program G-K).
 
-## Penggunaan Dasar
+Project SAM menyediakan **dua jalur CLI**. Pastikan Anda tahu mana yang Anda
+gunakan, karena keduanya berbeda:
+
+| Jalur | Entry point | Kebutuhan ekstra | Tujuan |
+|---|---|---|---|
+| **Launcher CLI** (baru, rekomendasi) | `sam`, `sam-console`, `sam-desktop`, `sam-headless`, `sam-diagnostic` | tidak ada | Menjalankan host SAM via launcher pipeline |
+| **Legacy CLI** | `python -m sam.cli.main` | `console` | Perintah operasional klasik (health, run, workflow, dst.) |
+
+---
+
+## 1. Launcher CLI (baru)
+
+Entry points yang terpasang ketika package diinstal:
+
+```bash
+sam
+sam-console
+sam-desktop
+sam-headless
+sam-diagnostic
+```
+
+Juga dapat dijalankan via modul:
+
+```bash
+python -m sam.launcher.cli_entry [ARGUMEN]
+```
+
+### Argumen launcher
+
+| Argumen | Pilihan | Deskripsi |
+|---|---|---|
+| `--host` | `auto` (default), `console`, `desktop`, `headless`, `api_server` | Host target |
+| `--safe-mode` | `NORMAL` (default), `SAFE`, `READ_ONLY`, `MINIMAL` | Mode startup |
+| `--workspace` | path | Folder workspace (default `SAM_WORKSPACE` atau cwd) |
+| `--report` | - | Cetak laporan startup |
+| `--version` | - | Tampilkan versi launcher |
+
+Contoh:
+
+```bash
+# Jalankan dengan host otomatis (deteksi dari SAM_HOST / console)
+sam
+
+# Jalankan mode desktop
+sam-desktop
+
+# Cek versi launcher
+sam --version
+
+# Jalankan console dengan laporan startup
+sam --host console --report
+
+# Jalankan headless dalam mode safemode
+sam --host headless --safe-mode SAFE
+```
+
+`sam-diagnostic` menjalankan pemeriksaan diagnostik lalu keluar:
+
+```bash
+sam-diagnostic
+# SAM Diagnostics - N checks
+#   Passed:   X
+#   Failed:   Y
+```
+
+> Health launcher tidak perlu ekstra tambahan dan tidak memerlukan database.
+
+---
+
+## 2. Legacy CLI
+
+Jalur klasik yang membutuhkan ekstra `console`:
 
 ```bash
 python -m sam.cli.main [COMMAND] [ARGS]
@@ -10,7 +82,8 @@ python -m sam.cli.main [COMMAND] [ARGS]
 sam [COMMAND] [ARGS]
 ```
 
-## Perintah Utama
+> Catatan: perintah di bawah membutuhkan extra `console` (typer) **dan**
+> environment SAM yang lengkap (workspace dengan aset mission / database).
 
 ### `health`
 
@@ -19,20 +92,6 @@ Menampilkan status kesehatan sistem secara agregat.
 ```bash
 sam health
 sam health --json   # Output JSON
-```
-
-Output:
-```
-=== SAM Health ===
-  Python      : 3.12.0
-  Database    : OK
-  cognition   : OK
-  healing     : OK
-  evolution   : OK
-  tuning      : OK
-  autonomy    : OK
-  cluster     : OK
-System status: HEALTHY
 ```
 
 ### `run <capability_id>`
@@ -52,142 +111,54 @@ Menjalankan workflow dengan daftar capability.
 sam workflow "diagnose-runtime,repair-provider,deploy-workspace"
 ```
 
----
-
-## Autonomy Commands
-
-### `sam autonomy status`
-
-Menampilkan level autonomy saat ini.
-
-```
-Current autonomy level: supervise (level 4/5)
-```
-
-### `sam autonomy set <level>`
-
-Mengubah level autonomy.
+### Autonomy Commands
 
 ```bash
-sam autonomy set observe    # Level 1 — hanya observasi
-sam autonomy set recommend  # Level 2 — rekomendasi
-sam autonomy set assist     # Level 3 — asisten
-sam autonomy set supervise  # Level 4 — supervisi (default)
-sam autonomy set autonomous # Level 5 — otonom penuh
+sam autonomy status
+sam autonomy set observe|recommend|assist|supervise|autonomous
+sam autonomy history
+sam autonomy guardrails
+sam autonomy escalate "pesan"
+sam autonomy degrade
+sam autonomy upgrade
 ```
 
-### `sam autonomy history`
-
-Riwayat perubahan level autonomy.
-
-### `sam autonomy guardrails`
-
-Menampilkan guardrails aktif.
-
-### `sam autonomy escalate <message>`
-
-Membuat escalation request.
+### Evolution Commands
 
 ```bash
-sam autonomy escalate "CPU usage di atas 90%"
+sam evolution list [--status approved|pending]
+sam evolution show <proposal_id>
+sam evolution approve <proposal_id>
+sam evolution reject <proposal_id>
 ```
 
-### `sam autonomy degrade`
-
-Menurunkan level autonomy satu tingkat.
-
-### `sam autonomy upgrade`
-
-Menaikkan level autonomy satu tingkat.
-
----
-
-## Evolution Commands
-
-### `sam evolution list`
-
-Menampilkan daftar proposal.
+### Cluster Commands
 
 ```bash
-sam evolution list
-sam evolution list --status approved
-sam evolution list --status pending
+sam cluster status
+sam cluster sync
+sam cluster strategies-list
+sam cluster strategies-vote <proposal_id> --approve
 ```
 
-### `sam evolution show <proposal_id>`
-
-Detail proposal.
+### Federation Commands
 
 ```bash
-sam evolution show prop_001
+sam federation status
+sam federation clusters
 ```
 
-### `sam evolution approve <proposal_id>`
-
-Menyetujui proposal.
-
-```bash
-sam evolution approve prop_001
-```
-
-### `sam evolution reject <proposal_id>`
-
-Menolak proposal.
-
-```bash
-sam evolution reject prop_001
-```
-
----
-
-## Cluster Commands
-
-### `sam cluster status`
-
-Status cluster (standalone atau multi-node).
-
-```
-Cluster: standalone mode
-  Status : running as single node
-  ID     : default-cluster
-```
-
-### `sam cluster sync`
-
-Sinkronisasi state cluster.
-
-### `sam cluster strategies-list`
-
-Daftar proposal strategi.
-
-### `sam cluster strategies-vote <proposal_id>`
-
-Vote proposal strategi.
-
-```bash
-sam cluster strategies-vote strategy_001 --approve
-```
-
----
-
-## Federation Commands
-
-### `sam federation status`
-
-Status federasi knowledge.
-
-### `sam federation clusters`
-
-Daftar cluster peer.
-
----
-
-## Graph Commands
-
-### `sam graph run <file>`
-
-Menjalankan execution graph dari file.
+### Graph Commands
 
 ```bash
 sam graph run examples/monitoring_graph.yaml
 ```
+
+---
+
+## Cara Menentukan Jalur yang Dipakai
+
+Jika Anda hanya ingin menjalankan SAM (bukan perintah operasional klasik),
+gunakan **Launcher CLI**. Jika Anda menjalankan perintah operasional seperti
+`autonomy`, `evolution`, `cluster`, gunakan **Legacy CLI** dengan ekstra
+`console` dan environment lengkap.
