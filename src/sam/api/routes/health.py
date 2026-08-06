@@ -1,25 +1,30 @@
+"""Health Routes - SAM REST API (Program J, J2 rewire).
+
+Menggantikan `WebRuntimeService()` instansiasi langsung dengan jalur resmi
+`runtime_service.api` (ConversationPreviewGateway.api.health()) via DI.
+TIDAK mengubah RuntimeService. health berasal dari RuntimeAPI.health().
 """
-Health Routes — SAM Runtime API
-"""
+from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-from ...runtime_service import WebRuntimeService
+
+
+def _gateway():
+    """Gateway jalur resmi (dibangun di wiring). Import lazy agar tidak circular."""
+    from ..wiring import conversation_preview_gateway
+    return conversation_preview_gateway
+
 
 router = APIRouter()
 
 
 @router.get("/")
 async def health():
-    """Root health check — return OK jika runtime aktif.
-
-    S10 (TDR): pindah dari direct-wiring RuntimeCoordinator ke WebRuntimeService
-    (jalur resmi, AD-ENG-002). Sumber state = lifecycle service.
-    """
-    service = WebRuntimeService()
-    service.initialize()
-    status = service.status_dict()
-    state = status["status"]
-    healthy = state in ("ready", "running")
+    """Root health check via jalur resmi RuntimeAPI.health()."""
+    health_view = _gateway().api.health()
+    data = getattr(health_view, "as_dict", lambda: {})()
+    state = str(data.get("status", "degraded"))
+    healthy = state in ("healthy", "ready", "ok")
 
     return {
         "status": "healthy" if healthy else "degraded",
@@ -30,12 +35,11 @@ async def health():
 
 @router.get("/ready")
 async def ready():
-    """Readiness probe — return OK hanya jika runtime siap menerima kerja."""
-    service = WebRuntimeService()
-    service.initialize()
-    status = service.status_dict()
-    state = status["status"]
-    ready_state = state in ("ready", "running")
+    """Readiness probe - OK hanya jika runtime siap menerima kerja."""
+    health_view = _gateway().api.health()
+    data = getattr(health_view, "as_dict", lambda: {})()
+    state = str(data.get("status", "degraded"))
+    ready_state = state in ("healthy", "ready", "ok")
 
     if not ready_state:
         raise HTTPException(
