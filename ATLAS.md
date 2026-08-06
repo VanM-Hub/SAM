@@ -238,6 +238,7 @@
  • code tidak ubah Mission/Constitution/Architecture
  • engineering tidak ubah Architecture; ubah = Architecture Session
  • history bukan authority (read-only)
+ • dokumen ber-status Draft/Deprecated (mis. konsep arsitektur eksploratif) = IDE, bukan status SAM saat ini
  • ADR = keputusan; specification = kontrak — beda
  • presentation tanpa business logic / tanpa coordinator (Article XVI)
  • provider tanpa governance; approval wajib; preview-first (ADR-024)
