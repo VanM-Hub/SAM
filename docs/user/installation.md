@@ -1,10 +1,10 @@
 # Panduan Instalasi SAM
 
-> SAM Framework v1.0.0
+> SAM Framework v30.0.0 (Capability Release - Program G-K)
 
 ## Prasyarat
 
-- **Python:** 3.12+ (direkomendasikan) atau 3.8–3.11
+- **Python:** 3.12+ (direkomendasikan) atau 3.8-3.11
 - **Pip:** versi terbaru
 - **Git:** untuk clone repository
 - **OS:** Windows (10/11), Linux, macOS
@@ -29,40 +29,60 @@ source venv/bin/activate
 pip install -e .
 
 # 4. Install dengan extras (opsional)
-pip install -e ".[metrics]"   # Dukungan metrik sistem (psutil)
-pip install -e ".[knowledge]" # Dukungan knowledge graph (pyyaml)
-pip install -e ".[dev]"       # Pengembangan (pytest)
+pip install -e ".[console]"  # Dukungan CLI (typer, rich)
+pip install -e ".[server]"   # Dukungan REST API (fastapi, uvicorn, httpx, jinja2)
+pip install -e ".[desktop]"  # Dukungan GUI (PySide6)
+pip install -e ".[all]"      # Semua extras
+pip install -e ".[dev]"      # Pengembangan (pytest, ruff)
 ```
 
 ## Verifikasi Instalasi
 
+Way 1 - launcher CLI (rekomendasi, tidak butuh ekstra tambahan):
+
 ```bash
-# Cek versi Python
-python --version
+# Cek versi launcher
+python -m sam.launcher.cli_entry --version
 
-# Cek SAM health
-python -m sam.cli.main health
-
-# Cek CLI
-python -m sam.cli.main --help
+# Cek health via launcher
+python -m sam.launcher.cli_entry health
 ```
 
-Output yang diharapkan:
+Output yang diharapkan (health):
 
 ```
-=== SAM Health ===
-  Python      : 3.12.x
-  Database    : OK
-  cognition   : OK
-  healing     : OK
-  autonomy    : OK
-System status: HEALTHY
+SAM ready -- host: console   mode: NORMAL
 ```
+
+Way 2 - CLI legacy (butuh extra `console`):
+
+```bash
+# Cek health via CLI klasik
+sam health
+```
+
+> Catatan: perintah yang tersedia bergantung pada ekstra yang diinstal dan
+> apakah `SAM_WORKSPACE` (folder dengan aset mission/database) tersedia.
 
 ## Troubleshooting
 
 | Masalah | Solusi |
 |---|---|
-| `ModuleNotFoundError` | Pastikan `pip install -e .` sudah jalan |
-| Database error | Hapus `sam.db` lalu jalankan ulang |
+| `ModuleNotFoundError: No module named 'typer'` | Install ekstra console: `pip install -e ".[console]"` |
+| `ModuleNotFoundError: No module named 'fastapi'` | Install ekstra server: `pip install -e ".[server]"` |
+| Database error | Hapus file database lalu jalankan ulang |
 | `asyncio.to_thread` error | Upgrade ke Python 3.9+ |
+
+## Jalur Runtime Aktif
+
+Rilis v30.0.0 (Program G-K) mengaktifkan jalur runtime berikut:
+
+- **Presentation Hosts** (Program G-J): Conversation, Dashboard, CLI, REST API
+  - semuanya melalui `runtime_service.api` (tidak ada bypass).
+- **Jalur LLM** (Program K): Connector -> Provider -> Agent.
+  - Aktif dengan menyetel env kredensial provider (mis. `OPENAI_API_KEY`).
+
+Lihat panduan terpisah:
+
+- REST API: `docs/user/rest_api_guide.md`
+- Integrasi LLM: `docs/user/llm_integration_guide.md`
