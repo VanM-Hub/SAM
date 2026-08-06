@@ -1,6 +1,6 @@
 # Forbidden Dependency Matrix
 
-> **SAM v10.2.0** — Architecture Governance Baseline
+> **SAM 1.0 Foundation** - Architecture Governance Baseline
 > **File:** `docs/architecture/Forbidden_Dependencies.md`
 
 ---

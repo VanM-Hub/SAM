@@ -1,174 +1,204 @@
 # Sprint Tracker
 
-> Semua 111 sprint dari Phase I hingga Phase X.
-> Repository Stabilization = Hotfix H1-H5 (v10.0.1).
+> Kronologi pembangunan **Foundation SAM** dari 0.01 hingga 0.30, yang berpuncak pada
+> **rilis resmi SAM 1.0 (v1.0.0, 2026-08-07)**.
+>
+> Seluruh versi 0.01–0.30 adalah **tahapan pembangunan fondasi** (pre-1.0). Baru pada
+> 2026-08-07 SAM mencapai rilis publik pertama yang stabil: **SAM 1.0 (versi teknis 1.0.0)**.
+> Sumber: header isi laporan sprint (Program + versi + tanggal), diverifikasi dari
+> arsip sejarah (sekarang dipindah ke **backup eksternal arsip proyek**, di luar repo).
+> Nama folder sprint tidak selalu dapat dipercaya; nomor di peta ini = nomor sprint asli.
 
 ---
 
-## Phase I - Foundation (Sprint 1-7)
+## Ringkasan Era / Program (Foundation 0.01 – 0.30)
 
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 1 | Project bootstrap, agent state | v0.0.1 |
-| 2 | Telemetry foundation, events | v0.0.2 |
-| 3 | Contracts, Pydantic schemas | v0.0.3 |
-| 4 | Core engine abstractions | v0.0.4 |
-| 5 | Service layer | v0.0.5 |
-| 6 | Integration wiring | v0.0.6 |
-| 7 | Phase I completion | v0.1.0 |
+| Rentang Sprint | Era / Program | Versi Foundation |
+|----------------|---------------|------------------|
+| 1-7 | Foundation | 0.01 - 0.1 |
+| 8-17 | Operational Brain | 0.2 - 0.20 |
+| 18-29 | Guardian Intelligence | 0.21 - 0.30 |
+| 30-42 | Guardian Runtime + OP-era | 0.31 - 0.40 |
+| 43-58 | Guardian Live Intelligence | 0.5 - 0.60 |
+| 59-75 | Decision Runtime | 0.60 - 0.611 |
+| 76-81 | OP Brain Integration | 0.7 |
+| 82-87 | Activation Runtime | 0.8 |
+| 88-99 | Execution Runtime | 0.9 |
+| 100-111 | Runtime Kernel | 0.100 |
+| 112-122 | Universal Connector | 0.110 |
+| 123-133 | Orchestration Runtime | 0.120 |
+| 134-143 | Mission Runtime | 0.130 |
+| 144-155 | Provider Runtime | 0.140 |
+| 156-163 | Agent Runtime | 0.150 |
+| 164-171 | Skill Runtime | 0.160 |
+| 172-179 | Memory Runtime | 0.170 |
+| 180-187 | Knowledge Runtime | 0.180 |
+| 188-195 | Cognitive Runtime | 0.190 |
+| 196-203 | Workflow Runtime | 0.200 |
+| 204-211 | Policy Runtime | 0.210 |
+| 212-219 | Audit Runtime | 0.220 |
+| 220-227 | Artifact Runtime | 0.230 |
+| 228-238 | Program A - Connector/Provider Interface | 0.240 |
+| 239-249 | Program B - Model Runtime | 0.250 |
+| 250-260 | Program C - Execution Runtime | 0.260 |
+| 261-271 | Program D - Runtime Services | 0.270 |
+| 261-268e | Program E - Unified Intelligence (paralel) | 0.280 |
+| 272-279 | Program F - Presentation | 0.290 |
+| 280+ | Program G-K - Production Readiness | 0.300 |
+| **Rilis** | **SAM 1.0 Foundation (rilis publik resmi)** | **1.0** |
 
-## Phase II - Operational Brain (Sprint 8-17)
-
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 8 | Planner foundation | v1.0.0 |
-| 9 | Archive engine | v1.1.0 |
-| 10 | Monitor engine | v1.2.0 |
-| 11 | Visualize engine | v1.3.0 |
-| 12 | Health aggregator | v1.4.0 |
-| 13 | Readiness checker | v1.5.0 |
-| 14 | Dependency resolver | v1.6.0 |
-| 15 | Operational metrics | v1.7.0 |
-| 16 | Plan exporter | v1.8.0 |
-| 17 | Phase II completion | v2.0.0 |
-
-## Phase III - Guardian Intelligence (Sprint 18-29)
-
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 18 | Assessment engine | v2.1.0 |
-| 19 | Intent engine | v2.2.0 |
-| 20 | Handoff engine | v2.3.0 |
-| 21 | Justification engine | v2.4.0 |
-| 22 | Packaging engine | v2.5.0 |
-| 23 | Observation pipeline | v2.6.0 |
-| 24 | Policy engine | v2.7.0 |
-| 25 | Event engine | v2.8.0 |
-| 26 | Correlation engine | v2.9.0 |
-| 27 | Evidence chain | v2.10.0 |
-| 28 | Snapshot engine | v2.11.0 |
-| 29 | Phase III completion | v3.0.0 |
-
-## Phase IV - Guardian Runtime (Sprint 30-42)
-
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 30 | Dispatcher | v3.1.0 |
-| 31 | Guardian pipeline | v3.2.0 |
-| 32 | Reasoning bridge | v3.3.0 |
-| 33 | Learning bridge | v3.4.0 |
-| 34 | Execution preview | v3.5.0 |
-| 35 | Dashboard bridge | v3.6.0 |
-| 36 | Conversation bridge | v3.7.0 |
-| 37 | External integrations | v3.8.0 |
-| 38 | Plugin ecosystem | v3.9.0 |
-| 39 | Extension SDK | v3.10.0 |
-| 40 | Launcher runtime | v3.11.0 |
-| 41 | Service layer | v3.12.0 |
-| 42 | Phase IV completion | v4.0.0 |
-
-## Phase V - Guardian Live Intelligence (Sprint 43-58)
-
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 43 | Runtime sync | v5.0.0 |
-| 44 | Runtime sync (cont.) | v5.0.1 |
-| 45 | Transition intelligence | v5.2.0 |
-| 46 | Situation intelligence | v5.3.0 |
-| 47 | Operational assessment | v5.4.0 |
-| 48 | Operational intent | v5.5.0 |
-| 49 | Decision handoff | v5.6.0 |
-| 50 | Decision justification | v5.7.0 |
-| 51 | Decision packaging | v5.8.0 |
-| 52 | Decision consumption | v5.9.0 |
-| 53 | Evaluation runtime | v5.10.0 |
-| 54 | Planning runtime | v5.11.0 |
-| 55 | Approval runtime | v5.12.0 |
-| 56 | Adapter runtime | v5.13.0 |
-| 57 | Submission runtime | v5.14.0 |
-| 58 | Phase V completion | v6.0.0 |
-
-## Phase VI - Decision Runtime (Sprint 59-75)
-
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 59 | Gateway runtime | v6.0.0 |
-| 60 | Session runtime | v6.1.0 |
-| 61 | Lifecycle runtime | v6.2.0 |
-| 62 | Activation runtime | v6.3.0 |
-| 63 | Certification runtime | v6.4.0 |
-| 64 | Finalization runtime | v6.5.0 |
-| 65 | Conversation bridges I | v6.6.0 |
-| 66-75 | Conversation + dashboard bridges | v6.6.0-v6.9.0 |
-
-## Phase VII - Operational Brain Integration (Sprint 76-81)
-
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 76 | OP brain foundation | v7.0.0 |
-| 77 | Dashboard operational | v7.1.0 |
-| 78 | Conversation operational | v7.2.0 |
-| 79 | Planning + scheduling | v7.3.0 |
-| 80 | Readiness + metrics | v7.4.0 |
-| 81 | Phase VII completion | v7.5.0 |
-
-## Phase VIII - Activation Runtime (Sprint 82-87)
-
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 82 | Activation builder | v8.0.0 |
-| 83 | Activation pipeline | v8.1.0 |
-| 84 | Health + metrics | v8.2.0 |
-| 85 | Package engine | v8.3.0 |
-| 86 | Conversation bridges | v8.4.0 |
-| 87 | Phase VIII completion | v8.5.0 |
-
-## Phase IX - Execution Runtime (Sprint 88-99)
-
-| Sprint | Fokus | Versi |
-|--------|-------|-------|
-| 88 | Execution request + builder | v9.0.0 |
-| 89 | Execution validator + strategy | v9.1.0 |
-| 90 | Resource plan + dependency | v9.2.0 |
-| 91 | Timeline + alerts | v9.3.0 |
-| 92 | Budget + risk | v9.4.0 |
-| 93 | Quality + simulation | v9.5.0 |
-| 94 | Assembly engine | v9.6.0 |
-| 95 | Conversation bridges I | v9.7.0 |
-| 96 | Conversation bridges II | v9.8.0 |
-| 97 | Dashboard bridges I | v9.9.0 |
-| 98 | Dashboard bridges II | v9.10.0 |
-| 99 | Phase IX completion | v9.11.0-final |
-
-## Phase X - Runtime Kernel (Sprint 100-111)
-
-| Sprint | Fokus | Versi | Tests |
-|--------|-------|-------|-------|
-| 100 | Runtime Context | v10.0.0-alpha.100 | 137 |
-| 101 | Runtime Registry | v10.0.0-alpha.101 | 136 |
-| 102 | Runtime State | v10.0.0-alpha.102 | 139 |
-| 103 | Runtime Lifecycle | v10.0.0-alpha.103 | 142 |
-| 104 | Runtime Bridge/Adapter | v10.0.0-alpha.104 | 150 |
-| 105 | Runtime Health | v10.0.0-alpha.105 | 144 |
-| 106 | Runtime Security | v10.0.0-alpha.106 | 142 |
-| 107 | Runtime Scheduler | v10.0.0-alpha.107 | 150 |
-| 108 | Runtime Event Bus | v10.0.0-alpha.108 | 141 |
-| 109 | Runtime Coordinator | v10.0.0-alpha.109 | 146 |
-| 110 | Runtime Telemetry | v10.0.0-alpha.110 | 133 |
-| 111 | Kernel Final Assembly | v10.0.0 | 134 |
-
-**Phase X total: 1,719 tests, 91 source files, 60 ExecutionCards.**
+> **Catatan kunci:** seluruh era di atas adalah fase **Foundation (pre-1.0)**.
+> Penomoran 0.01–0.30 menunjukkan 30 tahap pembangunan fondasi.
+> **1.0** adalah rilis stabil pertama yang baru dicapai 2026-08-07.
 
 ---
 
-## Repository Stabilization (H1-H5)
+## Detail per Era (perjalanan Foundation 0.01 → 0.30)
 
-| Hotfix | Status | Deskripsi |
-|--------|--------|-----------|
-| H1 | DONE | CI Recovery - workflow clean, valid YAML |
-| H2 | DONE | Test structure - 42 __init__.py added |
-| H3 | DONE | Fixture cleanup - modular conftest.py |
-| H4 | IN PROGRESS | Documentation refresh |
-| H5 | PENDING | Repository hygiene |
+### Foundation (Sprint 1-7, 0.01 - 0.1)
+Dasar proyek: bootstrap, telemetry, contracts, core engine, service layer, integration.
 
-Target: v10.0.1
+### Operational Brain (Sprint 8-17, 0.2 - 0.20)
+Sprint 8-17: planner, archive, monitor, visualize, health, readiness, dependency, metrics,
+plan exporter. Berakhir 0.20.
+
+### Guardian Intelligence (Sprint 18-29, 0.21 - 0.30)
+Assessment, intent, handoff, justification, packaging, observation, policy, event,
+correlation, evidence chain, snapshot. Berakhir 0.30.
+
+### Guardian Runtime & OP-era (Sprint 30-42, 0.31 - 0.40)
+Sprint 33-42 rilis di bawah label OP (OP-390 s.d. OP-450): Learning Foundation,
+Execution Connectors, Connector Runtime, Execution Engine, Dispatch Runtime,
+Execution Adapter, Execution Provider, External Integration, Plugin Ecosystem,
+Extension SDK. Nama di file asli memakai OP-* (bukan "sprint-N").
+
+### Guardian Live Intelligence (Sprint 43-58, 0.5 - 0.60)
+Runtime/transition/situation intelligence, operational assessment/intent, decision
+handoff/justification/packaging/consumption, evaluation/planning/approval/adapter/
+submission runtime.
+
+### Decision Runtime (Sprint 59-75, 0.60 - 0.611)
+Gateway, session, lifecycle, activation, certification, finalization runtime +
+conversation/dashboard bridges.
+
+### OP Brain Integration (Sprint 76-81, 0.7)
+Sprint 76-81: OP brain foundation + dashboard/conversation operational +
+planning/scheduling + readiness/metrics + completion. Sprint 77-80 tidak punya
+file terpisah; digabung dalam satu laporan "Phase VII Operational Brain (Complete)".
+
+### Activation Runtime (Sprint 82-87, 0.8)
+Sprint 82-87: activation builder/pipeline + health/metrics + package engine +
+conversation bridges + completion. Sprint 83-86 digabung dalam satu laporan
+"Phase VIII: Activation Runtime".
+
+### Execution Runtime (Sprint 88-99, 0.9)
+Sprint 88-99: execution request/builder/validator/strategy, resource plan,
+timeline, budget/risk, quality/simulation, assembly engine, conversation +
+dashboard bridges. Sprint 89-98 digabung; laporan akhir "Execution Plan Assembly".
+
+### Runtime Kernel (Sprint 100-111, 0.100)
+Sprint 100-111: Runtime Context, Registry, State, Lifecycle, Bridge/Adapter, Health,
+Security, Scheduler, Event Bus, Coordinator, Telemetry, Kernel Final Assembly.
+Laporan gabungan "Sprint 100-111 Runtime Kernel Phase".
+
+### Universal Connector (Sprint 112-122, 0.110)
+Laporan gabungan "Sprint 112-122 Universal Connector".
+
+### Orchestration Runtime (Sprint 123-133, 0.120)
+Laporan "Sprint 133 (Orchestration Runtime)".
+
+### Mission Runtime (Sprint 134-143, 0.130)
+Laporan "Sprint 143 (Mission Runtime)".
+
+### Provider Runtime (Sprint 144-155, 0.140)
+Provider base, filesystem, shell, docker, openclaw, discovery, session, routing,
+certification.
+
+### Agent Runtime (Sprint 156-163, 0.150)
+Agent Foundation, Mission Session, Lifecycle State Machine, Mission Planner,
+Runtime Coordinator, Transition Monitor, Agent Runtime Engine, Certification.
+
+### Skill Runtime (Sprint 164-171, 0.160)
+Skill Foundation, Definition, Builder, Runtime, Catalog, Monitoring, Certification,
+Runtime Integration.
+
+### Memory Runtime (Sprint 172-179, 0.170)
+Memory Foundation, Model, Builder, Runtime, Catalog, Monitoring, Certification,
+Integration.
+
+### Knowledge Runtime (Sprint 180-187, 0.180)
+Knowledge Foundation, Model, Builder, Runtime, Catalog, Monitoring, Certification,
+Integration.
+
+### Cognitive Runtime (Sprint 188-195, 0.190)
+Cognitive Foundation, Context, Builder, Runtime, Workspace, Monitoring, Certification,
+Integration.
+
+### Workflow Runtime (Sprint 196-203, 0.200)
+Workflow Foundation, Model, Builder, Runtime, Catalog, Monitoring, Certification,
+Integration.
+
+### Policy Runtime (Sprint 204-211, 0.210)
+Policy Foundation, Model, Builder, Runtime, Catalog, Monitoring, Certification,
+Integration.
+
+### Audit Runtime (Sprint 212-219, 0.220)
+Audit Foundation, Model, Builder, Runtime, Catalog, Monitoring, Certification,
+Integration.
+
+### Artifact Runtime (Sprint 220-227, 0.230)
+Artifact Foundation, Model, Builder, Runtime, Catalog, Monitoring, Certification,
+Integration.
+
+### Program A - Connector/Provider Interface (Sprint 228-238, 0.240)
+Provider Interface, LLM Common Adapter, OpenAI, Anthropic, Gemini, DeepSeek, Ollama,
+OpenClaw Runtime Integration, Connector Runtime Integration, Execution Preview
+Integration, Certification.
+
+### Program B - Model Runtime (Sprint 239-249, 0.250)
+Model foundation/interface, chat, embedding, reasoning, vision, tool, mapping,
+certification, integration.
+
+### Program C - Execution Runtime (Sprint 250-260, 0.260)
+Execution foundation/request/option/validation, pipeline, provider dispatch/selector,
+engine, rollback, monitoring, safety/limits/policy, certification, provider activation.
+
+### Program D - Runtime Services (Sprint 261-271, 0.270)
+Runtime service layers & deployment. Menjadi fondasi Program F (Presentation).
+
+### Program E - Unified Intelligence (Sprint 261-268, 0.280)
+Program E berjalan paralel terhadap Program D (menempati nomor sprint yang sama
+261-268). Di sini ditandai `261e-268e`. Pipeline-nya tidak menjadi dasar Program F,
+yang dibangun langsung di atas Program D (0.270).
+
+### Program F - Presentation (Sprint 272-279, 0.290)
+Presentation foundation/workspace/panels/dashboard, conversation, monitoring,
+certification, integration, desktop.
+
+### Program G-K - Production Readiness (0.300)
+Fase pematangan produksi: stabilitas repository, konsistensi dokumentasi, kesehatan
+kode, verifikasi build & CI, transisi ke runtime layanan, aktivasi CLI/dashboard/
+REST API, dan integrasi LLM. Menghasilkan 0.300 — landasan langsung menuju rilis resmi.
+
+### SAM 1.0 Foundation (rilis publik resmi, 2026-08-07, 1.0)
+Baseline stabil pertama SAM. Seluruh fondasi (9 dokumen) diselaraskan ke **1.0.0
+Foundational/Accepted**; versi package resmi **1.0.0**; riwayat laporan & arsip
+dikonsolidasi ke backup eksternal. **Nama publik: `SAM 1.0`.** Ini bukan "tahap
+0.31" — ini **rilis 1.0** yang menandai fondasi resmi selesai.
+
+---
+
+## Konflik Penomoran (diketahui)
+
+| Sprint | Lokasi | Program | Versi Foundation |
+|--------|--------|---------|------------------|
+| 261-268 | sprint-reports/ (arsip) | D (Runtime Services) | 0.270 |
+| 261-268 | program-e-reports/ (arsip) | E (Unified Intelligence) | 0.280 |
+
+Sprint 261-268 muncul dobel (Program D dan E, versi berbeda). Fakta teknis: Program F
+(272-279, 0.290) dibangun langsung di atas Program D (0.270), bukan dari Program E
+(0.280) sehingga Program E adalah cabang paralel. Penamaan `261e-268e` dipakai untuk
+membedakan.
+
+> Lokasi `sprint-reports/` & `program-e-reports/` merujuk arsip yang kini disimpan di
+> **backup eksternal arsip proyek** (folder `docs/history/` lokal kosong).

@@ -1,6 +1,6 @@
-﻿# SAM Glossary
+# SAM Glossary
 
-Version: 1.0
+Version: 1.0.0
 Status: Foundational
 Authority: Constitutional Vocabulary
 
