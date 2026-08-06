@@ -1,5 +1,5 @@
 """
-SAM Web Dashboard — Phase 1
+SAM Web Dashboard - Phase 1
 
 FastAPI + Jinja2 + HTMX dashboard untuk SAM Operations Console.
 Ringan, cepat, tanpa build frontend.
@@ -49,6 +49,16 @@ from ..autonomous.executor import ActionExecutor
 from ..autonomous.models import AutonomousActionStatus
 from ..openclaw.discovery import OpenClawDiscovery
 from ..openclaw.health import OpenClawHealthCollector
+
+# --- Program I: CLI host resmi (Presentation Capability) ---
+# CLI -> runtime_service.api via DI; TIDAK menyentuh Runtime langsung.
+from ..presentation.cli import (
+    CLIApplication,
+    CLICommandRegistry,
+    CLIFormatter,
+    wire_cli_runtime,
+    CLIIntegration,
+)
 
 WEB_DIR = Path(__file__).parent
 
@@ -141,7 +151,7 @@ def _execute_preview(request: ExecutionRequest):
 # preview (di wiring entry, BUKAN di execution_runtime). Registry tetap immutable;
 # referensi holder di-swap ke instance hasil register. Tanpa ubah consumer/bridge/registry.
 _audit_registry_holder = AuditRegistryRef(AuditRegistry())
-# Registry yang sama juga dipakai audit_consumer (Session 09) — holder dan consumer
+# Registry yang sama juga dipakai audit_consumer (Session 09) - holder dan consumer
 # berbagi registry awal; record preview dibaca via holder (titik baca registry terbaru).
 _audit_registry = _audit_registry_holder.get()
 audit_consumer = AuditPreviewConsumer(registry=_audit_registry_holder.get())
@@ -285,7 +295,7 @@ async def runtime_page(request: Request):
 
 @app.get("/workflow")
 async def workflow_page(request: Request):
-    """Workflow monitor — data dari WorkflowRegistry via consumer (bukan hardcode)."""
+    """Workflow monitor - data dari WorkflowRegistry via consumer (bukan hardcode)."""
     workflow_ids = workflow_consumer.list_workflows()
     workflows = []
     for wf_id in workflow_ids:
@@ -400,6 +410,30 @@ async def settings_page(request: Request):
         "dos": dos_content,
         "mission": mission_content,
     })
+
+
+# ---------------------------------------------------------------------------
+# Program I - CLI host resmi (Presentation Capability)
+# DI wiring: gateway + consumers sudah di-inject di entry. CLI TIDAK membuat
+# RuntimeAPI/gateway sendiri, TIDAK menyentuh Runtime/Provider/Connector/
+# Registry/ExecutionRuntime langsung. Semua command via runtime_service.api.
+# ---------------------------------------------------------------------------
+_cli_registry = CLICommandRegistry()
+_cli_wiring = wire_cli_runtime(
+    conversation_preview_gateway,
+    registry=_cli_registry,
+    consumers={
+        "knowledge": knowledge_consumer,
+        "workflow": workflow_consumer,
+        "artifact": artifact_consumer,
+        "memory": memory_consumer,
+        "policy": policy_consumer,
+        "audit": audit_consumer,
+    },
+)
+cli_app = CLIApplication(registry=_cli_registry, formatter=CLIFormatter())
+cli_integration = CLIIntegration(registry=_cli_registry)
+
 
 
 def run_server(host: str = "127.0.0.1", port: int = 8080):
