@@ -202,25 +202,37 @@ Pipeline akhir: Mission→Agent→Workflow→Memory→Knowledge→Cognitive→Po
 
 #### Program G — Conversation
 
+> **SELESAI (v30.0.0, Program G, 2026-08-06, commit `bda9313`).** Conversation as Presentation Capability aktif; 14 test.
+
 Conversation Runtime menjadi benar-benar berguna: buat mission, tampilkan workflow, cari policy, lihat audit, preview artifact, jalankan approval, preview execution, ringkas knowledge, cari memory. **Bukan lagi sekadar bridge.**
 
 #### Program H — Dashboard
+
+> **SELESAI (v30.0.0, Program H, 2026-08-06, commit `fe0956a`).** Dashboard as Presentation Capability aktif; 18 test.
 
 Dashboard menjadi konsol operasional: **Mission · Workflow · Execution · Approval · Audit · Connector · Provider · Runtime · Health · Telemetry**.
 
 #### Program I — CLI
 
+> **SELESAI (v30.0.0, Program I, 2026-08-06, commit `f5bd184`).** CLI as Presentation Capability aktif; 21 test.
+
 Perintah seperti: `sam mission` · `sam workflow` · `sam policy` · `sam audit` · `sam artifact` · `sam connector` · `sam provider` · `sam execution` · `sam preview` · `sam dashboard`.
 
 #### Program J — REST API
+
+> **SELESAI (v30.0.0, Program J, 2026-08-06).** REST API as Presentation Host aktif via `runtime_service.api`; endpoint J3-J10 + /runtime /health; 19 test REST + 11 api.
 
 REST API untuk semua runtime, mis. `POST /missions` · `POST /workflow` · `POST /approval` · `POST /execution-preview` · `GET /audit` · `GET /artifact` · `GET /policy`.
 
 #### Program K — LLM Integration
 
-SAM memperoleh kemampuan AI nyata. Connector: **OpenAI · Anthropic · Gemini · Ollama · OpenClaw**. Tetap melalui **Connector Runtime → Provider Runtime → Agent Runtime** — bukan langsung memanggil provider.
+> **SELESAI (v30.0.0, Program K, 2026-08-06).** LLM Runtime Activation aktif via `api/llm_wiring.py`; jalur Connector->Provider->Agent; 5 provider LLM active + 5 documented; 35 test.
+
+SAM memperoleh kemampuan AI nyata. Connector: **OpenAI + Anthropic + Gemini + DeepSeek + Ollama**. Tetap melalui **Connector Runtime -> Provider Runtime -> Agent Runtime** (bukan langsung memanggil provider).
 
 ### Tahap 3 — Product Release
+
+> **SELESAI (v30.0.0, Product Release R-001, 2026-08-06, commit `16c71b4`).** Seluruh 8 fase R1-R8 tuntas; 8 laporan di `docs/releases/history/`; gap dokumentasi R3 dituntaskan; tetap v30.0.0 tanpa tag baru.
 
 Sesudah integrasi selesai: **SAM Desktop · SAM CLI · SAM Server · SAM SDK · SAM Python Package · SAM Documentation · SAM Examples · SAM Templates · SAM Tutorial · SAM Marketplace (opsional)**.
 
@@ -332,4 +344,4 @@ Program K — LLM Integration
 Production
 ```
 
-**Catatan status:** Program A (v24.0.0 ✅), B (v25.0.0 ✅), C (v26.0.0 ✅), D (v27.0.0 ✅), E (v28.0.0 ✅), F (v30.0.0 ✅ — Presentation Layer; v29.0.0 di-*skip*) **sudah dieksekusi & dirilis**. Program G-K & Tahap 3 masih **perencanaan**. Lihat *3 Tahap Pembangunan* di atas untuk detail per Program.
+**Catatan status:** Program A (v24.0.0), B (v25.0.0), C (v26.0.0), D (v27.0.0), E (v28.0.0), F (v30.0.0 - Presentation Layer; v29.0.0 di-skip), G (Conversation), H (Dashboard), I (CLI), J (REST API), K (LLM Integration) **sudah dieksekusi** (seluruhnya tetap v30.0.0, capability release, 2026-08-01 s/d 2026-08-06). **Tahap 3 - Product Release R-001 juga SELESAI** (2026-08-06, commit `16c71b4`; 8 fase R1-R8). Program A-F dirilis dengan bump versi; Program G-K dirilis tanpa bump versi (capability presentation/release R-001). Lihat *3 Tahap Pembangunan* & `docs/releases/` untuk detail.

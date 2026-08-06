@@ -1,5 +1,19 @@
 # Changelog
 
+## v30.0.0 (2026-08-06) - Capability Release (Program G-K) + Product Release R-001
+
+### Program G-K: Presentation Hosts & LLM activation (tanpa bump versi)
+- Conversation as Presentation Capability (Program G): `presentation/conversation/` + 14 test; `ConversationPreviewGateway` via `runtime_service.api` (0 bypass).
+- Dashboard as Presentation Capability (Program H): `presentation/dashboard/` + 18 test; panel activation per area; Mission/Provider/Connector/Telemetry = Escalation (STOP, tanpa activation path).
+- CLI as Presentation Capability (Program I): `presentation/cli/` + 21 test; rewire `sam.runtime` ke `runtime_service.api`; 11 command resmi.
+- REST API as Presentation Host (Program J): `api/presentation_rest/` (RESTApplication/RESTRouter/RESTEndpoint/RESTSerializer) + composition root `api/wiring.py`; endpoint J3-J10 (workflow/policy/audit/preview/knowledge/memory/artifact/approval/status) + /runtime /health via `runtime_service.api`; 19 test + api 11; regression 584 passed.
+- LLM Runtime Activation (Program K): composition root `api/llm_wiring.py`; jalur Connector->Provider->Agent (contract `connector.llm.chat`); 5 provider LLM active + 5 documented; 35 test.
+- Seluruh host & capability tanpa business logic, DTO immutable (ADR-023), preview-only (ADR-024); nol perubahan Runtime/RuntimeService/public contract/Architecture.
+
+### Product Release R-001 (8 fase: R1-R8)
+- Release audit, artifact verification, documentation validation, release validation, regression (3541 passed, 42 skipped), packaging, release notes, akhirn readiness - laporan di `docs/releases/history/`.
+- Gap dokumentasi R3 dituntaskan: `docs/user/installation.md` & `cli_reference.md` ditulis ulang (v30.0.0, ekstra aktual, dua jalur CLI); `capability_guide.md` menambah seksi capability bawaan; dokumen baru `docs/user/rest_api_guide.md` & `docs/user/llm_integration_guide.md`; `docs/architecture/Entry_Points.md` diupdate; release notes `docs/releases/history/R-001_Release_Notes.md`; manifest & version-history direkam.
+
 ## v30.0.0 (2026-08-01) - Program F: Presentation Layer
 
 ### Restrukturisasi arsitektur (Sprint 272-279, 189 tes)
