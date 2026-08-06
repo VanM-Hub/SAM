@@ -1,24 +1,40 @@
-"""
-SAM Runtime API — Phase 1
+"""SAM REST API - Host (Program J).
 
-FastAPI server dengan endpoints:
-  - /health          — health check
-  - /health/ready    — readiness probe
-  - /runtime         — status runtime
-  - /metrics         — metrics terkini
-  - /events          — event telemetry
+FastAPI server dengan endpoints REST (JSON):
+  - /health           health check (jalur resmi runtime_service.api)
+  - /health/ready     readiness probe
+  - /runtime          status runtime (jalur resmi)
+  - /events           event telemetry
+  - /metrics          metrics terkini
+  - /workflow         workflow capability (jalur resmi)
+  - /policy           policy capability
+  - /audit            audit capability
+  - /preview          preview capability (preview only)
+  - /knowledge        knowledge capability
+  - /memory           memory capability
+  - /artifact         artifact capability
+  - /approval         approval (pass-through)
+  - /status           status runtime
+  - /                 metadata API
+
+Seluruh endpoint yang berhubungan dengan capability memakai `runtime_service.api`
+via wiring (composition root di `wiring.py`). TIDAK ada import langsung ke
+Runtime/Registry/Provider/Connector/ExecutionRuntime di route handler.
 
 Run:
     uvicorn sam.api.server:app --host 0.0.0.0 --port 8080
 """
+from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from .routes import health, runtime, events, metrics
+from .wiring import rest_app
 
 app = FastAPI(
     title="SAM Runtime API",
-    description="SAM — AI Operations Guardian Runtime API",
+    description="SAM - AI Operations Guardian Runtime API",
     version="1.0",
 )
 
@@ -29,11 +45,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers
+# Register routers (jalur resmi capability ada di rest_app.routers)
 app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(runtime.router, prefix="/runtime", tags=["runtime"])
 app.include_router(events.router, prefix="/events", tags=["events"])
 app.include_router(metrics.router, prefix="/metrics", tags=["metrics"])
+
+# Program J: capability REST (workflow/policy/audit/preview/knowledge/memory/
+# artifact/approval/status) - composition-only, via runtime_service.api.
+for _router in rest_app.routers:
+    app.include_router(_router.router)
 
 
 @app.get("/")
@@ -47,5 +68,14 @@ async def root():
             "runtime": "/runtime",
             "metrics": "/metrics",
             "events": "/events",
+            "workflow": "/workflow",
+            "policy": "/policy",
+            "audit": "/audit",
+            "preview": "/preview/{execution_id}",
+            "knowledge": "/knowledge",
+            "memory": "/memory",
+            "artifact": "/artifact",
+            "approval": "/approval/{execution_id}",
+            "status": "/status",
         },
     }

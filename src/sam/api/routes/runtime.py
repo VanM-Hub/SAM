@@ -1,40 +1,31 @@
+"""Runtime Routes - SAM REST API (Program J, J2 rewire).
+
+Menggantikan import langsung `RuntimeCoordinator` dengan jalur resmi
+`runtime_service.api` (ConversationPreviewGateway.api.status()) via DI.
+TIDAK ada akses langsung ke Runtime citizens. TIDAK mengubah RuntimeService.
 """
-Runtime Routes — SAM Runtime API
-"""
+from __future__ import annotations
 
 from fastapi import APIRouter
-from ...runtime.coordinator import RuntimeCoordinator
+
+
+def _gateway():
+    """Gateway jalur resmi (dibangun di wiring). Import lazy agar tidak circular."""
+    from ..wiring import conversation_preview_gateway
+    return conversation_preview_gateway
+
 
 router = APIRouter()
 
 
 @router.get("/")
 async def runtime_status():
-    """Status runtime saat ini."""
-    coord = RuntimeCoordinator()
-
-    # Dapatkan nama adapter dengan aman
-    adapter_name = "Unknown"
-    if hasattr(coord, "adapter_name") and coord.adapter_name:
-        adapter_name = coord.adapter_name
-    elif hasattr(coord, "hosting_adapter") and coord.hosting_adapter:
-        adapter_name = coord.hosting_adapter.__class__.__name__.replace("Adapter", "")
-
-    # Dapatkan uptime
-    uptime = 0
-    if hasattr(coord, "start_time") and coord.start_time:
-        from datetime import datetime
-        uptime = (datetime.utcnow() - coord.start_time).total_seconds()
+    """Status runtime via jalur resmi RuntimeAPI.status()."""
+    status_view = _gateway().api.status()
+    data = getattr(status_view, "as_dict", lambda: {})()
 
     return {
-        "state": coord.state.value,
-        "hosting": adapter_name,
-        "uptime_seconds": uptime,
-        "session": coord.session_manager.get_current_session()["id"]
-        if hasattr(coord, "session_manager")
-        else "none",
-        "plugins": {
-            "loaded": 14,
-            "expected": 14,
-        },
+        "services": data.get("services", {}),
+        "version": data.get("version", "27.0.0"),
+        "healthy": data.get("healthy", True),
     }
