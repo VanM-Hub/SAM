@@ -132,7 +132,7 @@ menyentuh coordinator/execution; ia kontrak + pipeline-aware.
 JAWABAN: KEDUANYA, pada lapisan berbeda.
 
 A. RuntimeService SEBAGAI LAPISAN KONTRAK/LIFECYCLE = SUDAH SELESAI.
-   - v27.0.0, 11 sprint (261-271), 187 test.
+   - 0.27 (11 sprint 261-271), 187 test - tahap Foundation 0.27 (Program D).
    - OP-2700 status: Released.
    - 0 forbidden imports, ruff clean, 0 layer violation.
    - Contract, descriptor, metadata, lifecycle, pipeline, registry semua ada.

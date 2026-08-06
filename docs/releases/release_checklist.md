@@ -1,11 +1,11 @@
 # Release Checklist
 
-> **SAM v30.0.0 — Baseline Stabil (Production / Release Ready, 2026-08-06)**
-> Quality gates berikut terverifikasi pada v30.0.0 pasca-engineering (L1/L2/L6, EP-001/EP-002):
+> **SAM 1.0 Foundation - Baseline Stabil (Production / Release Ready)**
+> Quality gates berikut terverifikasi pada baseline SAM 1.0 pasca-engineering (L1/L2/L6, EP-001/EP-002):
 
 ---
 
-## Status kesiapan v30.0.0 Baseline
+## Status kesiapan SAM 1.0 Baseline
 
 - [x] CI GREEN (ci.yml 7/7: validation, server, desktop, core 3.10/3.11/3.12, coverage)
 - [x] Regression hijau (unit + runtime_service + presentation + api + e2e + integration + runtime)
@@ -50,12 +50,11 @@
 
 ## 3. Documentation
 
-- [ ] `docs/releases/version-history.md` → tambah entry versi baru
 - [ ] `docs/releases/manifest.md` → update manifest
+- [ ] `CHANGELOG.md` → tambah entry rilis baru (SAM 1.0 = rilis pertama)
 - [ ] `ROADMAP.md` → update roadmap (jika milestone tercapai)
 - [ ] `SPRINT_TRACKER.md` → update sprint tracker
-- [ ] `docs/history/reports/Architecture_Health.md` → update score
-- [ ] `docs/history/reports/Repository_Metrics.md` → update metrics
+- [ ] Arsip laporan/riwayat lama → pindahkan ke backup eksternal jika tak lagi dibutuhkan
 
 ## 4. Quality Gates
 
@@ -79,8 +78,8 @@
 
 - [ ] Verify release page: `https://github.com/VanM-Hub/SAM/releases/tag/vX.Y.Z`
 - [ ] Verify CI post-release (trigger re-run if needed)
-- [ ] Update sprint completion report di `docs/history/sprint-reports/`
-- [ ] Update `ZN_SAM/01_CURRENT_STATUS.md` dengan versi baru
+- [ ] Update sprint completion report (arsip ke backup eksternal jika tak lagi dibutuhkan)
+- [ ] Perbarui status versi baru di catatan proyek internal (tidak di-commit ke repo)
 
 ## Quick Commands
 

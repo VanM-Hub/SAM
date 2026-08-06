@@ -20,7 +20,7 @@ Apa yang seharusnya terjadi.
 **Lingkungan**
 - OS: [Windows/Linux]
 - Python: [3.8/3.12]
-- SAM Version: [v2.0.0]
+- SAM Version: [1.0.0]
 
 **Log/Screenshots**
 Jika ada, tambahkan log atau screenshot.

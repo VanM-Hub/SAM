@@ -6,11 +6,13 @@ PUBLIC API (frozen for v4):
   Conversation  — Semua interaksi. answer(), timeline(), dll.
   MissionSession— Konteks operasional sesi kerja.
 
-@internal — Semua modul lain tidak dijamin stabil.
+@internal - Semua modul lain tidak dijamin stabil.
 Berubah tanpa pemberitahuan.
 
 Stability: STABLE_API
 """
+
+__version__ = "1.0.0"
 
 from .operations.conversation_api import SAM
 

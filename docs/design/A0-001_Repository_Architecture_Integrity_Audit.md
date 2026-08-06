@@ -6,7 +6,7 @@
 **Initiator:** ✦ Aster — MISSION G-001 (Architecture Integrity Audit)
 **Status:** Completed (READ-ONLY — tidak mengubah repository)
 **Date:** 2026-08-04
-**Baseline:** Repo SAM `v30.0.0` (Program F complete, CI green)
+**Baseline:** Repo SAM tahap Foundation `0.30` (Program F complete, CI green)
 
 > **Misi (from Aster):** Audit menyeluruh agar seluruh dokumentasi memiliki **satu
 > sumber kebenaran (Single Source of Truth)**. Bukan mencari bug, bukan menambah fitur,
@@ -17,7 +17,7 @@
 
 ## Executive Summary
 
-Repository SAM berada di titik transisi: arsitektur sudah matang (v30.0.0, Program F
+Repository SAM berada di titik transisi: arsitektur sudah matang (tahap Foundation 0.30, Program F
 selesai, 189 test hijau), sehingga risiko terbesar bukan lagi "kurang fitur", melainkan
 **drift dokumentasi** — dokumen yang perlahan menjauh dari satu sumber kebenaran.
 

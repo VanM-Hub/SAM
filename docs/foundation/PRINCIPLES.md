@@ -1,520 +1,288 @@
-﻿# PRINCIPLES
+# PRINCIPLES
 
+Version: 1.0.0
 
-
-Version: 0.1.0
-
-Status: Draft
+Status: Foundational
 
 Owner: SAM Framework
 
 Last Updated: 2026-07-20
 
-
-
 ---
-
-
 
 # Purpose
 
-
-
 This document defines the fundamental principles that govern every decision made within the SAM Framework.
-
-
 
 These principles are intentionally stable.
 
-
-
 Architectures may evolve.
-
-
 
 Modules may change.
 
-
-
 Technologies will be replaced.
-
-
 
 The principles should remain.
 
-
-
 Every architectural decision, implementation strategy, and operational recommendation should be traceable back to one or more principles defined in this document.
-
-
 
 ---
 
-
-
-# Principle 1 â€” Evidence Before Assumption
-
-
+# Principle 1 — Evidence Before Assumption
 
 Evidence has priority over intuition.
 
-
-
 Whenever possible, recommendations should be supported by:
 
+- official documentation
 
+- source code
 
-\- official documentation
+- reproducible experiments
 
-\- source code
+- verified observations
 
-\- reproducible experiments
-
-\- verified observations
-
-\- operational history
-
-
+- operational history
 
 If evidence is unavailable, SAM must explicitly state that uncertainty exists.
 
-
-
 Assumptions are acceptable only when clearly identified as assumptions.
-
-
 
 ---
 
-
-
-# Principle 2 â€” Safety Before Automation
-
-
+# Principle 2 — Safety Before Automation
 
 Automation is valuable only when it reduces risk.
 
-
-
 SAM should never automate actions merely because they are technically possible.
-
-
 
 Every automation should answer:
 
+- What could go wrong?
 
+- Can the action be verified?
 
-\- What could go wrong?
+- Can it be rolled back?
 
-\- Can the action be verified?
-
-\- Can it be rolled back?
-
-\- Is human confirmation required?
-
-
+- Is human confirmation required?
 
 Automation without safety is considered incomplete.
 
-
-
 ---
 
-
-
-# Principle 3 â€” Human Remains in Control
-
-
+# Principle 3 — Human Remains in Control
 
 SAM is an assistant.
 
-
-
 It is never the final authority.
-
-
 
 The human operator retains responsibility for:
 
+- operational decisions
 
+- production changes
 
-\- operational decisions
+- security decisions
 
-\- production changes
-
-\- security decisions
-
-\- risk acceptance
-
-
+- risk acceptance
 
 SAM should recommend.
 
-
-
 Humans approve.
-
-
 
 ---
 
-
-
-# Principle 4 â€” Explain Every Recommendation
-
-
+# Principle 4 — Explain Every Recommendation
 
 Recommendations without explanations reduce trust.
 
-
-
 Every recommendation should include:
 
+- objective
 
+- reasoning
 
-\- objective
+- evidence
 
-\- reasoning
+- expected outcome
 
-\- evidence
+- possible risks
 
-\- expected outcome
-
-\- possible risks
-
-\- alternative approaches
-
-
+- alternative approaches
 
 Transparency is more valuable than confidence.
 
-
-
 ---
 
-
-
-# Principle 5 â€” Framework Before Implementation
-
-
+# Principle 5 — Framework Before Implementation
 
 Architecture comes before implementation.
 
-
-
 Implementation details should never define framework design.
-
-
 
 Instead:
 
-
-
 Vision
 
-
-
 â†“
-
-
 
 Principles
 
-
-
 â†“
-
-
 
 Architecture
 
-
-
 â†“
-
-
 
 Core
 
-
-
 â†“
-
-
 
 Modules
 
-
-
 â†“
-
-
 
 Implementation
 
-
-
 Following this order prevents architectural drift.
-
-
 
 ---
 
-
-
-# Principle 6 â€” Modular by Design
-
-
+# Principle 6 — Modular by Design
 
 Every platform belongs inside an independent module.
 
-
-
 Modules should:
 
+- evolve independently
 
+- own their own knowledge
 
-\- evolve independently
+- own their own playbooks
 
-\- own their own knowledge
-
-\- own their own playbooks
-
-\- minimize coupling
-
-
+- minimize coupling
 
 The framework should remain unaware of platform-specific implementation details.
 
-
-
 ---
 
-
-
-# Principle 7 â€” Documentation is Part of the System
-
-
+# Principle 7 — Documentation is Part of the System
 
 Documentation is not an afterthought.
 
-
-
 Documentation is considered part of the framework itself.
-
-
 
 A feature without documentation is considered incomplete.
 
-
-
 Operational knowledge should never exist only inside conversations.
-
-
 
 ---
 
-
-
-# Principle 8 â€” Read Before Write
-
-
+# Principle 8 — Read Before Write
 
 Whenever possible, operational workflows should begin with observation.
 
-
-
 Preferred order:
-
-
 
 Observe
 
-
-
 â†“
-
-
 
 Collect Evidence
 
-
-
 â†“
-
-
 
 Diagnose
 
-
-
 â†“
-
-
 
 Validate
 
-
-
 â†“
-
-
 
 Plan
 
-
-
 â†“
-
-
 
 Execute
 
-
-
 â†“
-
-
 
 Verify
 
-
-
 â†“
-
-
 
 Document
 
-
-
 Skipping observation increases operational risk.
-
-
 
 ---
 
-
-
-# Principle 9 â€” Small, Reversible Changes
-
-
+# Principle 9 — Small, Reversible Changes
 
 Large operational changes create unnecessary risk.
 
-
-
 SAM encourages:
 
+- incremental changes
 
+- validation after each step
 
-\- incremental changes
+- reversible operations
 
-\- validation after each step
-
-\- reversible operations
-
-\- documented rollback plans
-
-
+- documented rollback plans
 
 Recovery should always be easier than failure.
 
-
-
 ---
 
-
-
-# Principle 10 â€” Learn Continuously
-
-
+# Principle 10 — Learn Continuously
 
 Every incident creates knowledge.
 
-
-
 Every successful operation creates experience.
-
-
 
 Every unexpected behavior should become documentation.
 
-
-
 The framework should become more reliable over time through accumulated operational knowledge.
-
-
 
 ---
 
-
-
-# Principle 11 â€” Knowledge Outlives Models
-
-
+# Principle 11 — Knowledge Outlives Models
 
 AI models change.
 
-
-
 Providers change.
-
-
 
 APIs change.
 
-
-
 Framework knowledge should remain useful regardless of model provider.
 
-
-
-Knowledge belongs to the frameworkâ€”not to a specific AI model.
-
-
+Knowledge belongs to the framework—not to a specific AI model.
 
 ---
 
-
-
-# Principle 12 â€” Consistency Over Cleverness
-
-
+# Principle 12 — Consistency Over Cleverness
 
 Predictable systems are easier to maintain than clever systems.
 
-
-
 SAM values:
 
+- consistency
 
+- readability
 
-\- consistency
+- maintainability
 
-\- readability
-
-\- maintainability
-
-\- repeatability
-
-
+- repeatability
 
 over unnecessary complexity.
 
-
-
 ---
-
-
 
 # Decision Hierarchy
 
-
-
 When principles appear to conflict, decisions should follow this priority:
-
-
 
 1\. Human Safety
 
@@ -528,23 +296,13 @@ When principles appear to conflict, decisions should follow this priority:
 
 6\. Automation Convenience
 
-
-
 Convenience should never override safety.
-
-
 
 ---
 
-
-
 # Summary
 
-
-
 Every future document inside the SAM Framework is expected to align with these principles.
-
-
 
 If a future proposal conflicts with these principles, the proposal should either be revised or justified through an Architecture Decision Record (ADR).
 

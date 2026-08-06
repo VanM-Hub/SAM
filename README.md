@@ -2,7 +2,7 @@
 
 The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
-**Versi:** v30.0.0 - Capability Release (Program G-K: Conversation/Dashboard/CLI/REST hosts + aktivasi jalur LLM)
+**Versi:** SAM 1.0 Foundation (versi teknis 1.0.0) — rilis fondasi resmi pertama
 
 ---
 

@@ -43,7 +43,7 @@ CATATAN PENTING — DUA DUNIA:
 Repository berisi DUA "Execution Runtime" dan DUA "ExecutionRequest".
 Membedakannya adalah KUNCI menjawab D1-001.
 
-DUNIA B (baru, Program C, v26.0.0):
+DUNIA B (baru, Program C, tahap Foundation 0.26):
 - Folder: src/sam/execution_runtime/  (60+ modul, Sprint 250-260, commit b9ae710)
 - ExecutionRequest: execution_id/provider_id/operation/payload/mode
   mode default = "preview" | execute | rollback

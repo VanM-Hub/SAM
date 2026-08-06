@@ -33,7 +33,9 @@ REQUIRED_ARCH_DOCS = [
 ]
 
 REQUIRED_ADR_FOLDER = "docs/adr"
-REQUIRED_RELEASE_DOCS = ["docs/releases/version-history.md", "docs/releases/manifest.md"]
+REQUIRED_RELEASE_DOCS = ["docs/releases/manifest.md"]
+# version-history.md tidak lagi wajib: SAM 1.0 adalah rilis pertama, sehingga
+# belum ada riwayat versi untuk dicatat (lihat CHANGELOG.md).
 REQUIRED_DIAGRAMS = [
     "01_subsystem_overview.html",
     "02_pipeline_overview.html",
@@ -133,8 +135,8 @@ def scan():
     if os.path.isfile(readme_path):
         with open(readme_path, "r", encoding="utf-8") as f:
             readme = f.read()
-        # Look for vX.Y.Z in README
-        rm_versions = re.findall(r'v\d+\.\d+\.\d+', readme)
+        # Look for version (vX.Y.Z or X.Y.Z) in README
+        rm_versions = re.findall(r'v?\d+\.\d+\.\d+', readme)
         if pp_version not in " ".join(rm_versions):
             warnings.append(f"README version mismatch: pyproject.toml has {pp_version} but README has {rm_versions[:3]}")
 

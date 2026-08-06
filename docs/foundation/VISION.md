@@ -1,10 +1,10 @@
-﻿SAM Vision
+SAM Vision
 
 Version:
-2.0.0
+1.0.0
 
 Status:
-Accepted
+Foundational
 
 Owner:
 Project SAM

@@ -5,12 +5,11 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      v30.0.0 - Capability release (Program G-K: Conversation/Dashboard/CLI/
-              REST presentation hosts + jalur LLM Connector->Provider->Agent)
-Release:      1 - Production / Release Ready (baseline stabil, 2026-08-06)
-Baseline:     v30.0.0 - Capability release R-001 (HEAD e0c52f3; Program G-K activation
-              dalam garis keturunan release v30.0.0. Versi arsitektural tetap v30.0.0;
-              tag v30.0.0 menunjuk commit Program F. Tidak membentuk versi baru.)
+Current:      SAM 1.0 Foundation (versi teknis 1.0.0)
+Release:      1 - Production / Release Ready (foundation stabil)
+Baseline:     Foundation 0.01-0.30 (sebelumnya dilabeli v0.0.1-v30.0.0) -> SAM 1.0
+              Foundation (rilis resmi pertama; seluruh tahap fondasi 0.01-0.30
+              terangkum dalam versi stabil 1.0.0)
 Framework:    Python
 Build:        setuptools
 Test:         pytest (modern suite; regression 3541 passed, 42 skipped; legacy folder eksklusif)
