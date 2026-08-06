@@ -76,7 +76,7 @@ preserved in git history (previous version of this index) for forensics only.
 
 ## Migration note
 
-This file was previously `v1.0.0` and held full ADR bodies for ADR-001..014. Under the
+This file previously held full ADR bodies for ADR-001..014. Under the
 one-decision-one-ADR rule, the active decisions ADR-011/012/013 were extracted to
 standalone canonical files in `docs/adr/` (Phase C0.5). The remaining non-canonical
 bodies (ADR-001..007, 014) were superseded/obsolete or already represented by the

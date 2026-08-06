@@ -12,7 +12,7 @@ Baseline:     Foundation 0.01-0.30 (sebelumnya dilabeli v0.0.1-v30.0.0) -> SAM 1
               terangkum dalam versi stabil 1.0.0)
 Framework:    Python
 Build:        setuptools
-Test:         pytest (modern suite; regression 3541 passed, 42 skipped; legacy folder eksklusif)
+Test:         pytest (modern suite; 2964 collected, 2922 passed, 42 skipped; legacy folder eksklusif)
 Lint:         ruff
 CI:           GitHub Actions (core + server + desktop)
 ```
