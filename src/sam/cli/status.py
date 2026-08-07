@@ -3,6 +3,7 @@ sam status — Tampilan lengkap status Runtime dari Coordinator.
 """
 
 import typer
+import sam
 from sam.runtime.coordinator import RuntimeCoordinator
 from sam.mission.loader import MissionLoader
 from sam.dos.loader import DOSLoader
@@ -37,7 +38,7 @@ def status(ctx: typer.Context):
     health = health_map.get(state.value, "UNKNOWN")
 
     typer.echo("=" * 48)
-    typer.echo("  SAM Framework v1.1.0 — Phase 0")
+    typer.echo("  SAM Framework v" + sam.__version__ + " — Phase 0")
     typer.echo("=" * 48)
 
     # ── Runtime State ──
