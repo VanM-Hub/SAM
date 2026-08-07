@@ -94,7 +94,8 @@ class TestDeterminism:
         # Strip session_id lines (unique) and compare the rest
         def strip_session(text):
             return [l for l in text.splitlines() if "session_id" not in l
-                    and "started_at" not in l and "completed_at" not in l]
+                    and "started_at" not in l and "completed_at" not in l
+                    and "duration" not in l]
         assert strip_session(t1) == strip_session(t2)
 
     def test_list_stable_across_calls(self, cli):
