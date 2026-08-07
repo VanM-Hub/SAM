@@ -9,6 +9,7 @@ Yang selesai permanen → report/history.
 |---|---|---|
 | **Ringkasan Sesi 2026-08-06** (posisi engineering, status gap, tata letak) | `journals/2026-08-06_ringkasan-sesi.md` | konteks lanjutan (tanpa file audit internal) |
 | **Perbaikan Launcher 2026-08-07** (Desktop/CLI/Ops jalan; selaras 5 mode .bat) | `journals/2026-08-07_launcher-fix.md` | akar masalah & verifikasi 5 mode launcher |
+| **Program G — Simulation Capability 2026-08-07** (SimulationEvidence/Engine/Integration + Preview & Dry Run; add ke ROADMAP) | `journals/2026-08-07_programg-simulation.md` | implementasi Simulation V1 + arah roadmap |
 
 | Dokumen | Lokasi | Nilai |
 |---|---|---|

@@ -13,7 +13,7 @@ class ExecutionMetadata:
     """Metadata eksekusi (immutable)."""
     owner_id: str
     source_runtime: str = "execution"
-    mode: str = "preview"  # preview | execute | rollback
+    mode: str = "preview"  # preview | simulation | execute | rollback
     preview_only: bool = True
     approved: bool = False
     executed: bool = False
