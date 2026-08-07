@@ -1,16 +1,13 @@
 @echo off
+rem ============================================================
+rem  SAM Ops  ->  Launcher mode: HEADLESS  (sam-headless)
+rem  Jalur resmi: sam.launcher.cli_entry:headless_main
+rem  Headless = tanpa GUI; telemetry + health server via asyncio
+rem ============================================================
 cd /d "D:\Project AI\SAM"
 set PYTHONPATH=D:\Project AI\SAM\src
 set PYTHONIOENCODING=utf-8
+python -B -c "import sys; sys.path.insert(0, r'D:\Project AI\SAM\src'); from sam.launcher.cli_entry import headless_main; headless_main()"
 echo.
-echo === SAM Operations CLI ===
-echo Commands: task, history, settings, knowledge, explain
-echo.
-echo Examples:
-echo   ops.py settings list
-echo   ops.py task list
-echo   ops.py history show
-echo   ops.py knowledge show
-echo   ops.py explain recent
-echo.
-cmd /k
+echo  SAM Headless (Ops) ditutup.
+pause >nul

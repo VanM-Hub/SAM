@@ -212,3 +212,19 @@ class ConsoleApp:
 
     def __exit__(self, *args: Any) -> None:
         self.shutdown()
+
+
+def run(config: Optional[AppConfig] = None) -> ConsoleApp:
+    """Module-level launcher entry for the SAM Console.
+
+    Instantiates :class:`ConsoleApp`, runs the startup sequence, then
+    transitions to RUNNING. Returns the running app instance so callers
+    can call :meth:`ConsoleApp.shutdown` when done.
+
+    Expected by ``sam.launcher.host_launcher._launch_console`` which
+    resolves a module-level ``run`` callable (mirrors desktop app).
+    """
+    app = ConsoleApp()
+    app.startup(config)
+    app.run()
+    return app
