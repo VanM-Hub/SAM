@@ -7,7 +7,7 @@ Folder ini = **rencana kerja Engineering** (Engineering Plan). Menjabarkan apa y
 - **Bukan Source of Truth arsitektur** — tidak mengubah ADR/spesifikasi/boundary/dependency/ownership/runtime model.
 
 ## Isi
-- `ROADMAP_ENGINEERING.md` — rencana 7 sprint engineering (disetujui Software Architect + Guardian Mission).
+- `ROADMAP_ENGINEERING.md` 
 
 ## Aturan
 - Isi tetap sebagai **rencana kerja**, tidak memuat/menambah aturan arsitektur (aturan sudah ada di Constitution/Governance/ADR/Spec).

@@ -40,11 +40,9 @@ See:
 
 \- SAM_ARCHITECTURE.md
 
-\- LAYERS.md
+\- ARCHITECTURAL_DECISIONS.md
 
-\- DEPENDENCY\_RULES.md
-
-\- FRAMEWORK\_VS\_MODULE.md
+\- Architecture_Rulebook.md
 
 \- DOCUMENT\_STRUCTURE.md
 
