@@ -124,5 +124,5 @@ SAM succeeds when it:
 
 ## License
 
-[Choose appropriate license, e.g., MIT]
+Apache-2.0
 
