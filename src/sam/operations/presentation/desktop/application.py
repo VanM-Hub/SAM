@@ -15,6 +15,17 @@ from enum import Enum
 from typing import Any, Callable, Optional
 from datetime import datetime
 
+import sam as _sam_pkg
+
+
+
+def _desktop_version() -> str:
+    """Resolve the desktop app version from the single package source."""
+    try:
+        return str(getattr(_sam_pkg, "__version__", "1.0.0"))
+    except Exception:
+        return "1.0.0"
+
 
 class DesktopAppState(Enum):
     """Desktop application lifecycle states."""
@@ -36,7 +47,7 @@ class DesktopConfig:
     Both are independent.
     """
     app_name: str = "SAM Desktop"
-    version: str = "4.9.0"
+    version: str = field(default_factory=_desktop_version)
     log_level: str = "INFO"
     enable_notifications: bool = True
     enable_system_tray: bool = True

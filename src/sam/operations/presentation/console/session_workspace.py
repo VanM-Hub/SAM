@@ -9,6 +9,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
+import sam as _sam_pkg
+
+
+def _workspace_version() -> str:
+    """Resolve the console workspace version from the single package source."""
+    try:
+        return str(getattr(_sam_pkg, "__version__", "1.0.0"))
+    except Exception:
+        return "1.0.0"
+
 
 @dataclass(frozen=True)
 class SessionWorkspace:
@@ -79,7 +89,7 @@ class SessionWorkspaceFactory:
     def compose(
         session_id: str = "",
         app_name: str = "SAM Console",
-        app_version: str = "4.8.0",
+        app_version: Optional[str] = None,
         started_at: str = "",
         uptime_seconds: float = 0.0,
         active_screen: str = "dashboard",
@@ -99,6 +109,8 @@ class SessionWorkspaceFactory:
         notification_count: int = 0,
     ) -> SessionWorkspace:
         """Build SessionWorkspace from individual parameters."""
+        if app_version is None:
+            app_version = _workspace_version()
         return SessionWorkspace(
             session_id=session_id,
             app_name=app_name,
@@ -159,7 +171,7 @@ class SessionWorkspaceFactory:
                 current_page = getattr(fs, 'page', 1)
 
         app_name = "SAM Console"
-        app_version = "4.8.0"
+        app_version = _workspace_version()
         started_at = ""
         session_id = ""
         if app is not None:
