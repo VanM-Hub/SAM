@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Optional, List, Tuple
 from datetime import datetime
 
+import sam as _sam_pkg
+
 from .console_view import ConsoleView, HeaderView, SidebarView, BodyView, StatusBarView, FooterView
 from .console_renderer import ConsoleRenderer
 from .widget_renderer import WidgetRenderer
@@ -23,6 +25,14 @@ from .navigation import (
 )
 from .dashboard_composer import ConsoleDashboard, DashboardComposer
 from .widgets import WidgetRegistry
+
+
+def _console_version() -> str:
+    """Resolve the SAM console version from the single package source."""
+    try:
+        return str(getattr(_sam_pkg, "__version__", "1.0.0"))
+    except Exception:
+        return "1.0.0"
 
 
 @dataclass
@@ -234,7 +244,7 @@ class ConsoleSession:
         status = "running" if self._running else "stopped"
         return HeaderView(
             title=f"SAM Console — {menu.screen_label}",
-            subtitle=f"v4.6.0 | {self.theme.current.name} theme",
+            subtitle=f"v{_console_version()} | {self.theme.current.name} theme",
             status=status,
             mode=self.refresh.mode.value,
         )
@@ -300,7 +310,7 @@ class ConsoleSession:
             f"Theme: {self.theme.current.name}",
             "Q: Exit",
         ]
-        return FooterView(hints=tuple(hints), version="4.6.0",
+        return FooterView(hints=tuple(hints), version=_console_version(),
                           mode=self.refresh.mode.value)
 
     @staticmethod

@@ -11,6 +11,17 @@ from enum import Enum
 from typing import Any, Callable, Optional, Tuple
 from datetime import datetime
 
+import sam as _sam_pkg
+
+
+
+def _app_version() -> str:
+    """Resolve the console app version from the single package source."""
+    try:
+        return str(getattr(_sam_pkg, "__version__", "1.0.0"))
+    except Exception:
+        return "1.0.0"
+
 
 class AppState(Enum):
     """Console application lifecycle states."""
@@ -28,7 +39,7 @@ class AppState(Enum):
 class AppConfig:
     """Console application configuration (immutable after boot)."""
     app_name: str = "SAM Console"
-    version: str = "4.7.0"
+    version: str = field(default_factory=_app_version)
     log_level: str = "INFO"
     enable_plugins: bool = False
     enable_telemetry: bool = True
