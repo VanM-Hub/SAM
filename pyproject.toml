@@ -27,6 +27,7 @@ classifiers = [
 dependencies = [
     "structlog>=21.0",
     "pydantic>=1.10,<3",
+    "psutil>=5.9",
 ]
 
 [project.optional-dependencies]

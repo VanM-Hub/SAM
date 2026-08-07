@@ -192,6 +192,14 @@ class StartupPipeline:
         host_start = time.perf_counter()
 
         host_type_str = app_ctx.metadata.get("selected_host", "console")
+        # selected_host may arrive as a display name (e.g. "Desktop Host" /
+        # "API Server") or a raw key ("desktop" / "api_server"). Normalize to
+        # the lowercase underscore key used by host_map so the requested host is
+        # selected instead of silently falling back to CONSOLE.
+        norm = host_type_str.strip().lower().replace(" ", "_").replace("host", "")
+        norm = norm.rstrip("_").lstrip("_")
+        aliases = {"desktop": "desktop", "headless_mode": "headless"}
+        norm = aliases.get(norm, norm)
         host_map = {
             "console": HostType.CONSOLE,
             "desktop": HostType.DESKTOP,
@@ -200,7 +208,7 @@ class StartupPipeline:
             "testing": HostType.TESTING,
             "diagnostics": HostType.DIAGNOSTICS,
         }
-        htype = host_map.get(host_type_str, HostType.CONSOLE)
+        htype = host_map.get(norm, HostType.CONSOLE)
 
         try:
             host_result = self._launcher.launch(htype)
