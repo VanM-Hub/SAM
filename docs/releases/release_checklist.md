@@ -52,7 +52,7 @@
 
 - [ ] `docs/releases/manifest.md` → update manifest
 - [ ] `CHANGELOG.md` → tambah entry rilis baru (SAM 1.0 = rilis pertama)
-- [ ] `ROADMAP.md` → update roadmap (jika milestone tercapai)
+- [ ] `docs/foundation/ROADMAP.md` → update roadmap (jika milestone tercapai)
 - [ ] `SPRINT_TRACKER.md` → update sprint tracker
 - [ ] Arsip laporan/riwayat lama → pindahkan ke backup eksternal jika tak lagi dibutuhkan
 

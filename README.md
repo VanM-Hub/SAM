@@ -117,7 +117,7 @@ SAM/
 │   └── specifications/      # Specifications
 ├── MISSION.md               # Mission
 ├── VISION.md                # Vision
-├── ROADMAP.md               # Implementation evolution ordering
+├── foundation/ROADMAP.md     # Implementation evolution ordering
 └── .github/workflows/       # CI
 ```
 
@@ -166,7 +166,7 @@ The test suite runs locally and in CI. Metrics history was archived to **[docs/h
 
 The roadmap defines the ordering of implementation evolution that serves the Mission — not an independent statement of direction.
 
-> See **[ROADMAP.md](ROADMAP.md)** — the ordering of implementation phases.
+> See **[ROADMAP.md](docs/foundation/ROADMAP.md)** — the ordering of implementation phases.
 
 ---
 
