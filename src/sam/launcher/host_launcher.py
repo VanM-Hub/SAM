@@ -125,14 +125,13 @@ class HostLauncher:
         async def _run():
             telemetry = TelemetryService()
             server = HealthServer()
-            await telemetry.start()
             server.mark_ready(telemetry=True)
             await server.start()
             try:
                 await asyncio.Event().wait()
             except (KeyboardInterrupt, asyncio.CancelledError):
                 await server.stop()
-                await telemetry.stop()
+                telemetry.close()
 
         asyncio.run(_run())
         return True
