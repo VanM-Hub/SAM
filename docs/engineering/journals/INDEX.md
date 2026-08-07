@@ -8,6 +8,7 @@ Yang selesai permanen → report/history.
 | Dokumen | Lokasi | Nilai |
 |---|---|---|
 | **Ringkasan Sesi 2026-08-06** (posisi engineering, status gap, tata letak) | `journals/2026-08-06_ringkasan-sesi.md` | konteks lanjutan (tanpa file audit internal) |
+| **Perbaikan Launcher 2026-08-07** (Desktop/CLI/Ops jalan; selaras 5 mode .bat) | `journals/2026-08-07_launcher-fix.md` | akar masalah & verifikasi 5 mode launcher |
 
 | Dokumen | Lokasi | Nilai |
 |---|---|---|
