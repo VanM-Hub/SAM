@@ -2,7 +2,7 @@
 
 The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
-**Versi:** SAM 1.0 Foundation (versi teknis 1.0.0) — rilis fondasi resmi pertama
+**Versi:** SAM 1.0 Foundation 
 
 ---
 

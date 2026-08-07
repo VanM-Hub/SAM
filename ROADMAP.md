@@ -89,7 +89,7 @@ untuk pekerjaan nyata. Prinsip tetap: **approval dulu → preview dulu → baru 
 |---------|-----|-------|
 | A | External Connectors (OpenAI · Anthropic · Gemini · DeepSeek · Ollama · OpenClaw · GitHub · Filesystem · SQLite · Docker · Terminal · REST API · MCP) | 0.24 |
 | B | Model Runtime Integration (interface chat/embedding/reasoning/vision/tool, provider mapping, certification) | 0.25 |
-| C | Real Execution Runtime (execution engine, approval gate, rollback, monitoring, safety, provider activation) | 0.26 |
+| C | Real Execution Runtime (execution engine, approval gate, rollback, monitoring, safety, provider activation, Simulation & Preview) | 0.26 |
 | D | Runtime Services & Deployment (configuration, secrets, lifecycle, DI, API, server runtime, monitoring) | 0.27 |
 | E | Unified Intelligence Runtime (runtime registry, pipeline graph, context assembly) — cabang paralel | 0.28 |
 | F | Presentation Layer (desktop, dashboard, conversation bridge) — Sprint 272–279 | 0.29 |
@@ -147,24 +147,20 @@ Ekosistem — Marketplace, Templates, Examples (opsional)
 | **SAM 2.0** | Skalabilitas cluster, distributed runtime, federation |
 | **Ekosistem** | Marketplace, examples, templates, dokumentasi pelengkap |
 
-### Program G (Execution Evolution) — lanjutan post-1.0
+### Simulation & Preview — bagian dari Program C (Execution Evolution)
 
-Arah penyusunan ulang roadmap (keputusan arsitek 2026-08-07): menyempurnakan
-**governed execution** dengan menambahkan lapisan **Simulation** di antara Policy dan
-Approval. Pipeline konseptual: Mission → Workflow → Policy → **Simulation** → Approval
+Simulation merupakan **penyempurnaan Program C (Real Execution Runtime)**:
+menambahkan lapisan **Simulation** di antara Policy dan Approval sehingga **approval
+gate** milik Program C menjadi **Decision + Evidence** (bukan "buta").
+Pipeline konseptual: Mission → Workflow → Policy → **Simulation** → Approval
 → Execution → Verification → Audit. Simulation menyediakan evidence (cost, time,
-risk, expected provider, rollback feasibility, side effects, external calls) sehingga
-Approval menjadi **Decision + Evidence**.
+risk, expected provider, rollback feasibility, side effects, external calls).
 
-> **Catatan nama:** ini BEDA dengan "Program G – Conversation as Presentation
-> Capability" (0.30, sudah selesai). "Program G (Execution Evolution)" adalah
-> penyusunan ulang roadmap pasca-SAM 1.0.
+Daftar kerja Simulation (bagian dari lingkup Program C):
 
-| Item | Isi |
-|------|-----|
-| Program G.1 | Simulation Capability (SimulationEvidence deterministik dari metadata governance; SimulationEngine tanpa mock; mode simulation di ExecutionRequest) |
-| Program G.2 | Preview & Dry Run (external_calls = 0) + wiring ke Approval (evidence opsional, kontrak ApprovalGate tidak berubah) |
-| Program G.3 | Validation (perbandingan hasil simulasi vs hasil nyata) — program terpisah berikutnya |
+- **C.1 Simulation Capability** — SimulationEvidence deterministik dari metadata governance; SimulationEngine tanpa mock; mode simulation di ExecutionRequest.
+- **C.2 Preview & Dry Run** — external_calls = 0; wiring ke Approval (evidence opsional, kontrak ApprovalGate tidak berubah).
+- **C.3 Validation** — perbandingan hasil simulasi vs hasil nyata; program terpisah berikutnya.
 
 > **Kebijakan:** jangan menambah runtime/lapisan arsitektur baru tanpa kebutuhan nyata.
 > Pertumbuhan kompleksitas harus terkendali; energi diarahkan ke integrasi, stabilitas, dan nilai produk.
