@@ -97,14 +97,35 @@ class HostLauncher:
     # ── individual launchers ──
 
     def _launch_console(self) -> bool:
-        # Console via importlib
-        mod = import_module("sam.operations.presentation.console.app")
-        # The console app usually has a main or run function
-        run_fn = getattr(mod, "run", None)
+        # Console via importlib — sesi console interaktif (REPL)
+        app_mod = import_module("sam.operations.presentation.console.app")
+        run_fn = getattr(app_mod, "run", None)
         if run_fn:
-            run_fn()
-            return True
-        return False
+            app = run_fn()  # lifecycle: READY -> RUNNING
+        else:
+            app = None
+
+        session_mod = import_module("sam.operations.presentation.console_session")
+        ConsoleSession = getattr(session_mod, "ConsoleSession")
+        session = ConsoleSession()
+        session.start()
+        try:
+            print("SAM Console — ketik 'help' untuk bantuan, 'exit' untuk keluar")
+            while session.is_running:
+                try:
+                    line = input("sam> ")
+                except (EOFError, KeyboardInterrupt):
+                    print()
+                    break
+                if not line.strip():
+                    continue
+                session.handle_input(line)
+                session.render()
+        finally:
+            session.stop()
+            if app is not None:
+                app.shutdown()
+        return True
 
     def _launch_desktop(self) -> bool:
         # Desktop via importlib
