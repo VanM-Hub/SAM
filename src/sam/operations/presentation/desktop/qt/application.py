@@ -10,6 +10,8 @@ import sys
 import signal
 from typing import Optional, Callable
 
+import sam as _sam_pkg
+
 try:
     from PySide6.QtWidgets import QApplication
     from PySide6.QtCore import Qt
@@ -19,6 +21,14 @@ except ImportError:
     QApplication = object  # stub
 
 
+def _qt_version() -> str:
+    """Resolve the Qt desktop version from the single package source."""
+    try:
+        return str(getattr(_sam_pkg, "__version__", "1.0.0"))
+    except Exception:
+        return "1.0.0"
+
+
 class QtApplication:
     """SAM Qt Desktop application bootstrap.
 
@@ -26,7 +36,8 @@ class QtApplication:
     and signal handling. No business logic.
     """
 
-    def __init__(self, app_name: str = "SAM Desktop", version: str = "4.10.0"):
+    def __init__(self, app_name: str = "SAM Desktop", version: Optional[str] = None):
+        version = version if version is not None else _qt_version()
         if not HAS_QT:
             raise ImportError(
                 "PySide6 is required to run the SAM Qt Desktop. "
