@@ -10,8 +10,8 @@ docs/engineering/
 ├── decisions/    ← Keputusan engineering/arsitektur implementasi (AD-ENG-001..003, AD-S*)
 ├── reports/      ← Laporan sesi/release yang masih relevan (kosong; akan terisi laporan ringkas baru)
 ├── journals/     ← Catatan kerja per-sesi/area (aktif; ringkas)
-├── references/   ← Referensi engineering yang tidak lapuk (EC-001..025, format laporan)
-├── roadmap/      ← Rencana kerja Engineering (Engineering Plan; bukan Source of Truth)
+├── strategy/     ← Strategi pengembangan SAM 2.x (DEVELOPMENT_STRATEGY, Planning Standard, Readiness Model)
+├── roadmap/      ← Rencana kerja SAM 2.x (ROADMAP SAM 2.x, Program A–E, Milestone, Appendix)
 └── templates/    ← Template laporan/ADR/keputusan (format baku)
 ```
 
@@ -19,9 +19,9 @@ docs/engineering/
 - **`decisions/`** = keputusan yang menjadi dasar implementasi (record; jangan edit, tambah AD baru).
 - **`reports/`** = hasil akhir yang masih dirujuk. Yang **selesai permanen & tak lagi dirujuk** → diarsipkan (backup eksternal) / `docs/history/`.
 - **`journals/`** = kerja aktif lintas sesi; ringkas (tujuan → kerja → hasil → blocker → handoff). Yang selesai → report/history.
-- **`references/`** = pengetahuan engineering bernilai tetap (aturan, pola, kosakata, direktori status capability) — bukan keputusan, bukan journal.
-- **`roadmap/`** = rencana kerja Engineering (Engineering Plan). Bukan Source of Truth arsitektur; tidak berisi keputusan ADR/spesifikasi/boundary.
-- **`templates/`** = format baku utk laporan/ADR/keputusan baru.
+- **`strategy/`** = arah strategis SAM 2.x (Sumber kebenaran strategi: Development Strategy → Planning Standard → Readiness Model).
+- **`roadmap/`** = rencana kerja Engineering (Engineering Plan; bukan Source of Truth arsitektur); berisi ROADMAP SAM 2.x + Program A–E + Milestone + Appendix.
+- **`templates/`** = format baku utk laporan/ADR/keputusan baru (incl. Format_Laporan_Engineer).
 
 ## Dokumen Keputusan (decisions/)
 - `AD-ENG-001_Activation_Readiness_Rule.md`
@@ -33,16 +33,11 @@ docs/engineering/
 - `AD-S05_Knowledge_Memory_Activation.md`
 - (keputusan sesi lain: lihat isi folder)
 
-## Referensi (references/)
-- `README.md` (indeks)
-- `EC-001..EC-025` — konteks engineering (peta/aturan/pola/kosakata/readiness) dari fase engineering
-- `Format_Laporan_Engineer.md` — format baku laporan sesi
-
 ## Navigasi
-- Ingin rencana kerja → `docs/engineering/roadmap/ROADMAP_ENGINEERING.md`
+- Ingin strategi pengembangan → `docs/engineering/strategy/`
+- Ingin rencana kerja/roadmap → `docs/engineering/roadmap/ROADMAP SAM 2.x.md`
 - Ingin laporan sesi baru → `docs/engineering/reports/` (akan terisi laporan ringkas); laporan EP/OP/L2/L6 masa lalu diarsipkan ke backup eksternal
 - Ingin keputusan → `docs/engineering/decisions/`
 - Ingin catatan kerja → `docs/engineering/journals/`
-- Ingin referensi/konteks → `docs/engineering/references/`
 - Ingin template → `docs/engineering/templates/`
 - Ingin arsip lama → `docs/history/`

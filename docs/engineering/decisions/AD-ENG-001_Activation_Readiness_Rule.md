@@ -20,4 +20,4 @@ Jika SATU syarat belum terpenuhi → **bukan** target Engineering Session, melai
 - Intelligence / Agent / Reasoning → Architecture Backlog (activation model belum memberi nilai operasional tanpa perubahan arsitektur, lihat RSR-I01).
 
 ## Dasar
-Setiap sesi dipilih berdasar Activation Readiness yang dihitung dari repository. Ini membuat roadmap **stabil & prediktif**; capability baru cukup diskor & ditempatkan di tier (lihat EC-025).
+Setiap sesi dipilih berdasar Activation Readiness yang dihitung dari repository. Ini membuat roadmap **stabil & prediktif**; capability baru cukup diskor & ditempatkan di tier (lihat `docs/engineering/strategy/SAM Platform Readiness Model.md`).

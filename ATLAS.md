@@ -26,6 +26,7 @@
               RUNTIME
               COMPLIANCE
               ENGINEERING
+              (strategy · roadmap)
               HISTORY
 ```
 
@@ -70,8 +71,9 @@
 - **Klik "bagaimana membangun runtime?"** → `docs/runtime/` (R4→R5→I-series)
 - **Klik "sudah sesuai?"** → `docs/compliance/`
 - **Klik "masa lalu?"** → `docs/history/` — baca saja, jangan dipakai utk keputusan baru
-- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (decisions/reports/journals/templates/roadmap)
-- **Klik "rencana kerja engineering?"** → `docs/engineering/roadmap/ROADMAP_ENGINEERING.md` (Engineering Plan — bukan Source of Truth)
+- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (decisions/reports/journals/templates)
+- **Klik "strategi pengembangan?"** → `docs/engineering/strategy/` (DEVELOPMENT_STRATEGY, Planning Standard, Readiness Model)
+- **Klik "rencana kerja/roadmap?"** → `docs/engineering/roadmap/` (ROADMAP SAM 2.x.md, Program A–E, Milestone Architecture, Appendix)
 - **Klik "sudah jadi arsip non-aktif?"** → `docs/history/`
 
 ---
@@ -209,11 +211,11 @@
  paham SAM         → MISSION → VISION → CHARTER → CONSTITUTION → SAM_ARCHITECTURE
  jadi kontributor  → README → ATLAS → GOVERNANCE → CONTRIBUTING → REPOSITORY_CONVENTION
  perbaiki runtime  → docs/runtime (R4/R5/I-series) → runtime_root → compliance
- buat capability   → AD-ENG-001/002/003 → Activation Pattern → EC-025
+ buat capability   → AD-ENG-001/002/003 → Activation Pattern → docs/engineering/decisions/
  perbaiki UI       → Article XVI → presentation → runtime_service
  paham citizen     → docs/CITIZEN_SPECIFICATION → SAM_ARCHITECTURE (Citizen)
  paham compliance  → docs/compliance P1-001 → src/sam/compliance
- paham engineering → docs/engineering/ (decisions/reports/journals) → EC-025 → docs/history
+ paham engineering → docs/engineering/ (strategy · roadmap · decisions/reports/journals) → docs/history
 ```
 
 ---
