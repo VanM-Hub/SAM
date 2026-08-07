@@ -23,4 +23,4 @@
 
 ### Catatan
 - Seluruh fase pengembangan fondasi (Foundation 0.01 → 0.30, 279 sprint + Program A–K) tercatat di `SPRINT_TRACKER.md` sebagai konteks pengembangan, bukan riwayat rilis.
-- Rencana ke depan di `ROADMAP.md` (post-1.0).
+- Rencana ke depan di `docs/foundation/ROADMAP.md` (post-1.0).

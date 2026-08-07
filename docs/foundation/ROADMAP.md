@@ -34,20 +34,9 @@ Karakteristik kunci:
 > ✅ **SAM 1.0 (versi teknis 1.0.0, 2026-08-07) — RILIS PUBLIK PERTAMA.**
 
 Seluruh perjalanan pengembangan (Foundation 0.01 → 0.30, 279 sprint + Program A–K) telah
-mencapai titik rilis stabil: **SAM 1.0 Foundation**. Ini adalah **rilis pertama dan satu-satunya**
-SAM. Tidak ada rilis sebelumnya — semua versi internal lama hanyalah tahap pengembangan
-fondasi (pre-1.0), bukan rilis publik.
-
-Roadmap di bawah menjabarkan fase-fase fondasi yang telah dilalui (sebagai konteks pengembangan),
-diikuti rencana ke depan (post-1.0).
-
+mencapai titik rilis stabil: **SAM 1.0 Foundation**. 
 ---
 
-## Fase Fondasi (sudah dilalui — konteks pengembangan)
-
-> Seluruh fase ini adalah **tahap pengembangan fondasi (pre-1.0)**, bukan rilis publik.
-> Penomoran **0.X** menunjukkan tahap fondasi; puncaknya adalah **0.30**, yang kemudian
-> dirilis resmi sebagai **SAM 1.0**. Lihat `SPRINT_TRACKER.md` untuk kronologi rinci.
 
 ### Ringkasan Fase I–XXIII (0.01 → 0.23)
 
