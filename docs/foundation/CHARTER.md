@@ -102,7 +102,7 @@ Changes to core architecture require ADR and architectural review.
 
 - **Chief Architect:** SAM Framework
 
-- **Contributors:** Open to public contributions after v0.1.0
+- **Contributors:** Open to public contributions after SAM 1.0 Foundation (1.0.0)
 
 ---
 
