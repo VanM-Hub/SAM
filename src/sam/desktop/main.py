@@ -44,7 +44,12 @@ except ValueError:
     from sam.desktop.pages.knowledge import KnowledgePage, HistoryPage, SettingsPage
     from sam.desktop.pages.assistant import NotificationPage, AssistantPage
 
-VERSION = "4.0.0"
+# Version digenerate dari sumber tunggal sam.__version__ (SAM 1.0 Foundation)
+try:
+    import sam as _sam_pkg
+    VERSION = getattr(_sam_pkg, "__version__", "1.0.0")
+except Exception:
+    VERSION = "1.0.0"
 
 
 # ============================================================================
