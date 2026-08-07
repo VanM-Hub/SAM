@@ -16,7 +16,7 @@ class ExecutionRequest:
     provider_id: str
     operation: str
     payload: Dict[str, Any] = field(default_factory=dict)
-    mode: str = "preview"  # preview | execute | rollback
+    mode: str = "preview"  # preview | simulation | execute | rollback
     timeout_seconds: int = 60
     max_retries: int = 2
     cancellation_token: Optional[str] = None
@@ -30,8 +30,8 @@ class ExecutionRequest:
             raise ValueError("execution_id is required")
         if not self.provider_id:
             raise ValueError("provider_id is required")
-        if self.mode not in ("preview", "execute", "rollback"):
-            raise ValueError("mode must be preview|execute|rollback")
+        if self.mode not in ("preview", "simulation", "execute", "rollback"):
+            raise ValueError("mode must be preview|simulation|execute|rollback")
         if self.timeout_seconds < 1:
             raise ValueError("timeout_seconds must be >= 1")
         if self.max_retries < 0:

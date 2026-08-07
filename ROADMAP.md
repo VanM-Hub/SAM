@@ -147,6 +147,25 @@ Ekosistem — Marketplace, Templates, Examples (opsional)
 | **SAM 2.0** | Skalabilitas cluster, distributed runtime, federation |
 | **Ekosistem** | Marketplace, examples, templates, dokumentasi pelengkap |
 
+### Program G (Execution Evolution) — lanjutan post-1.0
+
+Arah penyusunan ulang roadmap (keputusan arsitek 2026-08-07): menyempurnakan
+**governed execution** dengan menambahkan lapisan **Simulation** di antara Policy dan
+Approval. Pipeline konseptual: Mission → Workflow → Policy → **Simulation** → Approval
+→ Execution → Verification → Audit. Simulation menyediakan evidence (cost, time,
+risk, expected provider, rollback feasibility, side effects, external calls) sehingga
+Approval menjadi **Decision + Evidence**.
+
+> **Catatan nama:** ini BEDA dengan "Program G – Conversation as Presentation
+> Capability" (0.30, sudah selesai). "Program G (Execution Evolution)" adalah
+> penyusunan ulang roadmap pasca-SAM 1.0.
+
+| Item | Isi |
+|------|-----|
+| Program G.1 | Simulation Capability (SimulationEvidence deterministik dari metadata governance; SimulationEngine tanpa mock; mode simulation di ExecutionRequest) |
+| Program G.2 | Preview & Dry Run (external_calls = 0) + wiring ke Approval (evidence opsional, kontrak ApprovalGate tidak berubah) |
+| Program G.3 | Validation (perbandingan hasil simulasi vs hasil nyata) — program terpisah berikutnya |
+
 > **Kebijakan:** jangan menambah runtime/lapisan arsitektur baru tanpa kebutuhan nyata.
 > Pertumbuhan kompleksitas harus terkendali; energi diarahkan ke integrasi, stabilitas, dan nilai produk.
 
