@@ -30,8 +30,8 @@ Keberhasilan SAM BUKAN jumlah Runtime/folder/ADR/dokumen.
 Keberhasilan SAM = "Semakin banyak capability yang **AKTIF** melalui Activation Pattern
 Standard tanpa menambah kompleksitas arsitektur" — metrik terukur.
 
-## Roadmap Engineering (terkunci)
-S01..S10 — lihat `docs/engineering/reports/` (Session Report) & EC-025 (Readiness Index).
+## Roadmap Engineering (arah SAM 2.x)
+S01..S10 — lihat `docs/engineering/reports/` (Session Report) & `docs/engineering/roadmap/ROADMAP SAM 2.x.md` (prioritas program).
 
 ## Architecture Backlog (resmi)
 Intelligence Runtime · Agent Runtime · Reasoning — sampai ada Architecture Decision baru
@@ -40,5 +40,5 @@ yang menunjukkan activation path nyata.
 ## Baseline Dokumen
 - AD-ENG-001 (Activation Readiness Rule)
 - AD-ENG-002 (Activation Pattern Standard)
-- EC-025 (Activation Readiness Index)
-- Roadmap Engineering S07-S10
+- `docs/engineering/strategy/SAM Platform Readiness Model.md` (Readiness Levels)
+- `docs/engineering/roadmap/ROADMAP SAM 2.x.md` (program & prioritas)
