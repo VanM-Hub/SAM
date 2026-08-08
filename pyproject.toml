@@ -118,7 +118,7 @@ max-complexity = 15
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
-testpaths = ["tests/unit", "tests/knowledge_runtime", "tests/memory_runtime", "tests/policy_runtime", "tests/workflow_runtime", "tests/artifact_runtime", "tests/audit_runtime", "tests/mission_runtime"]
+testpaths = ["tests/unit", "tests/knowledge_runtime", "tests/memory_runtime", "tests/policy_runtime", "tests/workflow_runtime", "tests/artifact_runtime", "tests/audit_runtime", "tests/mission_runtime", "tests/execution_runtime"]
 addopts = "--tb=short"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
