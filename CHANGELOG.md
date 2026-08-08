@@ -93,3 +93,15 @@
 - 142/142 test observation dijalankan ulang lokal — hijau.
 - CI commit `e6c514b` (HEAD) terkonfirmasi **hijau 7/7** (core 3.10/3.11/3.12, server, desktop, validation, coverage).
 - Hasil: **Engineering Report Accepted** -> **Lead Engineer Verdict: Fully Verified**. Zero Architecture Drift dikonfirmasi.
+
+## SAM 1.0.2 (2026-08-08) - C-Phase 3 Observation Recommendation Engine
+
+### Observation Recommendation Engine (Engineering Decision 2026-08-08, Opsi A)
+- Analisis terhadap 3 recommendation engine existing: (`recommendations/engine.py` berbasis event bus - di luar scope; `operations/recommend.py` berbasis anomaly/infra - tidak baca PublicationRegistry; `guardian/recommendation.py` berbasis Guardian) - tidak ada yang konsumsi ObservationReport/PublicationRegistry.
+- Dibangun **Observation Recommendation Engine** baru di `src/sam/observation/recommendation.py` - domain `Observation -> Analytics -> Recommendation`, bukan `Runtime -> Recommendation`.
+- 7 kategori output observasi: missing_publication, capability_degradation, readiness_regression, stale_timeline, missing_metadata, metric_insufficiency (+ inconsistent_health).
+- Constraint read-only: 0 mutation call (approve/execute/publish/register/emit/transition/write); 0 import governance/execution/workflow/events/runtime; source = PublicationRegistry saja.
+- Wiring: `get_recommendation_engine()` + `recommend_observations()` di `observation_wiring.py` (bounded context Observation).
+- Test suite baru: `tests/observation/test_recommendation_engine.py` (21 tests) - Total observation 163 passed.
+- Laporan: `docs/engineering/reports/EA-C03_Engineering_Report_C-Phase_3.md` (commit `43382b5`).
+- Total baseline (lokal): 4,180 tests (unit + 8 runtime suites + observation 163 tests).
