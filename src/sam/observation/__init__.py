@@ -15,3 +15,55 @@ Constraints (AP-2C-001):
 - Tidak ada execution/approval/workflow/policy mutation
 """
 from __future__ import annotations
+
+# C-Phase 2: Gap Resolution exports
+from sam.observation.gaps import (
+    ApprovalHealthDetail,
+    ApprovalHealthInspector,
+    EventBusDescriptor,
+    EventBusInspector,
+    EventBusRegistry,
+    GapResolutionCoordinator,
+    GapResolutionReport,
+    OperationalAnalytics,
+    OperationalAnalyticsReport,
+    OperationalTrend,
+    PerRuntimeHealthDetail,
+    PreviewAvailability,
+    PreviewAvailabilityIndex,
+    PreviewConsumerIndex,
+    ReadinessDetail,
+    ReadinessReport,
+    ReadinessReporter,
+    UnifiedHealthReport,
+    UnifiedHealthReporter,
+)
+
+__all__ = [
+    # GAP-001
+    "PerRuntimeHealthDetail",
+    "UnifiedHealthReport",
+    "UnifiedHealthReporter",
+    # GAP-002
+    "PreviewAvailability",
+    "PreviewAvailabilityIndex",
+    "PreviewConsumerIndex",
+    # GAP-003
+    "EventBusDescriptor",
+    "EventBusRegistry",
+    "EventBusInspector",
+    # GAP-004
+    "ReadinessDetail",
+    "ReadinessReport",
+    "ReadinessReporter",
+    # GAP-005
+    "OperationalTrend",
+    "OperationalAnalyticsReport",
+    "OperationalAnalytics",
+    # GAP-006
+    "ApprovalHealthDetail",
+    "ApprovalHealthInspector",
+    # Coordinator
+    "GapResolutionCoordinator",
+    "GapResolutionReport",
+]
