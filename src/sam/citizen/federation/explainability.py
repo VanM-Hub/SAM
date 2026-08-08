@@ -1,5 +1,7 @@
 # Federation Trust Explainability - WP-16
 # IP-3.4-002 (AO-3.4-001 / ED-3.4-001, paket kedua)
+# + WP-27 Explainability (IP-3.4-003)
+# + WP-36 Federation Explainability (IP-3.4-004)
 #
 # Menjelaskan trust & interoperability:
 #   - mengapa trust tinggi/rendah
@@ -18,6 +20,7 @@ from typing import Any, Dict, Tuple
 
 from sam.citizen.federation.intelligence import FederationInsight
 from sam.citizen.federation.recommendation import (
+    CoordinationRecommendation,
     FederationRecommendation,
     RecommendationResult,
 )
@@ -183,4 +186,84 @@ class FederationIntelligenceExplainer:
             focus=recommendation.focus,
             summary=recommendation.suggestion,
             basis=recommendation.basis,
+        )
+
+
+# ---------------------------------------------------------------------------
+# WP-36 - Federation Explainability (IP-3.4-004)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ReadinessExplanation:
+    """Penjelasan readiness Federation (evidence-based, read-only)."""
+
+    focus: str
+    summary: str
+    basis: Tuple[str, ...] = ()
+    member_contributions: Tuple[str, ...] = ()
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "focus": self.focus,
+            "summary": self.summary,
+            "basis": list(self.basis),
+            "member_contributions": list(self.member_contributions),
+        }
+
+
+@dataclass(frozen=True)
+class CoordinationExplanation:
+    """Penjelasan rekomendasi koordinasi (advisory, bukan perintah)."""
+
+    focus: str
+    summary: str
+    basis: Tuple[str, ...] = ()
+    is_command: bool = False         # OR-03 selalu False
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "focus": self.focus,
+            "summary": self.summary,
+            "basis": list(self.basis),
+            "is_command": self.is_command,
+        }
+
+
+class FederationOperationalExplainer:
+    """Penyusun penjelasan readiness & koordinasi Federation (read-only)."""
+
+    def explain_aggregate(
+        self,
+        aggregate,
+    ) -> ReadinessExplanation:
+        """Jelaskan gambaran readiness Federation secara keseluruhan."""
+        assert aggregate is not None
+        dist = aggregate.level_distribution or {}
+        member_contributions = tuple(
+            "{m}:{s:.0%}".format(m=mem.member_id, s=mem.overall)
+            for mem in aggregate.members)
+        return ReadinessExplanation(
+            focus="federation-readiness",
+            summary=("Kesiapan operasional Federation {s:.0%} (level {l}); "
+                     "distribusi ready={r} partial={p} not-ready={n}."
+                     .format(s=aggregate.overall, l=aggregate.level,
+                             r=dist.get("ready", 0),
+                             p=dist.get("partial", 0),
+                             n=dist.get("not-ready", 0))),
+            basis=("overall:{:.2f}".format(aggregate.overall),
+                   "level:{}".format(aggregate.level)),
+            member_contributions=member_contributions,
+        )
+
+    def explain_recommendation(
+        self,
+        recommendation: CoordinationRecommendation,
+    ) -> CoordinationExplanation:
+        """Jelaskan satu rekomendasi koordinasi (advisory)."""
+        return CoordinationExplanation(
+            focus=recommendation.focus,
+            summary=recommendation.suggestion,
+            basis=recommendation.basis,
+            is_command=recommendation.is_command,
         )

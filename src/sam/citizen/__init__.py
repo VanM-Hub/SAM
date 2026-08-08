@@ -41,6 +41,14 @@
 # Knowledge != Authority; Evidence != Runtime Sharing; Recommendation !=
 # Decision; Collaboration != Execution; Intelligence != Central Intelligence;
 # sovereignty preserved; deterministic; evidence-first; read-only API.
+# Batas IP-3.4-004: Federation Operational Coordination &
+# Ecosystem Readiness - federation memahami kesiapan operasional kolektif
+# (readiness assessment, coordination insight, federation health,
+# recommendation, explanation). BUKAN distributed execution/scheduling.
+# Readiness != Execution; Coordination != Orchestration;
+# Recommendation != Command; Aggregation != Authority; Health != Control;
+# sovereignty preserved; registry authoritative; evidence-first;
+# deterministic aggregation; read-only operational API.
 
 # re-expor API utama untuk konsumen platform
 from sam.citizen.api.citizen import CitizenAPI, CitizenSummary
@@ -54,11 +62,14 @@ from sam.citizen.federation.interop_api import \
     FederationInteroperabilityAPI
 from sam.citizen.federation.intelligence_api import \
     FederationIntelligenceAPI
+from sam.citizen.federation.operational_api import \
+    FederationOperationalAPI
 
-__version__ = "3.5.0"
+__version__ = "3.6.0"
 
 __all__ = ["CitizenAPI", "CitizenSummary",
            "CitizenCollaborationAPI", "CollaborationSummary",
            "CitizenIntelligenceAPI", "FederationAPI",
            "FederationInteroperabilityAPI",
-           "FederationIntelligenceAPI"]
+           "FederationIntelligenceAPI",
+           "FederationOperationalAPI"]

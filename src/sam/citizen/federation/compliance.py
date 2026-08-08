@@ -1,9 +1,11 @@
-# Federation Compliance - WP-08 (+ WP-18 IP-3.4-002, + WP-29 IP-3.4-003)
+# Federation Compliance - WP-08 (+ WP-18 IP-3.4-002, + WP-29 IP-3.4-003,
+# + WP-38 IP-3.4-004)
 # IP-3.4-001 (AO-3.4-001 / ED-3.4-001)
 #
 # Compliance khas Federation (10 checks paket-1 FED-01..10 + 9 checks
-# paket-2 TRUST-01..09 + 10 checks paket-3 DGI-01..10). Memastikan
-# federation/ tidak melanggar guardrail IP-3.4-001 / AO-3.4-001:
+# paket-2 TRUST-01..09 + 10 checks paket-3 DGI-01..10 + 10 checks
+# paket-4 OR-01..10). Memastikan federation/ tidak melanggar guardrail
+# IP-3.4-001 / AO-3.4-001:
 #
 #   Federation != Central Governance
 #   Registry != Control Plane
@@ -39,10 +41,26 @@
 #   Read-only API (DGI-09)
 #   No hidden dependency (DGI-10)
 #
+# Guardrail IP-3.4-004 (Federation Operational Coordination &
+# Ecosystem Readiness):
+#
+#   Readiness != Execution (OR-01)
+#   Coordination != Orchestration (OR-02)
+#   Recommendation != Command (OR-03)
+#   Aggregation != Authority (OR-04)
+#   Federation Health != Runtime Control (OR-05)
+#   Local sovereignty preserved (OR-06)
+#   Registry remains authoritative (OR-07)
+#   Evidence-first readiness (OR-08)
+#   Deterministic aggregation (OR-09)
+#   Read-only operational API (OR-10)
+#
 # SHALL NOT: central authority, shared approval, remote execution, network
 # connect/execute, hidden dependency ke runtime/governance, otomatisasi,
 # activation/binding otomatis, delegated authority, sinkronisasi state,
-# federation scheduler, remote invoke.
+# federation scheduler, remote invoke, failover, load balancing,
+# federation leader election, jalankan workflow lintas federation,
+# aktivasi citizen.
 
 import ast
 import os
@@ -61,6 +79,10 @@ _FORBIDDEN_AUTHORITY = (
     # paket-3 (IP-3.4-003): sinkronisasi state, remote invoke, scheduler
     "sync_state", "synchronize_state", "federation_scheduler",
     "schedule_remote", "remote_invoke",
+    # paket-4 (IP-3.4-004): koordinasi operasional tidak boleh jadi aksi
+    "failover", "load_balance", "select_leader", "elect_leader",
+    "run_workflow", "start_collaboration", "activate_remote",
+    "distributed_schedule", "auto_coordinate",
 )
 
 # modul eksekusi/runtime/governance/network yang TIDAK boleh diimport.
@@ -689,6 +711,220 @@ def _check_no_hidden_dependency_dgi(trees) -> FederationComplianceItem:
         else "; ".join(violations[:5]))
 
 
+# --- checks paket-4 (IP-3.4-004) OR-01..10 ---
+
+
+def _check_readiness_not_execution(trees) -> FederationComplianceItem:
+    """Readiness != Execution (OR-01): penilaian bukan eksekusi."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "readiness" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.Attribute)):
+                name = node.attr if isinstance(node, ast.Attribute) else node.name
+                if name in ("run_workflow", "start_collaboration",
+                            "execute_ready", "deploy_readiness"):
+                    violations.append("{}: {}".format(path, name))
+    return FederationComplianceItem(
+        "OR-01", "readiness_not_execution", ok and not violations,
+        "readiness is assessment, not execution"
+        if ok and not violations else "readiness triggers execution")
+
+
+def _check_coordination_not_orchestration(trees) -> FederationComplianceItem:
+    """Coordination != Orchestration (OR-02): insight bukan orchestration."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "coordination" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Name, ast.Attribute)):
+                name = node.attr if isinstance(node, ast.Attribute) else node.id
+                if name in ("orchestrate", "orchestrator", "coordinate_execute",
+                            "distributed_schedule", "auto_coordinate"):
+                    violations.append("{}: {}".format(path, name))
+    return FederationComplianceItem(
+        "OR-02", "coordination_not_orchestration", ok and not violations,
+        "coordination is insight, not orchestration"
+        if ok and not violations else "coordination orchestrates execution")
+
+
+def _check_recommendation_not_command(trees) -> FederationComplianceItem:
+    """Recommendation != Command (OR-03): saran bukan perintah."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "is_command" in src:
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name in (
+                    "command", "order", "direct", "enforce_coordination"):
+                violations.append("{}: {}".format(path, node.name))
+    return FederationComplianceItem(
+        "OR-03", "recommendation_not_command", ok and not violations,
+        "recommendation is advisory, not command"
+        if ok and not violations else "recommendation issues command")
+
+
+def _check_aggregation_not_authority(trees) -> FederationComplianceItem:
+    """Aggregation != Authority (OR-04): agregasi tidak berikan otoritas."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "aggregat" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Name, ast.Attribute)):
+                name = node.attr if isinstance(node, ast.Attribute) else node.id
+                if name in ("global_authority", "aggregated_authority",
+                            "central_rule", "override_member"):
+                    violations.append("{}: {}".format(path, name))
+    return FederationComplianceItem(
+        "OR-04", "aggregation_not_authority", ok and not violations,
+        "aggregation is summary, not authority"
+        if ok and not violations else "aggregation grants authority")
+
+
+def _check_health_not_runtime_control(trees) -> FederationComplianceItem:
+    """Federation Health != Runtime Control (OR-05): health observasional."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "health" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name in (
+                    "restart", "stop", "start", "failover", "kill"):
+                violations.append("{}: {}".format(path, node.name))
+    return FederationComplianceItem(
+        "OR-05", "health_not_runtime_control", ok and not violations,
+        "federation health is observational, not control"
+        if ok and not violations else "health issues runtime control")
+
+
+def _check_sovereignty_preserved_or(trees) -> FederationComplianceItem:
+    """Local sovereignty preserved (OR-06)."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "sovereign" in src.lower() or "sovereignty" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Name, ast.Attribute)):
+                name = node.attr if isinstance(node, ast.Attribute) else node.id
+                if name in ("select_leader", "elect_leader",
+                            "supersede_local", "impose_readiness"):
+                    violations.append("{}: {}".format(path, name))
+    return FederationComplianceItem(
+        "OR-06", "sovereignty_preserved", ok and not violations,
+        "operational coordination preserves local sovereignty"
+        if ok and not violations else "sovereignty overridden")
+
+
+def _check_registry_authoritative_or(trees, module_root) -> FederationComplianceItem:
+    """Registry remains authoritative (OR-07)."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        rel = os.path.relpath(path, module_root) if module_root else path
+        if "registry" in rel.lower():
+            continue
+        src = _read(path)
+        if "registry" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in (
+                    "overwrite_registry", "replace_registry",
+                    "registry_override", "bypass_registry"):
+                violations.append("{}: {}".format(path, node.id))
+    return FederationComplianceItem(
+        "OR-07", "registry_authoritative", ok and not violations,
+        "registry remains authoritative"
+        if ok and not violations else "registry bypass/override")
+
+
+def _check_evidence_first_readiness(trees) -> FederationComplianceItem:
+    """Evidence-first readiness (OR-08)."""
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "evidence" in src.lower():
+            ok = True
+    return FederationComplianceItem(
+        "OR-08", "evidence_first_readiness", ok,
+        "readiness grounded in evidence" if ok else "no evidence grounding")
+
+
+def _check_deterministic_aggregation(trees) -> FederationComplianceItem:
+    """Deterministic aggregation (OR-09)."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "deterministic" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in (
+                    "random", "randint", "time", "datetime", "uuid",
+                    "secrets"):
+                violations.append("{}: {}".format(path, node.id))
+    return FederationComplianceItem(
+        "OR-09", "deterministic_aggregation", ok and not violations,
+        "aggregation is deterministic (no RNG/time)"
+        if ok and not violations else "; ".join(violations[:3]))
+
+
+def _check_read_only_operational_api(trees) -> FederationComplianceItem:
+    """Read-only operational API (OR-10)."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "read-only" in src.lower() or "read_only" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name in (
+                    "failover", "load_balance", "select_leader",
+                    "elect_leader", "run_workflow", "start_collaboration",
+                    "activate_remote", "distributed_schedule",
+                    "auto_coordinate", "connect", "execute", "authorize",
+                    "approve", "sync_state"):
+                violations.append("{}: {}".format(path, node.name))
+    return FederationComplianceItem(
+        "OR-10", "read_only_operational_api", ok and not violations,
+        "operational api is read-only (no execution/coordination action)"
+        if ok and not violations else "; ".join(violations[:3]))
+
+
 # pilih source files sesuai implementation_dirs (tanpa compliance.py)
 def _select_source_files(
     source_files: List[str],
@@ -752,6 +988,17 @@ def compliance_check(
         _check_evidence_first_reasoning(trees),
         _check_read_only_api(trees),
         _check_no_hidden_dependency_dgi(trees),
+        # paket-4 (IP-3.4-004)
+        _check_readiness_not_execution(trees),
+        _check_coordination_not_orchestration(trees),
+        _check_recommendation_not_command(trees),
+        _check_aggregation_not_authority(trees),
+        _check_health_not_runtime_control(trees),
+        _check_sovereignty_preserved_or(trees),
+        _check_registry_authoritative_or(trees, module_root),
+        _check_evidence_first_readiness(trees),
+        _check_deterministic_aggregation(trees),
+        _check_read_only_operational_api(trees),
     )
     all_pass = all(c.passed for c in checks)
     return all_pass, checks

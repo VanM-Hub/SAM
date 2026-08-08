@@ -1,6 +1,7 @@
 # Federation - IP-3.4-001 (AO-3.4-001 / ED-3.4-001)
 # WP-01..10 (+ WP-11..20 IP-3.4-002 Federation Trust & Interoperability
-# + WP-21..30 IP-3.4-003 Distributed Governance Intelligence)
+# + WP-21..30 IP-3.4-003 Distributed Governance Intelligence
+# + WP-31..40 IP-3.4-004 Operational Coordination & Ecosystem Readiness)
 #
 # Layer: mengakui & bertukar capability antar beberapa Citizen Ecosystem yang
 # berdaulat (sovereign) melalui contract. KEPUTUSAN ARSITEKTUR KUNCI:
@@ -33,6 +34,19 @@
 #   Recommendation != Decision; Collaboration != Execution;
 #   Federation Intelligence != Central Intelligence; Sovereignty preserved;
 #   Deterministic reasoning; Evidence-first; Read-only API; No hidden dependency.
+#
+# IP-3.4-004 (Federation Operational Coordination & Ecosystem Readiness):
+#   federation mengetahui apakah kolaborasi lintas-ekosistem LAYAK, tetapi
+#   TIDAK pernah memulai kolaborasi otomatis. Output = readiness assessment /
+#   coordination insight / federation health / recommendation / explanation.
+#   BUKAN distributed execution, BUKAN distributed scheduling.
+#
+# Guardrail IP-3.4-004 (compliance.py OR-01..10):
+#   Readiness != Execution; Coordination != Orchestration;
+#   Recommendation != Command; Aggregation != Authority;
+#   Federation Health != Runtime Control; Local sovereignty preserved;
+#   Registry remains authoritative; Evidence-first readiness;
+#   Deterministic aggregation; Read-only operational API.
 
 # WP-01 - Federation Identity
 from sam.citizen.federation.identity import (
@@ -138,6 +152,42 @@ from sam.citizen.federation.explainability import (
 )
 from sam.citizen.federation.intelligence_api import FederationIntelligenceAPI
 
+# WP-31..38 - Federation Operational Coordination & Ecosystem Readiness (IP-3.4-004)
+from sam.citizen.federation.operational_readiness import (
+    FederationReadiness,
+    FederationOperationalModel,
+    READINESS_DIMENSIONS,
+    categorize_overall,
+)
+from sam.citizen.federation.aggregation import (
+    FederationReadinessAggregate,
+    FederationReadinessAggregator,
+)
+from sam.citizen.federation.coordination_intelligence import (
+    CoordinationInsight,
+    CoordinationIntelligence,
+)
+from sam.citizen.federation.risk import (
+    FederationRisk,
+    FederationRiskAssessment,
+    FederationRiskAssessor,
+)
+from sam.citizen.federation.recommendation import (
+    CoordinationRecommendation,
+    CoordinationRecommendationResult,
+    CoordinationRecommendationEngine,
+)
+from sam.citizen.federation.explainability import (
+    ReadinessExplanation,
+    CoordinationExplanation,
+    FederationOperationalExplainer,
+)
+from sam.citizen.federation.operational_api import (
+    FederationOperationalAPI,
+)
+
+__version__ = "3.6.0"
+
 __all__ = [
     "FederationIdentity", "FederationMember", "FederationInstance",
     "FederationRegistry",
@@ -168,4 +218,15 @@ __all__ = [
     "DistributedRecommendation",
     "IntelligenceExplanation", "FederationIntelligenceExplainer",
     "FederationIntelligenceAPI",
+    # IP-3.4-004
+    "FederationReadiness", "FederationOperationalModel",
+    "READINESS_DIMENSIONS", "categorize_overall",
+    "FederationReadinessAggregate", "FederationReadinessAggregator",
+    "CoordinationInsight", "CoordinationIntelligence",
+    "FederationRisk", "FederationRiskAssessment", "FederationRiskAssessor",
+    "CoordinationRecommendation", "CoordinationRecommendationResult",
+    "CoordinationRecommendationEngine",
+    "ReadinessExplanation", "CoordinationExplanation",
+    "FederationOperationalExplainer",
+    "FederationOperationalAPI",
 ]
