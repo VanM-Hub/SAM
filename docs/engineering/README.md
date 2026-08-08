@@ -8,7 +8,7 @@ Dokumen di sini = peran **Engineering**; pisah dari Architecture (aturan) & Hist
 ```
 docs/engineering/
 ├── decisions/    ← Keputusan engineering/arsitektur implementasi (AD-ENG-001..003, AD-S*)
-├── reports/      ← Laporan sesi/release yang masih relevan (kosong; akan terisi laporan ringkas baru)
+├── reports/      ← Laporan sesi/kerja BERJALAN (ringkas); laporan program SELESAI -> docs/history/reports/
 ├── journals/     ← Catatan kerja per-sesi/area (aktif; ringkas)
 ├── strategy/     ← Strategi pengembangan SAM 2.x (DEVELOPMENT_STRATEGY, Planning Standard, Readiness Model)
 ├── roadmap/      ← Rencana kerja SAM 2.x (ROADMAP SAM 2.x, Program A–E, Milestone, Appendix)
@@ -36,7 +36,7 @@ docs/engineering/
 ## Navigasi
 - Ingin strategi pengembangan → `docs/engineering/strategy/`
 - Ingin rencana kerja/roadmap → `docs/engineering/roadmap/ROADMAP SAM 2.x.md`
-- Ingin laporan sesi baru → `docs/engineering/reports/` (akan terisi laporan ringkas); laporan EP/OP/L2/L6 masa lalu diarsipkan ke backup eksternal
+- Ingin laporan sesi baru → `docs/engineering/reports/` (laporan sesi berjalan); laporan program selesai -> docs/history/reports/
 - Ingin keputusan → `docs/engineering/decisions/`
 - Ingin catatan kerja → `docs/engineering/journals/`
 - Ingin template → `docs/engineering/templates/`

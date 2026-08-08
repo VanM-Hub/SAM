@@ -71,7 +71,7 @@
 - **Klik "bagaimana membangun runtime?"** → `docs/runtime/` (R4→R5→I-series)
 - **Klik "sudah sesuai?"** → `docs/compliance/`
 - **Klik "masa lalu?"** → `docs/history/` — baca saja, jangan dipakai utk keputusan baru
-- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (decisions/reports/journals/templates)
+- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (decisions/reports/journals/templates); laporan program selesai -> docs/history/reports/
 - **Klik "strategi pengembangan?"** → `docs/engineering/strategy/` (DEVELOPMENT_STRATEGY, Planning Standard, Readiness Model)
 - **Klik "rencana kerja/roadmap?"** → `docs/engineering/roadmap/` (ROADMAP SAM 2.x.md, Program A–E, Milestone Architecture, Appendix)
 - **Klik "sudah jadi arsip non-aktif?"** → `docs/history/`

@@ -18,10 +18,10 @@ Yang selesai permanen → report/history.
 
 ## Prinsip isi journal
 - Ringkas & struktural: Tujuan → Kerja → Hasil → Blocker → Handoff.
-- Bukan diary/steno. Yang selesai permanen → `docs/engineering/reports/` / arsip eksternal.
+- Bukan diary/steno. Yang selesai permanen → `docs/engineering/reports/` (berjalan) / `docs/history/reports/` (selesai).
 - Catatan yang murni proses transient (plan sesi) tetap di luar repo (tidak di-commit).
 
 ## Navigasi
 - Riset/keputusan bernilai → `docs/engineering/decisions/` + `docs/engineering/journals/`
-- Laporan sesi final → `docs/engineering/reports/` / arsip eksternal
+- Laporan sesi final → `docs/engineering/reports/` (berjalan) / `docs/history/reports/` (selesai)
 - Catatan kerja aktif per-sesi → tambahkan di folder ini (ringkas, bersih).

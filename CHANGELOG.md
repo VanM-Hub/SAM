@@ -116,7 +116,7 @@
 - Constraint read-only: 0 mutation call (approve/execute/publish/register/emit/transition/write); 0 import governance/execution/workflow/events/runtime; source = PublicationRegistry saja.
 - Wiring: `get_recommendation_engine()` + `recommend_observations()` di `observation_wiring.py` (bounded context Observation).
 - Test suite baru: `tests/observation/test_recommendation_engine.py` (21 tests) - Total observation 163 passed.
-- Laporan: `docs/engineering/reports/EA-C03_Engineering_Report_C-Phase_3.md` (commit `43382b5`).
+- Laporan: `docs/history/reports/EA-C03_Engineering_Report_C-Phase_3.md` (commit `43382b5`).
 - Total baseline (lokal): 4,180 tests (unit + 8 runtime suites + observation 163 tests).
 
 ## SAM 1.0.2 (2026-08-08) - C-Phase 3 Workstream C1-C5 Operational Intelligence
@@ -165,7 +165,7 @@
 - Test suite baru: C6 (14) + C7 (14) + C8 (13) + C9 (14) + C10 (12) = 67 test baru - Total observation 273 passed.
 - Full tests/ (tanpa root test_sprint25 legacy): 16,204 passed, 1 skipped, 2 xfailed - tanpa regresi.
 - Commit: eb14e35 (C6), 288a74d (C7), f888f73 (C8), 25ceae5 (C9), 77039a6 (C10).
-- Laporan: docs/engineering/reports/EA-C05_Report_C-Phase_4_C6-C10.md.
+- Laporan: docs/history/reports/EA-C05_Report_C-Phase_4_C6-C10.md.
 - Status: COMPLETE (Working Report) - menunggu Engineering Verdict - Program C Completion dari Lead Engineer.
 
 ## SAM 1.0.2 (2026-08-08) - Verdict Lead Engineer: Program C CLOSED + Transition to Program D
@@ -181,7 +181,7 @@
 
 ### Read-Only Assessment (MISSION-2D)
 - Program D dimulai dengan phase **Assessment** (EA-001) - read-only, tidak ada perubahan source/architecture/CI/CD.
-- 6 deliverables assessment (docs/engineering/reports/EA-001-001..006):
+- 6 deliverables assessment (docs/history/reports/EA-001-001..006):
   - EA-001-001 Deployment Inventory Report (partial - H1 non-portable path)
   - EA-001-002 Recovery Assessment Report (partial - H2 no checkpoint)
   - EA-001-003 Rollback Assessment Report (partial - H3 no rollback deploy)
@@ -204,7 +204,7 @@
 - Verifikasi nyata: SAM_Run diagnostic 8/8; SAM_CLI console mencapai prompt `sam>`.
 - Evidence suite baru: tests/integration/test_launcher_portable.py (8 test) - otomatis masuk CI integration job.
 - Regression: baseline CI scope 4290 passed, no regression.
-- Report: docs/engineering/reports/WP-D2.1_H1_Portable_Deployment_Report.md.
+- Report: docs/history/reports/WP-D2.1_H1_Portable_Deployment_Report.md.
 - Constraint EA-002 dijaga (Foundation/Constitution/Governance/ADR beku).
 
 ## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P2/H5 User IAM
@@ -221,7 +221,7 @@
 - Kredensial hash (bukan plaintext); audit akses user sukses/gagal tanpa simpan kredensial.
 - Evidence suite: tests/integration/test_iam.py (30 test) masuk CI integration job.
 - Regression: integration suite 86 passed; baseline CI scope 4290 passed.
-- Report: docs/engineering/reports/WP-D2.2_H5_IAM_Report.md.
+- Report: docs/history/reports/WP-D2.2_H5_IAM_Report.md.
 - Constraint EA-002 dijaga: IAM stand-alone, TIDAK mengubah responsibility runtime existing.
 
 ## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P3/H2 Runtime Checkpoint & Recovery
@@ -234,7 +234,7 @@
 - runtime_kernel/state_snapshot.py TIDAK diubah (responsibility existing, constraint EA-002).
 - Evidence suite: tests/integration/test_recovery_checkpoint.py (23 test) masuk CI integration job.
 - Regression: integration suite 109 passed; baseline CI scope 4290 passed.
-- Report: docs/engineering/reports/WP-D2.3_H2_Recovery_Report.md.
+- Report: docs/history/reports/WP-D2.3_H2_Recovery_Report.md.
 
 ## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P4/H3 Deployment Rollback
 
@@ -245,7 +245,7 @@
 - execution_runtime rollback (Program C, eksekusi) TIDAK diubah - konteks berbeda dari deployment rollback.
 - Evidence suite: tests/integration/test_deploy_rollback.py (24 test) masuk CI integration job.
 - Regression: integration suite 133 passed; baseline CI scope 4290 passed.
-- Report: docs/engineering/reports/WP-D2.4_H3_Deployment_Rollback_Report.md.
+- Report: docs/history/reports/WP-D2.4_H3_Deployment_Rollback_Report.md.
 
 ## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P5/H4 Operational Alerting
 
@@ -256,7 +256,7 @@
 - TIDAK melakukan efek eksternal (kanal = label; pengiriman nyata oleh sink eksternal); alert_engine & operations notification TIDAK diubah.
 - Evidence suite: tests/integration/test_operational_alerting.py (25 test) masuk CI integration job.
 - Regression: integration suite 158 passed; baseline CI scope 4290 passed.
-- Report: docs/engineering/reports/WP-D2.5_H4_Operational_Alerting_Report.md.
+- Report: docs/history/reports/WP-D2.5_H4_Operational_Alerting_Report.md.
 
 ## SAM 1.0.2 (2026-08-08) - Program E EA-002 Implementation: WP-E2.1 E1-G1 Bootstrap Installation
 
@@ -269,7 +269,7 @@
 - TIDAK mengubah runtime/governance/deployment/Foundation/launcher existing - boundary EA-002 Developer Experience layer.
 - Evidence suite: tests/integration/test_devx_bootstrap.py (28 test) masuk CI integration job.
 - Regression: integration suite hijau (28 baru); baseline CI scope 4290 passed, 1 skipped, 2 xfailed - no regression.
-- Report: docs/engineering/reports/WP-E2.1_E1-G1_Bootstrap_Installation_Report.md.
+- Report: docs/history/reports/WP-E2.1_E1-G1_Bootstrap_Installation_Report.md.
 - Next: WP-E2.2 E2-G1 CLI Onboarding (sam init / doctor / version).
 - **Kelima High gap Program D (H1/H5/H2/H3/H4) tuntas -> EA-002 Implementation SELESAI.**
 - State dir data/checkpoints/ ditambahkan ke .gitignore (tidak ikut commit).
@@ -287,7 +287,7 @@
 - TIDAK mengubah runtime/governance/deployment/Foundation/launcher existing - boundary EA-002 Developer Experience layer.
 - Evidence suite: tests/integration/test_devx_onboarding.py (12 test) masuk CI integration job.
 - Regression: integration suite (3.12) 198 passed (186 existing + 12 baru), 0 collection error.
-- Report: docs/engineering/reports/WP-E2.2_E2-G1_CLI_Onboarding_Report.md.
+- Report: docs/history/reports/WP-E2.2_E2-G1_CLI_Onboarding_Report.md.
 - Next: WP-E2.3 E4-G1 Quick Start.
 
 ## SAM 1.0.2 (2026-08-08) - Program E EA-002 Implementation: WP-E2.3 E4-G1 End-to-End Quick Start
@@ -298,7 +298,7 @@
 - Konsistensi command naming: next_steps / help text onboarding dirapikan jadi `sam onboarding init/doctor/version` (sebelumnya sebagian tertulis tanpa prefix onboarding).
 - ATLAS reading-path ditambah jalur 'coba cepat' -> docs/user/quickstart.md.
 - Constraint EA-002 dijaga: dokumentasi saja; tidak ubah runtime/governance/Foundation/ADR.
-- Report: docs/engineering/reports/WP-E2.3_E4-G1_Quick_Start_Report.md.
+- Report: docs/history/reports/WP-E2.3_E4-G1_Quick_Start_Report.md.
 - Next: WP-E2.4 E5-G1 Starter Project.
 
 ## SAM 1.0.2 (2026-08-08) - Program E EA-002 Implementation: WP-E2.4 E5-G1 Starter Project
@@ -309,7 +309,7 @@
 - Mengisi janji next-steps `sam onboarding init --scaffold` dari WP-E2.2.
 - Evidence suite: tests/integration/test_devx_scaffold.py (13 test) masuk CI integration job.
 - Regression: integration suite (3.12) 211 passed (198 existing + 13 baru), 0 collection error.
-- Report: docs/engineering/reports/WP-E2.4_E5-G1_Starter_Project_Report.md.
+- Report: docs/history/reports/WP-E2.4_E5-G1_Starter_Project_Report.md.
 - Next: WP-E2.5 E3-G1 SDK Public API.
 
 ## SAM 1.0.2 (2026-08-08) - Program E EA-002 Implementation: WP-E2.5 E3-G1 SDK Public API
@@ -318,7 +318,7 @@
 - Tidak mengubah behavior/definisi; hanya ekspor kontrak yang sudah didokumentasikan. sam.observe() -> Conversation tetap entry point utama.
 - Evidence suite: tests/unit/test_sdk_public_api.py (7 test) masuk baseline CI via tests/unit (tanpa ubah testpaths).
 - Regression: baseline unit (3.8) 2970 passed; integration (3.12) 211 passed, no regression.
-- Report: docs/engineering/reports/WP-E2.5_E3-G1_SDK_Public_API_Report.md.
+- Report: docs/history/reports/WP-E2.5_E3-G1_SDK_Public_API_Report.md.
 - **Program E (EA-002 / MISSION-2E) SELESAI - seluruh 5 WP (E2.1-E2.5) tuntas.**
 
 ## SAM 1.0.2 (2026-08-08) - Program F MISSION-2F SAM 2.0 Certification
