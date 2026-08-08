@@ -1,20 +1,26 @@
-"""compliance — WP-13 (IP-3.1-001) + WP-24 (IP-3.1-002).
+"""compliance - WP-13 (IP-3.1-001) + WP-24 (IP-3.1-002).
 
 Automatic verification that the Intelligence layer never crosses its
 safety boundaries (WP-13) and that it exhibits the required positive
 properties (WP-24):
 
-WP-13 (forbidden — capability must NOT have):
+WP-13 (forbidden - capability must NOT have):
   *  no runtime mutation
   *  no authority
   *  no orchestration
   *  no execution
   *  no approval
 
-WP-24 (required — capability MUST exhibit):
+WP-24 (required - capability MUST exhibit):
   *  deterministic reasoning
   *  explainable output
   *  evidence-backed recommendation
+
+WP-34 (Conversation Compliance - IP-3.1-003):
+  *  no governance mutation
+  *  no hidden memory (only session context, never persisted)
+  *  deterministic follow-up
+  *  no evidence loss (answers keep the evidence chain)
 
 This is a static, read-only safety/property check over source files (no
 runtime side effects). Returns a ComplianceReport.
@@ -38,6 +44,15 @@ _FORBIDDEN = {
     "no orchestration": ["orchestrat", "spawn("],
     "no execution": ["subprocess", "os.system(", "exec(", "Popen(", "run_cmd"],
     "no approval": ["approve("],
+    # WP-34: conversation must not mutate governance or persist hidden memory
+    "no governance mutation": [
+        "update_governance", "save_governance", "commit_governance",
+        "mutate_governance", "write_governance", "persist_governance",
+    ],
+    "no hidden memory": [
+        "pickle", "shelve", "sqlite3", "joblib", "json.dump",
+        "open(\"w", "open('w", "to_disk", "save_persistent",
+    ],
 }
 
 # Required positive capability markers. At least one marker must appear in the
@@ -46,6 +61,9 @@ _REQUIRED = {
     "deterministic reasoning": ["keyword_rule", "def reason", "ReasoningTree", "rule("],
     "explainable output": ["StructuredExplanation", "def compose", "public_dict"],
     "evidence-backed recommendation": ["evidence", "has_evidence", "evidence-backed", "EvidenceRepository"],
+    # WP-34: required positive conversation properties
+    "deterministic follow-up": ["InteractiveTurn", "def run(", "_update_session", "_token"],
+    "no evidence loss": ["evidence_chain", "_gather_evidence", "EvidenceTrace"],
 }
 
 
