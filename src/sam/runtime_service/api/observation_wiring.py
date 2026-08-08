@@ -24,6 +24,10 @@ from sam.observation.adapters import (
 )
 from sam.observation.gaps import GapResolutionCoordinator, GapResolutionReport
 from sam.observation.publication import PublicationRegistry
+from sam.observation.recommendation import (
+    ObservationRecommendationEngine,
+    OperationalRecommendationReport,
+)
 from sam.runtime_service.api.observation_endpoint import ObservationGateway
 
 
@@ -32,6 +36,7 @@ from sam.runtime_service.api.observation_endpoint import ObservationGateway
 _registry: Optional[PublicationRegistry] = None
 _gateway: Optional[ObservationGateway] = None
 _gap_coordinator: Optional[GapResolutionCoordinator] = None
+_recommendation_engine: Optional[ObservationRecommendationEngine] = None
 
 
 def create_publication_registry() -> PublicationRegistry:
@@ -72,6 +77,21 @@ def get_gap_coordinator() -> GapResolutionCoordinator:
     if _gap_coordinator is None:
         _gap_coordinator = GapResolutionCoordinator(get_publication_registry())
     return _gap_coordinator
+
+
+def get_recommendation_engine() -> ObservationRecommendationEngine:
+    """Dapatkan singleton observation recommendation engine (lazy init)."""
+    global _recommendation_engine
+    if _recommendation_engine is None:
+        _recommendation_engine = ObservationRecommendationEngine(
+            get_publication_registry()
+        )
+    return _recommendation_engine
+
+
+def recommend_observations() -> OperationalRecommendationReport:
+    """Shortcut: generate operational recommendations dari observasi."""
+    return get_recommendation_engine().recommend()
 
 
 def resolve_all_gaps() -> GapResolutionReport:
