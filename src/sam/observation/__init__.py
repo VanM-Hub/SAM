@@ -16,6 +16,13 @@ Constraints (AP-2C-001):
 """
 from __future__ import annotations
 
+# C-Phase 3: Observation Recommendation Engine exports
+from sam.observation.recommendation import (
+    ObservationRecommendation,
+    ObservationRecommendationEngine,
+    OperationalRecommendationReport,
+)
+
 # C-Phase 2: Gap Resolution exports
 from sam.observation.gaps import (
     ApprovalHealthDetail,
@@ -66,4 +73,8 @@ __all__ = [
     # Coordinator
     "GapResolutionCoordinator",
     "GapResolutionReport",
+    # C-Phase 3: Observation Recommendation Engine
+    "ObservationRecommendation",
+    "ObservationRecommendationEngine",
+    "OperationalRecommendationReport",
 ]
