@@ -146,12 +146,13 @@
    Reference Runtime  ✓
    Engineering        ✓   (S01-S10 selesai; Program A/B/C closed)
    Operationalization ◉  ← KAMU DI SINI (M3 Observable Platform; 6 capability active)
-   Production         ◉   (PROGRAM D - EA-002 Implementation Active; P1/H1 done)
+   Production         ◉   (PROGRAM E - EA-002 Early Adopter Experience Active; WP-E2.1 done)
 ```
 > Fase: **Product Integration & Operationalization** (Tahap 2). Execution = preview (ADR-024).
 > Observability: Observation Layer (C-Phase 1-4) sudah observasi 5 pipeline + Platform Intelligence (C6-C10) secara read-only (M3).
 > Program C **CLOSED** (Verdict EA-C06); M3 Observable Platform tercapai.
 > **Program D (MISSION-2D) EA-002 Production Readiness Implementation SELESAI** - Verdict EA-002/EA-003; Official Order P1-P5. **Kelima High gap DONE** (H1 portable + H5 IAM + H2 recovery + H3 deploy rollback + H4 operational alerting; modul sam/iam + sam/recovery + sam/deploy_rollback + sam/operational_alerting; 8+30+23+24+25 test). EA-002 Implementation COMPLETE, menunggu Verdict Lead Engineer. Menuju Production Platform (M4).
+> **Program E (MISSION-2E) EA-002 Early Adopter Experience Implementation ACTIVE** - Verdict EA-002 (AP-2E-001); Official Order WP-E2.1..E2.5. **WP-E2.1 E1-G1 Automatic Bootstrap Installation DONE** (modul sam/devx; 28 test evidence; baseline 4290 passed, no regression). Next: WP-E2.2 E2-G1 CLI Onboarding (sam init / doctor / version).
 
 ---
 
