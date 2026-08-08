@@ -16,11 +16,11 @@
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
 | Program terakhir (post-1.0) | Program A Test Baseline Convergence Phase 2-3 |
-| Status saat ini | **Baseline CI: 7 runtime Operational** (3,808 tests) — Policy · Workflow · Artifact · Audit · Mission + Knowledge · Memory |
-| Branch / HEAD | `main` / `96e984f` |
+| Status saat ini | **Baseline CI: 8 runtime Operational** (4,017 tests) — Execution + Policy · Workflow · Artifact · Audit · Mission + Knowledge · Memory |
+| Branch / HEAD | `main` / `f58ff0d` |
 | Total commit | ~690+ |
-| Baseline CI | 3,808 passed · 1 skipped (8 folder: unit + 7 runtime suites) |
-| Execution Runtime | 209/211 passed (2 pre-existing env-dependent) — belum masuk baseline |
+| Baseline CI | 4,017 passed · 1 skipped · 2 xfailed (9 folder: unit + 8 runtime suites) |
+| Execution Runtime | 209/211 passed, 2 xfailed (pre-existing) — masuk baseline CI Phase 4 |
 | Tanggal update | 2026-08-08 |
 
 ---

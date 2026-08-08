@@ -36,3 +36,11 @@
   - Artifact (135 tests), Audit (173 tests), Mission (60 tests)
 - Mission Runtime Activation Path: `mission_preview.py` + wiring `preview_with_mission()` (WP-B2).
 - Execution Runtime: 209/211 passed (2 pre-existing environment-dependent, belum masuk baseline CI).
+
+## SAM 1.0.2 (2026-08-08) - Execution Baseline CI
+
+### Test Baseline Convergence (Program A Phase 4)
+- Execution Runtime masuk baseline CI dengan 2 test pre-existing di-xfail.
+- Total baseline: 4,017 tests passed, 1 skipped, 2 xfailed.
+- 8 runtime OPERATIONAL: Knowledge · Memory · Policy · Workflow · Artifact · Audit · Mission · Execution.
+- 2 xfail: `test_no_hardcoded_secrets_in_provider_executor_source` (false positive pada prefix "Bearer") dan `test_provider_executor_non_auth_execute_ok` (filesystem provider belum memenuhi syarat base_url).
