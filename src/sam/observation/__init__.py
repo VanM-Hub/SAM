@@ -119,6 +119,18 @@ from sam.observation.platform_health import (
     PlatformStatusSummary,
 )
 
+# C-Phase 4: Workstream C10 Operational Learning
+from sam.observation.operational_learning import (
+    HistoricalObservationSummary,
+    LearningEvidence,
+    LearningEvidenceReport,
+    OperationalLearningObserver,
+    OperationalRecommendation,
+    OperationalRecommendationCenter,
+    OperationalTrendEntry,
+    OperationalTrendReport,
+)
+
 # C-Phase 2: Gap Resolution exports
 from sam.observation.gaps import (
     ApprovalHealthDetail,
@@ -250,4 +262,13 @@ __all__ = [
     "CrossRuntimeHealthView",
     "PlatformStatusSummary",
     "PlatformHealthObserver",
+    # C-Phase 4: Workstream C10 Operational Learning
+    "OperationalTrendEntry",
+    "OperationalTrendReport",
+    "OperationalRecommendation",
+    "OperationalRecommendationCenter",
+    "HistoricalObservationSummary",
+    "LearningEvidence",
+    "LearningEvidenceReport",
+    "OperationalLearningObserver",
 ]
