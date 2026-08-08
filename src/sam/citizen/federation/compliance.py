@@ -1,9 +1,9 @@
-# Federation Compliance - WP-08 (+ WP-18 IP-3.4-002)
+# Federation Compliance - WP-08 (+ WP-18 IP-3.4-002, + WP-29 IP-3.4-003)
 # IP-3.4-001 (AO-3.4-001 / ED-3.4-001)
 #
 # Compliance khas Federation (10 checks paket-1 FED-01..10 + 9 checks
-# paket-2 TRUST-01..09). Memastikan federation/ tidak melanggar guardrail
-# IP-3.4-001 / AO-3.4-001:
+# paket-2 TRUST-01..09 + 10 checks paket-3 DGI-01..10). Memastikan
+# federation/ tidak melanggar guardrail IP-3.4-001 / AO-3.4-001:
 #
 #   Federation != Central Governance
 #   Registry != Control Plane
@@ -14,7 +14,7 @@
 #   Federation Identity != Global Identity
 #   Sovereignty First
 #
-# Dan guardrail IP-3.4-002 (Trust & Interoperability):
+# Guardrail IP-3.4-002 (Trust & Interoperability):
 #
 #   Trust != Authority
 #   Interoperability != Execution
@@ -26,9 +26,23 @@
 #   Deterministic
 #   Evidence-first
 #
+# Guardrail IP-3.4-003 (Distributed Governance Intelligence):
+#
+#   Knowledge != Authority (DGI-01)
+#   Evidence Exchange != Runtime Sharing (DGI-02)
+#   Recommendation != Decision (DGI-03)
+#   Collaboration != Execution (DGI-04)
+#   Federation Intelligence != Central Intelligence (DGI-05)
+#   Sovereignty preserved (DGI-06)
+#   Deterministic reasoning (DGI-07)
+#   Evidence-first (DGI-08)
+#   Read-only API (DGI-09)
+#   No hidden dependency (DGI-10)
+#
 # SHALL NOT: central authority, shared approval, remote execution, network
 # connect/execute, hidden dependency ke runtime/governance, otomatisasi,
-# activation/binding otomatis, delegated authority.
+# activation/binding otomatis, delegated authority, sinkronisasi state,
+# federation scheduler, remote invoke.
 
 import ast
 import os
@@ -44,6 +58,9 @@ _FORBIDDEN_AUTHORITY = (
     # paket-2 (IP-3.4-002): activation/binding/deligasi otomatis
     "activate", "bind", "authorize", "delegate_authority",
     "grant_trust", "auto_bind", "auto_activate",
+    # paket-3 (IP-3.4-003): sinkronisasi state, remote invoke, scheduler
+    "sync_state", "synchronize_state", "federation_scheduler",
+    "schedule_remote", "remote_invoke",
 )
 
 # modul eksekusi/runtime/governance/network yang TIDAK boleh diimport.
@@ -462,6 +479,216 @@ def _check_evidence_first(trees) -> FederationComplianceItem:
         "trust grounded in evidence" if ok else "no evidence grounding")
 
 
+# --- checks paket-3 (IP-3.4-003) DGI-01..10 ---
+
+
+def _check_knowledge_not_authority(trees) -> FederationComplianceItem:
+    """Knowledge != Authority: knowledge exchange tidak membawa otoritas."""
+    ok = False
+    violates = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "is_authority" in src or "as_authority" in src:
+            ok = True
+        # knowledge yang dipakai sebagai perintah eksekusi = pelanggaran
+        if "authoritative_knowledge" in src or "knowledge_directive" in src:
+            violates = True
+    return FederationComplianceItem(
+        "DGI-01", "knowledge_not_authority", ok and not violates,
+        "knowledge is shared, never authority" if ok and not violates
+        else "knowledge carries authority")
+
+
+def _check_evidence_not_runtime_share(trees) -> FederationComplianceItem:
+    """Evidence Exchange != Runtime Sharing."""
+    ok = False
+    violates = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "is_runtime_share" in src:
+            ok = True
+        if "runtime_share" in src and "shared_state" in src:
+            violates = True
+    return FederationComplianceItem(
+        "DGI-02", "evidence_not_runtime_share", ok and not violates,
+        "evidence exchange is not runtime sharing" if ok and not violates
+        else "evidence shares runtime state")
+
+
+def _check_recommendation_not_decision(trees) -> FederationComplianceItem:
+    """Recommendation != Decision: rekomendasi tidak pernah menjadi keputusan."""
+    violations = []
+    has_rec = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "recommend" in src.lower():
+            has_rec = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Attribute) and node.attr in (
+                    "to_decision", "enforce_recommendation", "apply_suggestion"):
+                violations.append("{}: {}".format(path, node.attr))
+    # is_decision atribut yang SELALU False di rekomendasi = sah
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "is_decision" in src:
+            has_rec = True
+    return FederationComplianceItem(
+        "DGI-03", "recommendation_not_decision", has_rec and not violations,
+        "recommendation is advisory, never decision"
+        if has_rec and not violations else "recommendation enforces decision")
+
+
+def _check_collaboration_not_execution(trees) -> FederationComplianceItem:
+    """Collaboration != Execution: kolaborasi deskriptif, bukan eksekusi."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "is_execution" in src:
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in (
+                    "execute_collaboration", "run_collaboration",
+                    "start_collaboration"):
+                violations.append("{}: {}".format(path, node.id))
+    return FederationComplianceItem(
+        "DGI-04", "collaboration_not_execution", ok and not violations,
+        "collaboration is descriptive, not execution"
+        if ok and not violations else "collaboration executes")
+
+
+def _check_federation_not_central_intelligence(trees) -> FederationComplianceItem:
+    """Federation Intelligence != Central Intelligence (reasoning tetap lokal)."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "local" in src.lower():  # reasoning lokal dipertahankan
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in (
+                    "global_brain", "central_reasoner", "single_intelligence",
+                    "replaces_local_reasoning"):
+                violations.append("{}: {}".format(path, node.id))
+    return FederationComplianceItem(
+        "DGI-05", "federation_not_central_intelligence", ok and not violations,
+        "each federation reasons locally, shares evidence not authority"
+        if ok and not violations else "central intelligence found")
+
+
+def _check_sovereignty_preserved_dgi(trees) -> FederationComplianceItem:
+    """Sovereignty preserved: reasoning tidak menggantikan otoritas lokal."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "sovereign" in src.lower() or "sovereignty" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in (
+                    "override_local_decision", "central_rule",
+                    "supersede_local"):
+                violations.append("{}: {}".format(path, node.id))
+    return FederationComplianceItem(
+        "DGI-06", "sovereignty_preserved", ok and not violations,
+        "reasoning preserves local sovereignty"
+        if ok and not violations else "sovereignty overridden")
+
+
+def _check_deterministic_reasoning(trees) -> FederationComplianceItem:
+    """Deterministic reasoning: tanpa RNG/time sebagai dasar reasoning."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "deterministic" in src.lower():
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in (
+                    "random", "randint", "time", "datetime", "uuid",
+                    "secrets"):
+                violations.append("{}: {}".format(path, node.id))
+    return FederationComplianceItem(
+        "DGI-07", "deterministic_reasoning", ok and not violations,
+        "reasoning is deterministic (no RNG/time)"
+        if ok and not violations else "; ".join(violations[:3]))
+
+
+def _check_evidence_first_reasoning(trees) -> FederationComplianceItem:
+    """Evidence-first: reasoning diturunkan dari evidence."""
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "evidence" in src.lower():
+            ok = True
+    return FederationComplianceItem(
+        "DGI-08", "evidence_first_reasoning", ok,
+        "reasoning grounded in evidence" if ok else "no evidence grounding")
+
+
+def _check_read_only_api(trees) -> FederationComplianceItem:
+    """Read-only API: tidak ada method mutasi/eksekusi/network."""
+    violations = []
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "read-only" in src.lower() or "read-only" in src:
+            ok = True
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name in (
+                    "connect", "execute", "authorize", "approve",
+                    "invoke", "sync_state", "synchronize_state"):
+                violations.append("{}: {}".format(path, node.name))
+    return FederationComplianceItem(
+        "DGI-09", "read_only_api", ok and not violations,
+        "api is read-only (no mutation/execution/network)"
+        if ok and not violations else "; ".join(violations[:3]))
+
+
+def _check_no_hidden_dependency_dgi(trees) -> FederationComplianceItem:
+    """No hidden dependency: tidak ada import forbidden (runtime/governance/network)."""
+    violations = []
+    for path, tree in trees:
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                mod = None
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        mod = alias.name
+                        if _import_forbidden(mod):
+                            violations.append("{}: {}".format(path, mod))
+                else:
+                    mod = node.module or ""
+                    if _import_forbidden(mod):
+                        violations.append("{}: {}".format(path, mod))
+    return FederationComplianceItem(
+        "DGI-10", "no_hidden_dependency", not violations,
+        "no hidden dep on runtime/governance/network" if not violations
+        else "; ".join(violations[:5]))
+
+
 # pilih source files sesuai implementation_dirs (tanpa compliance.py)
 def _select_source_files(
     source_files: List[str],
@@ -514,6 +741,17 @@ def compliance_check(
         _check_registry_authoritative_trust(trees, module_root),
         _check_deterministic_trust(trees),
         _check_evidence_first(trees),
+        # paket-3 (IP-3.4-003)
+        _check_knowledge_not_authority(trees),
+        _check_evidence_not_runtime_share(trees),
+        _check_recommendation_not_decision(trees),
+        _check_collaboration_not_execution(trees),
+        _check_federation_not_central_intelligence(trees),
+        _check_sovereignty_preserved_dgi(trees),
+        _check_deterministic_reasoning(trees),
+        _check_evidence_first_reasoning(trees),
+        _check_read_only_api(trees),
+        _check_no_hidden_dependency_dgi(trees),
     )
     all_pass = all(c.passed for c in checks)
     return all_pass, checks

@@ -1,5 +1,6 @@
 # Federation - IP-3.4-001 (AO-3.4-001 / ED-3.4-001)
-# WP-01..10 (+ WP-11..20 IP-3.4-002 Federation Trust & Interoperability)
+# WP-01..10 (+ WP-11..20 IP-3.4-002 Federation Trust & Interoperability
+# + WP-21..30 IP-3.4-003 Distributed Governance Intelligence)
 #
 # Layer: mengakui & bertukar capability antar beberapa Citizen Ecosystem yang
 # berdaulat (sovereign) melalui contract. KEPUTUSAN ARSITEKTUR KUNCI:
@@ -9,6 +10,11 @@
 # distributed runtime, global governance.
 # Federation BERARTI: beberapa Citizen Ecosystem berdaulat saling MENGENALI
 # dan BERTUKAR capability melalui contract (deskriptif, bukan eksekusi).
+#
+# IP-3.4-003 (Distributed Governance Intelligence): tiap federation reasoning
+# secara lokal, reasoning dipertukarkan sebagai EVIDENCE (bukan authority),
+# diagregasi secara deterministik menjadi insight, diturunkan jadi rekomendasi.
+# BUKAN Distributed Governance, BUKAN Shared Governance.
 #
 # Guardrail IP-3.4-001 dikunci (compliance.py FED-01..10):
 #   Federation != Central Governance; Registry != Control Plane;
@@ -21,6 +27,12 @@
 #   Negotiation != Agreement; Assessment != Federation Control;
 #   Compatibility != Approval; Local Sovereignty; Registry authoritative;
 #   Deterministic; Evidence-first.
+#
+# Guardrail IP-3.4-003 (Distributed Governance Intelligence):
+#   Knowledge != Authority; Evidence Exchange != Runtime Sharing;
+#   Recommendation != Decision; Collaboration != Execution;
+#   Federation Intelligence != Central Intelligence; Sovereignty preserved;
+#   Deterministic reasoning; Evidence-first; Read-only API; No hidden dependency.
 
 # WP-01 - Federation Identity
 from sam.citizen.federation.identity import (
@@ -88,6 +100,44 @@ from sam.citizen.federation.explainability import (
 )
 from sam.citizen.federation.interop_api import FederationInteroperabilityAPI
 
+# WP-21..30 - Distributed Governance Intelligence (IP-3.4-003)
+from sam.citizen.federation.collaboration import (
+    FederationCollaboration,
+    CollaborationStatus,
+    FederationCollaborationModel,
+)
+from sam.citizen.federation.proposal import (
+    CollaborationProposal,
+    CollaborationProposalResult,
+    CollaborationProposalEngine,
+)
+from sam.citizen.federation.knowledge_exchange import (
+    KnowledgeArtifact,
+    KnowledgePackage,
+    DistributedKnowledgeExchange,
+)
+from sam.citizen.federation.evidence_exchange import (
+    EvidenceNode,
+    EvidenceEdge,
+    EvidenceGraph,
+    DistributedEvidenceExchange,
+)
+from sam.citizen.federation.intelligence import (
+    LocalReasoning,
+    FederationInsight,
+    FederationIntelligenceEngine,
+)
+from sam.citizen.federation.recommendation import (
+    FederationRecommendation,
+    RecommendationResult,
+    DistributedRecommendation,
+)
+from sam.citizen.federation.explainability import (
+    IntelligenceExplanation,
+    FederationIntelligenceExplainer,
+)
+from sam.citizen.federation.intelligence_api import FederationIntelligenceAPI
+
 __all__ = [
     "FederationIdentity", "FederationMember", "FederationInstance",
     "FederationRegistry",
@@ -105,4 +155,17 @@ __all__ = [
     "FederationCompatibilityAnalyzer",
     "TrustExplanation", "InteropExplanation", "TrustExplainer",
     "FederationInteroperabilityAPI",
+    # IP-3.4-003
+    "FederationCollaboration", "CollaborationStatus",
+    "FederationCollaborationModel",
+    "CollaborationProposal", "CollaborationProposalResult",
+    "CollaborationProposalEngine",
+    "KnowledgeArtifact", "KnowledgePackage", "DistributedKnowledgeExchange",
+    "EvidenceNode", "EvidenceEdge", "EvidenceGraph",
+    "DistributedEvidenceExchange",
+    "LocalReasoning", "FederationInsight", "FederationIntelligenceEngine",
+    "FederationRecommendation", "RecommendationResult",
+    "DistributedRecommendation",
+    "IntelligenceExplanation", "FederationIntelligenceExplainer",
+    "FederationIntelligenceAPI",
 ]

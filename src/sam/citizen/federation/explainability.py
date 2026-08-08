@@ -16,6 +16,11 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Tuple
 
+from sam.citizen.federation.intelligence import FederationInsight
+from sam.citizen.federation.recommendation import (
+    FederationRecommendation,
+    RecommendationResult,
+)
 from sam.citizen.federation.trust import (
     FederationTrustProfile,
     TrustEvidence,
@@ -115,4 +120,67 @@ class TrustExplainer:
             summary=summary,
             gaps=tuple(sorted(gaps)),
             recommendations=tuple(sorted(recommended)),
+        )
+
+
+# ---------------------------------------------------------------------------
+# WP-27 - Explainability lintas federation (IP-3.4-003)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class IntelligenceExplanation:
+    """Penjelasan insight & rekomendasi lintas federation (evidence-based)."""
+
+    focus: str
+    summary: str
+    basis: Tuple[str, ...] = ()
+    member_signals: Tuple[str, ...] = ()
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "focus": self.focus,
+            "summary": self.summary,
+            "basis": list(self.basis),
+            "member_signals": list(self.member_signals),
+        }
+
+
+class FederationIntelligenceExplainer:
+    """Penyusun penjelasan reasoning lintas federation (read-only)."""
+
+    def explain_insight(self, insight: FederationInsight) -> IntelligenceExplanation:
+        signal = insight.signal
+        if signal == "clear":
+            summary = ("Fokus {focus} menunjukkan kesepakatan kuat antar "
+                       "federation (agreement {score:.0%}).".format(
+                           focus=insight.focus, score=insight.agreement_score))
+        elif signal == "mixed":
+            summary = ("Fokus {focus} menunjukkan pandangan terbagi "
+                       "antar federation.".format(focus=insight.focus))
+        else:
+            summary = ("Fokus {focus} belum memiliki cukup evidence untuk "
+                       "menarik kesimpulan.".format(focus=insight.focus))
+
+        member_signals = tuple(
+            "{member}:{assessment}".format(
+                member=r.member_id, assessment=r.assessment)
+            for r in insight.members)
+        basis = ("agreement:{:.2f}".format(insight.agreement_score),
+                 "signal:{}".format(signal))
+        return IntelligenceExplanation(
+            focus=insight.focus,
+            summary=summary,
+            basis=basis,
+            member_signals=member_signals,
+        )
+
+    def explain_recommendation(
+        self,
+        recommendation: FederationRecommendation,
+    ) -> IntelligenceExplanation:
+        return IntelligenceExplanation(
+            focus=recommendation.focus,
+            summary=recommendation.suggestion,
+            basis=recommendation.basis,
         )
