@@ -129,3 +129,12 @@
 - Tidak ada blocker architecture; temuan validate_imports.py = pre-existing tooling issue.
 - Prioritas berikutnya: C6 Capability, C7 Provider, C8 Runtime, C9 Platform Health, C10 Operational Learning.
 - Dokumen: docs/engineering/decisions/EA-C04_Lead_Engineer_Verdict_C1-C5.md (commit dirujuk di atas).
+
+## SAM 1.0.2 (2026-08-08) - Directive Lead Engineer: C-Phase 4 (Workstream C6-C10) CONTINUE
+
+### Engineering Directive (EA-C05)
+- Lead Engineer menetapkan status CONTINUE (Continuous Execution) untuk C-Phase 4 - Platform Operational Intelligence.
+- Workstream C6-C10: C6 Capability, C7 Provider, C8 Runtime, C9 Platform Health, C10 Operational Learning.
+- Constraint global: read-only (tanpa execute/approve/reject/publish/emit/transition/finalize), dependency Observation->Analytics->Recommendation->Platform Intelligence (tanpa Platform Intelligence->Runtime), tanpa Runtime/Governance/Event Bus baru, tanpa mengubah Approval/Workflow/Execution/Audit/Provider Runtime.
+- Exit Criteria Program C: seluruh Runtime & Capability observable, Platform Health, Operational Metrics, Readiness Reporting, Recommendation, Operational Learning, tanpa Architecture Drift / Foundation Impact.
+- Dokumen: docs/engineering/decisions/EA-C05_Lead_Engineer_Directive_C6-C10.md.
