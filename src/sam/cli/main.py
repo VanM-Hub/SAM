@@ -14,6 +14,7 @@ from sam.cli import history as history_cli
 from sam.cli import settings as settings_cli
 from sam.cli import task as task_cli
 from sam.cli import explain as explain_cli
+from sam.cli import onboarding as onboarding_cli
 
 app = typer.Typer(
     name="sam",
@@ -42,6 +43,7 @@ app.add_typer(history_cli.app, name="history", help="View and search history")
 app.add_typer(task_cli.app, name="task", help="Task management (list, show, approve, deny)")
 app.add_typer(settings_cli.app, name="settings", help="View and manage settings (list, get, set)")
 app.add_typer(explain_cli.app, name="explain", help="Explain events (explain, recent)")
+app.add_typer(onboarding_cli.app, name="onboarding", help="SAM onboarding (init, doctor, version)")
 
 
 @app.command()

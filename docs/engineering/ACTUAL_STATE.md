@@ -1,4 +1,4 @@
-﻿# ACTUAL_STATE — Status Aktual SAM
+# ACTUAL_STATE — Status Aktual SAM
 
 > Dokumen **status & riwayat** kondisi SAM terkini (hidup). Perbarui saat versi/status/fase berubah.
 > Detail fase yang sudah selesai -> `docs\history\` + git tag di repo.
@@ -15,10 +15,10 @@
 | Identitas rilis | **SAM 1.0 Foundation** + **SAM 1.0.1** (baseline expansion) + **SAM 1.0.2** (execution baseline) |
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
-| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 CLOSED (M4 ACHIEVED), Program E EA-002 ACTIVE (WP-E2.1 done)** |
-| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D CLOSED (M4) - Program E EA-002 ACTIVE (WP-E2.1 E1-G1 Bootstrap DONE)** · **CI** |
-| Branch / HEAD | `main` / Program E EA-002 - WP-E2.1 Bootstrap DONE (sam/devx) |
-| Verifikasi independen | Program C **CLOSED (EA-C06)**; **Program D CLOSED (EA-002) - M4 ACHIEVED**; **Program E EA-002 WP-E2.1 done + 28 test evidence + CI SUCCESS** |
+| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 CLOSED (M4 ACHIEVED), Program E EA-002 ACTIVE (WP-E2.2 done)** |
+| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D CLOSED (M4) - Program E EA-002 ACTIVE (WP-E2.2 CLI Onboarding DONE)** · **CI** |
+| Branch / HEAD | `main` / Program E EA-002 - WP-E2.2 CLI Onboarding DONE (sam/devx) |
+| Verifikasi independen | Program C **CLOSED (EA-C06)**; **Program D CLOSED (EA-002) - M4 ACHIEVED**; **Program E EA-002 WP-E2.2 done + 40 test evidence + CI SUCCESS** |
 | Tanggal update | 2026-08-08 (21:05 WITA) |
 | Total commit | ~700+ |
 | Baseline CI (lokal) | 4,216 passed (unit + 8 runtime suites + observation 206 tests) |
@@ -240,12 +240,23 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Regression: integration suite hijau; baseline CI scope 4290 passed, 1 skipped, 2 xfailed - no regression.
 - Report: reports/WP-E2.1_E1-G1_Bootstrap_Installation_Report.md. Next: WP-E2.2.
 
+**WP-E2.2 E2-G1 CLI Onboarding (MISSION-2E) - DONE:**
+- Command onboarding CLI: sam onboarding init / doctor / version (gap E2-G1 High).
+- Logika di src/sam/devx/onboarding.py (pure logic): version_string(), doctor(), init_plan(); REUSE komponen WP-E2.1 (no duplikasi).
+- sam onboarding version: versi package robust; doctor: diagnosa instalasi+env read-only; init: rencana project dry-run (tidak mengubah FS).
+- Pemisahan scope: init (WP-E2.2) hanya onboarding-plan; scaffold starter project penuh = WP-E2.4 (E5-G1).
+- CLI handler tipis: src/sam/cli/onboarding.py (Typer) + registrasi di main.py.
+- Evidence: tests/integration/test_devx_onboarding.py (12 test) masuk CI integration job.
+- Regression: integration suite (3.12) 198 passed (186 + 12 baru), 0 collection error.
+- Report: reports/WP-E2.2_E2-G1_CLI_Onboarding_Report.md. Next: WP-E2.3.
+
 ## Next
 
 - **Program D (MISSION-2D) - EA-002 Production Readiness Implementation CLOSED (Verdict EA-002).** Kelima High gap (H1/H5/H2/H3/H4) **DONE** (WP-D2.1..D2.5) - **M4 Production Platform ACHIEVED**.
 - **Program E (MISSION-2E) - EA-002 Early Adopter Experience Implementation ACTIVE.** Verdict EA-002 (AP-2E-001); Official Order WP-E2.1..E2.5.
 - **WP-E2.1 E1-G1 Automatic Bootstrap Installation DONE** (modul sam/devx; 28 test evidence; baseline 4290 passed, no regression).
-- **Next: WP-E2.2 E2-G1 CLI Onboarding** (sam init / doctor / version) - lanjut otomatis sesuai urutan resmi.
+- **WP-E2.2 E2-G1 CLI Onboarding DONE** (sam onboarding init/doctor/version; 12 test evidence; integration 198 passed, no regression).
+- **Next: WP-E2.3 E4-G1 Quick Start** - lanjut otomatis sesuai urutan resmi.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 

@@ -260,3 +260,19 @@
 - Next: WP-E2.2 E2-G1 CLI Onboarding (sam init / doctor / version).
 - **Kelima High gap Program D (H1/H5/H2/H3/H4) tuntas -> EA-002 Implementation SELESAI.**
 - State dir data/checkpoints/ ditambahkan ke .gitignore (tidak ikut commit).
+
+## SAM 1.0.2 (2026-08-08) - Program E EA-002 Implementation: WP-E2.2 E2-G1 CLI Onboarding
+
+- Command onboarding CLI AKTIF (gap E2-G1 High): `sam onboarding init / doctor / version`.
+- Logika onboarding di src/sam/devx/onboarding.py (pure logic, testable tanpa CLI): version_string(), doctor(), init_plan(), DTO DoctorReport & InitPlan.
+- REUSE komponen WP-E2.1 (DependencyChecker + EnvironmentValidator + bootstrap) - tanpa duplikasi logika.
+- `sam onboarding version` - versi package robust lintas env (metadata, fallback sam.__version__, tidak pernah error).
+- `sam onboarding doctor` - diagnosa kesehatan instalasi & environment, agregat blocking issues (read-only).
+- `sam onboarding init` - rencana onboarding project (default dry-run, TIDAK mengubah filesystem): cek struktur repo + dry-run bootstrap 6 fase + next-steps.
+- Pemisahan scope: `init` di WP-E2.2 hanya onboarding-plan; scaffold starter-project penuh = WP-E2.4 (E5-G1).
+- CLI handler tipis: src/sam/cli/onboarding.py (Typer) + registrasi subcommand di src/sam/cli/main.py.
+- TIDAK mengubah runtime/governance/deployment/Foundation/launcher existing - boundary EA-002 Developer Experience layer.
+- Evidence suite: tests/integration/test_devx_onboarding.py (12 test) masuk CI integration job.
+- Regression: integration suite (3.12) 198 passed (186 existing + 12 baru), 0 collection error.
+- Report: docs/engineering/reports/WP-E2.2_E2-G1_CLI_Onboarding_Report.md.
+- Next: WP-E2.3 E4-G1 Quick Start.
