@@ -109,6 +109,16 @@ from sam.observation.runtime_intelligence import (
     RuntimeStatusMatrix,
 )
 
+# C-Phase 4: Workstream C9 Platform Health Intelligence
+from sam.observation.platform_health import (
+    CrossRuntimeHealth,
+    CrossRuntimeHealthView,
+    PlatformHealthObserver,
+    PlatformHealthReport,
+    PlatformMetrics,
+    PlatformStatusSummary,
+)
+
 # C-Phase 2: Gap Resolution exports
 from sam.observation.gaps import (
     ApprovalHealthDetail,
@@ -233,4 +243,11 @@ __all__ = [
     "RuntimeHealthEntry",
     "RuntimeHealthMatrix",
     "RuntimeIntelligenceObserver",
+    # C-Phase 4: Workstream C9 Platform Health
+    "PlatformHealthReport",
+    "PlatformMetrics",
+    "CrossRuntimeHealth",
+    "CrossRuntimeHealthView",
+    "PlatformStatusSummary",
+    "PlatformHealthObserver",
 ]
