@@ -154,14 +154,14 @@ Contributions follow the repository conventions and the governance lifecycle. Se
 ## 9. Testing
 
 ```powershell
-# Baseline CI (7 runtime suites + unit tests)
-python -m pytest tests/unit/ tests/knowledge_runtime/ tests/memory_runtime/ tests/policy_runtime/ tests/workflow_runtime/ tests/artifact_runtime/ tests/audit_runtime/ tests/mission_runtime/ -q --tb=short
+# Baseline CI (8 runtime suites + unit tests, 4,017 tests)
+python -m pytest tests/unit/ tests/knowledge_runtime/ tests/memory_runtime/ tests/policy_runtime/ tests/workflow_runtime/ tests/artifact_runtime/ tests/audit_runtime/ tests/mission_runtime/ tests/execution_runtime/ -q --tb=short
 
 # Semua test (termasuk di luar baseline)
 python -m pytest tests/ -q --tb=short
 ```
 
-Baseline CI: 3,808 tests passed, 1 skipped (8 folder, 7 runtime suites + unit). The test suite runs locally and in CI. Metrics history was archived to **[docs/history/reports/Repository_Metrics.md](docs/history/reports/Repository_Metrics.md)**.
+Baseline CI: 4,017 tests passed, 1 skipped, 2 xfailed (9 folder, 8 runtime suites + unit). The test suite runs locally and in CI. Metrics history was archived to **[docs/history/reports/Repository_Metrics.md](docs/history/reports/Repository_Metrics.md)**.
 
 ---
 
