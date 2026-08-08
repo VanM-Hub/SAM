@@ -85,7 +85,7 @@
    │
    ├── world (AKTIF, jalur resmi — ubah di sini utk capability baru)
    │     runtime_service       ← GATEWAY (konsumen: 6 capability)
-   │     observation           ← OBSERVATION LAYER (C-Phase 1+2, read-only + gap resolution)
+   │     observation           ← OBSERVATION LAYER (C-Phase 1-3, read-only + gap resolution + recommendation + C1-C5 intel)
    │     execution_runtime     ← Execution (preview, ADR-024)
    │     presentation          ← UI entry (memakai RuntimeService)
    │     web / desktop         ← host UI
@@ -149,6 +149,7 @@
    Production         ○   (tergantung ADR-024 diubah = Architecture Session)
 ```
 > Fase: **Product Integration & Operationalization** (Tahap 2). Execution = preview (ADR-024).
+> Observability: Observation Layer (C-Phase 1-3) sudah observasi 5 pipeline (Mission/Workflow/Approval/Execution/Audit) secara read-only.
 > Menuju Production = butuh keputusan arsitektur, bukan sekadar engineering.
 
 ---
@@ -228,7 +229,7 @@
    ├── Identity      (MISSION, VISION, CHARTER, PRINCIPLES, GOVERNANCE)
    ├── Documentation (docs/ — authority + engineering(docs/engineering) + history)
    ├── Source        (src/sam/ — implementasi: world/legacy/backlog/infra)
-   ├── Tests         (tests/ — 9 folder baseline CI: unit + 8 runtime suites, 4,017 tests)
+   ├── Tests         (tests/ — folder baseline CI: unit + 8 runtime suites + observation, 4,216 tests)
    ├── Tools         (scripts/ — validasi; data/ — migrasi)
    └── History       (docs/history/ — arsip, bukan authority)
 ```
