@@ -151,7 +151,7 @@
 > Fase: **Product Integration & Operationalization** (Tahap 2). Execution = preview (ADR-024).
 > Observability: Observation Layer (C-Phase 1-4) sudah observasi 5 pipeline + Platform Intelligence (C6-C10) secara read-only (M3).
 > Program C **CLOSED** (Verdict EA-C06); M3 Observable Platform tercapai.
-> **Program D (MISSION-2D) EA-002 Implementation Active** - Verdict EA-002/EA-003; Official Order P1-P5. **P1/H1 Portable Deployment + P2/H5 User IAM + P3/H2 Runtime Checkpoint & Recovery DONE** (5 .bat portable + modul sam/iam + modul sam/recovery; 30 test IAM + 23 test recovery). Menuju Production Platform (M4).
+> **Program D (MISSION-2D) EA-002 Implementation Active** - Verdict EA-002/EA-003; Official Order P1-P5. **P1/H1 + P2/H5 + P3/H2 + P4/H3 DONE** (5 .bat portable + modul sam/iam + modul sam/recovery + modul sam/deploy_rollback; 8+30+23+24 test). Next: P5/H4 Operational Alerting. Menuju Production Platform (M4).
 
 ---
 
