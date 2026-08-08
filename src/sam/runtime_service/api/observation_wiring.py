@@ -30,6 +30,28 @@ from sam.observation.recommendation import (
 )
 from sam.runtime_service.api.observation_endpoint import ObservationGateway
 
+# C-Phase 3 (Workstream C1-C5) observers
+from sam.observation.mission_intelligence import (
+    MissionIntelligenceObserver,
+    MissionIntelligenceReport,
+)
+from sam.observation.workflow_intelligence import (
+    WorkflowIntelligenceObserver,
+    WorkflowIntelligenceReport,
+)
+from sam.observation.approval_intelligence import (
+    ApprovalIntelligenceObserver,
+    ApprovalIntelligenceReport,
+)
+from sam.observation.execution_intelligence import (
+    ExecutionIntelligenceObserver,
+    ExecutionIntelligenceReport,
+)
+from sam.observation.audit_intelligence import (
+    AuditIntelligenceObserver,
+    AuditIntelligenceReport,
+)
+
 
 # ── Singleton (module-level, immutable after wiring) ──
 
@@ -97,3 +119,83 @@ def recommend_observations() -> OperationalRecommendationReport:
 def resolve_all_gaps() -> GapResolutionReport:
     """Shortcut: resolve all 6 gaps."""
     return get_gap_coordinator().resolve_all()
+
+
+# ══════════════════════════════════════════════════════════════════════
+# C-Phase 3: Workstream C1-C5 Operational Intelligence wiring
+# ══════════════════════════════════════════════════════════════════════
+# Observer dibentuk dgn publication_registry (jalur publikasi read-only).
+# Registry runtime (workflow/approval/execution/audit) TIDAK di-inject di
+# sini agar wiring tdk menciptakan dependency ke runtime engine (AP-2C-001):
+# observer memakai jalur publikasi yg aman dan konsisten.
+
+_mission_intel: Optional[MissionIntelligenceObserver] = None
+_workflow_intel: Optional[WorkflowIntelligenceObserver] = None
+_approval_intel: Optional[ApprovalIntelligenceObserver] = None
+_execution_intel: Optional[ExecutionIntelligenceObserver] = None
+_audit_intel: Optional[AuditIntelligenceObserver] = None
+
+
+def get_mission_intelligence_observer() -> MissionIntelligenceObserver:
+    """Singleton observer Mission (read-only, jalur publikasi)."""
+    global _mission_intel
+    if _mission_intel is None:
+        _mission_intel = MissionIntelligenceObserver(get_publication_registry())
+    return _mission_intel
+
+
+def observe_mission(mission_id: str = "mission") -> MissionIntelligenceReport:
+    """Shortcut: laporan intelligence Mission."""
+    return get_mission_intelligence_observer().dashboard(mission_id)
+
+
+def get_workflow_intelligence_observer() -> WorkflowIntelligenceObserver:
+    """Singleton observer Workflow (read-only, jalur publikasi)."""
+    global _workflow_intel
+    if _workflow_intel is None:
+        _workflow_intel = WorkflowIntelligenceObserver(get_publication_registry())
+    return _workflow_intel
+
+
+def observe_workflows() -> WorkflowIntelligenceReport:
+    """Shortcut: laporan intelligence Workflow."""
+    return get_workflow_intelligence_observer().report()
+
+
+def get_approval_intelligence_observer() -> ApprovalIntelligenceObserver:
+    """Singleton observer Approval (read-only, jalur publikasi)."""
+    global _approval_intel
+    if _approval_intel is None:
+        _approval_intel = ApprovalIntelligenceObserver(get_publication_registry())
+    return _approval_intel
+
+
+def observe_approvals() -> ApprovalIntelligenceReport:
+    """Shortcut: laporan intelligence Approval."""
+    return get_approval_intelligence_observer().report()
+
+
+def get_execution_intelligence_observer() -> ExecutionIntelligenceObserver:
+    """Singleton observer Execution (read-only, jalur publikasi)."""
+    global _execution_intel
+    if _execution_intel is None:
+        _execution_intel = ExecutionIntelligenceObserver(get_publication_registry())
+    return _execution_intel
+
+
+def observe_executions() -> ExecutionIntelligenceReport:
+    """Shortcut: laporan intelligence Execution."""
+    return get_execution_intelligence_observer().report()
+
+
+def get_audit_intelligence_observer() -> AuditIntelligenceObserver:
+    """Singleton observer Audit (read-only, jalur publikasi)."""
+    global _audit_intel
+    if _audit_intel is None:
+        _audit_intel = AuditIntelligenceObserver(get_publication_registry())
+    return _audit_intel
+
+
+def observe_audits(search_query: str = "") -> AuditIntelligenceReport:
+    """Shortcut: laporan intelligence Audit (opsional search)."""
+    return get_audit_intelligence_observer().report(search_query)
