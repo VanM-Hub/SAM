@@ -16,7 +16,7 @@
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
 | Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 Implementation ACTIVE** |
-| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 Implementation ACTIVE — P1/H1 + P2/H5 + P3/H2 + P4/H3 DONE** · **CI** |
+| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 Implementation ACTIVE — P1/H1 + P2/H5 + P3/H2 + P4/H3 + P5/H4 DONE** · **CI** |
 | Branch / HEAD | `main` / EA-002 Implementation (P1-H1 selesai) |
 | Verifikasi independen | Program C **CLOSED (EA-C06)**; **EA-002 (H1) terimplementasi + 8 test evidence + baseline 4290 passed** |
 | Tanggal update | 2026-08-08 (19:xx WITA) |
@@ -172,7 +172,7 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 | **P2** | **H5** | User Identity & Access Management | ✅ **DONE** |
 | **P3** | **H2** | Runtime Checkpoint & Recovery | ✅ **DONE** |
 | **P4** | **H3** | Deployment Rollback | ✅ **DONE** |
-| P5 | H4 | Operational Alerting | ⏳ Next |
+| **P5** | **H4** | Operational Alerting | ✅ **DONE** |
 
 **P1/H1 Portable Deployment — DONE (WP-D2.1):**
 - 5 launcher `.bat` root di-refactor portable: `cd /d "%~dp0"`, `PYTHONPATH=%CD%\src`, 0 absolute path.
@@ -214,11 +214,23 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Regression: integration suite 133 passed; baseline CI scope 4290 passed.
 - Report: reports/WP-D2.4_H3_Deployment_Rollback_Report.md.
 
+
+**P5/H4 Operational Alerting - DONE (WP-D2.5):**
+- Modul src/sam/operational_alerting/ baru (stand-alone capability): state, policy, router, dispatcher, audit.
+- Alerting/notification AKTIF (gap D4-G1 High): platform mengobservasi kondisi kritis namun tidak memberitahu operator.
+- AlertPolicy (severity threshold & kanal tujuan), AlertRecord (immutable, tanpa rahasia), AlertDispatcher (record -> policy -> router -> audit).
+- Dedup fingerprint (SHA-256 kanonik), ring buffer retensi, lifecycle OPEN -> ACKNOWLEDGED -> RESOLVED.
+- TIDAK melakukan efek eksternal (kanal = label; pengiriman nyata oleh sink eksternal); executions alert_engine & operations notification TIDAK diubah.
+- Evidence suite: tests/integration/test_operational_alerting.py (25 test) masuk CI integration job.
+- Regression: integration suite 158 passed; baseline CI scope 4290 passed.
+- Report: reports/WP-D2.5_H4_Operational_Alerting_Report.md.
+- **Kelima High gap Program D (H1/H5/H2/H3/H4) tuntas -> EA-002 Implementation SELESAI.**
+
 ## Next
 
-- **Program D (MISSION-2D) — EA-002 Implementation ACTIVE.** P1/H1 + P2/H5 + P3/H2 + P4/H3 **DONE**.
-- **Next: P5/H4 Operational Alerting** (sesuai urutan resmi).
-- Urutan resmi Program D: P1 H1 ✅ → P2 H5 ✅ → P3 H2 ✅ → P4 H3 ✅ → **P5 H4**.
+- **Program D (MISSION-2D) — EA-002 Production Readiness Implementation SELESAI.** Kelima High gap (H1/H5/H2/H3/H4) **DONE** (WP-D2.1..D2.5).
+- **Next: Verdict Lead Engineer EA-002 completion** — evaluasi whole Program D untuk status Production Readiness.
+- Urutan resmi Program D: P1 H1 .. P2 H5 .. P3 H2 .. P4 H3 .. P5 H4 **semua DONE**.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 
