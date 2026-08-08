@@ -21,10 +21,8 @@ Aturan:
 """
 from __future__ import annotations
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, Optional
-
-import httpx
 
 from ..llm.llm_request import LLMRequest
 from ..llm.llm_message import LLMMessage, LLMRole
@@ -144,6 +142,8 @@ class ProviderExecutor:
                    body: Dict[str, Any], api_key: str,
                    timeout_seconds: int) -> Dict[str, Any]:
         """Panggilan HTTP nyata via httpx (hanya di execute, sudah di-gate)."""
+        import httpx  # lazy import — hanya dibutuhkan saat panggilan HTTP runtime
+
         headers = {"Content-Type": "application/json"}
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"

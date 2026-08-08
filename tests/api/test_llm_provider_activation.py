@@ -102,10 +102,13 @@ class TestProviderExecutorOperational:
             api_key_env="OPENAI_API_KEY",
         )
 
-        # Monkeypatch `httpx.post` pada module ProviderExecutor agar memakai mock
-        # transport. Ini membuktikan jalur HTTP nyata tanpa kredensial asli.
-        import sam.providers.execution.provider_executor as pe_mod
-        original_post = pe_mod.httpx.post
+        # Monkeypatch `httpx.post` pada module `httpx` (bukan atribut modul
+        # ProviderExecutor — httpx di-import lazy di _call_http). Membuktikan
+        # jalur HTTP nyata tanpa kredensial asli.
+        import httpx
+        from unittest import mock
+
+        original_post = httpx.post
 
         def fake_post(url: str, json=None, headers=None, timeout=None):
             req = httpx.Request("POST", url, json=json or {}, headers=headers or {})
@@ -113,14 +116,11 @@ class TestProviderExecutorOperational:
             resp.request = req  # agar raise_for_status() valid
             return resp
 
-        pe_mod.httpx.post = fake_post
-        try:
+        with mock.patch("httpx.post", fake_post):
             result = executor.execute(
                 "openai", "chat",
                 payload={"prompt": "hello", "model": "gpt-4o"},
             )
-        finally:
-            pe_mod.httpx.post = original_post
 
         assert result["status"] == "completed"
         assert result["external_calls"] == 1
