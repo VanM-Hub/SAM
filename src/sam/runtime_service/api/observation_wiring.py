@@ -80,6 +80,15 @@ from sam.observation.runtime_intelligence import (
     RuntimeStatusMatrix,
 )
 
+# C-Phase 4 (Workstream C9) Platform Health Intelligence observer
+from sam.observation.platform_health import (
+    CrossRuntimeHealthView,
+    PlatformHealthObserver,
+    PlatformHealthReport,
+    PlatformMetrics,
+    PlatformStatusSummary,
+)
+
 
 # ── Singleton (module-level, immutable after wiring) ──
 
@@ -90,6 +99,7 @@ _recommendation_engine: Optional[ObservationRecommendationEngine] = None
 _capability_intel: Optional[CapabilityIntelligenceObserver] = None
 _provider_intel: Optional[ProviderIntelligenceObserver] = None
 _runtime_intel: Optional[RuntimeIntelligenceObserver] = None
+_platform_observer: Optional[PlatformHealthObserver] = None
 
 
 def create_publication_registry() -> PublicationRegistry:
@@ -331,3 +341,37 @@ def observe_runtime_lifecycle() -> RuntimeLifecycleView:
 def observe_runtime_health() -> RuntimeHealthMatrix:
     """Shortcut: matriks health seluruh runtime (read-only)."""
     return get_runtime_intelligence_observer().health_matrix()
+
+
+# ══════════════════════════════════════════════════════════════════════
+# C-Phase 4: Workstream C9 Platform Health Intelligence wiring
+# ══════════════════════════════════════════════════════════════════════
+
+def get_platform_health_observer() -> PlatformHealthObserver:
+    """Singleton observer Platform Health (read-only, agregasi publikasi)."""
+    global _platform_observer
+    if _platform_observer is None:
+        _platform_observer = PlatformHealthObserver(
+            get_publication_registry(), get_runtime_intelligence_observer()
+        )
+    return _platform_observer
+
+
+def observe_platform_health() -> PlatformHealthReport:
+    """Shortcut: unified health platform (dihitung, bukan dipaksa)."""
+    return get_platform_health_observer().health_report()
+
+
+def observe_platform_metrics() -> PlatformMetrics:
+    """Shortcut: metrik agregat platform (read-only)."""
+    return get_platform_health_observer().metrics()
+
+
+def observe_cross_runtime_health() -> CrossRuntimeHealthView:
+    """Shortcut: korelasi health lintas runtime (read-only)."""
+    return get_platform_health_observer().cross_runtime_health()
+
+
+def observe_platform_status() -> PlatformStatusSummary:
+    """Shortcut: ringkasan status platform (read-only)."""
+    return get_platform_health_observer().status_summary()
