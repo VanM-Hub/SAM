@@ -5,11 +5,11 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      SAM 1.0 Foundation (versi teknis 1.0.0)
-Release:      1 - Production / Release Ready (foundation stabil)
-Baseline:     Foundation 0.01-0.30 (sebelumnya dilabeli v0.0.1-v30.0.0) -> SAM 1.0
-              Foundation (rilis resmi pertama; seluruh tahap fondasi 0.01-0.30
-              terangkum dalam versi stabil 1.0.0)
+Current:      SAM 2.0 Operational Governance Platform (versi teknis 2.0.0)
+Release:      2 - Production / Operational Governance Platform (Program A-F COMPLETE)
+Baseline:     SAM 1.0 Foundation (rilis pertama, 2026-08-07) -> SAM 2.0
+              Operational Governance Platform (rilis kedua, 2026-08-08); seluruh Program
+              A-F selesai, Milestone M1-M6 ACHIEVED, no architecture drift.
 Framework:    Python
 Build:        setuptools
 Test:         pytest (modern suite; 2964 collected, 2922 passed, 42 skipped; legacy folder eksklusif)

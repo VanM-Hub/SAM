@@ -1,8 +1,21 @@
 ﻿# Changelog
 
-> Riwayat perubahan rilis SAM. **SAM 1.0 (1.0.0, 2026-08-07) adalah rilis publik pertama dan satu-satunya.**
-> Tidak ada rilis sebelum ini — seluruh versi internal lama (0.01–0.30) hanyalah tahap pengembangan
-> fondasi (pre-1.0), bukan rilis publik, sehingga tidak tercatat sebagai rilis di sini.
+> Riwayat perubahan rilis SAM. **SAM 2.0 (2.0.0, 2026-08-08) adalah rilis terbaru** - Operational Governance Platform yang menyelesaikan Program A-F.
+> **SAM 1.0 (1.0.0, 2026-08-07)** adalah rilis fondasi pertama. Tidak ada rilis sebelum itu - seluruh versi internal lama
+> (0.01-0.30) hanyalah tahap pengembangan fondasi (pre-1.0), bukan rilis publik.
+
+## SAM 2.0.0 (2026-08-08) - SAM 2.0 Operational Governance Platform
+
+### Rilis SAM 2.0 resmi - Program A-F COMPLETE
+- **Milestone M6 (SAM 2.0) ACHIEVED; M1-M5 tercapai; seluruh Program A-F selesai.**
+- **Foundation (MISSION-2A):** Repository Convergence, Architecture mapping, baseline engineering stabil.
+- **Governance Pipeline (MISSION-2B):** Policy Runtime, Approval Gate, Audit Runtime (immutable), IAM - operasional.
+- **Observability (MISSION-2C):** Observation Layer + Operational Intelligence, Incident/RCA/Recommendation.
+- **Production Platform (MISSION-2D):** IAM (H5), Recovery (H2), Deploy rollback (H3), Operational alerting (H4), Portable deployment (H1) - M4 ACHIEVED.
+- **Early Adopter Experience (MISSION-2E):** Bootstrap instalasi, CLI onboarding, quickstart, starter project, SDK Public API - M5 ACHIEVED.
+- **Certification (MISSION-2F):** DoD 7/7 terverifikasi, Platform Readiness (8 dimensi min L5), Foundation 16/16 Article compliance, Architecture 25 Accepted ADR no drift. **No architecture drift.**
+- **Framework:** Python >=3.8 (test 3.10/3.11/3.12); CI GitHub Actions 7/7 jobs hijau.
+- **Catatan scope:** eksekusi nyata (ARC-002), autonomous/federation/evolution, dan sebagian capability lanjutan masih open untuk SAM 3.x.
 
 ## SAM 1.0.0 (2026-08-07) - SAM 1.0 Foundation
 
