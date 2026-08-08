@@ -15,11 +15,11 @@
 | Identitas rilis | **SAM 1.0 Foundation** + **SAM 1.0.1** (baseline expansion) + **SAM 1.0.2** (execution baseline) |
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
-| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Observable Platform Achieved** |
-| Status saat ini | **Baseline: M1 Engineering Baseline ✅ · M2 Operational Governance ✅ · M3 Observable Platform ✅ → lanjut Program D (Production Readiness)** (observation 273 tests, **CI hijau 7/7**) |
-| Branch / HEAD | `main` / Verdict EA-C06 (Program C Closed → Program D) |
-| Verifikasi independen | C-Phase 1-2 **Fully Verified**; C-Phase 3 **COMPLETE (Verdict EA-C04)**; C-Phase 4 C6-C10 **COMPLETE (Report EA-C05)**; **Program C CLOSED (Verdict EA-C06)** |
-| Tanggal update | 2026-08-08 (19:22 WITA) |
+| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — STARTED (EA-001 Assessment)** |
+| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-001 Production Readiness Assessment ACTIVE (read-only)** · **CI hijau 7/7** |
+| Branch / HEAD | `main` / 98907c2 (Verdict EA-C06) → EA-001 Program D (6 deliverables read-only) |
+| Verifikasi independen | C-Phase 1-2 **Fully Verified**; C-Phase 3 **COMPLETE (EA-C04)**; C-Phase 4 C6-C10 **COMPLETE (EA-C05)**; Program C **CLOSED (EA-C06)**; Program D **EA-001 Assessment** |
+| Tanggal update | 2026-08-08 (19:30 WITA) |
 | Total commit | ~700+ |
 | Baseline CI (lokal) | 4,216 passed (unit + 8 runtime suites + observation 206 tests) |
 | Observation Layer | 206 tests · 6 WP (C-Phase 1) + 6 Gap Resolution (C-Phase 2) + Recommendation Engine + **C1-C10 Intel Observers (C-Phase 3 & 4)** · Module: `src/sam/observation/` + endpoint + wiring |
@@ -54,6 +54,7 @@
 | **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 3 Workstream C1-C5 Operational Intelligence** | **SELESAI · Verdict COMPLETE** | Mission/Workflow/Approval/Execution/Audit observers; read-only; 43 test; commit 81211f6; Verdict EA-C04 |
 | **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 4 Platform Operational Intelligence (C6-C10)** | **SELESAI · Working Report** | Directive EA-C05; C6 eb14e35, C7 288a74d, C8 f888f73, C9 25ceae5, C10 77039a6; 67 test; Report EA-C05 |
 | **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — CLOSED · M3 Achieved (Verdict EA-C06)** | **SELESAI · CLOSED** | Engineering Closure; diterima Chief Architect; baseline M1/M2/M3; transition ke Program D |
+| **1.0.0** | **2026-08-08** | **Program D (MISSION-2D) — EA-001 Production Readiness Assessment** | **BERJALAN · Assessment** | READ-ONLY; 6 deliverables EA-001-001..006; D1-D6; 19 gap diklasifikasikan (5 High/10 Med/4 Low); menunggu Verdict Lead Engineer |
 | **1.0.0** | **2026-08-08** | **CI-003 Fix — lazy import httpx** | **SELESAI** | `provider_executor.py` lazy-import; CI hijau 7/7; commit bd2baa9 |
 
 **Program A (MISSION-2A, era 1.0)** — Program A baru (arsitektur/governance, bukan connectors) dimulai sebagai
@@ -154,13 +155,33 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 
 **Next → MISSION-2D — Program D (Production Readiness):** execution hardening, recovery, rollback, deployment, monitoring, security, production readiness. Tanpa mengubah Foundation / Constitution / Governance / Canonical Architecture / Accepted ADR; tanpa runtime atau capability konstitusional baru.
 
+**Status Program D:** ▶️ STARTED — EA-001 Production Readiness Assessment (phase assessment, read-only).
+
 ---
+
+## Status Program D (MISSION-2D) — EA-001 Assessment
+
+**Current Phase:** EA-001 — Production Readiness Assessment (read-only, no repo change).
+
+6 deliverables lengkap (reports/EA-001-Program-D/):
+
+| ID | Deliverable | Kesiapan | Gap High |
+|---|---|---|---|
+| EA-001-001 | Deployment Inventory Report | 🟡 Partial | H1 non-portable path |
+| EA-001-002 | Recovery Assessment Report | 🟡 Partial | H2 no checkpoint |
+| EA-001-003 | Rollback Assessment Report | 🟡 Partial | H3 no rollback deploy |
+| EA-001-004 | Monitoring Assessment Report | 🟢 Strong | H4 no alerting |
+| EA-001-005 | Security Readiness Report | 🟡 Partial | H5 no user IAM |
+| EA-001-006 | Production Readiness Matrix | — | 5 High / 10 Med / 4 Low |
+
+**Hasil:** 19 gap diklasifikasikan (5 High, 10 Medium, 4 Low) - input fase implementasi (keputusan di Chief Architect, BUKAN dieksekusi di assessment). Judgement awal: SAM belum mencapai M4 Production Platform - hanya Monitoring siap produksi; produksi ter-blokir oleh 5 gap High.
 
 ## Next
 
-- **Program C CLOSED (Verdict EA-C06)** - M3 Observable Platform Achieved. Baseline: M1/M2/M3 ✅.
-- **Next Program: ▶️ MISSION-2D — Program D (Production Readiness).** Engineering siap memulai EA-001 (Program D) sesuai ruang lingkup Chief Architect; Continuous Execution, hanya berhenti pada Stop Condition / keputusan arsitektur baru.
+- **Program D (MISSION-2D) — EA-001 Production Readiness Assessment SELESAI** (6 deliverables read-only, 19 gap diklasifikasikan).
+- **Menunggu Engineering Verdict** dari Lead Engineer setelah review assessment EA-001 (keputusan implementasi gap berada di Chief Architect).
 - Area Program D: execution hardening, recovery, rollback, deployment, monitoring, security, production readiness.
+- Gap High H1-H5: IAM (H5), portable deployment (H1), alerting (H4), checkpoint recovery (H2), rollback deploy (H3) - input fase implementasi berikutnya.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 
