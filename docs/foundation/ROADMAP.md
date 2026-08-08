@@ -199,3 +199,14 @@ Agent
 
 **Aturan:** setiap perubahan fase hanya memperbarui bagian terkait di dokumen dan
 merujuk ke ROADMAP induk. Dokumen lain cukup memperbarui versi aktif & status.
+
+---
+
+## Post SAM 1.0 — Baseline CI Expansion (2026-08-08)
+
+✅ **SAM 1.0.1 — Baseline CI diperluas.**
+
+- Baseline CI: 8 folder (unit + 7 runtime suites), 3,808 tests passed, 1 skipped.
+- Runtime Operational dalam baseline: Knowledge · Memory · Policy · Workflow · Artifact · Audit · Mission.
+- Execution Runtime: 209/211 passed (2 pre-existing), menunggu perbaikan sebelum masuk baseline.
+- Lihat `CHANGELOG.md` untuk detail per Sprint/Program.

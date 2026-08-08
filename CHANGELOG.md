@@ -24,3 +24,15 @@
 ### Catatan
 - Seluruh fase pengembangan fondasi (Foundation 0.01 → 0.30, 279 sprint + Program A–K) tercatat di `SPRINT_TRACKER.md` sebagai konteks pengembangan, bukan riwayat rilis.
 - Rencana ke depan di `docs/foundation/ROADMAP.md` (post-1.0).
+
+## SAM 1.0.1 (2026-08-08) - Baseline CI Expansion
+
+### Test Baseline Convergence (Program A Phase 2-3)
+- Baseline CI diperluas dari 2 runtime (Knowledge + Memory) menjadi 7 runtime.
+- Total baseline: 3,808 tests passed, 1 skipped (sebelumnya 3,022).
+- Runtime yang sekarang Operational dalam baseline CI:
+  - Knowledge (26 tests), Memory (33 tests)
+  - Policy (208 tests), Workflow (210 tests)
+  - Artifact (135 tests), Audit (173 tests), Mission (60 tests)
+- Mission Runtime Activation Path: `mission_preview.py` + wiring `preview_with_mission()` (WP-B2).
+- Execution Runtime: 209/211 passed (2 pre-existing environment-dependent, belum masuk baseline CI).
