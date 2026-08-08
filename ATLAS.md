@@ -213,6 +213,7 @@
 
 ```
  paham SAM         → MISSION → VISION → CHARTER → CONSTITUTION → SAM_ARCHITECTURE
+ coba cepat (quick start) → README §7 Quick Start → docs/user/quickstart.md → cli_reference.md
  jadi kontributor  → README → ATLAS → GOVERNANCE → CONTRIBUTING → REPOSITORY_CONVENTION
  perbaiki runtime  → docs/runtime (R4/R5/I-series) → runtime_root → compliance
  buat capability   → AD-ENG-001/002/003 → Activation Pattern → docs/engineering/decisions/

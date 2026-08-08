@@ -125,18 +125,31 @@ SAM/
 
 ## 7. Quick Start
 
+Jalur cepat **end-to-end** untuk early adopter - panduan lengkap ada di
+**[`docs/user/quickstart.md`](docs/user/quickstart.md)**.
+
 ```bash
-# Clone
-git clone https://github.com/VanM-Hub/SAM.git
-cd SAM
+# 1. Clone & masuk
+#    git clone https://github.com/VanM-Hub/SAM.git && cd SAM
+#    (atau pakai shortcut SAM_Run.bat di Windows)
 
-# Setup (Windows PowerShell)
-$env:PYTHONPATH = "./src"
-$env:PYTHONIOENCODING = "utf-8"
+# 2. Rencana instalasi (dry-run, tidak mengubah apa pun)
+python -m sam.cli.main onboarding init
 
-# Install dependencies
-pip install -e ".[dev,console]"
+# 3. Instalasi sungguhan (otomatis: venv + install editable)
+python -m sam.cli.main onboarding init --apply
+
+# 4. Verifikasi versi & kesehatan
+python -m sam.cli.main onboarding version
+python -m sam.cli.main onboarding doctor
+
+# 5. Jalankan
+python -m sam.cli.main health
 ```
+
+> Command `onboarding init / doctor / version` (WP-E2.2) memandu early adopter
+> dari install sampai contoh pertama - cepat, non-destruktif, dan tidak
+> memerlukan pemahaman arsitektur internal.
 
 ---
 
