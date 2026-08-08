@@ -72,7 +72,7 @@ jobs:
 
       - name: Run capability baseline tests (program-a phase3)
         run: |
-          python -m pytest tests/knowledge_runtime/ tests/memory_runtime/ tests/policy_runtime/ tests/workflow_runtime/ tests/artifact_runtime/ tests/audit_runtime/ \
+          python -m pytest tests/knowledge_runtime/ tests/memory_runtime/ tests/policy_runtime/ tests/workflow_runtime/ tests/artifact_runtime/ tests/audit_runtime/ tests/mission_runtime/ \
             --tb=short \
             -q
 
