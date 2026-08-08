@@ -85,6 +85,29 @@ sam [COMMAND] [ARGS]
 > Catatan: perintah di bawah membutuhkan extra `console` (typer) **dan**
 > environment SAM yang lengkap (workspace dengan aset mission / database).
 
+### onboarding (init, doctor, version) — Program E
+
+Command onboarding untuk early adopter (menutup gap E2-G1, WP-E2.2, Program E):
+
+```bash
+# Versi package SAM (tidak pernah error, robust lintas environment)
+sam onboarding version
+
+# Diagnosa kesehatan instalasi & environment
+sam onboarding doctor
+sam onboarding doctor --json   # Output JSON
+
+# Rencana inisialisasi project (default dry-run, tidak mengubah filesystem)
+sam onboarding init
+sam onboarding init --path <project_root>
+sam onboarding init --apply   # jalankan bootstrap aplikasi penuh
+```
+
+- `init` default **dry-run**: cek struktur repo + dry-run bootstrap + tampilkan
+  next-steps. Scaffold starter-project penuh tersedia di WP-E2.4 (`--scaffold`).
+- Logika berada di `sam.devx.onboarding`, memakai ulang komponen WP-E2.1
+  (DependencyChecker / EnvironmentValidator / bootstrap) - tanpa duplikasi.
+
 ### `health`
 
 Menampilkan status kesehatan sistem secara agregat.

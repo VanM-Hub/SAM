@@ -36,6 +36,7 @@ from sam.devx.state import (
 from sam.devx.dependencies import DependencyChecker
 from sam.devx.environment import EnvironmentValidator
 from sam.devx.installer import BootstrapInstaller, bootstrap
+from sam.devx.onboarding import DoctorReport, InitPlan, doctor, init_plan, version_string
 from sam.devx.report import InstallationReportBuilder
 from sam.devx.verifier import (
     InstallationVerifier,
@@ -46,6 +47,11 @@ from sam.devx.verifier import (
 __all__ = [
     "bootstrap",
     "BootstrapInstaller",
+    "doctor",
+    "DoctorReport",
+    "init_plan",
+    "InitPlan",
+    "version_string",
     "DependencyChecker",
     "EnvironmentValidator",
     "InstallationReportBuilder",
