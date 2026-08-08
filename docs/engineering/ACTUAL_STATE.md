@@ -12,18 +12,15 @@
 |---|---|
 | Versi (pyproject.toml) | **1.0.0** |
 | Versi (sam.__version__) | **1.0.0** |
-| Identitas rilis | **SAM 1.0 Foundation** (rilis publik pertama) |
-| CHANGELOG.md | **SAM 1.0.0** (2026-08-07) — semua versi internal 0.01–0.30 = pre-1.0 tahap pengembangan |
+| Identitas rilis | **SAM 1.0 Foundation** + **SAM 1.0.1** (baseline expansion) |
+| CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
-| Status saat ini | **Development Execution (Program A / MISSION-2A)** — WP-01.1 (Repository Mapping & Classification) berjalan; repo bersih; Gate A0 menunggu keputusan arsitektur (G1-02/G1-03) |
-| Branch / HEAD | `main` / `77485cc` |
-| Total commit | 667 |
-| Test collection | 2,964 test (pytest) + 14 test Simulation (Program G) ≈ 2,978 collect |
-| Baseline pytest terakhir | 15,867 passed · 6 failed (pre-existing, bukan regresi) · 1 skipped |
-| Compliance checkers | P1-008 SELESAI — 99 checker (12 L0 + 40 L1 + 17 L2 + 22 L3 + 8 L4) |
-| Entry points | 5 CLI (sam, sam-console, sam-desktop, sam-headless, sam-diagnostic) via `sam.launcher.cli_entry` |
-| File python `src\sam` | 2,568 (lintas ~80 folder) |
-| Documents (canonical) | `docs\foundation\` (Identity) · `docs\adr\` · `docs\specifications\` (freeze) · `ATLAS.md` (navigasi) |
+| Program terakhir (post-1.0) | Program A Test Baseline Convergence Phase 2-3 |
+| Status saat ini | **Baseline CI: 7 runtime Operational** (3,808 tests) — Policy · Workflow · Artifact · Audit · Mission + Knowledge · Memory |
+| Branch / HEAD | `main` / `96e984f` |
+| Total commit | ~690+ |
+| Baseline CI | 3,808 passed · 1 skipped (8 folder: unit + 7 runtime suites) |
+| Execution Runtime | 209/211 passed (2 pre-existing env-dependent) — belum masuk baseline |
 | Tanggal update | 2026-08-08 |
 
 ---
