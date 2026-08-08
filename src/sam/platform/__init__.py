@@ -54,6 +54,30 @@ from sam.platform.descriptor import WorkspaceDescriptor, descriptor_from_model
 from sam.platform.workspace_api import WorkspaceAPI, WorkspaceSnapshot, default_workspace
 from sam.platform.compliance import ComplianceResult, compliance_check
 
+# IP-3.5-002 - Mission Experience (WP-09..16)
+from sam.platform.mission_workspace import (
+    MissionInput,
+    MissionTimelineInput,
+    MissionHealthInput,
+    MissionJourney,
+    MissionJourneyStep,
+    MissionWorkspaceView,
+    build_journey,
+)
+from sam.platform.mission_timeline import (
+    MissionTimelineView,
+    MissionProgress,
+    compute_progress,
+    timeline_from_checkpoints,
+)
+from sam.platform.mission_context import (
+    MissionContext,
+    MissionInsight,
+    build_insight,
+)
+from sam.platform.mission_api import MissionAPI, MissionSnapshot
+from sam.platform.compliance import mission_compliance_check
+
 __version__ = "3.5.0"
 
 __all__ = [
@@ -87,4 +111,26 @@ __all__ = [
     # WP-08 compliance
     "ComplianceResult",
     "compliance_check",
+    # WP-09 mission workspace
+    "MissionInput",
+    "MissionTimelineInput",
+    "MissionHealthInput",
+    "MissionJourney",
+    "MissionJourneyStep",
+    "MissionWorkspaceView",
+    "build_journey",
+    # WP-10/12 timeline & progress
+    "MissionTimelineView",
+    "MissionProgress",
+    "compute_progress",
+    "timeline_from_checkpoints",
+    # WP-13/14 context & insight
+    "MissionContext",
+    "MissionInsight",
+    "build_insight",
+    # WP-15 mission api
+    "MissionAPI",
+    "MissionSnapshot",
+    # WP-16 mission compliance
+    "mission_compliance_check",
 ]

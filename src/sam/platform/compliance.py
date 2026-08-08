@@ -177,3 +177,110 @@ def compliance_check(
         messages=tuple(messages),
         forbidden_found=tuple(sorted(set(forbidden_all))),
     )
+
+
+# --- Mission Experience Compliance (IP-3.5-002, group MEX) -----------------
+
+# Token yang TIDAK BOLEH hadir dalam source Mission Experience. Kehadirannya
+# menandakan drift ke mission execution / coordination (melanggar batas
+# presentation-passive mission).
+_MISSION_FORBIDDEN = (
+    "run_mission", "execute_mission", "coordinate_mission",
+    "start_mission", "advance_mission", "transition_mission",
+    "allocate_resource", "build_mission", "submit_mission",
+    "activate_mission", "commit_mission", "approve_mission",
+    "launch_mission", "trigger_mission", "delegate_mission",
+)
+
+# Marker positif: kosa kata penyajian mission yang DIOLEHKAN.
+_MISSION_ALLOWED = (
+    "snapshot", "view", "insight", "timeline", "journey",
+    "progress", "context", "present", "read", "assembly",
+)
+
+
+def _scan_mission_file(path: str):
+    """Scan satu file mission: (clean, forbidden_hits)."""
+    import ast as _ast
+    with open(path, "r", encoding="utf-8") as f:
+        try:
+            tree = _ast.parse(f.read(), filename=path)
+        except SyntaxError:
+            return True, ["<syntax-error>"], []
+    forbidden = []
+    markers = []
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Import):
+            for a in node.names:
+                if a.asname in _MISSION_FORBIDDEN:
+                    forbidden.append(a.asname)
+        if isinstance(node, _ast.ImportFrom):
+            for a in node.names:
+                if a.name in _MISSION_FORBIDDEN:
+                    forbidden.append(a.name)
+        if isinstance(node, _ast.Name):
+            if node.id in _MISSION_FORBIDDEN:
+                forbidden.append(node.id)
+            elif node.id in _MISSION_ALLOWED:
+                markers.append(node.id)
+        if isinstance(node, _ast.Attribute):
+            if node.attr in _MISSION_FORBIDDEN:
+                forbidden.append(node.attr)
+        if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Name):
+            if node.func.id in _MISSION_FORBIDDEN:
+                forbidden.append(node.func.id)
+    return (not forbidden, sorted(set(forbidden)), sorted(set(markers)))
+
+
+_MISSION_MODULES = (
+    "mission_workspace.py",
+    "mission_timeline.py",
+    "mission_context.py",
+    "mission_api.py",
+)
+
+
+def mission_compliance_check(
+    module_root: Optional[str] = None,
+) -> ComplianceResult:
+    """Verifikasi kepatuhan Mission Experience (group MEX).
+
+    Memindai modul mission experience untuk forbidden execution tokens dan
+    memastikan ada marker presentasi (snapshot/view/insight).
+    """
+    base = module_root or os.path.dirname(os.path.abspath(__file__))
+    files = [os.path.join(base, m) for m in _MISSION_MODULES
+             if os.path.exists(os.path.join(base, m))]
+    if not files:
+        return ComplianceResult(
+            group="MEX", total_checks=1, passed=0, failed=1,
+            messages=("tidak ada modul mission experience",),
+        )
+    forbidden_all = []
+    markers = False
+    checked = 0
+    failed = 0
+    messages = []
+    for path in files:
+        clean, forb, marks = _scan_mission_file(path)
+        checked += 1
+        forbidden_all.extend(forb)
+        if marks:
+            markers = True
+        if not clean:
+            failed += 1
+            messages.append("forbidden mission token di %s: %s" % (
+                os.path.basename(path), ",".join(forb)))
+        else:
+            messages.append("OK %s" % os.path.basename(path))
+    if not markers:
+        failed += 1
+        messages.append("tidak ada marker presentation mission")
+    return ComplianceResult(
+        group="MEX",
+        total_checks=checked + 1,
+        passed=checked + 1 - failed,
+        failed=failed,
+        messages=tuple(messages),
+        forbidden_found=tuple(sorted(set(forbidden_all))),
+    )
