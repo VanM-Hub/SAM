@@ -71,3 +71,16 @@
 - ObservationWiring diperluas: `get_gap_coordinator()` + `resolve_all_gaps()` singleton.
 - Total baseline (lokal): 4,157 tests (unit + 8 runtime suites + observation 142 tests).
 - Constraint: read-only, no new runtime, no governance change.
+
+## SAM 1.0.2 (2026-08-08) - CI-003 Fix (lazy import httpx)
+
+### Stabilitas CI (Program C / maintenance)
+- Akar masalah CI-003: provider_executor.py menaruh import httpx di top-level, padahal httpx
+  hanya ada di extra `server` (pyproject.toml). Job `core` (install `[dev,console]`) tidak
+  punya `httpx` -> `ModuleNotFoundError` saat collection test -> exit code 2 -> 3 job core gagal.
+- Fix: pindahkan `import httpx` menjadi lazy (di dalam `_call_http`); konsisten pola lazy-import project.
+- Perbaiki test `test_llm_provider_activation.py`: mock `httpx.post` global (`unittest.mock.patch`)
+  alih-alih akses atribut modul `pe_mod.httpx`.
+- Hapus import `dataclasses.field` unused (F401).
+- Hasil: **CI hijau 7/7** (core 3.10/3.11/3.12, server, desktop, validation, coverage).
+- Total baseline (lokal): 4,159 tests (unit + 8 runtime suites + observation 142 tests).
