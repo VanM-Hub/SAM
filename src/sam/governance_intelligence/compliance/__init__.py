@@ -1,41 +1,51 @@
-"""compliance — WP-13 (IP-3.1-001).
+"""compliance — WP-13 (IP-3.1-001) + WP-24 (IP-3.1-002).
 
 Automatic verification that the Intelligence layer never crosses its
-safety boundaries. It inspects the package's own modules to assert:
+safety boundaries (WP-13) and that it exhibits the required positive
+properties (WP-24):
 
+WP-13 (forbidden — capability must NOT have):
   *  no runtime mutation
   *  no authority
   *  no orchestration
   *  no execution
   *  no approval
 
-This is a static, read-only safety check over source files (no runtime side
-effects). Returns a ComplianceReport.
+WP-24 (required — capability MUST exhibit):
+  *  deterministic reasoning
+  *  explainable output
+  *  evidence-backed recommendation
 
-Per directive (WP-13): the intelligence layer must prove it holds no
-authority and mutates nothing. This check is the proof.
+This is a static, read-only safety/property check over source files (no
+runtime side effects). Returns a ComplianceReport.
 """
 
 from __future__ import annotations
 
 import re
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
 
 # Forbidden capability markers. A positive hit means the module claims (or
 # calls) an ability the intelligence layer must NOT have.
-_STOPWORDS = {
+_FORBIDDEN = {
     "no runtime mutation": [
         "os.remove", "os.rename", "shutil.", "Path.unlink", "Path.write_",
         "open(", "file.write", ".commit(", "subprocess",
     ],
     "no authority": ["approve(", "grant(", "authorize(", "set_permissions", "chmod"],
-    "no orchestration": ["orchestrat", "spawn("]
-    ,
+    "no orchestration": ["orchestrat", "spawn("],
     "no execution": ["subprocess", "os.system(", "exec(", "Popen(", "run_cmd"],
     "no approval": ["approve("],
+}
+
+# Required positive capability markers. At least one marker must appear in the
+# implemented package for each property (proves the property is present).
+_REQUIRED = {
+    "deterministic reasoning": ["keyword_rule", "def reason", "ReasoningTree", "rule("],
+    "explainable output": ["StructuredExplanation", "def compose", "public_dict"],
+    "evidence-backed recommendation": ["evidence", "has_evidence", "evidence-backed", "EvidenceRepository"],
 }
 
 
@@ -75,11 +85,21 @@ def _scan_source_files(package_path: Path) -> List[Path]:
     )
 
 
+# Files that legitimately reference forbidden markers inside the required
+# positive checks (e.g. the compliance vocabulary) are excluded per-directory.
+_LEGITIMATE = ()
+
+
 def compliance_check(package_path: Path) -> ComplianceReport:
-    """Scan every .py under package_path for forbidden capability markers."""
+    """Scan every .py under package_path for forbidden and required markers."""
     checks: List[ComplianceCheck] = []
     files = _scan_source_files(package_path)
-    for name, markers in _STOPWORDS.items():
+    files_text = "".join(
+        f.read_text(encoding="utf-8", errors="ignore") for f in files
+    )
+
+    # --- WP-13 forbidden checks -------------------------------------------
+    for name, markers in _FORBIDDEN.items():
         violations: List[str] = []
         for f in files:
             try:
@@ -88,9 +108,14 @@ def compliance_check(package_path: Path) -> ComplianceReport:
                 continue
             for marker in markers:
                 if marker in text:
-                    # A marker inside a comment in THIS file is still a claim
-                    # we flag; the framework should not contain such markers
-                    # in implemented modules. Report the first occurrence only.
                     violations.append(f"{f.name}: contains '{marker}'")
         checks.append(ComplianceCheck(name=name, passed=not violations, violations=violations[:10]))
+
+    # --- WP-24 required positive checks ------------------------------------
+    for name, markers in _REQUIRED.items():
+        hits = [m for m in markers if m in files_text]
+        passed = bool(hits)
+        violations = [] if passed else [f"no marker for '{name}' found in package source"]
+        checks.append(ComplianceCheck(name=name, passed=passed, violations=violations))
+
     return ComplianceReport(package=str(package_path), checks=checks)

@@ -63,6 +63,14 @@ def test_gateway_recommendation_no_evidence_no_emit():
 
 
 def test_compliance_passes(mission_content):
+    # WP-13 (5 forbidden) + WP-24 (3 required positive) = 8 checks.
     rep = compliance_check(Path("src/sam/governance_intelligence"))
     assert rep.passed() is True
-    assert len(rep.checks) == 5
+    assert len(rep.checks) == 8
+    names = {c.name for c in rep.checks}
+    assert {
+        "no runtime mutation", "no authority", "no orchestration",
+        "no execution", "no approval",
+        "deterministic reasoning", "explainable output",
+        "evidence-backed recommendation",
+    } <= names

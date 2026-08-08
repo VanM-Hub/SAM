@@ -218,7 +218,8 @@ class TestCompliance:
     def test_package_passes_compliance(self):
         rep = compliance_check(Path("src/sam/governance_intelligence"))
         assert rep.passed() is True
-        assert len(rep.checks) == 5
+        # WP-13 (5 forbidden) + WP-24 (3 required) = 8 checks
+        assert len(rep.checks) == 8
 
     def test_signature_integrity(self):
         # evidence items carry SHA-256 signatures (WP-01 traceability)
