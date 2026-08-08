@@ -17,6 +17,13 @@ import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
+# File lens compliance (berisi token larangan di definisi lens-nya sendiri,
+# bukan implementasi). Tidak boleh di-scan oleh check compliance - kalau
+# di-scan, token di dalam lens-nya sendiri akan false-positive.
+_LENS_FILES = frozenset(
+    ("checker.py", "certification_checker.py", "collaboration_checker.py",
+     "compliance.py"))
+
 # kata kerja eksekusi/otoritas yang DILARANG di citizen/.
 _FORBIDDEN_AUTHORITY = (
     "activate_citizen", "deactivate_citizen", "restart_citizen",
@@ -56,7 +63,7 @@ def _py_files(root: str) -> List[str]:
         return files
     for dirpath, _, filenames in os.walk(root):
         for fn in sorted(filenames):
-            if fn.endswith(".py"):
+            if fn.endswith(".py") and fn not in (_LENS_FILES):
                 files.append(os.path.join(dirpath, fn))
     return sorted(files)
 

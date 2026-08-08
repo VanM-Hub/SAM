@@ -1,5 +1,5 @@
 # Federation - IP-3.4-001 (AO-3.4-001 / ED-3.4-001)
-# WP-01..10
+# WP-01..10 (+ WP-11..20 IP-3.4-002 Federation Trust & Interoperability)
 #
 # Layer: mengakui & bertukar capability antar beberapa Citizen Ecosystem yang
 # berdaulat (sovereign) melalui contract. KEPUTUSAN ARSITEKTUR KUNCI:
@@ -15,6 +15,12 @@
 #   Capability Exchange != Execution; Discovery != Connection;
 #   Health != Monitoring Control; Descriptor != Contract Execution;
 #   Federation Identity != Global Identity; Sovereignty First.
+#
+# Guardrail IP-3.4-002 (Federation Trust & Interoperability):
+#   Trust != Authority; Interoperability != Execution;
+#   Negotiation != Agreement; Assessment != Federation Control;
+#   Compatibility != Approval; Local Sovereignty; Registry authoritative;
+#   Deterministic; Evidence-first.
 
 # WP-01 - Federation Identity
 from sam.citizen.federation.identity import (
@@ -50,6 +56,38 @@ from sam.citizen.federation.health import (
 # WP-07 - Federation API
 from sam.citizen.federation.api import FederationAPI
 
+# WP-11..20 - Federation Trust & Interoperability (IP-3.4-002)
+from sam.citizen.federation.trust import (
+    FederationTrustProfile,
+    TrustLevel,
+    TrustEvidence,
+    TrustConstraint,
+)
+from sam.citizen.federation.trust_engine import (
+    TrustEvaluationEngine,
+    TrustAggregator,
+)
+from sam.citizen.federation.interoperability import (
+    InteroperabilityAssessment,
+    InteroperabilityEngine,
+)
+from sam.citizen.federation.negotiation import (
+    NegotiationProposal,
+    NegotiationResult,
+    CapabilityNegotiator,
+)
+from sam.citizen.federation.compatibility import (
+    FederationCompatibility,
+    FederationCompatibilityItem,
+    FederationCompatibilityAnalyzer,
+)
+from sam.citizen.federation.explainability import (
+    TrustExplanation,
+    InteropExplanation,
+    TrustExplainer,
+)
+from sam.citizen.federation.interop_api import FederationInteroperabilityAPI
+
 __all__ = [
     "FederationIdentity", "FederationMember", "FederationInstance",
     "FederationRegistry",
@@ -58,4 +96,13 @@ __all__ = [
     "CapabilityAdvertisement", "CapabilityExchange",
     "FederationHealth", "FederationHealthAssessor",
     "FederationAPI",
+    # IP-3.4-002
+    "FederationTrustProfile", "TrustLevel", "TrustEvidence", "TrustConstraint",
+    "TrustEvaluationEngine", "TrustAggregator",
+    "InteroperabilityAssessment", "InteroperabilityEngine",
+    "NegotiationProposal", "NegotiationResult", "CapabilityNegotiator",
+    "FederationCompatibility", "FederationCompatibilityItem",
+    "FederationCompatibilityAnalyzer",
+    "TrustExplanation", "InteropExplanation", "TrustExplainer",
+    "FederationInteroperabilityAPI",
 ]

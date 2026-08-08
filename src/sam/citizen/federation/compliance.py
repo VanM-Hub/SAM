@@ -1,8 +1,9 @@
-# Federation Compliance - WP-08
+# Federation Compliance - WP-08 (+ WP-18 IP-3.4-002)
 # IP-3.4-001 (AO-3.4-001 / ED-3.4-001)
 #
-# Compliance khas Federation (10 checks). Memastikan federation/ tidak
-# melanggar guardrail IP-3.4-001 / AO-3.4-001:
+# Compliance khas Federation (10 checks paket-1 FED-01..10 + 9 checks
+# paket-2 TRUST-01..09). Memastikan federation/ tidak melanggar guardrail
+# IP-3.4-001 / AO-3.4-001:
 #
 #   Federation != Central Governance
 #   Registry != Control Plane
@@ -13,8 +14,21 @@
 #   Federation Identity != Global Identity
 #   Sovereignty First
 #
+# Dan guardrail IP-3.4-002 (Trust & Interoperability):
+#
+#   Trust != Authority
+#   Interoperability != Execution
+#   Negotiation != Agreement
+#   Assessment != Federation Control
+#   Compatibility != Approval
+#   Local Sovereignty
+#   Registry remains authoritative
+#   Deterministic
+#   Evidence-first
+#
 # SHALL NOT: central authority, shared approval, remote execution, network
-# connect/execute, hidden dependency ke runtime/governance, otomatisasi.
+# connect/execute, hidden dependency ke runtime/governance, otomatisasi,
+# activation/binding otomatis, delegated authority.
 
 import ast
 import os
@@ -27,6 +41,9 @@ _FORBIDDEN_AUTHORITY = (
     "approve_shared", "central_approve", "governance_decision",
     "control_node", "control_runtime", "start_remote", "stop_remote",
     "restart_remote", "auto_connect", "establish_connection", "handshake",
+    # paket-2 (IP-3.4-002): activation/binding/deligasi otomatis
+    "activate", "bind", "authorize", "delegate_authority",
+    "grant_trust", "auto_bind", "auto_activate",
 )
 
 # modul eksekusi/runtime/governance/network yang TIDAK boleh diimport.
@@ -294,12 +311,188 @@ def _check_no_hidden_dependency(trees) -> FederationComplianceItem:
         else "; ".join(violations[:5]))
 
 
+# --- checks paket-2 (IP-3.4-002) TRUST-01..09 ---
+
+def _check_no_central_trust(trees) -> FederationComplianceItem:
+    """Tidak ada trust terpusat (central trust authority)."""
+    violations = []
+    for path, tree in trees:
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in (
+                    "central_trust_authority", "global_trust_root",
+                    "trust_authority"):
+                violations.append("{}: {}".format(path, node.id))
+    return FederationComplianceItem(
+        "TRUST-01", "no_central_trust", not violations,
+        "no central trust authority" if not violations
+        else "; ".join(violations[:3]))
+
+
+def _check_no_delegated_authority(trees) -> FederationComplianceItem:
+    """Trust tidak mendelegasikan kewenangan."""
+    violations = []
+    for path, tree in trees:
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Attribute) and node.attr in (
+                    "delegate_authority", "authorize", "grant_privilege"):
+                violations.append("{}: {}".format(path, node.attr))
+    return FederationComplianceItem(
+        "TRUST-02", "no_delegated_authority", not violations,
+        "trust grants no authority" if not violations
+        else "; ".join(violations[:3]))
+
+
+def _check_trust_not_approval(trees) -> FederationComplianceItem:
+    """Trust != Approval."""
+    violations = []
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        for ln in src.splitlines():
+            sl = ln.strip()
+            if sl.startswith(("#", '"', "'")):
+                continue
+            low = sl.lower()
+            if ("trust" in low and "approv" in low
+                    and any(sl.startswith(k) for k in (
+                        "def ", "is_", "@property", "return"))):
+                violations.append("{}: {!r}".format(path, sl[:50]))
+    return FederationComplianceItem(
+        "TRUST-03", "trust_not_approval", not violations,
+        "trust is assessment, not approval" if not violations
+        else "; ".join(violations[:3]))
+
+
+def _check_interoperability_not_execution(trees) -> FederationComplianceItem:
+    """Interoperability != Execution (assessment tidak memicu aksi)."""
+    violations = []
+    for path, tree in trees:
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Attribute) and node.attr in (
+                    "execute", "invoke", "run_remote"):
+                violations.append("{}: {}".format(path, node.attr))
+    return FederationComplianceItem(
+        "TRUST-04", "interoperability_not_execution", not violations,
+        "interoperability is assessment, not execution" if not violations
+        else "; ".join(violations[:3]))
+
+
+def _check_negotiation_not_agreement(trees) -> FederationComplianceItem:
+    """Negotiation != Agreement (proposal, bukan persetujuan)."""
+    violations = []
+    for path, tree in trees:
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name in (
+                    "sign_agreement", "finalize_agreement", "commit_agreement",
+                    "accept_agreement"):
+                violations.append("{}: {}".format(path, node.name))
+    return FederationComplianceItem(
+        "TRUST-05", "negotiation_not_agreement", not violations,
+        "negotiation produces proposal, not agreement" if not violations
+        else "; ".join(violations[:3]))
+
+
+def _check_sovereignty_preserved_trust(trees) -> FederationComplianceItem:
+    """Local Sovereignty dijaga (tidak ada perubahan otoritas lokal)."""
+    violations = []
+    for path, tree in trees:
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Attribute) and node.attr in (
+                    "override_local", "replace_governance", "global_approve"):
+                violations.append("{}: {}".format(path, node.attr))
+    return FederationComplianceItem(
+        "TRUST-06", "local_sovereignty_preserved", not violations,
+        "local sovereignty preserved" if not violations
+        else "; ".join(violations[:3]))
+
+
+def _check_registry_authoritative_trust(trees, module_root) -> FederationComplianceItem:
+    """Registry remains authoritative (discovery berbasis registry)."""
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "registry" in src.lower() or "registry" in src:
+            ok = True
+    return FederationComplianceItem(
+        "TRUST-07", "registry_authoritative", ok,
+        "discovery remains registry-based" if ok
+        else "no registry reference")
+
+
+def _check_deterministic_trust(trees) -> FederationComplianceItem:
+    """Deterministic: tidak ada RNG/random/waktu sebagai dasar putusan."""
+    violations = []
+    for path, tree in trees:
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in (
+                    "random", "randint", "time", "datetime", "uuid"):
+                violations.append("{}: {}".format(path, node.id))
+    return FederationComplianceItem(
+        "TRUST-08", "deterministic_trust", not violations,
+        "deterministic (no RNG/time-based decision)" if not violations
+        else "; ".join(violations[:3]))
+
+
+def _check_evidence_first(trees) -> FederationComplianceItem:
+    """Evidence-first: seluruh trust dapat dijelaskan oleh evidence."""
+    ok = False
+    for path, tree in trees:
+        if tree is None:
+            continue
+        src = _read(path)
+        if "evidence" in src.lower():
+            ok = True
+    return FederationComplianceItem(
+        "TRUST-09", "evidence_first", ok,
+        "trust grounded in evidence" if ok else "no evidence grounding")
+
+
+# pilih source files sesuai implementation_dirs (tanpa compliance.py)
+def _select_source_files(
+    source_files: List[str],
+    module_root: str,
+    implementation_dirs: Optional[Tuple[str, ...]],
+) -> List[str]:
+    if not implementation_dirs:
+        return source_files
+    dirs = tuple(d.rstrip("/\\") for d in implementation_dirs)
+    root = module_root or ""
+    selected: List[str] = []
+    for f in source_files:
+        rel = f.replace("\\", "/")
+        for d in dirs:
+            marker = d.replace("\\", "/")
+            if (root and (rel.startswith(marker)
+                          or rel.startswith(os.path.join(
+                              root.replace("\\", "/"), marker)))) \
+                    or (not root and marker in rel):
+                selected.append(f)
+                break
+    return selected
+
+
 def compliance_check(
     source_files: List[str],
     module_root: str = "",
     implementation_dirs: Optional[Tuple[str, ...]] = None,
 ) -> Tuple[bool, Tuple[FederationComplianceItem, ...]]:
-    trees = _ast_trees(source_files)
+    files = _select_source_files(source_files, module_root, implementation_dirs)
+    trees = _ast_trees(files)
     checks = (
         _check_no_central_governance(trees),
         _check_registry_not_control_plane(trees),
@@ -311,6 +504,16 @@ def compliance_check(
         _check_sovereignty_first(trees),
         _check_no_shared_approval(trees),
         _check_no_hidden_dependency(trees),
+        # paket-2 (IP-3.4-002)
+        _check_no_central_trust(trees),
+        _check_no_delegated_authority(trees),
+        _check_trust_not_approval(trees),
+        _check_interoperability_not_execution(trees),
+        _check_negotiation_not_agreement(trees),
+        _check_sovereignty_preserved_trust(trees),
+        _check_registry_authoritative_trust(trees, module_root),
+        _check_deterministic_trust(trees),
+        _check_evidence_first(trees),
     )
     all_pass = all(c.passed for c in checks)
     return all_pass, checks

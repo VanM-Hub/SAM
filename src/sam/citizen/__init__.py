@@ -36,9 +36,12 @@ from sam.citizen.api.collaboration import (
 )
 from sam.citizen.api.intelligence import CitizenIntelligenceAPI
 from sam.citizen.federation.api import FederationAPI
+from sam.citizen.federation.interop_api import \
+    FederationInteroperabilityAPI
 
 __version__ = "3.4.0"
 
 __all__ = ["CitizenAPI", "CitizenSummary",
            "CitizenCollaborationAPI", "CollaborationSummary",
-           "CitizenIntelligenceAPI", "FederationAPI"]
+           "CitizenIntelligenceAPI", "FederationAPI",
+           "FederationInteroperabilityAPI"]
