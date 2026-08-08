@@ -1,5 +1,6 @@
 # Runtime Compliance - IP-3.2-001 (checker) + IP-3.2-002 (planning_checker)
 #                    + IP-3.2-003 (recovery_checker) + IP-3.2-004 (coordination_checker)
+#                    + IP-3.2-005 (readiness_checker)
 # Autonomy without Authority. Seluruh suite memastikan output = observasi/proposal.
 
 from sam.autonomy_runtime.compliance.checker import (
@@ -22,6 +23,11 @@ from sam.autonomy_runtime.compliance.coordination_checker import (
     compliance_check as coordination_compliance_check,
     default_source_files as coordination_default_source_files,
 )
+from sam.autonomy_runtime.compliance.readiness_checker import (
+    ReadinessComplianceItem,
+    compliance_check as readiness_compliance_check,
+    default_source_files as readiness_default_source_files,
+)
 
 __all__ = [
     "ObservationComplianceItem", "observation_compliance_check",
@@ -29,4 +35,6 @@ __all__ = [
     "default_source_files", "RecoveryComplianceItem", "recovery_compliance_check",
     "recovery_default_source_files", "CoordinationComplianceItem",
     "coordination_compliance_check", "coordination_default_source_files",
+    "ReadinessComplianceItem", "readiness_compliance_check",
+    "readiness_default_source_files",
 ]

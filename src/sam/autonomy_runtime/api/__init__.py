@@ -1,5 +1,6 @@
-# Runtime Observation + Planning + Recovery + Coordination API - IP-3.2-001..004
-# Read-only facades. Observe + Plan + Recover(strategically) + Coordinate(model), never decide.
+# Runtime Observation + Planning + Recovery + Coordination + Readiness API
+# IP-3.2-001..005. Read-only facades. Observe + Plan + Recover (strategically)
+# + Coordinate (model) + Readiness (assessment), never decide / never execute.
 
 from sam.autonomy_runtime.api.observation import (
     ObservationSummary,
@@ -17,10 +18,15 @@ from sam.autonomy_runtime.api.coordination import (
     CoordinationAPI,
     CoordinationSummary,
 )
+from sam.autonomy_runtime.api.operational_readiness import (
+    OperationalReadinessAPI,
+    ReadinessSummary,
+)
 
 __all__ = [
     "ObservationSummary", "RuntimeObservationAPI",
     "PlanningAPI", "PlanningSummary",
     "RecoveryAPI", "RecoverySummary",
     "CoordinationAPI", "CoordinationSummary",
+    "OperationalReadinessAPI", "ReadinessSummary",
 ]
