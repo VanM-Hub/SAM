@@ -146,13 +146,14 @@
    Reference Runtime  ✓
    Engineering        ✓   (S01-S10 selesai; Program A/B/C closed)
    Operationalization ◉  ← KAMU DI SINI (M3 Observable Platform; 6 capability active)
-   Production         ◉   (PROGRAM E - EA-002 Early Adopter Experience Active; WP-E2.2 done)
+   Production         ◉   (Program D M4 ACHIEVED + Program E M5 5/5 WP tuntas; Program F Certification SELESAI)
 ```
 > Fase: **Product Integration & Operationalization** (Tahap 2). Execution = preview (ADR-024).
 > Observability: Observation Layer (C-Phase 1-4) sudah observasi 5 pipeline + Platform Intelligence (C6-C10) secara read-only (M3).
 > Program C **CLOSED** (Verdict EA-C06); M3 Observable Platform tercapai.
 > **Program D (MISSION-2D) EA-002 Production Readiness Implementation SELESAI** - Verdict EA-002/EA-003; Official Order P1-P5. **Kelima High gap DONE** (H1 portable + H5 IAM + H2 recovery + H3 deploy rollback + H4 operational alerting; modul sam/iam + sam/recovery + sam/deploy_rollback + sam/operational_alerting; 8+30+23+24+25 test). EA-002 Implementation COMPLETE, menunggu Verdict Lead Engineer. Menuju Production Platform (M4).
 > **Program E (MISSION-2E) EA-002 Early Adopter Experience Implementation ACTIVE** - Verdict EA-002 (AP-2E-001); Official Order WP-E2.1..E2.5. **WP-E2.1 E1-G1 Automatic Bootstrap Installation DONE** (modul sam/devx; 28 test evidence; baseline 4290 passed, no regression). **WP-E2.2 E2-G1 CLI Onboarding DONE** (sam onboarding init/doctor/version; 12 test evidence; integration 198 passed, no regression). **WP-E2.3 E4-G1 End-to-End Quick Start DONE** (docs/user/quickstart.md + README section 7). **WP-E2.4 E5-G1 Starter Project DONE** (sam onboarding init --scaffold; 13 test evidence; integration 211 passed). **WP-E2.5 E3-G1 SDK Public API DONE** (sam root exports SAM+Conversation+MissionSession; 7 test evidence; baseline unit 2970 passed). **PROGRAM E - SELURUH 5 WP SELESAI.**
+> **Program F (MISSION-2F) SAM 2.0 Certification ACTIVE** - Certification, not Development; no source change. **F1 DoD Verification DONE** (7/7 kriteria), **F2 Platform Readiness DONE** (8 dimensi min L5; M1-M5 ACHIEVED), **F3 Foundation Compliance DONE** (16/16 Article), **F4 Architecture Certification DONE** (25 ADR tidak dimodifikasi), **F5 Release Recommendation DONE** (rekomendasi SAM 2.0 Complete). **PROGRAM F - SELURUH 5 DELIVERABLE SELESAI.**
 
 ---
 

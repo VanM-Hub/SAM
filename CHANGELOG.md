@@ -307,3 +307,14 @@
 - Regression: baseline unit (3.8) 2970 passed; integration (3.12) 211 passed, no regression.
 - Report: docs/engineering/reports/WP-E2.5_E3-G1_SDK_Public_API_Report.md.
 - **Program E (EA-002 / MISSION-2E) SELESAI - seluruh 5 WP (E2.1-E2.5) tuntas.**
+
+## SAM 1.0.2 (2026-08-08) - Program F MISSION-2F SAM 2.0 Certification
+
+- **Program F (MISSION-2F) - Certification, not Development.** Tidak ada implementasi capability baru, tidak ada perubahan source/baseline/repo; seluruh 5 deliverable (F1-F5) bersifat verification & certification atas evidence Program A-E.
+- **F1 Definition of Done Verification Report**: 7/7 kriteria DoD (K1-K6 + constraint K-0) terverifikasi; M1-M5 ACHIEVED.
+- **F2 Platform Readiness Certification**: 8 dimensi readiness minimal L5, tiga dimensi governance-inti L6 (Certified); M1-M5 ACHIEVED.
+- **F3 Foundation Compliance Certification**: 16/16 Article Constitution + Governance + Principles compliance, no deviation.
+- **F4 Architecture Certification Report**: 25 Accepted ADR tidak dimodifikasi (git-verified); Architecture Package konsisten; no drift.
+- **F5 SAM 2.0 Release Recommendation**: rekomendasi teknis deklarasi SAM 2.0 Complete + rekomendasi non-blokir untuk SAM 3.x.
+- Reports: reports/WP-F1..F5_*.md (5 dokumen sertifikasi).
+- **PROGRAM F (MISSION-2F / SAM 2.0 Certification) SELESAI - 5/5 deliverable tuntas.**
