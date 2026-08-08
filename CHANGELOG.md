@@ -57,3 +57,17 @@
 - Observation Wiring — singleton composition root.
 - Total baseline (lokal): 4,096 tests (unit + 8 runtime suites + observation 79 tests).
 - Constraint: read-only, no new runtime, no governance change, no business logic.
+
+## SAM 1.0.2 (2026-08-08) — C-Phase 2 Gap Resolution
+
+### Operational Intelligence — Gap Resolution (Program C)
+- GAP-001: UnifiedHealthReporter — enhanced health overview per-runtime + rekomendasi otomatis.
+- GAP-002: PreviewConsumerIndex — mapping preview→consumer (5 consumer: desktop, console, web, cli, rest_api).
+- GAP-003: EventBusInspector — unified event bus facade (read-only, 3 bus teridentifikasi).
+- GAP-004: ReadinessReporter — readiness endpoint aggregation + gap detection.
+- GAP-005: OperationalAnalytics — trend + pattern detection (metric density, dashboard coverage, insights).
+- GAP-006: ApprovalHealthInspector — approval engine self-reporting assessment.
+- GapResolutionCoordinator — resolve_all_gaps() aggregator (1 panggilan, 6 laporan).
+- ObservationWiring diperluas: `get_gap_coordinator()` + `resolve_all_gaps()` singleton.
+- Total baseline (lokal): 4,157 tests (unit + 8 runtime suites + observation 142 tests).
+- Constraint: read-only, no new runtime, no governance change.

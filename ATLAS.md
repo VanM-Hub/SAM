@@ -85,7 +85,7 @@
    │
    ├── world (AKTIF, jalur resmi — ubah di sini utk capability baru)
    │     runtime_service       ← GATEWAY (konsumen: 6 capability)
-   │     observation           ← OBSERVATION LAYER (C-Phase 1, read-only)
+   │     observation           ← OBSERVATION LAYER (C-Phase 1+2, read-only + gap resolution)
    │     execution_runtime     ← Execution (preview, ADR-024)
    │     presentation          ← UI entry (memakai RuntimeService)
    │     web / desktop         ← host UI
