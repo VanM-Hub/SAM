@@ -148,11 +148,11 @@ def init_plan(
     notes: List[str] = []
     if not structure_ok:
         notes.append("Struktur repo belum lengkap (butuh pyproject.toml + src/sam/__init__.py).")
-        next_steps.append("Jalankan `sam init --scaffold` (tersedia di WP-E2.4) untuk starter project.")
+        next_steps.append("Jalankan `sam onboarding init --scaffold` (tersedia di WP-E2.4) untuk starter project.")
     else:
-        next_steps.append("Jalankan `sam init --apply` untuk membuat venv & install editable.")
-    next_steps.append("Jalankan `sam doctor` untuk verifikasi kesehatan instalasi.")
-    next_steps.append("Jalankan `sam version` untuk cek versi terpasang.")
+        next_steps.append("Jalankan `sam onboarding init --apply` untuk membuat venv & install editable.")
+    next_steps.append("Jalankan `sam onboarding doctor` untuk verifikasi kesehatan instalasi.")
+    next_steps.append("Jalankan `sam onboarding version` untuk cek versi terpasang.")
 
     return InitPlan(
         project_root=str(env.project_root),

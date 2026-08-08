@@ -250,13 +250,22 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Regression: integration suite (3.12) 198 passed (186 + 12 baru), 0 collection error.
 - Report: reports/WP-E2.2_E2-G1_CLI_Onboarding_Report.md. Next: WP-E2.3.
 
+**WP-E2.3 E4-G1 End-to-End Quick Start (MISSION-2E) - DONE:**
+- Quick Start Guide end-to-end early adopter (gap E4-G1 High): docs/user/quickstart.md - jalur install -> verify -> run -> contoh pertama.
+- README section 7 Quick Start diperbarui: pintu masuk ringkas (onboarding init/version/doctor/health) + tautan quickstart.md.
+- Konsistensi command naming onboarding dirapikan: sam onboarding init/doctor/version (next_steps + help text).
+- ATLAS reading-path ditambah jalur 'coba cepat' -> docs/user/quickstart.md.
+- Constraint EA-002 dijaga: dokumentasi; tidak ubah runtime/governance/Foundation/ADR.
+- Report: reports/WP-E2.3_E4-G1_Quick_Start_Report.md. Next: WP-E2.4.
+
 ## Next
 
 - **Program D (MISSION-2D) - EA-002 Production Readiness Implementation CLOSED (Verdict EA-002).** Kelima High gap (H1/H5/H2/H3/H4) **DONE** (WP-D2.1..D2.5) - **M4 Production Platform ACHIEVED**.
 - **Program E (MISSION-2E) - EA-002 Early Adopter Experience Implementation ACTIVE.** Verdict EA-002 (AP-2E-001); Official Order WP-E2.1..E2.5.
 - **WP-E2.1 E1-G1 Automatic Bootstrap Installation DONE** (modul sam/devx; 28 test evidence; baseline 4290 passed, no regression).
 - **WP-E2.2 E2-G1 CLI Onboarding DONE** (sam onboarding init/doctor/version; 12 test evidence; integration 198 passed, no regression).
-- **Next: WP-E2.3 E4-G1 Quick Start** - lanjut otomatis sesuai urutan resmi.
+- **WP-E2.3 E4-G1 End-to-End Quick Start DONE** (docs/user/quickstart.md + README section 7; dokumentasi, no code change).
+- **Next: WP-E2.4 E5-G1 Starter Project** - lanjut otomatis sesuai urutan resmi.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 

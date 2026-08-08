@@ -1,9 +1,9 @@
 """SAM CLI - Onboarding commands (E2-G1, WP-E2.2, Program E / MISSION-2E).
 
 Menyediakan command CLI onboarding untuk early adopter:
-- `sam init`      : rencana inisialisasi/onboarding project (dry-run).
-- `sam doctor`    : diagnosa kesehatan instalasi & environment.
-- `sam version`   : tampilkan versi package.
+- `sam onboarding init` : rencana inisialisasi/onboarding project (dry-run).
+- `sam onboarding doctor` : diagnosa kesehatan instalasi & environment.
+- `sam onboarding version` : tampilkan versi package.
 
 Implementasi logic murni berada di `sam.devx.onboarding`; handler di sini
 hanya menampilkan ke terminal via Typer (keep it thin).
