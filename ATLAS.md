@@ -85,7 +85,7 @@
    │
    ├── world (AKTIF, jalur resmi — ubah di sini utk capability baru)
    │     runtime_service       ← GATEWAY (konsumen: 6 capability)
-   │     observation           ← OBSERVATION LAYER (C-Phase 1-3, read-only + gap resolution + recommendation + C1-C5 intel)
+   │     observation           ← OBSERVATION LAYER (C-Phase 1-4, read-only + gap resolution + recommendation + C1-C10 intel)
    │     execution_runtime     ← Execution (preview, ADR-024)
    │     presentation          ← UI entry (memakai RuntimeService)
    │     web / desktop         ← host UI
@@ -229,7 +229,7 @@
    ├── Identity      (MISSION, VISION, CHARTER, PRINCIPLES, GOVERNANCE)
    ├── Documentation (docs/ — authority + engineering(docs/engineering) + history)
    ├── Source        (src/sam/ — implementasi: world/legacy/backlog/infra)
-   ├── Tests         (tests/ — folder baseline CI: unit + 8 runtime suites + observation, 4,216 tests)
+   ├── Tests         (tests/ — folder baseline CI: unit + 8 runtime suites + observation layer C1-C10, 273 observation tests)
    ├── Tools         (scripts/ — validasi; data/ — migrasi)
    └── History       (docs/history/ — arsip, bukan authority)
 ```
