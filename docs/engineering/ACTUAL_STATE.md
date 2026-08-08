@@ -16,7 +16,7 @@
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
 | Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 Implementation ACTIVE** |
-| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 Production Readiness Implementation ACTIVE — P1/H1 Portable Deployment DONE** · **CI** |
+| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 Implementation ACTIVE — P1/H1 + P2/H5 DONE** · **CI** |
 | Branch / HEAD | `main` / EA-002 Implementation (P1-H1 selesai) |
 | Verifikasi independen | Program C **CLOSED (EA-C06)**; **EA-002 (H1) terimplementasi + 8 test evidence + baseline 4290 passed** |
 | Tanggal update | 2026-08-08 (19:xx WITA) |
@@ -169,7 +169,7 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 | Priority | Gap | Scope | Status |
 |---|---|---|---|
 | **P1** | **H1** | Portable Deployment | ✅ **DONE** |
-| P2 | H5 | User Identity & Access Management | ⏳ Next |
+| **P2** | **H5** | User Identity & Access Management | ✅ **DONE** |
 | P3 | H2 | Runtime Checkpoint & Recovery | — |
 | P4 | H3 | Deployment Rollback | — |
 | P5 | H4 | Operational Alerting | — |
@@ -182,11 +182,21 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Report: `reports/Program-D/WP-D2.1_H1_Portable_Deployment_Report.md`.
 - Constraint dijaga: Foundation/Constitution/Governance/ADR beku, no new constitutional runtime.
 
+**P2/H5 User IAM — DONE (WP-D2.2):**
+- Modul `src/sam/iam/` baru (stand-alone capability): principal, registry, authenticator, authorizer, audit.
+- Authentication PBKDF2-SHA256 (120k iterasi, salt unik, constant-time), anti user-enumeration.
+- Authorization RBAC (subject/resource/permission), kompatibel pola runtime AccessControl.
+- Kredensial hash (bukan plaintext); audit akses user sukses/gagal tanpa simpan kredensial.
+- Evidence suite: `tests/integration/test_iam.py` (30 test) masuk CI integration job.
+- Regression: integration suite 86 passed; baseline CI scope 4290 passed.
+- Report: `reports/Program-D/WP-D2.2_H5_IAM_Report.md`.
+- Constraint EA-002 dijaga: IAM stand-alone, TIDAK mengubah responsibility runtime existing.
+
 ## Next
 
-- **Program D (MISSION-2D) — EA-002 Implementation ACTIVE.** P1/H1 **DONE**.
-- **Next: P2/H5 User Identity & Access Management** (setelah Verdict EA-002 H1 diterima / sesuai urutan resmi).
-- Urutan resmi Program D: P1 H1 ✅ → **P2 H5** → P3 H2 → P4 H3 → P5 H4.
+- **Program D (MISSION-2D) — EA-002 Implementation ACTIVE.** P1/H1 **DONE**, P2/H5 **DONE**.
+- **Next: P3/H2 Runtime Checkpoint & Recovery** (sesuai urutan resmi).
+- Urutan resmi Program D: P1 H1 ✅ → P2 H5 ✅ → **P3 H2** → P4 H3 → P5 H4.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 

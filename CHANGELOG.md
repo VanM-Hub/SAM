@@ -193,3 +193,20 @@
 - Regression: baseline CI scope 4290 passed, no regression.
 - Report: docs/engineering/reports/Program-D/WP-D2.1_H1_Portable_Deployment_Report.md.
 - Constraint EA-002 dijaga (Foundation/Constitution/Governance/ADR beku).
+
+## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P2/H5 User IAM
+
+### Verdict EA-003 (decision)
+- docs/engineering/decisions/EA-003_Lead_Engineer_Verdict_H1_Complete.md
+- H1 Portable Deployment diakui selesai (5 launcher dinormalisasi, 0 absolute path, SAM_Run 8/8, SAM_CLI prompt, 8 test, baseline 4290, CI 7/7).
+- Otorisasi otomatis lanjut P2/H5.
+
+### Implementasi P2/H5 User Identity & Access Management
+- Modul baru src/sam/iam/ (stand-alone capability): principal, registry, authenticator, authorizer, audit.
+- Authentication PBKDF2-SHA256 (120k iterasi, salt unik, constant-time), anti user-enumeration.
+- Authorization RBAC (subject/resource/permission), kompatibel pola runtime AccessControl.
+- Kredensial hash (bukan plaintext); audit akses user sukses/gagal tanpa simpan kredensial.
+- Evidence suite: tests/integration/test_iam.py (30 test) masuk CI integration job.
+- Regression: integration suite 86 passed; baseline CI scope 4290 passed.
+- Report: docs/engineering/reports/Program-D/WP-D2.2_H5_IAM_Report.md.
+- Constraint EA-002 dijaga: IAM stand-alone, TIDAK mengubah responsibility runtime existing.
