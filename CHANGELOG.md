@@ -105,3 +105,17 @@
 - Test suite baru: `tests/observation/test_recommendation_engine.py` (21 tests) - Total observation 163 passed.
 - Laporan: `docs/engineering/reports/EA-C03_Engineering_Report_C-Phase_3.md` (commit `43382b5`).
 - Total baseline (lokal): 4,180 tests (unit + 8 runtime suites + observation 163 tests).
+
+## SAM 1.0.2 (2026-08-08) - C-Phase 3 Workstream C1-C5 Operational Intelligence
+
+### Operational Intelligence Observers (prioritas engineering Van, urutan governance konstitusional)
+- C1 Mission: MissionIntelligenceObserver - timeline/status/progress/health mission (baca mission_timeline/status/health DTO).
+- C2 Workflow: WorkflowIntelligenceObserver - workflow views, dependency graph, bottleneck detection (baca descriptor + step depends_on).
+- C3 Approval: ApprovalIntelligenceObserver - approval queue, decision history, metrics (baca intake registry + history).
+- C4 Execution: ExecutionIntelligenceObserver - executions, timeline end-to-end, analytics (baca registry + history).
+- C5 Audit: AuditIntelligenceObserver - audits, correlation per category, compliance status, search (baca audit registry + evidence explorer).
+- Constraint read-only: 5 file observation intelligence = imports stdlib-only (annotations/dataclasses/typing); 0 import governance/execution/workflow/events/runtime; 0 mutation call (execute/approve/reject/record/emit/publish); source = PublicationRegistry (jalur publikasi aman).
+- Wiring: get_{mission,workflow,approval,execution,audit}_intelligence_observer() + observe_{mission,workflows,approvals,executions,audits}() di observation_wiring.py (bounded context Observation).
+- Test suite baru: 5 file per workstream + wiring (43 tests) - Total observation 206 passed.
+- Baseline lokal: 4,216 tests passed, 1 skipped, 2 xfailed. CI 7/7 hijau.
+- Commit: 81211f6 (13 files, 2214 insertions).
