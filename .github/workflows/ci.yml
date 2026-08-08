@@ -70,6 +70,12 @@ jobs:
             --cov-fail-under=5 \
             -q
 
+      - name: Run capability baseline tests (program-a phase1)
+        run: |
+          python -m pytest tests/knowledge_runtime/ tests/memory_runtime/ \
+            --tb=short \
+            -q
+
   server:
     needs: validation
     runs-on: ubuntu-latest
