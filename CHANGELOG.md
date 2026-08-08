@@ -233,4 +233,16 @@
 - Evidence suite: tests/integration/test_deploy_rollback.py (24 test) masuk CI integration job.
 - Regression: integration suite 133 passed; baseline CI scope 4290 passed.
 - Report: docs/engineering/reports/WP-D2.4_H3_Deployment_Rollback_Report.md.
+
+## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P5/H4 Operational Alerting
+
+- Modul baru src/sam/operational_alerting/ (stand-alone capability): state, policy, router, dispatcher, audit.
+- Alerting/notification AKTIF (gap D4-G1 High): platform mengobservasi kondisi kritis namun tidak memberi tahu operator.
+- AlertPolicy (severity threshold & kanal tujuan), AlertRecord (immutable, tanpa rahasia), AlertDispatcher (record -> policy -> router -> audit).
+- Dedup fingerprint (SHA-256 kanonik), ring buffer retensi, lifecycle OPEN -> ACKNOWLEDGED -> RESOLVED.
+- TIDAK melakukan efek eksternal (kanal = label; pengiriman nyata oleh sink eksternal); alert_engine & operations notification TIDAK diubah.
+- Evidence suite: tests/integration/test_operational_alerting.py (25 test) masuk CI integration job.
+- Regression: integration suite 158 passed; baseline CI scope 4290 passed.
+- Report: docs/engineering/reports/WP-D2.5_H4_Operational_Alerting_Report.md.
+- **Kelima High gap Program D (H1/H5/H2/H3/H4) tuntas -> EA-002 Implementation SELESAI.**
 - State dir data/checkpoints/ ditambahkan ke .gitignore (tidak ikut commit).
