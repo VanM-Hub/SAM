@@ -12,7 +12,7 @@ Berubah tanpa pemberitahuan.
 Stability: STABLE_API
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 
 from .operations.conversation_api import Conversation
 from .operations.conversation_api import SAM
