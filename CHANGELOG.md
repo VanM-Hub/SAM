@@ -168,7 +168,7 @@
 
 ### Read-Only Assessment (MISSION-2D)
 - Program D dimulai dengan phase **Assessment** (EA-001) - read-only, tidak ada perubahan source/architecture/CI/CD.
-- 6 deliverables assessment (docs/engineering/reports/EA-001-Program-D/):
+- 6 deliverables assessment (docs/engineering/reports/EA-001-001..006):
   - EA-001-001 Deployment Inventory Report (partial - H1 non-portable path)
   - EA-001-002 Recovery Assessment Report (partial - H2 no checkpoint)
   - EA-001-003 Rollback Assessment Report (partial - H3 no rollback deploy)
@@ -191,7 +191,7 @@
 - Verifikasi nyata: SAM_Run diagnostic 8/8; SAM_CLI console mencapai prompt `sam>`.
 - Evidence suite baru: tests/integration/test_launcher_portable.py (8 test) - otomatis masuk CI integration job.
 - Regression: baseline CI scope 4290 passed, no regression.
-- Report: docs/engineering/reports/Program-D/WP-D2.1_H1_Portable_Deployment_Report.md.
+- Report: docs/engineering/reports/WP-D2.1_H1_Portable_Deployment_Report.md.
 - Constraint EA-002 dijaga (Foundation/Constitution/Governance/ADR beku).
 
 ## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P2/H5 User IAM
@@ -208,7 +208,7 @@
 - Kredensial hash (bukan plaintext); audit akses user sukses/gagal tanpa simpan kredensial.
 - Evidence suite: tests/integration/test_iam.py (30 test) masuk CI integration job.
 - Regression: integration suite 86 passed; baseline CI scope 4290 passed.
-- Report: docs/engineering/reports/Program-D/WP-D2.2_H5_IAM_Report.md.
+- Report: docs/engineering/reports/WP-D2.2_H5_IAM_Report.md.
 - Constraint EA-002 dijaga: IAM stand-alone, TIDAK mengubah responsibility runtime existing.
 
 ## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P3/H2 Runtime Checkpoint & Recovery
@@ -221,5 +221,5 @@
 - runtime_kernel/state_snapshot.py TIDAK diubah (responsibility existing, constraint EA-002).
 - Evidence suite: tests/integration/test_recovery_checkpoint.py (23 test) masuk CI integration job.
 - Regression: integration suite 109 passed; baseline CI scope 4290 passed.
-- Report: docs/engineering/reports/Program-D/WP-D2.3_H2_Recovery_Report.md.
+- Report: docs/engineering/reports/WP-D2.3_H2_Recovery_Report.md.
 - State dir data/checkpoints/ ditambahkan ke .gitignore (tidak ikut commit).

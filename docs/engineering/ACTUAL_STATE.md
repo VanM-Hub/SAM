@@ -179,7 +179,7 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Verifikasi nyata: SAM_Run diagnostic 8/8 passed; SAM_CLI console mencapai prompt `sam>`.
 - Evidence suite: `tests/integration/test_launcher_portable.py` (8 test) masuk CI integration job.
 - Regression: baseline CI scope 4290 passed, no regression.
-- Report: `reports/Program-D/WP-D2.1_H1_Portable_Deployment_Report.md`.
+- Report: `reports/WP-D2.1_H1_Portable_Deployment_Report.md`.
 - Constraint dijaga: Foundation/Constitution/Governance/ADR beku, no new constitutional runtime.
 
 **P2/H5 User IAM — DONE (WP-D2.2):**
@@ -189,7 +189,7 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Kredensial hash (bukan plaintext); audit akses user sukses/gagal tanpa simpan kredensial.
 - Evidence suite: `tests/integration/test_iam.py` (30 test) masuk CI integration job.
 - Regression: integration suite 86 passed; baseline CI scope 4290 passed.
-- Report: `reports/Program-D/WP-D2.2_H5_IAM_Report.md`.
+- Report: `reports/WP-D2.2_H5_IAM_Report.md`.
 - Constraint EA-002 dijaga: IAM stand-alone, TIDAK mengubah responsibility runtime existing.
 
 **P3/H2 Runtime Checkpoint & Recovery — DONE (WP-D2.3):**
@@ -200,7 +200,7 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - `runtime_kernel/state_snapshot.py` TIDAK diubah (responsibility existing, constraint EA-002).
 - Evidence suite: `tests/integration/test_recovery_checkpoint.py` (23 test) masuk CI integration job.
 - Regression: integration suite 109 passed; baseline CI scope 4290 passed.
-- Report: `reports/Program-D/WP-D2.3_H2_Recovery_Report.md`.
+- Report: `reports/WP-D2.3_H2_Recovery_Report.md`.
 - State dir `data/checkpoints/` ditambahkan ke .gitignore (tidak ikut commit).
 
 ## Next
