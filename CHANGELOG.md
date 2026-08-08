@@ -244,5 +244,19 @@
 - Evidence suite: tests/integration/test_operational_alerting.py (25 test) masuk CI integration job.
 - Regression: integration suite 158 passed; baseline CI scope 4290 passed.
 - Report: docs/engineering/reports/WP-D2.5_H4_Operational_Alerting_Report.md.
+
+## SAM 1.0.2 (2026-08-08) - Program E EA-002 Implementation: WP-E2.1 E1-G1 Bootstrap Installation
+
+- Modul baru src/sam/devx/ (stand-alone Developer Experience capability): state, dependencies, environment, installer, verifier, report.
+- Bootstrap installation AKTIF (gap E1-G1 High): one-command `bootstrap()` / `BootstrapInstaller.run()` menggantikan penyiapan manual (venv + pip + PYTHONPATH).
+- Alur deterministik 6 fase: dependency_validation -> environment_validation -> environment_init -> installation -> install_verification -> diagnostics.
+- Dependency checker (python/pip/setuptools/wheel/sam importable), environment validator (executable/venv/repo structure/PYTHONPATH/writable).
+- Installation verifier (import, version, entry points, first-run API) + report builder (text & dict).
+- Mode apply=False (dry-run default) tidak mengubah filesystem; apply=True mengeksekusi venv + pip install -e .
+- TIDAK mengubah runtime/governance/deployment/Foundation/launcher existing - boundary EA-002 Developer Experience layer.
+- Evidence suite: tests/integration/test_devx_bootstrap.py (28 test) masuk CI integration job.
+- Regression: integration suite hijau (28 baru); baseline CI scope 4290 passed, 1 skipped, 2 xfailed - no regression.
+- Report: docs/engineering/reports/WP-E2.1_E1-G1_Bootstrap_Installation_Report.md.
+- Next: WP-E2.2 E2-G1 CLI Onboarding (sam init / doctor / version).
 - **Kelima High gap Program D (H1/H5/H2/H3/H4) tuntas -> EA-002 Implementation SELESAI.**
 - State dir data/checkpoints/ ditambahkan ke .gitignore (tidak ikut commit).

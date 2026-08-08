@@ -15,10 +15,10 @@
 | Identitas rilis | **SAM 1.0 Foundation** + **SAM 1.0.1** (baseline expansion) + **SAM 1.0.2** (execution baseline) |
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
-| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 CLOSED (M4 ACHIEVED)** |
-| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 CLOSED (M4 ACHIEVED) - Program E EA-001 DONE** · **CI** |
-| Branch / HEAD | `main` / EA-002 DONE + EA-001-E deliverables |
-| Verifikasi independen | Program C **CLOSED (EA-C06)**; **Program D CLOSED (EA-002) - M4 ACHIEVED**; **EA-001-E 7 deliverable + CI SUCCESS** |
+| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 CLOSED (M4 ACHIEVED), Program E EA-002 ACTIVE (WP-E2.1 done)** |
+| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D CLOSED (M4) - Program E EA-002 ACTIVE (WP-E2.1 E1-G1 Bootstrap DONE)** · **CI** |
+| Branch / HEAD | `main` / Program E EA-002 - WP-E2.1 Bootstrap DONE (sam/devx) |
+| Verifikasi independen | Program C **CLOSED (EA-C06)**; **Program D CLOSED (EA-002) - M4 ACHIEVED**; **Program E EA-002 WP-E2.1 done + 28 test evidence + CI SUCCESS** |
 | Tanggal update | 2026-08-08 (21:05 WITA) |
 | Total commit | ~700+ |
 | Baseline CI (lokal) | 4,216 passed (unit + 8 runtime suites + observation 206 tests) |
@@ -232,11 +232,20 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - 5 High / 6 Medium / 6 Low gap; blocker experience-level (bukan arsitektur); no drift.
 - Commit 2ad37cb; CI SUCCESS.
 
+**WP-E2.1 E1-G1 Automatic Bootstrap Installation (MISSION-2E) - DONE:**
+- Modul baru src/sam/devx/ (stand-alone): state, dependencies, environment, installer, verifier, report.
+- One-command bootstrap deterministik 6 fase; dry-run default (apply=False), apply=True untuk venv + pip install -e .
+- Boundary EA-002: Developer Experience layer; TIDAK mengubah runtime/governance/deployment/Foundation/launcher existing.
+- Evidence: tests/integration/test_devx_bootstrap.py (28 test) masuk CI integration job.
+- Regression: integration suite hijau; baseline CI scope 4290 passed, 1 skipped, 2 xfailed - no regression.
+- Report: reports/WP-E2.1_E1-G1_Bootstrap_Installation_Report.md. Next: WP-E2.2.
+
 ## Next
 
 - **Program D (MISSION-2D) - EA-002 Production Readiness Implementation CLOSED (Verdict EA-002).** Kelima High gap (H1/H5/H2/H3/H4) **DONE** (WP-D2.1..D2.5) - **M4 Production Platform ACHIEVED**.
-- **Program E (MISSION-2E) - EA-001 Early Adopter Experience Assessment DONE** (7 deliverable, CI SUCCESS).
-- **Next: Engineering Verdict EA-001** ke Lead Engineer - menunggu Verdict untuk implementasi gap Program E (WP-E1..E6).
+- **Program E (MISSION-2E) - EA-002 Early Adopter Experience Implementation ACTIVE.** Verdict EA-002 (AP-2E-001); Official Order WP-E2.1..E2.5.
+- **WP-E2.1 E1-G1 Automatic Bootstrap Installation DONE** (modul sam/devx; 28 test evidence; baseline 4290 passed, no regression).
+- **Next: WP-E2.2 E2-G1 CLI Onboarding** (sam init / doctor / version) - lanjut otomatis sesuai urutan resmi.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 
