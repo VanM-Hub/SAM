@@ -174,11 +174,26 @@ def _check_no_runtime_mutation_call(source_files: List[Path]) -> ComplianceItem:
 
 
 def default_source_files(package_path: Path) -> List[Path]:
-    """Kumpulan file .py dalam package (kecuali compliance dir itu sendiri)."""
+    """Kumpulan file .py milik IP-3.2-001 dalam package.
+
+    Membatasi scan pada implementasi observasi saja: observation/, diagnostics/,
+    readiness/, api/observation.py, dan compliance/checker.py. Ini menjaga
+    isolasi bounded context antar-IP - checker observasi hanya mengaudit
+    implementasi observasi sendiri, bukan file planning/scheduling/optimization
+    ataupun planning_checker yang menjadi tanggung jawab compliance IP-3.2-002.
+    """
     skip_self = Path(__file__).resolve()
+    include_dirs = {"observation", "diagnostics", "readiness"}
+    include_files = {"api/observation.py"}  # file IP-3.2-001 di dir bersama
     files = []
     for f in package_path.rglob("*.py"):
         if f.resolve() == skip_self:
             continue
-        files.append(f)
+        rel = f.relative_to(package_path)
+        top = rel.parts[0] if rel.parts else ""
+        rel_str = rel.as_posix()
+        if top.lower() in include_dirs:
+            files.append(f)
+        elif rel_str in include_files:
+            files.append(f)
     return files
