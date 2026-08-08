@@ -549,3 +549,22 @@ class TestCrossWPIntegration:
         r2 = gw.observe_all()
         assert r1.runtime_count == r2.runtime_count
         assert r1.aggregated_health == r2.aggregated_health
+
+    def test_gap_coordinator_wiring(self):
+        """C-Phase 2: Gap coordinator accessible via wiring singleton."""
+        from sam.runtime_service.api.observation_wiring import (
+            get_gap_coordinator, resolve_all_gaps
+        )
+        coordinator = get_gap_coordinator()
+        assert coordinator is not None
+        report = coordinator.resolve_all()
+        assert report.total_gaps == 6
+        assert report.resolved_gaps == 6
+
+    def test_resolve_all_gaps_shortcut(self):
+        """C-Phase 2: resolve_all_gaps() shortcut works."""
+        from sam.runtime_service.api.observation_wiring import resolve_all_gaps
+        report = resolve_all_gaps()
+        assert report.unified_health.status == "ok"
+        assert report.readiness.status == "ok"
+        assert len(report.summary()) > 0

@@ -1,10 +1,11 @@
-"""Observation Wiring — C-Phase 1 Composition Root.
+"""Observation Wiring — C-Phase 2 Composition Root.
 
 Mendaftarkan semua PublicationAdapter ke PublicationRegistry
-dan membuat ObservationGateway yang siap di-inject ke API layer.
+dan membuat ObservationGateway + GapResolutionCoordinator yang siap di-inject.
 
 WP-C1.1: publication adapters
-WP-C1.3: health aggregation (via ObservationGateway.health_overview())
+WP-C1.3: health aggregation
+WP-C2.1-6: gap resolution coordinator
 """
 from __future__ import annotations
 from typing import Optional
@@ -21,6 +22,7 @@ from sam.observation.adapters import (
     RuntimeServicePublicationAdapter,
     WorkflowPublicationAdapter,
 )
+from sam.observation.gaps import GapResolutionCoordinator, GapResolutionReport
 from sam.observation.publication import PublicationRegistry
 from sam.runtime_service.api.observation_endpoint import ObservationGateway
 
@@ -29,6 +31,7 @@ from sam.runtime_service.api.observation_endpoint import ObservationGateway
 
 _registry: Optional[PublicationRegistry] = None
 _gateway: Optional[ObservationGateway] = None
+_gap_coordinator: Optional[GapResolutionCoordinator] = None
 
 
 def create_publication_registry() -> PublicationRegistry:
@@ -61,3 +64,16 @@ def get_observation_gateway() -> ObservationGateway:
     if _gateway is None:
         _gateway = ObservationGateway(get_publication_registry())
     return _gateway
+
+
+def get_gap_coordinator() -> GapResolutionCoordinator:
+    """Dapatkan singleton gap resolution coordinator (lazy init)."""
+    global _gap_coordinator
+    if _gap_coordinator is None:
+        _gap_coordinator = GapResolutionCoordinator(get_publication_registry())
+    return _gap_coordinator
+
+
+def resolve_all_gaps() -> GapResolutionReport:
+    """Shortcut: resolve all 6 gaps."""
+    return get_gap_coordinator().resolve_all()
