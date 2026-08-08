@@ -270,3 +270,59 @@ Tujuannya adalah menjaga SAM tetap memiliki fondasi yang cukup untuk berkembang 
 **Architecture tetap stabil.**
 
 **Development tetap bebas berkembang di atasnya.**
+
+# Repository Authority
+
+Repository structure is **not part of current architectural authority**.
+
+Directory layout, package organization, legacy package placement, repository migration state, and historical repository compatibility arrangements are engineering or historical concerns.
+
+They may evolve without constituting an architectural change.
+
+Historical repository decisions may be retained as historical records when useful for understanding migration history, but they do not constrain the current architecture.
+
+The current repository is an engineering baseline and should be allowed to converge toward the current architecture without preserving obsolete repository decisions merely for compatibility with historical structure.
+
+Repository structure SHALL NOT be treated as:
+
+* a constitutional requirement;
+* an architectural boundary;
+* a runtime responsibility;
+* a canonical specification;
+* an architectural dependency;
+* or a constraint on future architecture.
+
+Repository organization exists to support implementation, maintainability, testing, and migration.
+
+Architecture exists independently of repository layout.
+
+Changes to repository structure therefore do not require an Architecture Decision Record unless the change itself introduces or modifies an architectural decision.
+
+---
+
+## Non-Goals
+
+This architecture does not determine:
+
+* programming language;
+* framework;
+* library;
+* source-code structure;
+* repository structure;
+* package organization;
+* legacy package placement;
+* repository migration state;
+* backward-compatibility arrangements for historical code;
+* CI/CD;
+* deployment tooling;
+* test implementation;
+* roadmap;
+* sprint;
+* engineering task structure;
+* detailed API;
+* detailed database implementation.
+
+These concerns belong to Development and Engineering.
+
+Historical repository decisions may remain available as historical records, but they are not part of the current architectural surface.
+
