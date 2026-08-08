@@ -46,7 +46,12 @@ class TestPublicApiExports:
     def test_version_stable(self):
         import sam
 
-        assert sam.__version__ == "1.0.0"
+        # __version__ harus ada dan berupa SemVer yang valid (tidak dikunci
+        # ke angka rilis tertentu - versi naik di setiap rilis).
+        v = sam.__version__
+        assert isinstance(v, str) and len(v) > 0
+        parts = v.split(".")
+        assert len(parts) == 3 and all(p.isdigit() for p in parts)
 
 
 class TestObserveContract:
