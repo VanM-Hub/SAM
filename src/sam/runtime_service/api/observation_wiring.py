@@ -89,6 +89,15 @@ from sam.observation.platform_health import (
     PlatformStatusSummary,
 )
 
+# C-Phase 4 (Workstream C10) Operational Learning observer
+from sam.observation.operational_learning import (
+    HistoricalObservationSummary,
+    LearningEvidenceReport,
+    OperationalLearningObserver,
+    OperationalRecommendationCenter,
+    OperationalTrendReport,
+)
+
 
 # ── Singleton (module-level, immutable after wiring) ──
 
@@ -100,6 +109,7 @@ _capability_intel: Optional[CapabilityIntelligenceObserver] = None
 _provider_intel: Optional[ProviderIntelligenceObserver] = None
 _runtime_intel: Optional[RuntimeIntelligenceObserver] = None
 _platform_observer: Optional[PlatformHealthObserver] = None
+_learning_observer: Optional[OperationalLearningObserver] = None
 
 
 def create_publication_registry() -> PublicationRegistry:
@@ -375,3 +385,37 @@ def observe_cross_runtime_health() -> CrossRuntimeHealthView:
 def observe_platform_status() -> PlatformStatusSummary:
     """Shortcut: ringkasan status platform (read-only)."""
     return get_platform_health_observer().status_summary()
+
+
+# ══════════════════════════════════════════════════════════════════════
+# C-Phase 4: Workstream C10 Operational Learning wiring
+# ══════════════════════════════════════════════════════════════════════
+
+def get_operational_learning_observer() -> OperationalLearningObserver:
+    """Singleton observer Operational Learning (read-only, berbasis evidence)."""
+    global _learning_observer
+    if _learning_observer is None:
+        _learning_observer = OperationalLearningObserver(
+            get_publication_registry(), get_recommendation_engine()
+        )
+    return _learning_observer
+
+
+def observe_operational_trends() -> OperationalTrendReport:
+    """Shortcut: tren operasional (read-only)."""
+    return get_operational_learning_observer().trend_report()
+
+
+def observe_operational_recommendations() -> OperationalRecommendationCenter:
+    """Shortcut: pusat rekomendasi operational (dari Recommendation Engine)."""
+    return get_operational_learning_observer().recommendation_center()
+
+
+def observe_observation_history() -> HistoricalObservationSummary:
+    """Shortcut: ringkasan observasi historis (read-only)."""
+    return get_operational_learning_observer().historical_summary()
+
+
+def observe_learning_evidence() -> LearningEvidenceReport:
+    """Shortcut: evidence pendukung learning (read-only)."""
+    return get_operational_learning_observer().learning_evidence()
