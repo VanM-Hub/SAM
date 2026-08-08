@@ -71,7 +71,7 @@
 - **Klik "bagaimana membangun runtime?"** → `docs/runtime/` (R4→R5→I-series)
 - **Klik "sudah sesuai?"** → `docs/compliance/`
 - **Klik "masa lalu?"** → `docs/history/` — baca saja, jangan dipakai utk keputusan baru
-- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (decisions/reports/journals/templates); laporan program selesai -> docs/history/reports/
+- **Klik "keputusan/catatan engineering?"** → `docs/engineering/` (reports/journals/templates) - keputusan/verdict Rujukan aktif -> `docs/decisions/`; laporan program selesai -> docs/history/reports/
 - **Klik "strategi pengembangan?"** → `docs/engineering/strategy/` (DEVELOPMENT_STRATEGY, Planning Standard, Readiness Model)
 - **Klik "rencana kerja/roadmap?"** → `docs/engineering/roadmap/` (ROADMAP SAM 2.x.md, Program A–E, Milestone Architecture, Appendix)
 - **Klik "sudah jadi arsip non-aktif?"** → `docs/history/`
@@ -217,7 +217,7 @@
  coba cepat (quick start) → README §7 Quick Start → docs/user/quickstart.md → cli_reference.md
  jadi kontributor  → README → ATLAS → GOVERNANCE → CONTRIBUTING → REPOSITORY_CONVENTION
  perbaiki runtime  → docs/runtime (R4/R5/I-series) → runtime_root → compliance
- buat capability   → AD-ENG-001/002/003 → Activation Pattern → docs/engineering/decisions/
+ buat capability   → AD-ENG-001/002/003 → Activation Pattern → docs/engineering/decisions/ (arsip) | verdict rujukan -> docs/decisions/
  perbaiki UI       → Article XVI → presentation → runtime_service
  paham citizen     → docs/CITIZEN_SPECIFICATION → SAM_ARCHITECTURE (Citizen)
  paham compliance  → docs/compliance P1-001 → src/sam/compliance

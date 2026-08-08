@@ -933,6 +933,6 @@ docs/engineering/
 
 ## Navigasi
 
-Laporan sesi BERJALAN→ \docs/engineering/reports\ · laporan program SELESAI→ \docs/history/reports\ · Keputusan → \docs/engineering/decisions/\ ·
+Laporan sesi BERJALAN→ \docs/engineering/reports\ · laporan program SELESAI→ \docs/history/reports\ · Keputusan → \docs/decisions/ (verdict rujukan) | docs/engineering/decisions/ (AD/arsip)\ ·
 Catatan kerja → \docs/engineering/journals/\ · Template → \docs/engineering/templates/\ ·
 Arsip lama → \docs/history/\.
