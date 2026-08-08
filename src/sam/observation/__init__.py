@@ -81,6 +81,21 @@ from sam.observation.capability_intelligence import (
     CapabilityStatusEntry,
 )
 
+# C-Phase 4: Workstream C7 Provider Operational Intelligence
+from sam.observation.provider_intelligence import (
+    ProviderAvailability,
+    ProviderAvailabilityReport,
+    ProviderConnectivity,
+    ProviderConnectivityReport,
+    ProviderHealth,
+    ProviderHealthReport,
+    ProviderIntelligenceObserver,
+    ProviderMetrics,
+    ProviderReadiness,
+    ProviderReadinessReport,
+    ProviderTypeMetric,
+)
+
 # C-Phase 2: Gap Resolution exports
 from sam.observation.gaps import (
     ApprovalHealthDetail,
@@ -183,4 +198,16 @@ __all__ = [
     "CapabilityDependency",
     "CapabilityDependencyView",
     "CapabilityIntelligenceObserver",
+    # C-Phase 4: Workstream C7 Provider
+    "ProviderAvailability",
+    "ProviderAvailabilityReport",
+    "ProviderReadiness",
+    "ProviderReadinessReport",
+    "ProviderConnectivity",
+    "ProviderConnectivityReport",
+    "ProviderHealth",
+    "ProviderHealthReport",
+    "ProviderTypeMetric",
+    "ProviderMetrics",
+    "ProviderIntelligenceObserver",
 ]
