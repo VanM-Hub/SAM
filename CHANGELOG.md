@@ -298,3 +298,12 @@
 - Regression: integration suite (3.12) 211 passed (198 existing + 13 baru), 0 collection error.
 - Report: docs/engineering/reports/WP-E2.4_E5-G1_Starter_Project_Report.md.
 - Next: WP-E2.5 E3-G1 SDK Public API.
+
+## SAM 1.0.2 (2026-08-08) - Program E EA-002 Implementation: WP-E2.5 E3-G1 SDK Public API
+
+- Perluas public surface root package (gap E3-G1 High): `sam.__init__` kini mengekspor SAM, Conversation, MissionSession sesuai kontrak STABLE_API (sebelumnya hanya SAM).
+- Tidak mengubah behavior/definisi; hanya ekspor kontrak yang sudah didokumentasikan. sam.observe() -> Conversation tetap entry point utama.
+- Evidence suite: tests/unit/test_sdk_public_api.py (7 test) masuk baseline CI via tests/unit (tanpa ubah testpaths).
+- Regression: baseline unit (3.8) 2970 passed; integration (3.12) 211 passed, no regression.
+- Report: docs/engineering/reports/WP-E2.5_E3-G1_SDK_Public_API_Report.md.
+- **Program E (EA-002 / MISSION-2E) SELESAI - seluruh 5 WP (E2.1-E2.5) tuntas.**

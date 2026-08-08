@@ -14,6 +14,8 @@ Stability: STABLE_API
 
 __version__ = "1.0.0"
 
+from .operations.conversation_api import Conversation
 from .operations.conversation_api import SAM
+from .operations.session import MissionSession
 
-__all__ = ["SAM"]
+__all__ = ["SAM", "Conversation", "MissionSession"]
