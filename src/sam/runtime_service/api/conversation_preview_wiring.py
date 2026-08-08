@@ -31,6 +31,7 @@ from .artifact_preview import ArtifactPreviewConsumer
 from .memory_preview import MemoryPreviewConsumer
 from .policy_preview import PolicyPreviewConsumer
 from .audit_preview import AuditPreviewConsumer
+from .mission_preview import MissionPreviewConsumer
 
 
 @dataclass(frozen=True)
@@ -244,6 +245,27 @@ class ConversationPreviewGateway:
         return {
             "execution": result.as_dict(),
             "audit": audit.as_dict(),
+        }
+
+    def preview_with_mission(
+        self,
+        context: "ConversationExecutionContext",
+        mission_consumer: "MissionPreviewConsumer",
+        mission_id: str,
+        execution_id: str,
+    ) -> dict:
+        """Conversation preview + Mission via activation path (WP-B2).
+
+        Conversation->RuntimeService->ExecutionRuntime (preview) via preview(),
+        lalu Mission di-resolve lewat bridge yg sudah ada (MissionRegistry ->
+        ConversationMissionBridge). Mission jadi capability governance aktif,
+        mempublikasikan lifecycle/metadata/governance, read-only (AD-ENG-002).
+        """
+        result = self.preview(context, execution_id=execution_id)
+        mission = mission_consumer.resolve_mission(mission_id)
+        return {
+            "execution": result.as_dict(),
+            "mission": mission.as_dict(),
         }
 
 
