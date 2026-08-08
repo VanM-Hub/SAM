@@ -318,3 +318,4 @@
 - **F5 SAM 2.0 Release Recommendation**: rekomendasi teknis deklarasi SAM 2.0 Complete + rekomendasi non-blokir untuk SAM 3.x.
 - Reports: reports/WP-F1..F5_*.md (5 dokumen sertifikasi).
 - **PROGRAM F (MISSION-2F / SAM 2.0 Certification) SELESAI - 5/5 deliverable tuntas.**
+- **Verdict EA-M6 (Chief Architect Final Declaration):** MISSION-2F ACCEPTED & CLOSED; Milestone M6 (SAM 2.0) ACHIEVED; **SAM 2.0 COMPLETE**. Program A-F finished; M1-M6 achieved; no architecture drift; Engineering Phase SAM 2.x CLOSED. SAM 3.x planning dapat dimulai arsitektural.

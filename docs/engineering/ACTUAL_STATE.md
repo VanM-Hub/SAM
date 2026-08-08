@@ -272,13 +272,13 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Report: reports/WP-E2.5_E3-G1_SDK_Public_API_Report.md.
 - **PROGRAM E (EA-002 / MISSION-2E) SELESAI - seluruh 5 WP (E2.1-E2.5) tuntas, CI hijau per WP.**
 
-**Program F (MISSION-2F) SAM 2.0 Certification - DONE (5/5 deliverable):**
+**Program F (MISSION-2F) SAM 2.0 Certification - CLOSED (Verdict EA-M6).** Milestone M6 (SAM 2.0) ACHIEVED; SAM 2.0 COMPLETE; 5/5 deliverable (F1-F5):
 - Certification, not Development - tidak ada implementasi capability baru, tidak ada perubahan source/baseline/repo.
 - F1 Definition of Done Verification Report: 7/7 kriteria DoD (K1-K6 + constraint K-0) terverifikasi; M1-M5 ACHIEVED.
 - F2 Platform Readiness Certification: 8 dimensi readiness min. L5, tiga dimensi governance-inti L6 (Certified); M1-M5 ACHIEVED.
 - F3 Foundation Compliance Certification: 16/16 Article Constitution + Governance + Principles compliance, no deviation.
 - F4 Architecture Certification Report: 25 Accepted ADR tidak dimodifikasi (git-verified); Architecture Package konsisten; no drift.
-- F5 SAM 2.0 Release Recommendation: rekomendasi teknis deklarasi SAM 2.0 Complete.
+- F5 SAM 2.0 Release Recommendation: rekomendasi teknis deklarasi SAM 2.0 Complete -> diterima (Verdict EA-M6): SAM 2.0 COMPLETE, Program A-F finished, M1-M6 achieved, no drift.
 - Reports: reports/WP-F1..F5_*.md (5 dokumen sertifikasi).
 
 ## Next
@@ -291,11 +291,11 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - **WP-E2.4 E5-G1 Starter Project DONE** (sam.devx.scaffold; sam onboarding init --scaffold; 13 test; integration 211 passed).
 - **WP-E2.5 E3-G1 SDK Public API DONE** (sam.__all__ = [SAM, Conversation, MissionSession]; 7 test; baseline unit 2970 passed).
 - **Program E (MISSION-2E) SELESAI - 5/5 WP tuntas.**
-- **Program F (MISSION-2F) SAM 2.0 Certification SELESAI - 5/5 deliverable (F1-F5) tuntas; rekomendasi deklarasi SAM 2.0 Complete menunggu persetujuan Chief Architect.**
-- Next: menunggu arahan Chief Architect (deklarasi SAM 2.0 Complete) / keputusan G1-02 & G1-03.
+- **Program F (MISSION-2F) SAM 2.0 Certification CLOSED (Verdict EA-M6)** - MISSION-2F ACCEPTED; Milestone M6 (SAM 2.0) ACHIEVED; **SAM 2.0 COMPLETE**; Engineering Phase SAM 2.x CLOSED; Program A-F finished; M1-M6 achieved; no architecture drift.
+- Next: SAM 3.x - perencanaan SAM 3.x Ecosystem secara arsitektural dapat dimulai (arah Milestone M6 & Development Strategy); keputusan G1-02 & G1-03 (Program A / Repository Convergence) menjadi kandidat; ARC-002 Real Execution jadi pertimbangan.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 
 ---
 
-*— ACTUAL_STATE — snapshot 2026-08-08 (Program C CLOSED + Program D CLOSED/M4 + Program E EA-001 DONE) · selaras status aktual project · bersih untuk repo publik.*
+*— ACTUAL_STATE — snapshot 2026-08-08 (Program C CLOSED + Program D CLOSED/M4 + Program F CLOSED/M6 + SAM 2.0 COMPLETE) · selaras status aktual project · bersih untuk repo publik.*
