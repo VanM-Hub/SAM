@@ -210,3 +210,16 @@
 - Regression: integration suite 86 passed; baseline CI scope 4290 passed.
 - Report: docs/engineering/reports/Program-D/WP-D2.2_H5_IAM_Report.md.
 - Constraint EA-002 dijaga: IAM stand-alone, TIDAK mengubah responsibility runtime existing.
+
+## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P3/H2 Runtime Checkpoint & Recovery
+
+### Implementasi P3/H2
+- Modul baru src/sam/recovery/ (stand-alone capability): checkpoint, manifest, restore, audit, state DTO.
+- Capture state -> persist disk (atomic write temp+rename, checksum SHA-256 canonical).
+- Restore/resume setelah crash: verifikasi checksum anti korupsi/tamper sebelum pakai state.
+- Manifest (latest/list/get), retensi ring (RetentionPolicy), audit recovery tanpa payload state.
+- runtime_kernel/state_snapshot.py TIDAK diubah (responsibility existing, constraint EA-002).
+- Evidence suite: tests/integration/test_recovery_checkpoint.py (23 test) masuk CI integration job.
+- Regression: integration suite 109 passed; baseline CI scope 4290 passed.
+- Report: docs/engineering/reports/Program-D/WP-D2.3_H2_Recovery_Report.md.
+- State dir data/checkpoints/ ditambahkan ke .gitignore (tidak ikut commit).

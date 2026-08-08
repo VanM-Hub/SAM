@@ -61,6 +61,11 @@ openclaw/status/
 !data/migrations/
 !data/migrations/*.sql
 
+# Runtime checkpoints/recovery state - jangan commit
+/data/checkpoints/
+/data/checkpoints/**
+!/data/checkpoints/.gitkeep
+
 # ZaraNote — catatan internal, bukan bagian project
 ZaraNote/
 ZN_*/
