@@ -144,13 +144,14 @@
    Architecture       ✓
    Specification      ✓
    Reference Runtime  ✓
-   Engineering        ✓   (S01-S10 selesai)
-   Operationalization ◉  ← KAMU DI SINI (6 capability aktif, preview-only)
-   Production         ○   (tergantung ADR-024 diubah = Architecture Session)
+   Engineering        ✓   (S01-S10 selesai; Program A/B/C closed)
+   Operationalization ◉  ← KAMU DI SINI (M3 Observable Platform; 6 capability active)
+   Production         ◉   (PROGRAM D - EA-001 Assessment Active, read-only)
 ```
 > Fase: **Product Integration & Operationalization** (Tahap 2). Execution = preview (ADR-024).
-> Observability: Observation Layer (C-Phase 1-3) sudah observasi 5 pipeline (Mission/Workflow/Approval/Execution/Audit) secara read-only.
-> Menuju Production = butuh keputusan arsitektur, bukan sekadar engineering.
+> Observability: Observation Layer (C-Phase 1-4) sudah observasi 5 pipeline + Platform Intelligence (C6-C10) secara read-only (M3).
+> Program C **CLOSED** (Verdict EA-C06); M3 Observable Platform tercapai.
+> **Program D (MISSION-2D) sedang berjalan** - EA-001 Production Readiness Assessment (read-only, 6 deliverables, 19 gap diklasifikasikan). Menuju Production Platform (M4).
 
 ---
 
