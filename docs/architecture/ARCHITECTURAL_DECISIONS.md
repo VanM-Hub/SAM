@@ -43,7 +43,7 @@ contain unique decisions. Each decision lives in exactly one canonical ADR file 
 | ADR-024 | Preview Only Execution | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
 | ADR-025 | Approval Boundary | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
 | ADR-026 | Subsystem Independence | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
-| ADR-027 | Repository Structure | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
+| ADR-027 | Repository Structure | **Accepted** | `docs/architecture/Module_Ownership.md` *(canonical ownership map)* |
 | ADR-028 | Runtime Kernel | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
 
 ---

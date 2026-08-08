@@ -50,3 +50,9 @@ Architecture Freeze v10.
 | Guardian Live | Additional situation classifiers |
 | Decision | Extended certification rules |
 | Approval | More policy providers |
+
+---
+
+## Note
+
+Dokumen ini adalah canonical source untuk ownership & status subsystem (stable / preview / legacy-deprecated) pada Architecture Freeze v10. Perubahan struktur source tidak dilakukan tanpa rujukan ke dokumen ini.
