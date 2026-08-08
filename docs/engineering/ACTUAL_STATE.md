@@ -265,6 +265,13 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Evidence: tests/integration/test_devx_scaffold.py (13 test); integration (3.12) 211 passed, no regression.
 - Report: reports/WP-E2.4_E5-G1_Starter_Project_Report.md. Next: WP-E2.5.
 
+**WP-E2.5 E3-G1 SDK Public API (MISSION-2E) - DONE:**
+- Public surface root package (gap E3-G1 High) diekspor sesuai kontrak STABLE_API: sam.__all__ = [SAM, Conversation, MissionSession] (sebelumnya hanya SAM).
+- Tidak mengubah behavior/definisi; hanya ekspor kontrak. sam.observe() -> Conversation tetap entry point utama.
+- Evidence: tests/unit/test_sdk_public_api.py (7 test); baseline unit (3.8) 2970 passed; integration (3.12) 211 passed - no regression, tanpa ubah testpaths baseline.
+- Report: reports/WP-E2.5_E3-G1_SDK_Public_API_Report.md.
+- **PROGRAM E (EA-002 / MISSION-2E) SELESAI - seluruh 5 WP (E2.1-E2.5) tuntas, CI hijau per WP.**
+
 ## Next
 
 - **Program D (MISSION-2D) - EA-002 Production Readiness Implementation CLOSED (Verdict EA-002).** Kelima High gap (H1/H5/H2/H3/H4) **DONE** (WP-D2.1..D2.5) - **M4 Production Platform ACHIEVED**.
@@ -273,7 +280,8 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - **WP-E2.2 E2-G1 CLI Onboarding DONE** (sam onboarding init/doctor/version; 12 test evidence; integration 198 passed, no regression).
 - **WP-E2.3 E4-G1 End-to-End Quick Start DONE** (docs/user/quickstart.md + README section 7; dokumentasi, no code change).
 - **WP-E2.4 E5-G1 Starter Project DONE** (sam.devx.scaffold; sam onboarding init --scaffold; 13 test; integration 211 passed).
-- **Next: WP-E2.5 E3-G1 SDK Public API** - lanjut otomatis sesuai urutan resmi.
+- **WP-E2.5 E3-G1 SDK Public API DONE** (sam.__all__ = [SAM, Conversation, MissionSession]; 7 test; baseline unit 2970 passed).
+- **PROGRAM E (MISSION-2E / EA-002) SELESAI - 5/5 WP tuntas.** Next: menunggu arahan Chief Architect / keputusan G1-02 & G1-03.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 
