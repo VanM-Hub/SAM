@@ -66,6 +66,21 @@ openclaw/status/
 /data/checkpoints/**
 !/data/checkpoints/.gitkeep
 
-# ZaraNote — catatan internal, bukan bagian project
+# ZaraNote - catatan internal, bukan bagian project
 ZaraNote/
 ZN_*/
+
+# docs/engineering/ subfolders - workspace yang terus berubah selama SAM ada,
+# isi (file SAM 3.x) tidak dilacak git. ACTUAL_STATE.md & decisions/ARCHITECTURE ORDER.md tetap di-track.
+# .gitkeep dikecualikan agar folder tetap eksis di repo (isi dikosongkan, folder tidak dihapus).
+docs/engineering/roadmap/*
+docs/engineering/strategy/*
+docs/engineering/journals/*
+docs/engineering/reports/*
+docs/engineering/references/*
+docs/engineering/templates/*
+!docs/engineering/**/.gitkeep
+
+docs/engineering/decisions/*
+!docs/engineering/decisions/ARCHITECTURE ORDER.md
+!docs/engineering/decisions/.gitkeep
