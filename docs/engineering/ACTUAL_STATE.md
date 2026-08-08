@@ -16,13 +16,13 @@
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
 | Program aktif (post-1.0) | **Program C (MISSION-2C) — Operational Intelligence C-Phase 2 Complete** |
-| Status saat ini | **Baseline CI: 10 suites — 9 runtime + Observation Layer** (4,157 tests lokal, CI pre-existing failure) |
-| Branch / HEAD | `main` / `74f6a72` |
+| Status saat ini | **Baseline CI: 10 suites — 9 runtime + Observation Layer** (4,159 tests lokal, **CI hijau 7/7**) |
+| Branch / HEAD | `main` / `bd2baa9` (CI hijau 7/7) |
 | Total commit | ~695+ |
-| Baseline CI (lokal) | 4,157 passed (unit + 8 runtime suites + observation 142 tests) |
+| Baseline CI (lokal) | 4,159 passed (unit + 8 runtime suites + observation 142 tests) |
 | Observation Layer | 142 tests · 6 WP (C-Phase 1) + 6 Gap Resolution (C-Phase 2) · Module: `src/sam/observation/` + endpoint + wiring |
 | Gap Resolution | 6 GAP resolved (GAP-001 s/d 006) · `gaps.py` + `resolve_all_gaps()` · commit 74f6a72 |
-| Tanggal update | 2026-08-08 |
+| Tanggal update | 2026-08-08 (17:05 WITA) |
 
 ---
 
@@ -47,6 +47,7 @@
 | **1.0.0** | **2026-08-08** | **SAM 1.0.2** — Execution Runtime baseline CI (Phase 4) | **SELESAI** | commit f58ff0d; 2 xfail; baseline 4,017 |
 | **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 1 Wiring & Integration** | **SELESAI** | Observation Layer; 10 adapter + 6 WP; 79 tests; commit 978f89d |
 | **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 2 Gap Resolution** | **SELESAI** | 6 GAP resolved; `gaps.py` + coordinator; 61 tests; commit 74f6a72 |
+| **1.0.0** | **2026-08-08** | **CI-003 Fix — lazy import httpx** | **SELESAI** | `provider_executor.py` lazy-import; CI hijau 7/7; commit bd2baa9 |
 
 **Program A (MISSION-2A, era 1.0)** — Program A baru (arsitektur/governance, bukan connectors) dimulai sebagai
 **Development Execution** di era pasca-1.0. Lihat §Status Development Execution di bawah.
@@ -108,7 +109,7 @@
 | [OPEN] | `src/sam/runtime/discovery.py` import `sam.validation` (tidak ada di repo) = dead import (Low) | — |
 | [CLOSED] | UI Operational Intelligence Console belum dibangun | C-Phase 1 Observation Layer dibangun (commit 978f89d) |
 | [CLOSED] | 6 Gap Operational Intelligence (GAP-001 s/d 006) | C-Phase 2 resolved semua via `gaps.py` + coordinator (commit 74f6a72) |
-| [OPEN] | CI pre-existing failure (runs #15-24) — kemungkinan Node.js 20 deprecation pada runner | Semua test lokal hijau (4,157 passed); penyelidikan tertunda |
+| [CLOSED] | CI pre-existing failure (runs #15-24) — akar = `httpx` tidak ter-install di job core | Fix: lazy import httpx di `provider_executor.py` (commit bd2baa9); CI hijau 7/7 |
 | [OPEN] | 6 failure baseline pytest (pre-existing) | 3 checker Boundary · 2 bug `@runtime_checkable` · 1 lingkungan |
 
 ---
