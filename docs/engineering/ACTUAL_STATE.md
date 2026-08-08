@@ -1,4 +1,4 @@
-# ACTUAL_STATE — Status Aktual SAM
+﻿# ACTUAL_STATE — Status Aktual SAM
 
 > Dokumen **status & riwayat** kondisi SAM terkini (hidup). Perbarui saat versi/status/fase berubah.
 > Detail fase yang sudah selesai -> `docs\history\` + git tag di repo.
@@ -16,7 +16,7 @@
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
 | Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 Implementation ACTIVE** |
-| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 Implementation ACTIVE — P1/H1 + P2/H5 + P3/H2 DONE** · **CI** |
+| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 Implementation ACTIVE — P1/H1 + P2/H5 + P3/H2 + P4/H3 DONE** · **CI** |
 | Branch / HEAD | `main` / EA-002 Implementation (P1-H1 selesai) |
 | Verifikasi independen | Program C **CLOSED (EA-C06)**; **EA-002 (H1) terimplementasi + 8 test evidence + baseline 4290 passed** |
 | Tanggal update | 2026-08-08 (19:xx WITA) |
@@ -171,8 +171,8 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 | **P1** | **H1** | Portable Deployment | ✅ **DONE** |
 | **P2** | **H5** | User Identity & Access Management | ✅ **DONE** |
 | **P3** | **H2** | Runtime Checkpoint & Recovery | ✅ **DONE** |
-| P4 | H3 | Deployment Rollback | ⏳ Next |
-| P5 | H4 | Operational Alerting | — |
+| **P4** | **H3** | Deployment Rollback | ✅ **DONE** |
+| P5 | H4 | Operational Alerting | ⏳ Next |
 
 **P1/H1 Portable Deployment — DONE (WP-D2.1):**
 - 5 launcher `.bat` root di-refactor portable: `cd /d "%~dp0"`, `PYTHONPATH=%CD%\src`, 0 absolute path.
@@ -203,11 +203,22 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Report: `reports/WP-D2.3_H2_Recovery_Report.md`.
 - State dir `data/checkpoints/` ditambahkan ke .gitignore (tidak ikut commit).
 
+
+**P4/H3 Deployment Rollback - DONE (WP-D2.4):**
+- Modul src/sam/deploy_rollback/ baru (stand-alone capability): state, manifest, rollback, audit.
+- Deployment rollback terstandar (gap D3-G1 High): riwayat deployment ber-version + pointer aktif + snapshot state + rollback deterministik.
+- Semantic version (DeploymentVersion), atomic write, sanitasi path aman lintas filesystem (artifact_id like app:web).
+- rollback ke versi sebelumnya yang terverifikasi; can_rollback; audit deploy/activate/rollback tanpa payload.
+- Tidak melakukan efek eksternal; execution_runtime rollback (Program C) TIDAK diubah (berbeda konteks: eksekusi vs deployment).
+- Evidence suite: tests/integration/test_deploy_rollback.py (24 test) masuk CI integration job.
+- Regression: integration suite 133 passed; baseline CI scope 4290 passed.
+- Report: reports/WP-D2.4_H3_Deployment_Rollback_Report.md.
+
 ## Next
 
-- **Program D (MISSION-2D) — EA-002 Implementation ACTIVE.** P1/H1 + P2/H5 + P3/H2 **DONE**.
-- **Next: P4/H3 Deployment Rollback** (sesuai urutan resmi).
-- Urutan resmi Program D: P1 H1 ✅ → P2 H5 ✅ → P3 H2 ✅ → **P4 H3** → P5 H4.
+- **Program D (MISSION-2D) — EA-002 Implementation ACTIVE.** P1/H1 + P2/H5 + P3/H2 + P4/H3 **DONE**.
+- **Next: P5/H4 Operational Alerting** (sesuai urutan resmi).
+- Urutan resmi Program D: P1 H1 ✅ → P2 H5 ✅ → P3 H2 ✅ → P4 H3 ✅ → **P5 H4**.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 

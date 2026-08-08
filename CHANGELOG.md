@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 > Riwayat perubahan rilis SAM. **SAM 1.0 (1.0.0, 2026-08-07) adalah rilis publik pertama dan satu-satunya.**
 > Tidak ada rilis sebelum ini — seluruh versi internal lama (0.01–0.30) hanyalah tahap pengembangan
@@ -222,4 +222,15 @@
 - Evidence suite: tests/integration/test_recovery_checkpoint.py (23 test) masuk CI integration job.
 - Regression: integration suite 109 passed; baseline CI scope 4290 passed.
 - Report: docs/engineering/reports/WP-D2.3_H2_Recovery_Report.md.
+
+## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P4/H3 Deployment Rollback
+
+- Modul baru src/sam/deploy_rollback/ (stand-alone capability): state, manifest, rollback, audit.
+- Deployment rollback terstandar (gap D3-G1 High): riwayat deployment ber-version + pointer aktif + snapshot state + rollback deterministik.
+- Semantic version (DeploymentVersion), atomic write (temp+rename+fsync), sanitasi path aman lintas filesystem.
+- rollback ke versi sebelumnya yang terverifikasi; can_rollback; audit deploy/activate/rollback tanpa payload state.
+- execution_runtime rollback (Program C, eksekusi) TIDAK diubah - konteks berbeda dari deployment rollback.
+- Evidence suite: tests/integration/test_deploy_rollback.py (24 test) masuk CI integration job.
+- Regression: integration suite 133 passed; baseline CI scope 4290 passed.
+- Report: docs/engineering/reports/WP-D2.4_H3_Deployment_Rollback_Report.md.
 - State dir data/checkpoints/ ditambahkan ke .gitignore (tidak ikut commit).
