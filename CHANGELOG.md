@@ -138,3 +138,19 @@
 - Constraint global: read-only (tanpa execute/approve/reject/publish/emit/transition/finalize), dependency Observation->Analytics->Recommendation->Platform Intelligence (tanpa Platform Intelligence->Runtime), tanpa Runtime/Governance/Event Bus baru, tanpa mengubah Approval/Workflow/Execution/Audit/Provider Runtime.
 - Exit Criteria Program C: seluruh Runtime & Capability observable, Platform Health, Operational Metrics, Readiness Reporting, Recommendation, Operational Learning, tanpa Architecture Drift / Foundation Impact.
 - Dokumen: docs/engineering/decisions/EA-C05_Lead_Engineer_Directive_C6-C10.md.
+
+## SAM 1.0.2 (2026-08-08) - C-Phase 4 Workstream C6-C10 Operational Intelligence
+
+### Platform Operational Intelligence Observers (revisi #4 - Continuous Execution EA-C05) - COMPLETE (Working Report)
+- C6 Capability: CapabilityIntelligenceObserver - aggregation, readiness, health, dependency view (baca CapabilityStatusReader).
+- C7 Provider: ProviderIntelligenceObserver - availability, readiness, connectivity, health, metrics (baca ProviderRegistry metadata preview-only; bukan Provider Runtime).
+- C8 Runtime: RuntimeIntelligenceObserver - status matrix, dependency view, lifecycle view, health matrix (agregasi PublicationRegistry).
+- C9 Platform: PlatformHealthObserver - health report, metrics, cross-runtime correlation, status summary (health dihitung, bukan dipaksa).
+- C10 Learning: OperationalLearningObserver - trend report, recommendation center (dari Recommendation Engine C-Phase 3), historical summary, learning evidence (bukan AI/governance/autonomous).
+- Wiring: get_{capability,provider,runtime,platform_health,operational_learning}_observer() + observe_*() di observation_wiring.py (bounded context Observation).
+- Constraint read-only: 5 file observation intelligence = imports stdlib-only (annotations/dataclasses/typing/dict/list/tuple); 0 import governance/execution/workflow/approval/provider runtime; 0 mutation call (execute/approve/reject/connect/authenticate/retry/transition/finalize); registry terbukti tidak berubah sebelum/sesudah.
+- Test suite baru: C6 (14) + C7 (14) + C8 (13) + C9 (14) + C10 (12) = 67 test baru - Total observation 273 passed.
+- Full tests/ (tanpa root test_sprint25 legacy): 16,204 passed, 1 skipped, 2 xfailed - tanpa regresi.
+- Commit: eb14e35 (C6), 288a74d (C7), f888f73 (C8), 25ceae5 (C9), 77039a6 (C10).
+- Laporan: docs/engineering/reports/EA-C05_Report_C-Phase_4_C6-C10.md.
+- Status: COMPLETE (Working Report) - menunggu Engineering Verdict - Program C Completion dari Lead Engineer.
