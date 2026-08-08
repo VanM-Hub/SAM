@@ -96,6 +96,19 @@ from sam.observation.provider_intelligence import (
     ProviderTypeMetric,
 )
 
+# C-Phase 4: Workstream C8 Runtime Operational Intelligence
+from sam.observation.runtime_intelligence import (
+    RuntimeDependency,
+    RuntimeDependencyView,
+    RuntimeHealthEntry,
+    RuntimeHealthMatrix,
+    RuntimeIntelligenceObserver,
+    RuntimeLifecycleEntry,
+    RuntimeLifecycleView,
+    RuntimeStatusEntry,
+    RuntimeStatusMatrix,
+)
+
 # C-Phase 2: Gap Resolution exports
 from sam.observation.gaps import (
     ApprovalHealthDetail,
@@ -210,4 +223,14 @@ __all__ = [
     "ProviderTypeMetric",
     "ProviderMetrics",
     "ProviderIntelligenceObserver",
+    # C-Phase 4: Workstream C8 Runtime
+    "RuntimeStatusEntry",
+    "RuntimeStatusMatrix",
+    "RuntimeDependency",
+    "RuntimeDependencyView",
+    "RuntimeLifecycleEntry",
+    "RuntimeLifecycleView",
+    "RuntimeHealthEntry",
+    "RuntimeHealthMatrix",
+    "RuntimeIntelligenceObserver",
 ]

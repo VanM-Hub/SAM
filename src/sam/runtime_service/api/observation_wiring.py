@@ -71,6 +71,15 @@ from sam.observation.provider_intelligence import (
     ProviderReadinessReport,
 )
 
+# C-Phase 4 (Workstream C8) Runtime Intelligence observer
+from sam.observation.runtime_intelligence import (
+    RuntimeDependencyView,
+    RuntimeHealthMatrix,
+    RuntimeIntelligenceObserver,
+    RuntimeLifecycleView,
+    RuntimeStatusMatrix,
+)
+
 
 # ── Singleton (module-level, immutable after wiring) ──
 
@@ -80,6 +89,7 @@ _gap_coordinator: Optional[GapResolutionCoordinator] = None
 _recommendation_engine: Optional[ObservationRecommendationEngine] = None
 _capability_intel: Optional[CapabilityIntelligenceObserver] = None
 _provider_intel: Optional[ProviderIntelligenceObserver] = None
+_runtime_intel: Optional[RuntimeIntelligenceObserver] = None
 
 
 def create_publication_registry() -> PublicationRegistry:
@@ -289,3 +299,35 @@ def observe_provider_health() -> ProviderHealthReport:
 def observe_provider_metrics() -> ProviderMetrics:
     """Shortcut: metrik provider agregat (read-only)."""
     return get_provider_intelligence_observer().metrics()
+
+
+# ══════════════════════════════════════════════════════════════════════
+# C-Phase 4: Workstream C8 Runtime Operational Intelligence wiring
+# ══════════════════════════════════════════════════════════════════════
+
+def get_runtime_intelligence_observer() -> RuntimeIntelligenceObserver:
+    """Singleton observer Runtime (read-only, agregasi publikasi)."""
+    global _runtime_intel
+    if _runtime_intel is None:
+        _runtime_intel = RuntimeIntelligenceObserver(get_publication_registry())
+    return _runtime_intel
+
+
+def observe_runtimes() -> RuntimeStatusMatrix:
+    """Shortcut: matriks status operational seluruh runtime (read-only)."""
+    return get_runtime_intelligence_observer().status_matrix()
+
+
+def observe_runtime_dependencies() -> RuntimeDependencyView:
+    """Shortcut: graf dependency antar runtime (read-only)."""
+    return get_runtime_intelligence_observer().dependency_view()
+
+
+def observe_runtime_lifecycle() -> RuntimeLifecycleView:
+    """Shortcut: view lifecycle capability seluruh runtime (read-only)."""
+    return get_runtime_intelligence_observer().lifecycle_view()
+
+
+def observe_runtime_health() -> RuntimeHealthMatrix:
+    """Shortcut: matriks health seluruh runtime (read-only)."""
+    return get_runtime_intelligence_observer().health_matrix()
