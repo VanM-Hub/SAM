@@ -101,12 +101,21 @@ sam onboarding doctor --json   # Output JSON
 sam onboarding init
 sam onboarding init --path <project_root>
 sam onboarding init --apply   # jalankan bootstrap aplikasi penuh
+
+# Buat starter project SAM baru (WP-E2.4, menutup gap E5-G1)
+sam onboarding init --scaffold <nama>          # dry-run: tampilkan rencana file
+sam onboarding init --scaffold <nama> --apply   # tulis 8 file ke ./<nama>
+sam onboarding init --scaffold <nama> --scaffold-dir <dir> --apply  # target tertentu
 ```
 
 - `init` default **dry-run**: cek struktur repo + dry-run bootstrap + tampilkan
-  next-steps. Scaffold starter-project penuh tersedia di WP-E2.4 (`--scaffold`).
-- Logika berada di `sam.devx.onboarding`, memakai ulang komponen WP-E2.1
-  (DependencyChecker / EnvironmentValidator / bootstrap) - tanpa duplikasi.
+  next-steps.
+- `init --scaffold <nama>` membuat **starter project SAM baru** (struktur lengkap
+  Mission + Workflow + Runtime + pyproject + package, 8 file, WP-E2.4/E5-G1).
+  Default dry-run non-destruktif; `--apply` menulis file. Idempotent (tidak
+  menimpa file yang sudah ada).
+- Logika `init` berada di `sam.devx.onboarding`; logika scaffold di
+  `sam.devx.scaffold`. Keduanya memakai ulang komponen WP-E2.1 tanpa duplikasi.
 
 ### `health`
 

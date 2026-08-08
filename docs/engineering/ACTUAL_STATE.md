@@ -258,6 +258,13 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Constraint EA-002 dijaga: dokumentasi; tidak ubah runtime/governance/Foundation/ADR.
 - Report: reports/WP-E2.3_E4-G1_Quick_Start_Report.md. Next: WP-E2.4.
 
+**WP-E2.4 E5-G1 Starter Project (MISSION-2E) - DONE:**
+- Scaffold starter project SAM baru (gap E5-G1 High): sam.devx.scaffold - struktur lengkap Mission + Workflow + Runtime + pyproject + package (8 file).
+- CLI: sam onboarding init --scaffold <nama> (dry-run default) / --apply (menulis) / --scaffold-dir (target). Idempotent, tidak timpa existing.
+- Mengisi janji next-steps sam onboarding init --scaffold dari WP-E2.2. Pure logic + thin CLI handler.
+- Evidence: tests/integration/test_devx_scaffold.py (13 test); integration (3.12) 211 passed, no regression.
+- Report: reports/WP-E2.4_E5-G1_Starter_Project_Report.md. Next: WP-E2.5.
+
 ## Next
 
 - **Program D (MISSION-2D) - EA-002 Production Readiness Implementation CLOSED (Verdict EA-002).** Kelima High gap (H1/H5/H2/H3/H4) **DONE** (WP-D2.1..D2.5) - **M4 Production Platform ACHIEVED**.
@@ -265,7 +272,8 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - **WP-E2.1 E1-G1 Automatic Bootstrap Installation DONE** (modul sam/devx; 28 test evidence; baseline 4290 passed, no regression).
 - **WP-E2.2 E2-G1 CLI Onboarding DONE** (sam onboarding init/doctor/version; 12 test evidence; integration 198 passed, no regression).
 - **WP-E2.3 E4-G1 End-to-End Quick Start DONE** (docs/user/quickstart.md + README section 7; dokumentasi, no code change).
-- **Next: WP-E2.4 E5-G1 Starter Project** - lanjut otomatis sesuai urutan resmi.
+- **WP-E2.4 E5-G1 Starter Project DONE** (sam.devx.scaffold; sam onboarding init --scaffold; 13 test; integration 211 passed).
+- **Next: WP-E2.5 E3-G1 SDK Public API** - lanjut otomatis sesuai urutan resmi.
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 
