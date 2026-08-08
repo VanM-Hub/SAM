@@ -178,3 +178,18 @@
 - Hasil: **19 gap** diklasifikasikan (5 High, 10 Medium, 4 Low) - input fase implementasi, keputusan di Chief Architect.
 - Judgement awal: SAM belum mencapai M4 Production Platform; hanya Monitoring siap produksi.
 - Exit criteria EA-001 terpenuhi (baseline D1-D5 dipetakan + Production Readiness Matrix + gap terklasifikasi).
+
+## SAM 1.0.2 (2026-08-08) - Program D EA-002 Implementation: P1/H1 Portable Deployment
+
+### Verdict EA-002 (decision)
+- docs/engineering/decisions/EA-002_Lead_Engineer_Verdict_Production_Readiness_Implementation.md
+- EA-001 ditutup (diterima Chief Architect, no drift, no foundation impact); engineering diotorisasi masuk EA-002.
+- Official Implementation Order: P1 H1 → P2 H5 → P3 H2 → P4 H3 → P5 H4.
+
+### Implementasi P1/H1 Portable Deployment
+- 5 launcher `.bat` root di-refactor portable: `cd /d "%~dp0"`, `PYTHONPATH=%CD%\src`; hilangkan absolute path `D:\Project AI\SAM`.
+- Verifikasi nyata: SAM_Run diagnostic 8/8; SAM_CLI console mencapai prompt `sam>`.
+- Evidence suite baru: tests/integration/test_launcher_portable.py (8 test) - otomatis masuk CI integration job.
+- Regression: baseline CI scope 4290 passed, no regression.
+- Report: docs/engineering/reports/Program-D/WP-D2.1_H1_Portable_Deployment_Report.md.
+- Constraint EA-002 dijaga (Foundation/Constitution/Governance/ADR beku).
