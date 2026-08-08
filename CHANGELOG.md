@@ -287,3 +287,14 @@
 - Constraint EA-002 dijaga: dokumentasi saja; tidak ubah runtime/governance/Foundation/ADR.
 - Report: docs/engineering/reports/WP-E2.3_E4-G1_Quick_Start_Report.md.
 - Next: WP-E2.4 E5-G1 Starter Project.
+
+## SAM 1.0.2 (2026-08-08) - Program E EA-002 Implementation: WP-E2.4 E5-G1 Starter Project
+
+- Scaffold starter project SAM baru (gap E5-G1 High): src/sam/devx/scaffold.py (pure logic).
+- `sam onboarding init --scaffold <nama>` membuat struktur project lengkap: pyproject.toml, README, mission.yaml, workflow.yaml, src/<pkg>/{__init__,mission,workflow,runtime}/__init__.py (8 file).
+- Default dry-run (tidak menulis); `--apply` menulis; `--scaffold-dir` pilih target; idempotent (tidak menimpa existing).
+- Mengisi janji next-steps `sam onboarding init --scaffold` dari WP-E2.2.
+- Evidence suite: tests/integration/test_devx_scaffold.py (13 test) masuk CI integration job.
+- Regression: integration suite (3.12) 211 passed (198 existing + 13 baru), 0 collection error.
+- Report: docs/engineering/reports/WP-E2.4_E5-G1_Starter_Project_Report.md.
+- Next: WP-E2.5 E3-G1 SDK Public API.

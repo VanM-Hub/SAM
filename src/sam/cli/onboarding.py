@@ -2,6 +2,7 @@
 
 Menyediakan command CLI onboarding untuk early adopter:
 - `sam onboarding init` : rencana inisialisasi/onboarding project (dry-run).
+- `sam onboarding init --scaffold <name>` : buat starter project SAM baru (WP-E2.4).
 - `sam onboarding doctor` : diagnosa kesehatan instalasi & environment.
 - `sam onboarding version` : tampilkan versi package.
 
@@ -17,6 +18,7 @@ from typing import Optional
 import typer
 
 from sam.devx.onboarding import doctor, init_plan, version_string
+from sam.devx.scaffold import scaffold_project
 
 
 app = typer.Typer(
@@ -80,8 +82,18 @@ def init_cmd(
         None, "--path", "-p", help="Project root (default: auto-detect)"
     ),
     apply: bool = typer.Option(False, "--apply", help="Jalankan bootstrap aplikasi"),
+    scaffold: Optional[str] = typer.Option(
+        None, "--scaffold", help="Buat starter project SAM baru dengan nama ini (WP-E2.4)"
+    ),
+    scaffold_dir: Optional[Path] = typer.Option(
+        None, "--scaffold-dir", help="Direktori tujuan scaffold (default: ./<scaffold>)"
+    ),
 ) -> None:
     """Rencana/inisialisasi onboarding project (default dry-run)."""
+    if scaffold is not None:
+        _run_scaffold(scaffold, scaffold_dir, apply=apply)
+        return
+
     plan = init_plan(project_root=path)
     typer.echo("SAM Init - project: {0}".format(plan.project_root))
     typer.echo("  Struktur repo : {0}".format("OK" if plan.structure_ok else "BELUM LENGKAP"))
@@ -94,3 +106,36 @@ def init_cmd(
         typer.echo("    - {0}".format(step))
     if apply:
         typer.echo("  (mode --apply: jalankan BootstrapInstaller aplikasi penuh)")
+
+
+def _run_scaffold(name: str, target: Optional[Path], *, apply: bool = False) -> None:
+    """Handler `sam onboarding init --scaffold <name>`.
+
+    `apply=False` (default): dry-run - hanya menampilkan rencana file.
+    `apply=True`: menulis file scaffold ke target dir.
+    """
+    try:
+        result = scaffold_project(name, target_dir=target, apply=apply)
+    except ValueError as exc:
+        typer.echo("  ! scaffold_error: {0}".format(exc))
+        raise typer.Exit(code=2)
+
+    mode = "--apply (menulis)" if apply else "dry-run"
+    typer.echo("SAM Scaffold - project: {0} ({1})".format(result.name, mode))
+    typer.echo("  Tujuan  : {0}".format(result.target_dir))
+    typer.echo("  Valid   : {0}".format("OK" if result.validated else "GAGAL"))
+    if apply:
+        created = result.created
+        if created:
+            typer.echo("  Dibuat ({0} file):".format(len(created)))
+            for rel in created:
+                typer.echo("    + {0}".format(rel))
+        if result.skipped:
+            typer.echo("  Dilewati (sudah ada, {0}):".format(len(result.skipped)))
+            for rel in result.skipped:
+                typer.echo("    = {0}".format(rel))
+    else:
+        typer.echo("  Akan dibuat ({0} file):".format(len(result.created)))
+        for rel in result.created:
+            typer.echo("    - {0}".format(rel))
+        typer.echo("  Next: ulangi dengan --scaffold <nama> --apply untuk menulis file.")
