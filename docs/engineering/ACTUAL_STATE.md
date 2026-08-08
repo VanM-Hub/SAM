@@ -17,12 +17,13 @@
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
 | Program aktif (post-1.0) | **Program C (MISSION-2C) — Operational Intelligence C-Phase 2 Complete** |
 | Status saat ini | **Baseline CI: 10 suites — 9 runtime + Observation Layer** (4,159 tests lokal, **CI hijau 7/7**) |
-| Branch / HEAD | `main` / `bd2baa9` (CI hijau 7/7) |
+| Branch / HEAD | `main` / `e6c514b` (CI hijau 7/7) |
+| Verifikasi independen | C-Phase 1 & 2 **Fully Verified** — diff + source + test + CI diinspeksi langsung (Evidence Before Assumption) |
+| Tanggal update | 2026-08-08 (17:59 WITA) |
 | Total commit | ~695+ |
 | Baseline CI (lokal) | 4,159 passed (unit + 8 runtime suites + observation 142 tests) |
 | Observation Layer | 142 tests · 6 WP (C-Phase 1) + 6 Gap Resolution (C-Phase 2) · Module: `src/sam/observation/` + endpoint + wiring |
 | Gap Resolution | 6 GAP resolved (GAP-001 s/d 006) · `gaps.py` + `resolve_all_gaps()` · commit 74f6a72 |
-| Tanggal update | 2026-08-08 (17:05 WITA) |
 
 ---
 
@@ -45,8 +46,8 @@
 | 0.30 (v30.0.0) | 2026-08-06 | Program K — LLM Runtime Activation | SELESAI | 5 provider LLM; regression 3,541 passed |
 | 0.30 (v30.0.0) | 2026-08-06 | R-001 — Product Release | SELESAI | 8 fase R1–R8; commit 16c71b4 ter-push |
 | **1.0.0** | **2026-08-08** | **SAM 1.0.2** — Execution Runtime baseline CI (Phase 4) | **SELESAI** | commit f58ff0d; 2 xfail; baseline 4,017 |
-| **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 1 Wiring & Integration** | **SELESAI** | Observation Layer; 10 adapter + 6 WP; 79 tests; commit 978f89d |
-| **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 2 Gap Resolution** | **SELESAI** | 6 GAP resolved; `gaps.py` + coordinator; 61 tests; commit 74f6a72 |
+| **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 1 Wiring & Integration** | **SELESAI · Fully Verified** | Observation Layer; 10 adapter + 6 WP; 79 tests; commit 978f89d; diverifikasi langsung (diff+source+CI) |
+| **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 2 Gap Resolution** | **SELESAI · Fully Verified** | 6 GAP resolved; `gaps.py` + coordinator; 61 tests; commit 74f6a72; read-only terkonfirmasi |
 | **1.0.0** | **2026-08-08** | **CI-003 Fix — lazy import httpx** | **SELESAI** | `provider_executor.py` lazy-import; CI hijau 7/7; commit bd2baa9 |
 
 **Program A (MISSION-2A, era 1.0)** — Program A baru (arsitektur/governance, bukan connectors) dimulai sebagai
