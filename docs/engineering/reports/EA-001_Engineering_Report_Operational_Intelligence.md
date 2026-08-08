@@ -1,4 +1,4 @@
-# EA-001 Engineering Verdict — Operational Intelligence Assessment
+# EA-001 Engineering Report - Operational Intelligence Assessment
 
 **Mission:** MISSION-2C  
 **Date:** 2026-08-08  

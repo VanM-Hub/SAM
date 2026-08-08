@@ -1,4 +1,4 @@
-# WP-B2 — Engineering Verdict: Mission Runtime Activation
+# WP-B2 - Engineering Report: Mission Runtime Activation
 
 **Program:** MISSION-2B / Program B (Runtime Realization) **Work Package:** WP-B2 (Mission Runtime)
 **Status:** ▶️ **Complete (Execution)** **Tanggal:** 2026-08-08
