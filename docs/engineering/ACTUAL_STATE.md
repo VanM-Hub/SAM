@@ -15,11 +15,11 @@
 | Identitas rilis | **SAM 1.0 Foundation** + **SAM 1.0.1** (baseline expansion) + **SAM 1.0.2** (execution baseline) |
 | CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
-| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 Implementation ACTIVE** |
-| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 Implementation ACTIVE — P1/H1 + P2/H5 + P3/H2 + P4/H3 + P5/H4 DONE** · **CI** |
-| Branch / HEAD | `main` / EA-002 Implementation (P1-H1 selesai) |
-| Verifikasi independen | Program C **CLOSED (EA-C06)**; **EA-002 (H1) terimplementasi + 8 test evidence + baseline 4290 passed** |
-| Tanggal update | 2026-08-08 (19:xx WITA) |
+| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 CLOSED (M4 ACHIEVED)** |
+| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D EA-002 CLOSED (M4 ACHIEVED) - Program E EA-001 DONE** · **CI** |
+| Branch / HEAD | `main` / EA-002 DONE + EA-001-E deliverables |
+| Verifikasi independen | Program C **CLOSED (EA-C06)**; **Program D CLOSED (EA-002) - M4 ACHIEVED**; **EA-001-E 7 deliverable + CI SUCCESS** |
+| Tanggal update | 2026-08-08 (21:05 WITA) |
 | Total commit | ~700+ |
 | Baseline CI (lokal) | 4,216 passed (unit + 8 runtime suites + observation 206 tests) |
 | Observation Layer | 206 tests · 6 WP (C-Phase 1) + 6 Gap Resolution (C-Phase 2) + Recommendation Engine + **C1-C10 Intel Observers (C-Phase 3 & 4)** · Module: `src/sam/observation/` + endpoint + wiring |
@@ -226,14 +226,20 @@ Program C menjadi bagian dari baseline operasional SAM 2.x (keputusan Chief Arch
 - Report: reports/WP-D2.5_H4_Operational_Alerting_Report.md.
 - **Kelima High gap Program D (H1/H5/H2/H3/H4) tuntas -> EA-002 Implementation SELESAI.**
 
+**EA-001 Early Adopter Experience Assessment (MISSION-2E) - DONE:**
+- 6 workstream dipetakan: Installation, CLI, SDK, Documentation, Template & Sample, Developer Workflow.
+- 7 deliverable: reports/EA-001-E/EA-001-001..007 (assessment read-only, tidak mengubah source/repo/CI/docs existing).
+- 5 High / 6 Medium / 6 Low gap; blocker experience-level (bukan arsitektur); no drift.
+- Commit 2ad37cb; CI SUCCESS.
+
 ## Next
 
-- **Program D (MISSION-2D) — EA-002 Production Readiness Implementation SELESAI.** Kelima High gap (H1/H5/H2/H3/H4) **DONE** (WP-D2.1..D2.5).
-- **Next: Verdict Lead Engineer EA-002 completion** — evaluasi whole Program D untuk status Production Readiness.
-- Urutan resmi Program D: P1 H1 .. P2 H5 .. P3 H2 .. P4 H3 .. P5 H4 **semua DONE**.
+- **Program D (MISSION-2D) - EA-002 Production Readiness Implementation CLOSED (Verdict EA-002).** Kelima High gap (H1/H5/H2/H3/H4) **DONE** (WP-D2.1..D2.5) - **M4 Production Platform ACHIEVED**.
+- **Program E (MISSION-2E) - EA-001 Early Adopter Experience Assessment DONE** (7 deliverable, CI SUCCESS).
+- **Next: Engineering Verdict EA-001** ke Lead Engineer - menunggu Verdict untuk implementasi gap Program E (WP-E1..E6).
 - Tunggu keputusan arsitektur G1-02 & G1-03 (Program A / Repository Convergence).
 - Item arsitektur ARC-002 (Real Execution) tetap jadi pertimbangan jalur berikutnya.
 
 ---
 
-*— ACTUAL_STATE — snapshot 2026-08-08 (Program C CLOSED · Development Execution aktif) · selaras status aktual project · bersih untuk repo publik.*
+*— ACTUAL_STATE — snapshot 2026-08-08 (Program C CLOSED + Program D CLOSED/M4 + Program E EA-001 DONE) · selaras status aktual project · bersih untuk repo publik.*
