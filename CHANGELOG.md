@@ -44,3 +44,16 @@
 - Total baseline: 4,017 tests passed, 1 skipped, 2 xfailed.
 - 8 runtime OPERATIONAL: Knowledge · Memory · Policy · Workflow · Artifact · Audit · Mission · Execution.
 - 2 xfail: `test_no_hardcoded_secrets_in_provider_executor_source` (false positive pada prefix "Bearer") dan `test_provider_executor_non_auth_execute_ok` (filesystem provider belum memenuhi syarat base_url).
+
+## SAM 1.0.2 (2026-08-08) — C-Phase 1 Observation Layer
+
+### Operational Intelligence — Wiring & Integration (Program C)
+- Observation Layer: `src/sam/observation/` (publication, adapters, timeline, capability, evidence).
+- 10 Runtime Publication Adapter (mission, workflow, policy, execution, approval, audit, knowledge, memory, artifact, runtime_service).
+- Unified TimelineAggregator (4 sumber timeline: mission, execution, approval, audit).
+- CapabilityStatusReader — 10 runtime, 8 capability axis per runtime.
+- EvidenceExplorer — 10 evidence entries, by-category/by-runtime navigation.
+- ObservationGateway — unified REST endpoint via `runtime_service.api.observation_endpoint`.
+- Observation Wiring — singleton composition root.
+- Total baseline (lokal): 4,096 tests (unit + 8 runtime suites + observation 79 tests).
+- Constraint: read-only, no new runtime, no governance change, no business logic.

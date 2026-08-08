@@ -12,15 +12,15 @@
 |---|---|
 | Versi (pyproject.toml) | **1.0.0** |
 | Versi (sam.__version__) | **1.0.0** |
-| Identitas rilis | **SAM 1.0 Foundation** + **SAM 1.0.1** (baseline expansion) |
-| CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) |
+| Identitas rilis | **SAM 1.0 Foundation** + **SAM 1.0.1** (baseline expansion) + **SAM 1.0.2** (execution baseline) |
+| CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
 | Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
-| Program terakhir (post-1.0) | Program A Test Baseline Convergence Phase 2-3 |
-| Status saat ini | **Baseline CI: 8 runtime Operational** (4,017 tests) — Execution + Policy · Workflow · Artifact · Audit · Mission + Knowledge · Memory |
-| Branch / HEAD | `main` / `f58ff0d` |
+| Program aktif (post-1.0) | **Program C (MISSION-2C) — Operational Intelligence C-Phase 1 Complete** |
+| Status saat ini | **Baseline CI: 10 suites — 9 runtime + Observation Layer** (4,096 tests lokal, CI pre-existing failure) |
+| Branch / HEAD | `main` / `978f89d` |
 | Total commit | ~690+ |
-| Baseline CI | 4,017 passed · 1 skipped · 2 xfailed (9 folder: unit + 8 runtime suites) |
-| Execution Runtime | 209/211 passed, 2 xfailed (pre-existing) — masuk baseline CI Phase 4 |
+| Baseline CI (lokal) | 4,096 passed · 1 skipped · 2 xfailed (10 folder: unit + 8 runtime suites + observation) |
+| Observation Layer | 79 tests · 6 WP selesai · Module: `src/sam/observation/` + endpoint + wiring |
 | Tanggal update | 2026-08-08 |
 
 ---
@@ -43,7 +43,9 @@
 | 0.30 (v30.0.0) | 2026-08-06 | Program J — REST API as Presentation Host | SELESAI | regression 584 passed |
 | 0.30 (v30.0.0) | 2026-08-06 | Program K — LLM Runtime Activation | SELESAI | 5 provider LLM; regression 3,541 passed |
 | 0.30 (v30.0.0) | 2026-08-06 | R-001 — Product Release | SELESAI | 8 fase R1–R8; commit 16c71b4 ter-push |
-| **1.0.0** | **2026-08-07** | **SAM 1.0 Foundation (rilis publik pertama)** | **SELESAI** | rebranding 1.0.0; 9 dokumen foundation; identitas publik |
+| **1.0.0** | **2026-08-08** | **SAM 1.0.2** — Execution Runtime baseline CI (Phase 4) | **SELESAI** | commit f58ff0d; 2 xfail; baseline 4,017 |
+| **1.0.0** | **2026-08-08** | **Program C (MISSION-2C) — C-Phase 1 Wiring & Integration** | **SELESAI** | Observation Layer; 10 adapter + 6 WP; 79 tests; commit 978f89d |
+| 1.0.0 | 2026-08-08 | Program C (MISSION-2C) — C-Phase 2 Gap Resolution | PLAN | GAP-001 s/d 006; menunggu persetujuan |
 
 **Program A (MISSION-2A, era 1.0)** — Program A baru (arsitektur/governance, bukan connectors) dimulai sebagai
 **Development Execution** di era pasca-1.0. Lihat §Status Development Execution di bawah.
@@ -78,6 +80,7 @@
 | OpenClaw | `src\sam\openclaw\` | Aktif | integrasi OpenClaw runtime |
 | Telemetry | `src\sam\telemetry\` | Aktif | telemetry service |
 | Compliance | `src\sam\compliance\` | Aktif | 99 checker runtime compliance |
+| Observation | `src\sam\observation\` | Aktif | C-Phase 1 — Publication + Timeline + Health + Capability + Evidence (read-only) |
 
 ---
 
@@ -102,6 +105,8 @@
 | [OPEN] | UI Operational Intelligence Console belum dibangun | — |
 | [OPEN] | `test_two_runs_same_structure` flaky (Test Stability, Low) | backlog engineering |
 | [OPEN] | `src/sam/runtime/discovery.py` import `sam.validation` (tidak ada di repo) = dead import (Low) | — |
+| [CLOSED] | UI Operational Intelligence Console belum dibangun | C-Phase 1 Observation Layer dibangun (commit 978f89d) |
+| [OPEN] | CI pre-existing failure (runs #15-24) — kemungkinan Node.js 20 deprecation pada runner | Semua test lokal hijau (4,096 passed); penyelidikan tertunda |
 | [OPEN] | 6 failure baseline pytest (pre-existing) | 3 checker Boundary · 2 bug `@runtime_checkable` · 1 lingkungan |
 
 ---
