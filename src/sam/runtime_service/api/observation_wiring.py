@@ -52,6 +52,15 @@ from sam.observation.audit_intelligence import (
     AuditIntelligenceReport,
 )
 
+# C-Phase 4 (Workstream C6) Capability Intelligence observer
+from sam.observation.capability_intelligence import (
+    CapabilityAggregation,
+    CapabilityDependencyView,
+    CapabilityHealthReport,
+    CapabilityIntelligenceObserver,
+    CapabilityReadinessReport,
+)
+
 
 # ── Singleton (module-level, immutable after wiring) ──
 
@@ -59,6 +68,7 @@ _registry: Optional[PublicationRegistry] = None
 _gateway: Optional[ObservationGateway] = None
 _gap_coordinator: Optional[GapResolutionCoordinator] = None
 _recommendation_engine: Optional[ObservationRecommendationEngine] = None
+_capability_intel: Optional[CapabilityIntelligenceObserver] = None
 
 
 def create_publication_registry() -> PublicationRegistry:
@@ -199,3 +209,35 @@ def get_audit_intelligence_observer() -> AuditIntelligenceObserver:
 def observe_audits(search_query: str = "") -> AuditIntelligenceReport:
     """Shortcut: laporan intelligence Audit (opsional search)."""
     return get_audit_intelligence_observer().report(search_query)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# C-Phase 4: Workstream C6 Capability Operational Intelligence wiring
+# ══════════════════════════════════════════════════════════════════════
+
+def get_capability_intelligence_observer() -> CapabilityIntelligenceObserver:
+    """Singleton observer Capability (read-only, jalur publikasi)."""
+    global _capability_intel
+    if _capability_intel is None:
+        _capability_intel = CapabilityIntelligenceObserver(get_publication_registry())
+    return _capability_intel
+
+
+def observe_capabilities() -> CapabilityAggregation:
+    """Shortcut: agregasi status seluruh capability (read-only)."""
+    return get_capability_intelligence_observer().aggregation()
+
+
+def observe_capability_readiness() -> CapabilityReadinessReport:
+    """Shortcut: laporan readiness seluruh capability (read-only)."""
+    return get_capability_intelligence_observer().readiness()
+
+
+def observe_capability_health() -> CapabilityHealthReport:
+    """Shortcut: laporan health seluruh capability (read-only)."""
+    return get_capability_intelligence_observer().health()
+
+
+def observe_capability_dependencies() -> CapabilityDependencyView:
+    """Shortcut: graf dependency capability (read-only)."""
+    return get_capability_intelligence_observer().dependency_view()

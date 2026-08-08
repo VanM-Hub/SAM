@@ -68,6 +68,19 @@ from sam.observation.audit_intelligence import (
     ComplianceStatus,
 )
 
+# C-Phase 4: Workstream C6 Capability Operational Intelligence
+from sam.observation.capability_intelligence import (
+    CapabilityAggregation,
+    CapabilityDependency,
+    CapabilityDependencyView,
+    CapabilityHealthEntry,
+    CapabilityHealthReport,
+    CapabilityIntelligenceObserver,
+    CapabilityReadinessEntry,
+    CapabilityReadinessReport,
+    CapabilityStatusEntry,
+)
+
 # C-Phase 2: Gap Resolution exports
 from sam.observation.gaps import (
     ApprovalHealthDetail,
@@ -160,4 +173,14 @@ __all__ = [
     "ComplianceStatus",
     "AuditIntelligenceReport",
     "AuditIntelligenceObserver",
+    # C-Phase 4: Workstream C6 Capability
+    "CapabilityStatusEntry",
+    "CapabilityAggregation",
+    "CapabilityReadinessEntry",
+    "CapabilityReadinessReport",
+    "CapabilityHealthEntry",
+    "CapabilityHealthReport",
+    "CapabilityDependency",
+    "CapabilityDependencyView",
+    "CapabilityIntelligenceObserver",
 ]
