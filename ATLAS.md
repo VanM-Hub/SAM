@@ -227,7 +227,7 @@
    ├── Identity      (MISSION, VISION, CHARTER, PRINCIPLES, GOVERNANCE)
    ├── Documentation (docs/ — authority + engineering(docs/engineering) + history)
    ├── Source        (src/sam/ — implementasi: world/legacy/backlog/infra)
-   ├── Tests         (tests/ — unit/integration/presentation/e2e)
+   ├── Tests         (tests/ — 8 folder baseline CI: unit + 7 runtime suites, 3,808 tests)
    ├── Tools         (scripts/ — validasi; data/ — migrasi)
    └── History       (docs/history/ — arsip, bukan authority)
 ```
