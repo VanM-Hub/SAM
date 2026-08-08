@@ -61,6 +61,16 @@ from sam.observation.capability_intelligence import (
     CapabilityReadinessReport,
 )
 
+# C-Phase 4 (Workstream C7) Provider Intelligence observer
+from sam.observation.provider_intelligence import (
+    ProviderAvailabilityReport,
+    ProviderConnectivityReport,
+    ProviderHealthReport,
+    ProviderIntelligenceObserver,
+    ProviderMetrics,
+    ProviderReadinessReport,
+)
+
 
 # ── Singleton (module-level, immutable after wiring) ──
 
@@ -69,6 +79,7 @@ _gateway: Optional[ObservationGateway] = None
 _gap_coordinator: Optional[GapResolutionCoordinator] = None
 _recommendation_engine: Optional[ObservationRecommendationEngine] = None
 _capability_intel: Optional[CapabilityIntelligenceObserver] = None
+_provider_intel: Optional[ProviderIntelligenceObserver] = None
 
 
 def create_publication_registry() -> PublicationRegistry:
@@ -241,3 +252,40 @@ def observe_capability_health() -> CapabilityHealthReport:
 def observe_capability_dependencies() -> CapabilityDependencyView:
     """Shortcut: graf dependency capability (read-only)."""
     return get_capability_intelligence_observer().dependency_view()
+
+
+# ══════════════════════════════════════════════════════════════════════
+# C-Phase 4: Workstream C7 Provider Operational Intelligence wiring
+# ══════════════════════════════════════════════════════════════════════
+
+def get_provider_intelligence_observer() -> ProviderIntelligenceObserver:
+    """Singleton observer Provider (read-only, metadata provider ya tersedia)."""
+    global _provider_intel
+    if _provider_intel is None:
+        _provider_intel = ProviderIntelligenceObserver()
+    return _provider_intel
+
+
+def observe_providers() -> ProviderAvailabilityReport:
+    """Shortcut: laporan availability seluruh provider (read-only)."""
+    return get_provider_intelligence_observer().availability()
+
+
+def observe_provider_readiness() -> ProviderReadinessReport:
+    """Shortcut: laporan readiness seluruh provider (read-only)."""
+    return get_provider_intelligence_observer().readiness()
+
+
+def observe_provider_connectivity() -> ProviderConnectivityReport:
+    """Shortcut: laporan konektivitas provider (read-only)."""
+    return get_provider_intelligence_observer().connectivity()
+
+
+def observe_provider_health() -> ProviderHealthReport:
+    """Shortcut: laporan health provider (read-only)."""
+    return get_provider_intelligence_observer().health()
+
+
+def observe_provider_metrics() -> ProviderMetrics:
+    """Shortcut: metrik provider agregat (read-only)."""
+    return get_provider_intelligence_observer().metrics()
