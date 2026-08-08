@@ -1,10 +1,12 @@
-# Citizen Ecosystem - MISSION-3.3 (IP-3.3-001 Citizen Foundation + IP-3.3-002
-# Citizen Collaboration & Compatibility)
+# Citizen Ecosystem - MISSION-3.3 (IP-3.3-001 Citizen Foundation
+#                + IP-3.3-002 Citizen Collaboration & Compatibility
+#                + IP-3.3-003 Citizen Certification & Ecosystem Intelligence)
 # AO-3.3-001 / ED-3.3-001
 #
 # Bounded context citizen/: identity, registry, descriptor, capability,
 # discovery, health, lifecycle, collaboration (models/proposal/compatibility/
-# contract_resolution/dependency/explainability), api, compliance.
+# contract_resolution/dependency/explainability), ecosystem (certification/
+# intelligence/health/recommendation/explainability), api, compliance.
 #
 # Citizen adalah abstraksi konstitusional bersama: Runtime, Provider,
 # Workflow, Mission, Policy, Capability semuanya JENIS (kind) citizen yang
@@ -14,6 +16,9 @@
 # discovery/compliance.
 # Batas IP-3.3-002: kolaborasi & kompatibilitas antar-citizen (tanpa
 # otoritas; collaboration != orchestration; proposal != decision).
+# Batas IP-3.3-003: sertifikasi, evaluasi, pemahaman ekosistem (tanpa
+# otoritas; certification != approval; intelligence != governance;
+# recommendation != authority; ecosystem health != runtime control).
 
 # re-expor API utama untuk konsumen platform
 from sam.citizen.api.citizen import CitizenAPI, CitizenSummary
@@ -21,8 +26,10 @@ from sam.citizen.api.collaboration import (
     CitizenCollaborationAPI,
     CollaborationSummary,
 )
+from sam.citizen.api.intelligence import CitizenIntelligenceAPI
 
 __version__ = "3.3.0"
 
 __all__ = ["CitizenAPI", "CitizenSummary",
-           "CitizenCollaborationAPI", "CollaborationSummary"]
+           "CitizenCollaborationAPI", "CollaborationSummary",
+           "CitizenIntelligenceAPI"]
