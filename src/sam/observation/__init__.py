@@ -23,6 +23,51 @@ from sam.observation.recommendation import (
     OperationalRecommendationReport,
 )
 
+# C-Phase 3 (Workstream C1-C5): Operational Intelligence observers
+from sam.observation.mission_intelligence import (
+    MissionCheckpointView,
+    MissionHealthView,
+    MissionIntelligenceObserver,
+    MissionIntelligenceReport,
+    MissionProgressView,
+    MissionStatusView,
+    MissionTimelineView,
+)
+from sam.observation.workflow_intelligence import (
+    Bottleneck,
+    WorkflowBottleneckView,
+    WorkflowDependencyGraph,
+    WorkflowIntelligenceObserver,
+    WorkflowIntelligenceReport,
+    WorkflowStepDependency,
+    WorkflowView,
+)
+from sam.observation.approval_intelligence import (
+    ApprovalIntelligenceObserver,
+    ApprovalIntelligenceReport,
+    ApprovalMetric,
+    ApprovalMetrics,
+    ApprovalQueue,
+    ApprovalQueueEntry,
+    DecisionHistory,
+    DecisionHistoryEntry,
+)
+from sam.observation.execution_intelligence import (
+    ExecutionAnalytics,
+    ExecutionIntelligenceObserver,
+    ExecutionIntelligenceReport,
+    ExecutionTimeline,
+    ExecutionTimelineEntry,
+    ExecutionView,
+)
+from sam.observation.audit_intelligence import (
+    AuditCorrelation,
+    AuditIntelligenceObserver,
+    AuditIntelligenceReport,
+    AuditView,
+    ComplianceStatus,
+)
+
 # C-Phase 2: Gap Resolution exports
 from sam.observation.gaps import (
     ApprovalHealthDetail,
@@ -77,4 +122,42 @@ __all__ = [
     "ObservationRecommendation",
     "ObservationRecommendationEngine",
     "OperationalRecommendationReport",
+    # C-Phase 3: Workstream C1 Mission
+    "MissionCheckpointView",
+    "MissionTimelineView",
+    "MissionStatusView",
+    "MissionProgressView",
+    "MissionHealthView",
+    "MissionIntelligenceReport",
+    "MissionIntelligenceObserver",
+    # C-Phase 3: Workstream C2 Workflow
+    "WorkflowView",
+    "WorkflowStepDependency",
+    "WorkflowDependencyGraph",
+    "Bottleneck",
+    "WorkflowBottleneckView",
+    "WorkflowIntelligenceReport",
+    "WorkflowIntelligenceObserver",
+    # C-Phase 3: Workstream C3 Approval
+    "ApprovalQueueEntry",
+    "ApprovalQueue",
+    "DecisionHistoryEntry",
+    "DecisionHistory",
+    "ApprovalMetric",
+    "ApprovalMetrics",
+    "ApprovalIntelligenceReport",
+    "ApprovalIntelligenceObserver",
+    # C-Phase 3: Workstream C4 Execution
+    "ExecutionView",
+    "ExecutionTimelineEntry",
+    "ExecutionTimeline",
+    "ExecutionAnalytics",
+    "ExecutionIntelligenceReport",
+    "ExecutionIntelligenceObserver",
+    # C-Phase 3: Workstream C5 Audit
+    "AuditView",
+    "AuditCorrelation",
+    "ComplianceStatus",
+    "AuditIntelligenceReport",
+    "AuditIntelligenceObserver",
 ]
