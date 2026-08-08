@@ -84,3 +84,12 @@
 - Hapus import `dataclasses.field` unused (F401).
 - Hasil: **CI hijau 7/7** (core 3.10/3.11/3.12, server, desktop, validation, coverage).
 - Total baseline (lokal): 4,159 tests (unit + 8 runtime suites + observation 142 tests).
+
+## SAM 1.0.2 (2026-08-08) — C-Phase 1 & 2 Fully Verified
+
+### Verifikasi Independen (Evidence Before Assumption)
+- Diff commit `978f89d` (C-Phase 1) & `74f6a72` (C-Phase 2) diinspeksi langsung: perubahan terkonsentrasi di `src/sam/observation/` + endpoint wiring + test; **tidak ada perubahan** pada runtime boundary, governance flow, approval, execution, audit, atau ADR-001..007.
+- Engineering Concern Lead Engineer ditegakkan dari kode: `GapResolutionCoordinator` hanya punya 1 method publik `resolve_all()` (query read-only); **0 panggilan** approve/execute/submit/register/publish/emit/transition/write di seluruh `observation/`; **0 import** ke governance/approval/execution/events/runtime; registry terbukti tidak berubah (10 -> 10) sebelum & sesudah `resolve_all()`.
+- 142/142 test observation dijalankan ulang lokal — hijau.
+- CI commit `e6c514b` (HEAD) terkonfirmasi **hijau 7/7** (core 3.10/3.11/3.12, server, desktop, validation, coverage).
+- Hasil: **Engineering Report Accepted** -> **Lead Engineer Verdict: Fully Verified**. Zero Architecture Drift dikonfirmasi.
