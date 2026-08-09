@@ -80,6 +80,26 @@ from .recovery_compliance import (
     RecoveryComplianceChecker,
     RecoveryComplianceResult,
 )
+from .continuous_operations import (
+    AutonomousMetrics,
+    AutonomousMetricsCollector,
+    AutonomousRecommendation,
+    AutonomousRecommender,
+    ContinuousVerification,
+    ContinuousVerifier,
+    HealthMonitor,
+    OperationalHealth,
+    OperationalReadiness,
+    ReadinessVerifier,
+)
+from .autonomous_operations_api import (
+    AutonomousOperationsAPI,
+    OperationsSummary,
+)
+from .continuous_compliance import (
+    ContinuousComplianceChecker,
+    ContinuousComplianceResult,
+)
 
 __all__ = [
     "InvestigationRequest",
@@ -129,4 +149,18 @@ __all__ = [
     "RecoveryExplainer",
     "RecoveryComplianceChecker",
     "RecoveryComplianceResult",
+    "AutonomousMetrics",
+    "AutonomousMetricsCollector",
+    "AutonomousRecommendation",
+    "AutonomousRecommender",
+    "ContinuousVerification",
+    "ContinuousVerifier",
+    "HealthMonitor",
+    "OperationalHealth",
+    "OperationalReadiness",
+    "ReadinessVerifier",
+    "AutonomousOperationsAPI",
+    "OperationsSummary",
+    "ContinuousComplianceChecker",
+    "ContinuousComplianceResult",
 ]
