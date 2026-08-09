@@ -50,6 +50,36 @@ from .autonomous_compliance import (
     ForbiddenPatternCheck,
     ReadOnlyVerification,
 )
+from .recovery_planning import (
+    RecoveryPlan,
+    RecoveryPlanner,
+    RecoveryStep,
+    RecoveryValidation,
+    RecoveryValidator,
+)
+from .recovery_execution import (
+    RecoveryExecutionResult,
+    RecoveryExecutor,
+    RecoverySession,
+)
+from .recovery_verification import (
+    RecoveryVerificationResult,
+    RecoveryVerifier,
+    SelfDebugging,
+)
+from .operational_optimization import (
+    OperationalOptimizer,
+    OptimizationSuggestion,
+)
+from .recovery_api import RecoveryAPI
+from .recovery_explainability import (
+    RecoveryExplanation,
+    RecoveryExplainer,
+)
+from .recovery_compliance import (
+    RecoveryComplianceChecker,
+    RecoveryComplianceResult,
+)
 
 __all__ = [
     "InvestigationRequest",
@@ -81,4 +111,22 @@ __all__ = [
     "AutonomousComplianceResult",
     "ForbiddenPatternCheck",
     "ReadOnlyVerification",
+    "RecoveryPlan",
+    "RecoveryPlanner",
+    "RecoveryStep",
+    "RecoveryValidation",
+    "RecoveryValidator",
+    "RecoveryExecutionResult",
+    "RecoveryExecutor",
+    "RecoverySession",
+    "RecoveryVerificationResult",
+    "RecoveryVerifier",
+    "SelfDebugging",
+    "OperationalOptimizer",
+    "OptimizationSuggestion",
+    "RecoveryAPI",
+    "RecoveryExplanation",
+    "RecoveryExplainer",
+    "RecoveryComplianceChecker",
+    "RecoveryComplianceResult",
 ]
