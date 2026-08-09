@@ -10,17 +10,17 @@
 
 | Item | Nilai |
 |---|---|
-| Versi (pyproject.toml) | **4.0.0** |
-| Versi (sam.__version__) | **4.0.0** |
-| Identitas rilis | **Baseline Release 4.0.0** (SAM 4.0 - Federated Governance Platform, Architecture Accepted) · git tag `v4.0.0` |
-| CHANGELOG.md | **4.0.0** (baseline release) |
-| Misi selesai | MISSION-4.1 s/d 4.6 SEMUA COMPLETE & ARCHITECTURE ACCEPTED · baseline resmi arsitektur SAM 4.0 |
-| Status saat ini | **SAM 4.0 — Federated Governance Platform = ARCHITECTURE ACCEPTED** (verdict resmi Chief Architect di `docs/decisions` · MISSION-4.1 CLOSED · MISSION-4.2..4.6 ACCEPTED) · seluruh capability 4.0 (Real Execution, Operational Intelligence, Operational Learning, Governed AI Reasoning, Autonomous Operations, Human Operational Experience) = **baseline resmi arsitektur SAM** · roadmap lanjut ke SAM 5 — Universal Governance Platform |
-| Branch / HEAD | `main` / `8e64b57` (rilis v4.0.0) |
-| Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) · **SAM 4.0: 3543 passed (unit+5 BC 4.x+observation) + 559 compliance, lint & ASCII bersih** · Architecture Review: NONE (drift/impact/conflict/leakage) |
-| Tanggal update | 2026-08-10 (00:16 WITA) |
+| Versi (pyproject.toml) | **4.1.0** |
+| Versi (sam.__version__) | **4.1.0** |
+| Identitas rilis | **4.1.0** - SAM 5.x Universal Governance Platform (implementation WIP di atas baseline 4.0) · rilis v4.0.0 tetap baseline arsitektur Accepted |
+| CHANGELOG.md | **4.1.0** (mulai SAM 5.x) |
+| Misi selesai | MISSION-4.1 s/d 4.6 COMPLETE & ARCHITECTURE ACCEPTED (baseline 4.0) · **MISSION-5.1 s/d 5.6 IMPLEMENTATION COMPLETE (6/6)** (menunggu Architecture Review) |
+| Status saat ini | **SAM 4.0 = ARCHITECTURE ACCEPTED** (baseline resmi) · **SAM 5.x Universal Governance Platform = implementation selesai** (6 BC citizen: universal_ai/tool/agent/workflow, enterprise_governance, adaptive_governance; 158 test; authority tetap di manusia) · menunggu Architecture Review (EO-SAM5-001, review satu kali di akhir) sebelum close mission formal |
+| Branch / HEAD | `main` / `b469446` (feat 5.x: Universal Governance Platform) |
+| Verifikasi independen | **SAM 5.x: 158 test baru (6 BC) · full regression 4817 passed, 1 skipped, 2 xfailed · ruff bersih semua BC baru** · baseline 4.0 tetap Architecture Accepted tanpa regresi |
+| Tanggal update | 2026-08-10 (04:42 WITA) |
 | Berat repo | 3985 file · 765 commit · 1 author (VanM-Hub) |
-| History note | 2026-08-10: **rilis v4.0.0** (SAM 4.0 Federated Governance Platform, Architecture Accepted) - release notes + manifest + version-history + tag; **verdict Chief Architect** ditambahkan di `docs/decisions/`; web UI live server (presentation layer) ditambahkan di `src/sam/operational_workspace/`. 2026-08-09: ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo; backup di `D:\Project AI\_backup_SAM_prerw`); **rilis v3.6.0** (release notes + manifest + version-history + tag) **dan Close Order AO-2.0-001/AO-3.0-001** ditambahkan di `docs/decisions` |
+| History note | 2026-08-10: **SAM 5.x Universal Governance Platform - MISSION-5.1 s/d 5.6 IMPLEMENTATION COMPLETE** (feat 5.x, commit `b469446`; 6 BC citizen, 158 test, regression 4817 green, version 4.1.0) - implementation code+test selesai, menunggu Architecture Review sebelum close mission formal. Sebelumnya (rilis SAM 4.0): **v4.0.0** (Architecture Accepted) - release notes + manifest + version-history + tag; **verdict** di `docs/decisions/`; web UI live server (presentation layer) di `src/sam/operational_workspace/`. 2026-08-09: **rilis v3.6.0** + tag + release notes + manifest + version-history; **Close Order AO-2.0-001/AO-3.0-001** di `docs/decisions`; ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo) |
 
 ---
 
