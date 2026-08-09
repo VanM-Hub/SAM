@@ -12,15 +12,15 @@
 |---|---|
 | Versi (pyproject.toml) | **3.6.0** |
 | Versi (sam.__version__) | **3.6.0** |
-| Identitas rilis | **Baseline Release 3.6.0** (SAM 3.x COMPLETE 6/6, 100% roadmap) |
+| Identitas rilis | **Baseline Release 3.6.0** (SAM 3.x COMPLETE 6/6, 100% roadmap) · git tag `v3.6.0` |
 | CHANGELOG.md | **3.6.0** (baseline release) |
 | Misi selesai | MISSION-3.1 s/d 3.6 SEMUA COMPLETE & Architecture Accepted · baseline CI resmi (tests/platform/ 141 test) |
-| Status saat ini | **SAM 3.x COMPLETE** — baseline release 3.6.0; menunggu Architecture Order SAM 4.x Federation Operations |
-| Branch / HEAD | `main` / `9eb57bd` (baseline 3.6.0 + label ADR-008) |
+| Status saat ini | **SAM 3.x COMPLETE** — baseline release 3.6.0 + git tag `v3.6.0` (2026-08-09); AO-2.0-001 (SAM 2.x CLOSED) & AO-3.0-001 (SAM 3.0 CLOSED) memberikan kewenangan perbaikan SAM 2/3 tanpa mengubah Foundation; menunggu Architecture Order SAM 4.x Federation Operations |
+| Branch / HEAD | `main` / `0b4e45b` (rilis v3.6.0) |
 | Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) |
-| Tanggal update | 2026-08-09 (15:25 WITA) |
+| Tanggal update | 2026-08-09 (15:54 WITA) |
 | Berat repo | 3985 file · 765 commit · 1 author (VanM-Hub) |
-| History note | 2026-08-09: ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo); backup di `D:\Project AI\_backup_SAM_prerw` |
+| History note | 2026-08-09: ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo; backup di `D:\Project AI\_backup_SAM_prerw`); **rilis v3.6.0** (release notes + manifest + version-history + tag) **dan Close Order AO-2.0-001/AO-3.0-001** ditambahkan di `docs/decisions` |
 
 ---
 
