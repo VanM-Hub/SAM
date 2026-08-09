@@ -100,6 +100,28 @@ from sam.platform.collaboration_workspace import (
 from sam.platform.citizen_api import CitizenSnapshot, CitizenExperienceAPI
 from sam.platform.compliance import citizen_compliance_check
 
+# IP-3.5-004 - Explainability Experience (WP-24..28)
+from sam.platform.evidence_graph import (
+    EvidenceAggregate,
+    EvidenceGraph,
+    EvidenceInput,
+    EvidenceLink,
+    EvidenceNode,
+    aggregate_evidence,
+    build_evidence_graph,
+)
+from sam.platform.explainability import (
+    DomainPairCoverage,
+    ExplainabilitySummary,
+    explain_graph,
+)
+from sam.platform.evidence_chain import EvidenceChain, build_chain, orphaned_evidence
+from sam.platform.explain_api import (
+    ExplainabilityAPI,
+    ExplainabilitySnapshot,
+)
+from sam.platform.compliance import explainability_compliance_check
+
 __version__ = "3.5.0"
 
 __all__ = [
@@ -176,4 +198,25 @@ __all__ = [
     "CitizenExperienceAPI",
     # WP-23 citizen compliance
     "citizen_compliance_check",
+    # WP-24/25 evidence graph & aggregation
+    "EvidenceAggregate",
+    "EvidenceGraph",
+    "EvidenceInput",
+    "EvidenceLink",
+    "EvidenceNode",
+    "aggregate_evidence",
+    "build_evidence_graph",
+    # WP-26 cross-domain explainability
+    "DomainPairCoverage",
+    "ExplainabilitySummary",
+    "explain_graph",
+    # WP-27 evidence chain viewer
+    "EvidenceChain",
+    "build_chain",
+    "orphaned_evidence",
+    # WP-28 explainability api
+    "ExplainabilityAPI",
+    "ExplainabilitySnapshot",
+    # WP-28 compliance
+    "explainability_compliance_check",
 ]

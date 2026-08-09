@@ -390,3 +390,108 @@ def citizen_compliance_check(
         messages=tuple(messages),
         forbidden_found=tuple(sorted(set(forbidden_all))),
     )
+
+
+# --- Explainability Experience Compliance (IP-3.5-004, group EX) ------------
+
+# Token yang TIDAK BOLEH hadir dalam source Explainability Experience.
+# Kehadirannya menandakan drift ke verifikasi/judgment evidence atau
+# pengambilan keputusan (melanggar batas presentation-passive evidence).
+_EXPLAIN_FORBIDDEN = (
+    "verify_evidence", "reject_evidence", "accept_evidence",
+    "expire_evidence", "mark_evidence", "decide", "judge",
+    "infer_authority", "grant_authority", "approve_evidence",
+    "invalidate_evidence", "publish_decision",
+)
+
+# Marker positif: kosa kata penyajian evidence yang DIOLEHKAN.
+_EXPLAIN_ALLOWED = (
+    "graph", "aggregate", "summary", "chain", "snapshot", "present",
+    "read", "trace", "view", "coverage", "explain",
+)
+
+_EXPLAIN_MODULES = (
+    "evidence_graph.py",
+    "explainability.py",
+    "evidence_chain.py",
+    "explain_api.py",
+)
+
+
+def _scan_explain_file(path: str):
+    """Scan satu file explain: (clean, forbidden_hits, markers)."""
+    import ast as _ast
+    with open(path, "r", encoding="utf-8") as f:
+        try:
+            tree = _ast.parse(f.read(), filename=path)
+        except SyntaxError:
+            return True, ["<syntax-error>"], []
+    forbidden = []
+    markers = []
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Import):
+            for a in node.names:
+                if a.asname in _EXPLAIN_FORBIDDEN:
+                    forbidden.append(a.asname)
+        if isinstance(node, _ast.ImportFrom):
+            for a in node.names:
+                if a.name in _EXPLAIN_FORBIDDEN:
+                    forbidden.append(a.name)
+        if isinstance(node, _ast.Name):
+            if node.id in _EXPLAIN_FORBIDDEN:
+                forbidden.append(node.id)
+            elif node.id in _EXPLAIN_ALLOWED:
+                markers.append(node.id)
+        if isinstance(node, _ast.Attribute):
+            if node.attr in _EXPLAIN_FORBIDDEN:
+                forbidden.append(node.attr)
+        if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Name):
+            if node.func.id in _EXPLAIN_FORBIDDEN:
+                forbidden.append(node.func.id)
+    return (not forbidden, sorted(set(forbidden)), sorted(set(markers)))
+
+
+def explainability_compliance_check(
+    module_root: Optional[str] = None,
+) -> ComplianceResult:
+    """Verifikasi kepatuhan Explainability Experience (group EX).
+
+    Memindai modul explainability untuk forbidden judgment/verification
+    tokens dan memastikan ada marker presentasi (graph/aggregate/summary).
+    """
+    base = module_root or os.path.dirname(os.path.abspath(__file__))
+    files = [os.path.join(base, m) for m in _EXPLAIN_MODULES
+             if os.path.exists(os.path.join(base, m))]
+    if not files:
+        return ComplianceResult(
+            group="EX", total_checks=1, passed=0, failed=1,
+            messages=("tidak ada modul explainability experience",),
+        )
+    forbidden_all = []
+    markers = False
+    checked = 0
+    failed = 0
+    messages = []
+    for path in files:
+        clean, forb, marks = _scan_explain_file(path)
+        checked += 1
+        forbidden_all.extend(forb)
+        if marks:
+            markers = True
+        if not clean:
+            failed += 1
+            messages.append("forbidden explain token di %s: %s" % (
+                os.path.basename(path), ",".join(forb)))
+        else:
+            messages.append("OK %s" % os.path.basename(path))
+    if not markers:
+        failed += 1
+        messages.append("tidak ada marker presentation explain")
+    return ComplianceResult(
+        group="EX",
+        total_checks=checked + 1,
+        passed=checked + 1 - failed,
+        failed=failed,
+        messages=tuple(messages),
+        forbidden_found=tuple(sorted(set(forbidden_all))),
+    )
