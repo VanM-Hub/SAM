@@ -31,11 +31,22 @@ Karakteristik kunci:
 
 ## Status Saat Ini
 
-> ✅ **SAM 1.0 (versi teknis 1.0.0, 2026-08-07) — RILIS PUBLIK PERTAMA.**
+> ✅ **SAM 3.x Complete (versi teknis 3.6.0, 2026-08-09) — BASELINE RELEASE TERBARU.**
+> Roadmap SAM 3.x (MISSION-3.1 .. MISSION-3.6) **COMPLETE 6/6** dengan Production Readiness CERTIFIED
+> dan Federation Readiness CERTIFIED. Foundation tetap IMMUTABLE (tanpa perubahan identitas sejak SAM 1.x).
 
-Seluruh perjalanan pengembangan (Foundation 0.01 → 0.30, 279 sprint + Program A–K) telah
-mencapai titik rilis stabil: **SAM 1.0 Foundation**. 
----
+Seluruh perjalanan pengembangan (Foundation 0.01 → 0.30, 279 sprint + Program A–K + SAM 1.0/2.0 + SAM 3.x)
+menghasilkan platform **Deterministic Operational Intelligence** yang:
+
+- **SAM 1.0** — membangun identitas "Apa itu SAM?"
+- **SAM 2.0** — membangun platform operasional "Apakah SAM dapat digunakan?"
+- **SAM 3.x** — membangun ekosistem "Bagaimana banyak capability bekerja sebagai satu ekosistem?"
+  (Governance Intelligence, Autonomous Runtime, Citizen Ecosystem, Federation, Platform Experience,
+  Production Governance) — tanpa mengubah Foundation.
+
+Lalu ditutup dengan MISSION-3.6 (Production Governance, 2026-08-09) yang memastikan seluruh capability
+SAM 3.x dapat dioperasikan, diverifikasi, diaudit, diukur, dipelihara, dan disertifikasi. Platform siap
+memasuki **SAM 4.x — Federation Operations** sesuai Roadmap.
 
 
 ### Ringkasan Fase I–XXIII (0.01 → 0.23)
@@ -210,3 +221,26 @@ merujuk ke ROADMAP induk. Dokumen lain cukup memperbarui versi aktif & status.
 - Runtime Operational dalam baseline: Knowledge · Memory · Policy · Workflow · Artifact · Audit · Mission.
 - Execution Runtime: 209/211 passed (2 pre-existing), menunggu perbaikan sebelum masuk baseline.
 - Lihat `CHANGELOG.md` untuk detail per Sprint/Program.
+
+SAM 1.x
+Foundation
+
+        ↓
+
+SAM 2.x
+Governance Platform
+
+        ↓
+
+SAM 3.x
+Developer Ecosystem
+
+        ↓
+
+SAM 4.x
+Federated Governance Network
+
+        ↓
+
+SAM 5.x
+Universal Governance Layer

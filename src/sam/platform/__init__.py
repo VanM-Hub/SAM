@@ -236,7 +236,7 @@ from sam.platform.platform_check import (
     regression_gate,
 )
 
-__version__ = "3.5.0"
+__version__ = "3.6.0"
 
 __all__ = [
     # WP-01 model

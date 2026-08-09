@@ -2,7 +2,7 @@
 
 The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
-**Versi:** SAM 2.0 Operational Governance Platform (2.0.0) 
+**Versi:** SAM 3.x Complete - Production Governance Platform (3.6.0) 
 
 ---
 

@@ -1,8 +1,24 @@
 ﻿# Changelog
 
-> Riwayat perubahan rilis SAM. **SAM 2.0 (2.0.0, 2026-08-08) adalah rilis terbaru** - Operational Governance Platform yang menyelesaikan Program A-F.
-> **SAM 1.0 (1.0.0, 2026-08-07)** adalah rilis fondasi pertama. Tidak ada rilis sebelum itu - seluruh versi internal lama
-> (0.01-0.30) hanyalah tahap pengembangan fondasi (pre-1.0), bukan rilis publik.
+> Riwayat perubahan rilis SAM. **SAM 3.x (3.6.0, 2026-08-09) adalah rilis terbaru** - Production Governance Platform
+> yang menuntup seluruh Roadmap SAM 3.x. **SAM 2.0 (2.0.0, 2026-08-08)** adalah rilis Operational Governance
+> Platform (Program A-F).
+
+## 3.6.0 (2026-08-09) - SAM 3.x Complete - Production Governance Platform
+
+### MISSION-3.6 - Production Governance COMPLETE (Architecture Accepted)
+- **MISSION-3.6 closes Roadmap SAM 3.x secara penuh (6/6 mission, 100% roadmap).**
+- **Track A Operational Governance:** production governance profile, policy validation, readiness, compliance, baseline verification.
+- **Track B Platform Operations:** deployment/environment/configuration/startup/shutdown validation.
+- **Track C Operational Evidence:** audit evidence, metrics, runtime consolidation, health, governance aggregation.
+- **Track D Production Reliability:** reliability, recoverability, stability, diagnostics, long-running.
+- **Track E Mission Certification:** E2E production certification, readiness, operational & compliance regression, engineering report.
+- **Bounded context** src/sam/platform/ (keperpanjangan MISSION-3.5) - 5 modul verifikasi operasional read-only.
+- **Compliance:** 9 group presentation-passive PASS; forbidden execution/authority tokens NONE.
+- **Test:** platform 141 (9 suite); total regresi 511 hijau; ASCII & py38 clean.
+- **Baseline CI:** tests/platform/ resmi masuk regression suite permanen (SAM 3.x Final Baseline).
+- **Architecture:** SAM 3.x COMPLETE, Production Readiness CERTIFIED, Federation Readiness CERTIFIED, baseline release.
+- **Version bump:** 2.0.0 -> 3.6.0 (sejajar baseline SAM 3.x).
 
 ## SAM 2.0.0 (2026-08-08) - SAM 2.0 Operational Governance Platform
 
