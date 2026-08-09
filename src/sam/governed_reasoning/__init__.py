@@ -97,6 +97,20 @@ from .reasoning_compliance import (
     ReasoningComplianceChecker,
     ReasoningComplianceResult,
 )
+from .operational_ai import (
+    ConversationReasoning,
+    DiagnosisReasoning,
+    DomainReasoning,
+    InvestigationReasoning,
+    LearningAssistedReasoning,
+    OperationalExplainability,
+    RecommendationReasoning,
+)
+from .governed_ai_api import GovernedAIAPI, GovernedAIResponse
+from .operational_ai_compliance import (
+    OperationalAIComplianceChecker,
+    OperationalAIComplianceResult,
+)
 
 __all__ = [
     "LLMProviderAdapter",
@@ -162,4 +176,15 @@ __all__ = [
     "ReasoningResult",
     "ReasoningComplianceChecker",
     "ReasoningComplianceResult",
+    "ConversationReasoning",
+    "DiagnosisReasoning",
+    "DomainReasoning",
+    "InvestigationReasoning",
+    "LearningAssistedReasoning",
+    "OperationalExplainability",
+    "RecommendationReasoning",
+    "GovernedAIAPI",
+    "GovernedAIResponse",
+    "OperationalAIComplianceChecker",
+    "OperationalAIComplianceResult",
 ]
