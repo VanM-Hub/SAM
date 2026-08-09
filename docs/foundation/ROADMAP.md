@@ -233,7 +233,7 @@ Governance Platform
         ↓
 
 SAM 3.x
-Developer Ecosystem
+Production Governance Platform
 
         ↓
 
