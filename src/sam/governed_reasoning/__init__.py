@@ -71,6 +71,32 @@ from .llm_compliance import (
     LLMComplianceResult,
     ProviderSpecificVerification,
 )
+from .structured_reasoning import (
+    ContextResolver,
+    EvidenceRef,
+    ReasoningContext,
+    ReasoningStep,
+    StructuredReasoning,
+    StructuredReasoningEngine,
+)
+from .confidence_assessment import (
+    ConfidenceAssessment,
+    ConfidenceAssessor,
+)
+from .reasoning_verification import (
+    ReasoningVerification,
+    ReasoningVerifier,
+)
+from .reasoning_explainability import (
+    ReasoningExplainabilityAPI,
+    ReasoningExplainer,
+    ReasoningTrace,
+)
+from .reasoning_api import ReasoningAPI, ReasoningResult
+from .reasoning_compliance import (
+    ReasoningComplianceChecker,
+    ReasoningComplianceResult,
+)
 
 __all__ = [
     "LLMProviderAdapter",
@@ -119,4 +145,21 @@ __all__ = [
     "LLMComplianceChecker",
     "LLMComplianceResult",
     "ProviderSpecificVerification",
+    "ContextResolver",
+    "EvidenceRef",
+    "ReasoningContext",
+    "ReasoningStep",
+    "StructuredReasoning",
+    "StructuredReasoningEngine",
+    "ConfidenceAssessment",
+    "ConfidenceAssessor",
+    "ReasoningVerification",
+    "ReasoningVerifier",
+    "ReasoningExplainabilityAPI",
+    "ReasoningExplainer",
+    "ReasoningTrace",
+    "ReasoningAPI",
+    "ReasoningResult",
+    "ReasoningComplianceChecker",
+    "ReasoningComplianceResult",
 ]
