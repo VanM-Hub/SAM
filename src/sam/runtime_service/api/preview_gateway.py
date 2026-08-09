@@ -11,7 +11,7 @@ producer preview pertama, TANPA menjadikan RuntimeService executor:
   (dependency injection) — sehingga RuntimeService tetap gateway.
 - Hanya mode="preview": tidak network, tidak execute, approval pre-aware.
   Provider tidak pernah dieksekusi (mode preview bukan execute).
-- Konsisten ADR-024 (preview-only) & D0-001 (RuntimeService = gateway).
+- Konsisten ADR-008 sec 12 (preview-only) & D0-001 (RuntimeService = gateway).
 """
 from __future__ import annotations
 from dataclasses import dataclass

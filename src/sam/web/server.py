@@ -116,7 +116,7 @@ openclaw_health = OpenClawHealthCollector()
 # Routing/composition dilakukan di entry (web), bukan di dalam RuntimeService,
 # agar RuntimeService tetap gateway (tidak mengetahui provider/execution).
 # Producer menghasilkan ExecutionRequest(mode="preview") dan memanggil
-# ExecutionEngine.execute(). Provider TIDAK dieksekusi (preview, ADR-024).
+# ExecutionEngine.execute(). Provider TIDAK dieksekusi (preview, ADR-008 sec 12).
 runtime_api = RuntimeAPI()
 # --- Session 03: Provider Resolution (AD-S03-001) ---
 # Hubungkan jalur resmi preview ke provider layer VIA mekanisme resmi
@@ -137,7 +137,7 @@ def _build_preview_request(view: PreviewRequestView):
         execution_id=view.execution_id,
         provider_id=view.provider_id,
         operation=view.operation,
-        mode="preview",  # preview-only (ADR-024); bukan execute
+        mode="preview",  # preview-only (ADR-008 sec 12); bukan execute
     )
 
 
@@ -187,7 +187,7 @@ preview_gateway = wire_execution_preview(
 # ConversationPreviewGateway memakai RuntimeAPI(execution.preview) yang sama
 # (reuse Session 01). Builder ConversationExecutionContext -> ExecutionRequest
 # mode=preview; payload HANYA namespace 'conversation' (AD-S02-001).
-# Provider TIDAK dieksekusi (ADR-024 preview-only).
+# Provider TIDAK dieksekusi (ADR-008 sec 12 preview-only).
 conversation_preview_gateway = ConversationPreviewGateway(runtime_api)
 conversation_preview_gateway.configure(provider_id="filesystem")
 

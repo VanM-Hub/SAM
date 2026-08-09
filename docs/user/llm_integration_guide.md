@@ -80,7 +80,7 @@ dan detail per provider (adapter ada/tidak, status, available).
 ## Keamanan & Batasan
 
 - **TIDAK ada eksekusi eksternal** pada jalur preview: `ProviderActivationExecutor`
-  mode preview (ADR-024) - external_calls=0.
+  mode preview (ADR-008 sec 12) - external_calls=0.
 - Provider nyata dieksekusi hanya saat `ProviderExecutor.execute(...)` dipanggil
   dengan env kredensial lengkap.
 - Semua host & handler wajib lewat `runtime_service.api`; compliance memastikan

@@ -9,7 +9,7 @@ PENTING (batas Session 01):
   RuntimeService tetap gateway; ia tidak mengetahui provider/execution.
 - Producer menghasilkan ExecutionRequest(mode="preview") dan memanggil
   engine.execute(). Provider TIDAK dieksekusi (mode preview bukan execute),
-  no network, approval pre-aware. Konsisten ADR-024.
+  no network, approval pre-aware. Konsisten ADR-008 sec 12.
 - Alur: RuntimeAPI(action="execution.preview")
          -> PreviewGateway -> producer (dari wiring)
          -> ExecutionRequest(mode="preview")

@@ -53,6 +53,6 @@ class ConversationExecutionRequestBuilder:
             execution_id=execution_id,
             provider_id=provider_id,
             operation=operation,
-            mode="preview",  # ADR-024 preview-only; bukan execute
+            mode="preview",  # ADR-008 sec 12 preview-only; bukan execute
             payload=payload,
         )

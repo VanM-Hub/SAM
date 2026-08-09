@@ -53,7 +53,7 @@ Setelah berjalan, dokumentasi interaktif (Swagger) tersedia di:
 > Endpoint capability (`/workflow`, `/policy`, `/knowledge`, dst.) hanya
 > membaca (READ-ONLY, preview). Endpoint `/preview` dan `/approval` memakai
 > `ConversationPreviewGateway` dan TIDAK mengeksekusi provider sungguhan
-> (ADR-024).
+> (ADR-008 sec 12).
 
 ## Contoh Penggunaan
 

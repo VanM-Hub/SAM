@@ -58,7 +58,7 @@ from .presentation_rest import (
 
 # --------------------------------------------------------------------------- #
 # Runtime API + ExecutionRuntime (preview producer) - composition root.
-# Provider TIDAK dieksekusi (mode preview, ADR-024): external_calls=0.
+# Provider TIDAK dieksekusi (mode preview, ADR-008 sec 12): external_calls=0.
 # --------------------------------------------------------------------------- #
 def _build_preview_request(view: PreviewRequestView):
     """Bangun ExecutionRequest(mode='preview'). Provider tidak dieksekusi."""
@@ -66,7 +66,7 @@ def _build_preview_request(view: PreviewRequestView):
         execution_id=view.execution_id,
         provider_id=view.provider_id,
         operation=view.operation,
-        mode="preview",  # preview-only (ADR-024); bukan execute
+        mode="preview",  # preview-only (ADR-008 sec 12); bukan execute
     )
 
 
