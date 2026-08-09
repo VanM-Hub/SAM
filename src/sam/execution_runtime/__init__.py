@@ -84,6 +84,27 @@ from .execution_compliance import (
     ExecutionComplianceChecker,
 )
 
+# IP-4.1-002 - Governed Execution (WP-11..17)
+from .execution_explainer import (
+    RationaleStep,
+    ExecutionExplanation,
+    ExecutionExplainer,
+)
+from .execution_verification import (
+    VerificationCriterion,
+    ExecutionVerification,
+    ExecutionVerifier,
+)
+from .governed_execution import (
+    ExecutionEvidence,
+    GovernedExecutionResult,
+    GovernedExecution,
+)
+from .execution_api import (
+    ExecutionAPIStatus,
+    ExecutionAPI,
+)
+
 __all__ = [
     # Program C + G (existing)
     "SimulationEvidence",
@@ -146,4 +167,16 @@ __all__ = [
     "ExecutionCompliance",
     "GovernedExecutionInvariant",
     "ExecutionComplianceChecker",
+    # IP-4.1-002 - Governed Execution (WP-11..17)
+    "RationaleStep",
+    "ExecutionExplanation",
+    "ExecutionExplainer",
+    "VerificationCriterion",
+    "ExecutionVerification",
+    "ExecutionVerifier",
+    "ExecutionEvidence",
+    "GovernedExecutionResult",
+    "GovernedExecution",
+    "ExecutionAPIStatus",
+    "ExecutionAPI",
 ]
