@@ -495,3 +495,545 @@ def explainability_compliance_check(
         messages=tuple(messages),
         forbidden_found=tuple(sorted(set(forbidden_all))),
     )
+
+
+# --- Production Governance Compliance (IP-3.6-A, group PG) ------------------
+
+# Token yang TIDAK BOLEH hadir dalam source Production Governance. Kehadirannya
+# menandakan drift ke eksekusi/penerapan governance atau otorisasi operasional
+# (melanggar guardrail MISSION-3.6: measure & report readiness, never enforce).
+_PG_FORBIDDEN = (
+    "enforce_policy", "apply_policy", "grant_access", "revoke_access",
+    "spawn_workflow", "kill_workflow", "scale_up", "scale_down",
+    "pause_service", "resume_service", "deploy", "rollback",
+    "approve_production", "reject_production", "promote_to_prod",
+    "issue_credential", "rotate_secret", "failover_now",
+    "execute_governance", "perform_governance", "authorize_action",
+)
+
+# Marker positif: kosa kata pengukuran/pelaporan kesiapan yang DIOLEHKAN.
+_PG_ALLOWED = (
+    "profile", "readiness", "compliance", "baseline", "assess",
+    "validate", "verify", "measure", "status", "report", "check",
+    "score", "evidence", "snapshot", "present", "read", "aggregate",
+)
+
+# Modul Production Governance (Track A MISSION-3.6).
+_PG_MODULES = (
+    "production_governance.py",
+)
+
+
+def _scan_pg_file(path: str):
+    """Scan satu file production governance: (clean, forbidden_hits, markers)."""
+    import ast as _ast
+    with open(path, "r", encoding="utf-8") as f:
+        try:
+            tree = _ast.parse(f.read(), filename=path)
+        except SyntaxError:
+            return True, ["<syntax-error>"], []
+    forbidden = []
+    markers = []
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Import):
+            for a in node.names:
+                if a.asname in _PG_FORBIDDEN:
+                    forbidden.append(a.asname)
+        if isinstance(node, _ast.ImportFrom):
+            for a in node.names:
+                if a.name in _PG_FORBIDDEN:
+                    forbidden.append(a.name)
+        if isinstance(node, _ast.Name):
+            if node.id in _PG_FORBIDDEN:
+                forbidden.append(node.id)
+            elif node.id in _PG_ALLOWED:
+                markers.append(node.id)
+        if isinstance(node, _ast.Attribute):
+            if node.attr in _PG_FORBIDDEN:
+                forbidden.append(node.attr)
+        if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Name):
+            if node.func.id in _PG_FORBIDDEN:
+                forbidden.append(node.func.id)
+    return (not forbidden, sorted(set(forbidden)), sorted(set(markers)))
+
+
+def production_governance_compliance_check(
+    module_root: Optional[str] = None,
+) -> ComplianceResult:
+    """Verifikasi kepatuhan Production Governance (group PG).
+
+    Memindai modul production governance untuk forbidden enforcement/ops
+    tokens dan memastikan ada marker pengukuran (profile/readiness/compliance/.
+    baseline/assess). Menjaga boundary: measure & report, never enforce.
+    """
+    base = module_root or os.path.dirname(os.path.abspath(__file__))
+    files = [os.path.join(base, m) for m in _PG_MODULES
+             if os.path.exists(os.path.join(base, m))]
+    if not files:
+        return ComplianceResult(
+            group="PG", total_checks=1, passed=0, failed=1,
+            messages=("tidak ada modul production governance",),
+        )
+    forbidden_all = []
+    markers = False
+    checked = 0
+    failed = 0
+    messages = []
+    for path in files:
+        clean, forb, marks = _scan_pg_file(path)
+        checked += 1
+        forbidden_all.extend(forb)
+        if marks:
+            markers = True
+        if not clean:
+            failed += 1
+            messages.append("forbidden PG token di %s: %s" % (
+                os.path.basename(path), ",".join(forb)))
+        else:
+            messages.append("OK %s" % os.path.basename(path))
+    if not markers:
+        failed += 1
+        messages.append("tidak ada marker pengukuran production governance")
+    return ComplianceResult(
+        group="PG",
+        total_checks=checked + 1,
+        passed=checked + 1 - failed,
+        failed=failed,
+        messages=tuple(messages),
+        forbidden_found=tuple(sorted(set(forbidden_all))),
+    )
+
+
+# --- Platform Operations Compliance (IP-3.6-B, group PO) --------------------
+
+# Token yang TIDAK BOLEH hadir dalam source Platform Operations. Kehadirannya
+# menandakan drift ke eksekusi nyata deployment/start/stop (melanggar
+# guardrail MISSION-3.6: verify & report ops readiness, never execute ops).
+_PO_FORBIDDEN = (
+    "do_deploy", "actually_deploy", "perform_deploy", "start_service",
+    "stop_service", "restart_service", "kill_process", "spawn_process",
+    "write_config", "overwrite_config", "set_environment",
+    "export_deployment", "run_init", "execute_boot",
+)
+
+# Marker positif: kosa kata verifikasi/inspeksi operasional yang DIOLEHKAN.
+_PO_ALLOWED = (
+    "validate", "verify", "inspeksi", "check", "deployment",
+    "environment", "configuration", "startup", "shutdown",
+    "present", "read", "status", "report", "artifact", "factor",
+)
+
+# Modul Platform Operations (Track B MISSION-3.6).
+_PO_MODULES = (
+    "platform_operations.py",
+)
+
+
+def _scan_po_file(path: str):
+    """Scan satu file platform operations: (clean, forbidden_hits, markers)."""
+    import ast as _ast
+    with open(path, "r", encoding="utf-8") as f:
+        try:
+            tree = _ast.parse(f.read(), filename=path)
+        except SyntaxError:
+            return True, ["<syntax-error>"], []
+    forbidden = []
+    markers = []
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Import):
+            for a in node.names:
+                if a.asname in _PO_FORBIDDEN:
+                    forbidden.append(a.asname)
+        if isinstance(node, _ast.ImportFrom):
+            for a in node.names:
+                if a.name in _PO_FORBIDDEN:
+                    forbidden.append(a.name)
+        if isinstance(node, _ast.Name):
+            if node.id in _PO_FORBIDDEN:
+                forbidden.append(node.id)
+            elif node.id in _PO_ALLOWED:
+                markers.append(node.id)
+        if isinstance(node, _ast.Attribute):
+            if node.attr in _PO_FORBIDDEN:
+                forbidden.append(node.attr)
+        if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Name):
+            if node.func.id in _PO_FORBIDDEN:
+                forbidden.append(node.func.id)
+    return (not forbidden, sorted(set(forbidden)), sorted(set(markers)))
+
+
+def platform_operations_compliance_check(
+    module_root: Optional[str] = None,
+) -> ComplianceResult:
+    """Verifikasi kepatuhan Platform Operations (group PO).
+
+    Memindai modul platform operations untuk forbidden execution-ops tokens
+    dan memastikan ada marker verifikasi (
+    validate/verify/check/deployment). Menjaga boundary: verify, never
+    execute deploy/start/stop.
+    """
+    base = module_root or os.path.dirname(os.path.abspath(__file__))
+    files = [os.path.join(base, m) for m in _PO_MODULES
+             if os.path.exists(os.path.join(base, m))]
+    if not files:
+        return ComplianceResult(
+            group="PO", total_checks=1, passed=0, failed=1,
+            messages=("tidak ada modul platform operations",),
+        )
+    forbidden_all = []
+    markers = False
+    checked = 0
+    failed = 0
+    messages = []
+    for path in files:
+        clean, forb, marks = _scan_po_file(path)
+        checked += 1
+        forbidden_all.extend(forb)
+        if marks:
+            markers = True
+        if not clean:
+            failed += 1
+            messages.append("forbidden PO token di %s: %s" % (
+                os.path.basename(path), ",".join(forb)))
+        else:
+            messages.append("OK %s" % os.path.basename(path))
+    if not markers:
+        failed += 1
+        messages.append("tidak ada marker verifikasi platform operations")
+    return ComplianceResult(
+        group="PO",
+        total_checks=checked + 1,
+        passed=checked + 1 - failed,
+        failed=failed,
+        messages=tuple(messages),
+        forbidden_found=tuple(sorted(set(forbidden_all))),
+    )
+
+
+# --- Operational Evidence Compliance (IP-3.6-C, group OE) -------------------
+
+# Token yang TIDAK BOLEH hadir dalam source Operational Evidence. Kehadirannya
+# menandakan drift ke pengumpulan sensor/agent atau modifikasi evidence sumber
+# (melanggar guardrail MISSION-3.6: consolidate & aggregate, never collect/modify).
+_OE_FORBIDDEN = (
+    "collect_metric", "probe_runtime", "spawn_sensor", "inject_probe",
+    "modify_evidence", "delete_evidence", "overwrite_evidence",
+    "write_audit_log", "correlate_live", "attach_agent", "run_collector",
+    "emit_metric", "publish_metric",
+)
+
+# Marker positif: kosa kata konsolidasi/agregasi evidence yang DIOLEHKAN.
+_OE_ALLOWED = (
+    "summarize", "aggregate", "consolidate", "summary", "evidence",
+    "metrics", "audit", "health", "present", "read", "status",
+    "distribution", "average", "report",
+)
+
+# Modul Operational Evidence (Track C MISSION-3.6).
+_OE_MODULES = (
+    "operational_evidence.py",
+)
+
+
+def _scan_oe_file(path: str):
+    """Scan satu file operational evidence: (clean, forbidden_hits, markers)."""
+    import ast as _ast
+    with open(path, "r", encoding="utf-8") as f:
+        try:
+            tree = _ast.parse(f.read(), filename=path)
+        except SyntaxError:
+            return True, ["<syntax-error>"], []
+    forbidden = []
+    markers = []
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Import):
+            for a in node.names:
+                if a.asname in _OE_FORBIDDEN:
+                    forbidden.append(a.asname)
+        if isinstance(node, _ast.ImportFrom):
+            for a in node.names:
+                if a.name in _OE_FORBIDDEN:
+                    forbidden.append(a.name)
+        if isinstance(node, _ast.Name):
+            if node.id in _OE_FORBIDDEN:
+                forbidden.append(node.id)
+            elif node.id in _OE_ALLOWED:
+                markers.append(node.id)
+        if isinstance(node, _ast.Attribute):
+            if node.attr in _OE_FORBIDDEN:
+                forbidden.append(node.attr)
+        if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Name):
+            if node.func.id in _OE_FORBIDDEN:
+                forbidden.append(node.func.id)
+    return (not forbidden, sorted(set(forbidden)), sorted(set(markers)))
+
+
+def operational_evidence_compliance_check(
+    module_root: Optional[str] = None,
+) -> ComplianceResult:
+    """Verifikasi kepatuhan Operational Evidence (group OE).
+
+    Memindai modul operational evidence untuk forbidden collection/modify
+    tokens dan memastikan ada marker konsolidasi (
+    summarize/aggregate/consolidate). Menjaga boundary: consolidate, never
+    collect/modify evidence sumber.
+    """
+    base = module_root or os.path.dirname(os.path.abspath(__file__))
+    files = [os.path.join(base, m) for m in _OE_MODULES
+             if os.path.exists(os.path.join(base, m))]
+    if not files:
+        return ComplianceResult(
+            group="OE", total_checks=1, passed=0, failed=1,
+            messages=("tidak ada modul operational evidence",),
+        )
+    forbidden_all = []
+    markers = False
+    checked = 0
+    failed = 0
+    messages = []
+    for path in files:
+        clean, forb, marks = _scan_oe_file(path)
+        checked += 1
+        forbidden_all.extend(forb)
+        if marks:
+            markers = True
+        if not clean:
+            failed += 1
+            messages.append("forbidden OE token di %s: %s" % (
+                os.path.basename(path), ",".join(forb)))
+        else:
+            messages.append("OK %s" % os.path.basename(path))
+    if not markers:
+        failed += 1
+        messages.append("tidak ada marker konsolidasi operational evidence")
+    return ComplianceResult(
+        group="OE",
+        total_checks=checked + 1,
+        passed=checked + 1 - failed,
+        failed=failed,
+        messages=tuple(messages),
+        forbidden_found=tuple(sorted(set(forbidden_all))),
+    )
+
+
+# --- Production Reliability Compliance (IP-3.6-D, group PR) -----------------
+
+# Token yang TIDAK BOLEH hadir dalam source Production Reliability.
+# Kehadirannya menandakan drift ke intervensi nyata (recovery/failover/
+# self-heal) yang melanggar guardrail MISSION-3.6 (verify & diagnose, never fix).
+_PR_FORBIDDEN = (
+    "run_recovery", "execute_rollback", "trigger_failover", "self_heal",
+    "restart_component", "scale_up", "patch_runtime", "apply_mitigation",
+    "recover_now", "restore_snapshot", "kill_task", "reroute",
+)
+
+# Marker positif: kosa kata verifikasi/diagnosis keandalan yang DIOLEHKAN.
+_PR_ALLOWED = (
+    "verify", "validate", "assess", "summarize", "diagnose",
+    "reliability", "recoverability", "stability", "diagnostics",
+    "present", "read", "report", "check", "status", "observation",
+)
+
+# Modul Production Reliability (Track D MISSION-3.6).
+_PR_MODULES = (
+    "production_reliability.py",
+)
+
+
+def _scan_pr_file(path: str):
+    """Scan satu file production reliability: (clean, forbidden_hits, markers)."""
+    import ast as _ast
+    with open(path, "r", encoding="utf-8") as f:
+        try:
+            tree = _ast.parse(f.read(), filename=path)
+        except SyntaxError:
+            return True, ["<syntax-error>"], []
+    forbidden = []
+    markers = []
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Import):
+            for a in node.names:
+                if a.asname in _PR_FORBIDDEN:
+                    forbidden.append(a.asname)
+        if isinstance(node, _ast.ImportFrom):
+            for a in node.names:
+                if a.name in _PR_FORBIDDEN:
+                    forbidden.append(a.name)
+        if isinstance(node, (_ast.FunctionDef, _ast.ClassDef)):
+            if node.name in _PR_FORBIDDEN:
+                forbidden.append(node.name)
+            for m in _PR_ALLOWED:
+                if node.name == m or node.name.startswith(m + "_"):
+                    markers.append(node.name)
+                    break
+        if isinstance(node, _ast.Name):
+            if node.id in _PR_FORBIDDEN:
+                forbidden.append(node.id)
+            elif node.id in _PR_ALLOWED:
+                markers.append(node.id)
+        if isinstance(node, _ast.Attribute):
+            if node.attr in _PR_FORBIDDEN:
+                forbidden.append(node.attr)
+        if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Name):
+            if node.func.id in _PR_FORBIDDEN:
+                forbidden.append(node.func.id)
+    return (not forbidden, sorted(set(forbidden)), sorted(set(markers)))
+
+
+def production_reliability_compliance_check(
+    module_root: Optional[str] = None,
+) -> ComplianceResult:
+    """Verifikasi kepatuhan Production Reliability (group PR).
+
+    Memindai modul production reliability untuk forbidden intervention tokens
+    dan memastikan ada marker verifikasi/diagnosis.
+    Menjaga boundary: verify & diagnose, never fix.
+    """
+    base = module_root or os.path.dirname(os.path.abspath(__file__))
+    files = [os.path.join(base, m) for m in _PR_MODULES
+             if os.path.exists(os.path.join(base, m))]
+    if not files:
+        return ComplianceResult(
+            group="PR", total_checks=1, passed=0, failed=1,
+            messages=("tidak ada modul production reliability",),
+        )
+    forbidden_all = []
+    markers = False
+    checked = 0
+    failed = 0
+    messages = []
+    for path in files:
+        clean, forb, marks = _scan_pr_file(path)
+        checked += 1
+        forbidden_all.extend(forb)
+        if marks:
+            markers = True
+        if not clean:
+            failed += 1
+            messages.append("forbidden PR token di %s: %s" % (
+                os.path.basename(path), ",".join(forb)))
+        else:
+            messages.append("OK %s" % os.path.basename(path))
+    if not markers:
+        failed += 1
+        messages.append("tidak ada marker verifikasi production reliability")
+    return ComplianceResult(
+        group="PR",
+        total_checks=checked + 1,
+        passed=checked + 1 - failed,
+        failed=failed,
+        messages=tuple(messages),
+        forbidden_found=tuple(sorted(set(forbidden_all))),
+    )
+
+
+# --- Mission Certification Compliance (IP-3.6-E, group MC) ------------------
+
+# Token yang TIDAK BOLEH hadir dalam source Mission Certification.
+# Kehadirannya menandakan drift ke pengambilan keputusan architecture/
+# pemberian status Operational (melanggar guardrail: assessment, not authority).
+_MC_FORBIDDEN = (
+    "declare_operational", "grant_operational", "authorize_mission",
+    "approve_mission", "decide_architecture", "enforce_certification",
+    "border_override", "override_guardrail", "issue_authority",
+    "grant_authority", "adjudicate", "command_deploy",
+)
+
+# Marker positif: kosa kata penilaian/verifikasi misi yang DIOLEHKAN.
+_MC_ALLOWED = (
+    "certify", "certification", "assessment", "readiness", "regression",
+    "report", "recommendation", "verify", "measure", "present", "read",
+    "aggregate", "evidence",
+)
+
+# Modul Mission Certification (Track E MISSION-3.6).
+_MC_MODULES = (
+    "mission_certification.py",
+)
+
+
+def _scan_mc_file(path: str):
+    """Scan satu file mission certification: (clean, forbidden_hits, markers)."""
+    import ast as _ast
+    with open(path, "r", encoding="utf-8") as f:
+        try:
+            tree = _ast.parse(f.read(), filename=path)
+        except SyntaxError:
+            return True, ["<syntax-error>"], []
+    forbidden = []
+    markers = []
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Import):
+            for a in node.names:
+                if a.asname in _MC_FORBIDDEN:
+                    forbidden.append(a.asname)
+        if isinstance(node, _ast.ImportFrom):
+            for a in node.names:
+                if a.name in _MC_FORBIDDEN:
+                    forbidden.append(a.name)
+        if isinstance(node, (_ast.FunctionDef, _ast.ClassDef)):
+            if node.name in _MC_FORBIDDEN:
+                forbidden.append(node.name)
+            for m in _MC_ALLOWED:
+                if node.name == m or node.name.startswith(m + "_"):
+                    markers.append(node.name)
+                    break
+        if isinstance(node, _ast.Name):
+            if node.id in _MC_FORBIDDEN:
+                forbidden.append(node.id)
+            elif node.id in _MC_ALLOWED:
+                markers.append(node.id)
+        if isinstance(node, _ast.Attribute):
+            if node.attr in _MC_FORBIDDEN:
+                forbidden.append(node.attr)
+        if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Name):
+            if node.func.id in _MC_FORBIDDEN:
+                forbidden.append(node.func.id)
+    return (not forbidden, sorted(set(forbidden)), sorted(set(markers)))
+
+
+def mission_certification_compliance_check(
+    module_root: Optional[str] = None,
+) -> ComplianceResult:
+    """Verifikasi kepatuhan Mission Certification (group MC).
+
+    Memindai modul mission certification untuk forbidden authority tokens
+    dan memastikan ada marker penilaian (certify/assessment/readiness).
+    Menjaga boundary: assessment & report, never grant authority.
+    """
+    base = module_root or os.path.dirname(os.path.abspath(__file__))
+    files = [os.path.join(base, m) for m in _MC_MODULES
+             if os.path.exists(os.path.join(base, m))]
+    if not files:
+        return ComplianceResult(
+            group="MC", total_checks=1, passed=0, failed=1,
+            messages=("tidak ada modul mission certification",),
+        )
+    forbidden_all = []
+    markers = False
+    checked = 0
+    failed = 0
+    messages = []
+    for path in files:
+        clean, forb, marks = _scan_mc_file(path)
+        checked += 1
+        forbidden_all.extend(forb)
+        if marks:
+            markers = True
+        if not clean:
+            failed += 1
+            messages.append("forbidden MC token di %s: %s" % (
+                os.path.basename(path), ",".join(forb)))
+        else:
+            messages.append("OK %s" % os.path.basename(path))
+    if not markers:
+        failed += 1
+        messages.append("tidak ada marker penilaian mission certification")
+    return ComplianceResult(
+        group="MC",
+        total_checks=checked + 1,
+        passed=checked + 1 - failed,
+        failed=failed,
+        messages=tuple(messages),
+        forbidden_found=tuple(sorted(set(forbidden_all))),
+    )

@@ -122,6 +122,105 @@ from sam.platform.explain_api import (
 )
 from sam.platform.compliance import explainability_compliance_check
 
+# IP-3.6-A - Production Governance (Track A, WP-A1..A5)
+from sam.platform.production_governance import (
+    BaselineEntry,
+    BaselineVerification,
+    ComplianceCheckItem,
+    GovernanceProfile,
+    GovernanceProfileStatus,
+    GovernanceReadiness,
+    PolicyEntry,
+    PolicyValidationResult,
+    ReadinessInput,
+    assess_governance_profile,
+    assess_readiness,
+    operational_compliance_score,
+    validate_operational_policies,
+    verify_governance_baseline,
+)
+from sam.platform.compliance import production_governance_compliance_check
+
+# IP-3.6-B - Platform Operations (Track B, WP-B1..B5)
+from sam.platform.platform_operations import (
+    ConfigSetting,
+    ConfigVerification,
+    DeploymentArtifact,
+    DeploymentValidation,
+    EnvironmentFactor,
+    EnvironmentValidation,
+    ShutdownCheck,
+    ShutdownVerification,
+    StartupCheck,
+    StartupVerification,
+    validate_deployment,
+    validate_environment,
+    verify_configuration,
+    verify_shutdown,
+    verify_startup,
+)
+from sam.platform.compliance import platform_operations_compliance_check
+
+# IP-3.6-C - Operational Evidence (Track C, WP-C1..C5)
+from sam.platform.operational_evidence import (
+    AuditEvent,
+    AuditEvidenceSummary,
+    GovernanceEvidenceAggregate,
+    GovernanceEvidencePoint,
+    HealthEvidenceSummary,
+    HealthSignal,
+    MetricPoint,
+    MetricsSummary,
+    RuntimeConsolidation,
+    RuntimeEvidencePiece,
+    aggregate_governance_evidence,
+    consolidate_runtime_evidence,
+    summarize_audit_evidence,
+    summarize_health_evidence,
+    summarize_metrics,
+)
+from sam.platform.compliance import operational_evidence_compliance_check
+
+# IP-3.6-D - Production Reliability (Track D, WP-D1..D5)
+from sam.platform.production_reliability import (
+    DiagnosticFinding,
+    DiagnosticsSummary,
+    LongRunningObservation,
+    LongRunningVerification,
+    RecoveryPlanPiece,
+    RecoverabilityValidation,
+    ReliabilityObservation,
+    ReliabilityVerification,
+    StabilityAssessment,
+    StabilitySample,
+    assess_stability,
+    summarize_diagnostics,
+    validate_recoverability,
+    verify_long_running,
+    verify_reliability,
+)
+from sam.platform.compliance import production_reliability_compliance_check
+
+# IP-3.6-E - Mission Certification (Track E, WP-E1..E5)
+from sam.platform.mission_certification import (
+    ComplianceGroup,
+    ComplianceRegression,
+    MissionEngineeringReport,
+    MissionReadiness,
+    OperationalRegression,
+    ProductionCertification,
+    ReadinessGate,
+    RegressionSuite,
+    ReportSection,
+    TrackResult,
+    assess_mission_readiness,
+    build_engineering_report,
+    certify_end_to_end,
+    run_compliance_regression,
+    run_operational_regression,
+)
+from sam.platform.compliance import mission_certification_compliance_check
+
 # IP-3.5-005 - Platform Integration (WP-29..33)
 from sam.platform.integration import (
     PlatformEngine,
@@ -234,6 +333,90 @@ __all__ = [
     "ExplainabilitySnapshot",
     # WP-28 compliance
     "explainability_compliance_check",
+    # IP-3.6-A Production Governance
+    "BaselineEntry",
+    "BaselineVerification",
+    "ComplianceCheckItem",
+    "GovernanceProfile",
+    "GovernanceProfileStatus",
+    "GovernanceReadiness",
+    "PolicyEntry",
+    "PolicyValidationResult",
+    "ReadinessInput",
+    "assess_governance_profile",
+    "assess_readiness",
+    "operational_compliance_score",
+    "validate_operational_policies",
+    "verify_governance_baseline",
+    "production_governance_compliance_check",
+    # IP-3.6-B Platform Operations
+    "ConfigSetting",
+    "ConfigVerification",
+    "DeploymentArtifact",
+    "DeploymentValidation",
+    "EnvironmentFactor",
+    "EnvironmentValidation",
+    "ShutdownCheck",
+    "ShutdownVerification",
+    "StartupCheck",
+    "StartupVerification",
+    "validate_deployment",
+    "validate_environment",
+    "verify_configuration",
+    "verify_shutdown",
+    "verify_startup",
+    "platform_operations_compliance_check",
+    # IP-3.6-C Operational Evidence
+    "AuditEvent",
+    "AuditEvidenceSummary",
+    "GovernanceEvidenceAggregate",
+    "GovernanceEvidencePoint",
+    "HealthEvidenceSummary",
+    "HealthSignal",
+    "MetricPoint",
+    "MetricsSummary",
+    "RuntimeConsolidation",
+    "RuntimeEvidencePiece",
+    "aggregate_governance_evidence",
+    "consolidate_runtime_evidence",
+    "summarize_audit_evidence",
+    "summarize_health_evidence",
+    "summarize_metrics",
+    "operational_evidence_compliance_check",
+    # IP-3.6-D Production Reliability
+    "DiagnosticFinding",
+    "DiagnosticsSummary",
+    "LongRunningObservation",
+    "LongRunningVerification",
+    "RecoveryPlanPiece",
+    "RecoverabilityValidation",
+    "ReliabilityObservation",
+    "ReliabilityVerification",
+    "StabilityAssessment",
+    "StabilitySample",
+    "assess_stability",
+    "summarize_diagnostics",
+    "validate_recoverability",
+    "verify_long_running",
+    "verify_reliability",
+    "production_reliability_compliance_check",
+    # IP-3.6-E Mission Certification
+    "ComplianceGroup",
+    "ComplianceRegression",
+    "MissionEngineeringReport",
+    "MissionReadiness",
+    "OperationalRegression",
+    "ProductionCertification",
+    "ReadinessGate",
+    "RegressionSuite",
+    "ReportSection",
+    "TrackResult",
+    "assess_mission_readiness",
+    "build_engineering_report",
+    "certify_end_to_end",
+    "run_compliance_regression",
+    "run_operational_regression",
+    "mission_certification_compliance_check",
     # WP-29 integration
     "PlatformEngine",
     "PlatformPresentation",
