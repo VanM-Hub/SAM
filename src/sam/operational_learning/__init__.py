@@ -75,6 +75,33 @@ from .knowledge_compliance import (
     KnowledgeComplianceChecker,
     KnowledgeComplianceResult,
 )
+from .recommendation_feedback import (
+    RecommendationFeedback,
+    RecommendationFeedbackStore,
+)
+from .recommendation_improvement import (
+    RecommendationAdjustment,
+    RecommendationImprover,
+)
+from .learning_evaluation import (
+    LearningEvaluation,
+    LearningEvaluator,
+    VerificationOutcome,
+    ExperienceVerifier,
+)
+from .knowledge_validation import (
+    KnowledgeValidator,
+    ValidationResult,
+)
+from .operational_metrics import (
+    LearningMetrics,
+    LearningMetricsCalculator,
+)
+from .learning_api import LearningAPI, LearningSummary
+from .learning_compliance import (
+    LearningComplianceChecker,
+    LearningComplianceResult,
+)
 
 __all__ = [
     "Experience",
@@ -127,4 +154,20 @@ __all__ = [
     "KnowledgeTrace",
     "KnowledgeComplianceChecker",
     "KnowledgeComplianceResult",
+    "RecommendationFeedback",
+    "RecommendationFeedbackStore",
+    "RecommendationAdjustment",
+    "RecommendationImprover",
+    "LearningEvaluation",
+    "LearningEvaluator",
+    "VerificationOutcome",
+    "ExperienceVerifier",
+    "KnowledgeValidator",
+    "ValidationResult",
+    "LearningMetrics",
+    "LearningMetricsCalculator",
+    "LearningAPI",
+    "LearningSummary",
+    "LearningComplianceChecker",
+    "LearningComplianceResult",
 ]
