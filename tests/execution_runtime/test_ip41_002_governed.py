@@ -173,7 +173,7 @@ def test_provider_executor_source_compliance():
     checker = ExecutionComplianceChecker()
     checks = list(checker.scan_source(inspect.getsource(pe))) + \
         list(checker.scan_source(inspect.getsource(rpa)))
-    # Tidak boleh ada forbidden authority pattern（grant/bypass/execute-without-approval）
+    # Tidak boleh ada forbidden authority pattern (grant/bypass/execute-without-approval)
     failed = [c for c in checks if not c.passed]
     assert failed == [], "provider source melanggar compliance: {}".format(
         [f.detail for f in failed])

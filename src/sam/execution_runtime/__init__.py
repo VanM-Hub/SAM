@@ -105,6 +105,18 @@ from .execution_api import (
     ExecutionAPI,
 )
 
+# IP-4.1-003 - Production Execution (WP-21..28)
+from .production_execution import (
+    RetryOutcome,
+    RollbackOutcome,
+    ProductionExecutionResult,
+    ProductionExecution,
+)
+from .production_compliance import (
+    ProductionCompliance,
+    ProductionComplianceChecker,
+)
+
 __all__ = [
     # Program C + G (existing)
     "SimulationEvidence",
@@ -179,4 +191,11 @@ __all__ = [
     "GovernedExecution",
     "ExecutionAPIStatus",
     "ExecutionAPI",
+    # IP-4.1-003 - Production Execution (WP-21..28)
+    "RetryOutcome",
+    "RollbackOutcome",
+    "ProductionExecutionResult",
+    "ProductionExecution",
+    "ProductionCompliance",
+    "ProductionComplianceChecker",
 ]

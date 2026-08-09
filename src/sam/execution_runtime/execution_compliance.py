@@ -20,7 +20,7 @@ from typing import List, Optional, Tuple
 
 
 # Pola yang DILARANG di lapisan execution (jika muncul sebagai eksekusi,
-# bukan sebagai definisi/penjelasan) — authority leakage / bypass.
+# bukan sebagai definisi/penjelasan) - authority leakage / bypass.
 _FORBIDDEN_AUTHORITY_PATTERNS = (
     "grant_privilege",
     "approve_without_gate",
