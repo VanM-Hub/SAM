@@ -78,6 +78,28 @@ from sam.platform.mission_context import (
 from sam.platform.mission_api import MissionAPI, MissionSnapshot
 from sam.platform.compliance import mission_compliance_check
 
+# IP-3.5-003 - Citizen Experience (WP-17..23)
+from sam.platform.citizen_workspace import (
+    CitizenInput,
+    FederationInput,
+    FederationMemberInput,
+    CitizenWorkspaceView,
+    FederationWorkspaceView,
+    build_citizen_view,
+    build_federation_view,
+)
+from sam.platform.collaboration_workspace import (
+    CollaborationInput,
+    CollaborationWorkspaceView,
+    CompatibilityAssessment,
+    CertificationStatus,
+    CertificationWorkspaceView,
+    assess_compatibility,
+    build_certification_view,
+)
+from sam.platform.citizen_api import CitizenSnapshot, CitizenExperienceAPI
+from sam.platform.compliance import citizen_compliance_check
+
 __version__ = "3.5.0"
 
 __all__ = [
@@ -133,4 +155,25 @@ __all__ = [
     "MissionSnapshot",
     # WP-16 mission compliance
     "mission_compliance_check",
+    # WP-17 citizen workspace
+    "CitizenInput",
+    "FederationInput",
+    "FederationMemberInput",
+    "CitizenWorkspaceView",
+    "FederationWorkspaceView",
+    "build_citizen_view",
+    "build_federation_view",
+    # WP-19/20/21 collaboration, compatibility, certification
+    "CollaborationInput",
+    "CollaborationWorkspaceView",
+    "CompatibilityAssessment",
+    "CertificationStatus",
+    "CertificationWorkspaceView",
+    "assess_compatibility",
+    "build_certification_view",
+    # WP-22 citizen api
+    "CitizenSnapshot",
+    "CitizenExperienceAPI",
+    # WP-23 citizen compliance
+    "citizen_compliance_check",
 ]
