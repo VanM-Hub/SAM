@@ -10,22 +10,17 @@
 
 | Item | Nilai |
 |---|---|
-| Versi (pyproject.toml) | **1.0.0** |
-| Versi (sam.__version__) | **1.0.0** |
-| Identitas rilis | **SAM 1.0 Foundation** + **SAM 1.0.1** (baseline expansion) + **SAM 1.0.2** (execution baseline) |
-| CHANGELOG.md | **SAM 1.0.0** (2026-08-07) + **SAM 1.0.1** (2026-08-08) + **SAM 1.0.2** (2026-08-08) |
-| Program terakhir (pra-1.0) | Program G–K (capability presentation) + R-001 Product Release |
-| Program aktif (post-1.0) | **Program C (MISSION-2C) — CLOSED (Verdict EA-C06) · M3 Achieved** → **Program D (MISSION-2D) — EA-002 CLOSED (M4 ACHIEVED), Program E EA-002 ACTIVE (WP-E2.2 done)** |
-| Status saat ini | Program C CLOSED (M1/M2/M3 ✅) · **Program D CLOSED (M4) - Program E EA-002 ACTIVE (WP-E2.2 CLI Onboarding DONE)** · **CI** |
-| Branch / HEAD | `main` / Program E EA-002 - WP-E2.2 CLI Onboarding DONE (sam/devx) |
-| Verifikasi independen | Program C **CLOSED (EA-C06)**; **Program D CLOSED (EA-002) - M4 ACHIEVED**; **Program E EA-002 WP-E2.2 done + 40 test evidence + CI SUCCESS** |
-| Tanggal update | 2026-08-08 (21:05 WITA) |
-| Total commit | ~700+ |
-| Baseline CI (lokal) | 4,216 passed (unit + 8 runtime suites + observation 206 tests) |
-| Observation Layer | 206 tests · 6 WP (C-Phase 1) + 6 Gap Resolution (C-Phase 2) + Recommendation Engine + **C1-C10 Intel Observers (C-Phase 3 & 4)** · Module: `src/sam/observation/` + endpoint + wiring |
-| Gap Resolution | 6 GAP resolved (GAP-001 s/d 006) · `gaps.py` + `resolve_all_gaps()` · commit 74f6a72 |
-| C-Phase 3 | **Recommendation Engine** (43382b5) + **C1 Mission, C2 Workflow, C3 Approval, C4 Execution, C5 Audit Observers** (81211f6) |
-| C-Phase 4 | **C6 Capability** (eb14e35) · **C7 Provider** (288a74d) · **C8 Runtime** (f888f73) · **C9 Platform Health** (25ceae5) · **C10 Operational Learning** (77039a6) |
+| Versi (pyproject.toml) | **3.6.0** |
+| Versi (sam.__version__) | **3.6.0** |
+| Identitas rilis | **Baseline Release 3.6.0** (SAM 3.x COMPLETE 6/6, 100% roadmap) |
+| CHANGELOG.md | **3.6.0** (baseline release) |
+| Misi selesai | MISSION-3.1 s/d 3.6 SEMUA COMPLETE & Architecture Accepted · baseline CI resmi (tests/platform/ 141 test) |
+| Status saat ini | **SAM 3.x COMPLETE** — baseline release 3.6.0; menunggu Architecture Order SAM 4.x Federation Operations |
+| Branch / HEAD | `main` / `9eb57bd` (baseline 3.6.0 + label ADR-008) |
+| Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) |
+| Tanggal update | 2026-08-09 (15:25 WITA) |
+| Berat repo | 3985 file · 765 commit · 1 author (VanM-Hub) |
+| History note | 2026-08-09: ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo); backup di `D:\Project AI\_backup_SAM_prerw` |
 
 ---
 
