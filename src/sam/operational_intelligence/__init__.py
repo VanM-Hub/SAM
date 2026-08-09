@@ -60,6 +60,43 @@ from .investigation_compliance import (
     ComplianceFinding,
     InvestigationComplianceChecker,
 )
+from .root_cause_analysis import (
+    RootCauseAnalyzer,
+    RootCauseFinding,
+    RootCauseResult,
+)
+from .failure_correlation import (
+    CorrelatedFailure,
+    FailureCorrelationResult,
+    FailureCorrelator,
+)
+from .dependency_analysis import (
+    DependencyAnalysisResult,
+    DependencyAnalyzer,
+    DependencyEdge,
+    DependencyNode,
+)
+from .impact_assessment import (
+    ImpactAssessmentResult,
+    ImpactAssessor,
+    ImpactedComponent,
+)
+from .operational_diagnosis import (
+    DiagnosisConfidence,
+    DiagnosisConfidenceCalculator,
+    OperationalDiagnosis,
+    OperationalDiagnosisEngine,
+)
+from .diagnosis_api import (
+    DiagnosisAPI,
+    DiagnosisExplanation,
+    DiagnosisExplainabilityEngine,
+    DiagnosisNotFoundError,
+)
+from .diagnosis_compliance import (
+    DiagnosisComplianceChecker,
+    DiagnosisComplianceResult,
+)
 
 __all__ = [
     "Investigation",
@@ -100,4 +137,27 @@ __all__ = [
     "ComplianceCheckResult",
     "ComplianceFinding",
     "InvestigationComplianceChecker",
+    "RootCauseAnalyzer",
+    "RootCauseFinding",
+    "RootCauseResult",
+    "CorrelatedFailure",
+    "FailureCorrelationResult",
+    "FailureCorrelator",
+    "DependencyAnalysisResult",
+    "DependencyAnalyzer",
+    "DependencyEdge",
+    "DependencyNode",
+    "ImpactAssessmentResult",
+    "ImpactAssessor",
+    "ImpactedComponent",
+    "DiagnosisConfidence",
+    "DiagnosisConfidenceCalculator",
+    "OperationalDiagnosis",
+    "OperationalDiagnosisEngine",
+    "DiagnosisAPI",
+    "DiagnosisExplanation",
+    "DiagnosisExplainabilityEngine",
+    "DiagnosisNotFoundError",
+    "DiagnosisComplianceChecker",
+    "DiagnosisComplianceResult",
 ]
