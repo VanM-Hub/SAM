@@ -1,8 +1,29 @@
 ﻿# Changelog
 
-> Riwayat perubahan rilis SAM. **SAM 4.0.0 (2026-08-10) adalah rilis terbaru** - Federated Governance Platform
-> (MISSION-4.1..4.6 COMPLETE, Architecture Accepted). **SAM 3.6.0 (2026-08-09)** adalah rilis Production Governance
-> Platform yang menuntup Roadmap SAM 3.x.
+> Riwayat perubahan rilis SAM. **SAM 4.1.0 (2026-08-10)** memulai Universal Governance (SAM 5.x).
+> **SAM 4.0.0 (2026-08-10) adalah rilis Federated Governance Platform terakhir yang Architecture Accepted**
+> (MISSION-4.1..4.6 COMPLETE).
+
+## 4.1.0 (2026-08-10) - SAM 5.x Implementation Start - Universal Governance Platform
+
+### MISSION-5.x (Universal Governance) - Implementation bertahap (Work In Progress)
+- **SAM 5 PRINCIPLE:** perluasan di atas Foundation SAM 1-4 (Foundation immutable). Build by Integration, Extend by Capability, Govern by Contract, Certify by Evidence, Explain Every Decision, Human Owns Authority, Foundation Never Changes.
+- **Bounded context baru (Citizen governance):** `universal_ai` (5.1), `universal_tool` (5.2), `universal_agent` (5.3), `universal_workflow` (5.4), `enterprise_governance` (5.5), `adaptive_governance` (5.6).
+- **MISSION-5.1 Universal AI Integration:** fondasi provider multi-platform (identity/registry/descriptor/capability/discovery), adapter framework (OpenAI/Anthropic/Google/Local), konversasi, reasoning & konteks, certification.
+- **MISSION-5.2 Universal Tool Integration:** tool identity/registry/contract, connector + capability binding, governed execution (approval gate), tool workspace, certification.
+- **MISSION-5.3 Universal Agent Integration:** agent identity/registry/descriptor, contract framework, governed collaboration antar-agent, operational workspace, certification.
+- **MISSION-5.4 Universal Workflow:** definisi deklaratif workflow, komposisi & dependency, governed execution, state/recovery/learning, certification.
+- **MISSION-5.5 Enterprise Governance:** struktur organisasi/tenant (boundary tambahan), multi-tenant isolation, policy & delegation, audit & governance intelligence, workspace, certification.
+- **MISSION-5.6 Adaptive Governance:** learning, effectiveness, simulation, impact assessment, recommendation (authority tetap di manusia), evolution workspace, certification.
+
+### Engineering
+- **82 test baru** di 6 BC (25 file test).
+- **Full regression green: 4817 passed, 1 skipped, 2 xfailed.**
+- **Ruff bersih** di seluruh bounded context baru.
+
+### Konvensi & Kontrak
+- Citizen concept: AI, Tool, Agent, Workflow di-govern via Contract seragam; Provider tidak tersedia memakai adapter contract + test fixture.
+- EO-SAM5-001: eksekusi berurutan 5.1 -> 5.6; Mission Execution Rule; tidak ada laporan interim.
 
 ## 4.0.0 (2026-08-10) - SAM 4.0 Complete - Federated Governance Platform
 

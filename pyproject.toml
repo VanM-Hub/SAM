@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sam-ops"
-version = "4.0.0"
+version = "4.1.0"
 description = "SAM - The Autonomous Guardian Operating System for AI"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -118,7 +118,7 @@ max-complexity = 15
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
-testpaths = ["tests/unit", "tests/knowledge_runtime", "tests/memory_runtime", "tests/policy_runtime", "tests/workflow_runtime", "tests/artifact_runtime", "tests/audit_runtime", "tests/mission_runtime", "tests/execution_runtime", "tests/observation", "tests/operational_intelligence", "tests/operational_learning", "tests/governed_reasoning", "tests/autonomous_operations", "tests/operational_workspace"]
+testpaths = ["tests/unit", "tests/knowledge_runtime", "tests/memory_runtime", "tests/policy_runtime", "tests/workflow_runtime", "tests/artifact_runtime", "tests/audit_runtime", "tests/mission_runtime", "tests/execution_runtime", "tests/observation", "tests/operational_intelligence", "tests/operational_learning", "tests/governed_reasoning", "tests/autonomous_operations", "tests/operational_workspace", "tests/universal_ai", "tests/universal_tool", "tests/universal_agent", "tests/universal_workflow", "tests/enterprise_governance", "tests/adaptive_governance"]
 addopts = "--tb=short"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"

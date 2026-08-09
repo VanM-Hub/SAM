@@ -101,6 +101,14 @@
    │       └── web_ui_server.py     ← Presentation layer FastAPI (UI produksi, Article XVI)
    │       └── web_ui/              ← Host web UI (index.html)
    │
+   ├── 5.x (SAM 5.x - Universal Governance Platform, citizen governance)
+   │     universal_ai             ← Multi-provider AI platform (5.1)
+   │     universal_tool           ← Tool citizen + governed execution (5.2)
+   │     universal_agent          ← Agent citizen + governed collaboration (5.3)
+   │     universal_workflow       ← Workflow citizen + governed execution (5.4)
+   │     enterprise_governance    ← Org/tenant/policy/audit boundary (5.5)
+   │     adaptive_governance      ← Learning/simulation/impact/recommendation (5.6, authority di manusia)
+   │
    ├── legacy (HISTORIS — jangan tambah dependency baru)
    │     operations / execution / runtime / reasoning
    │
