@@ -10,17 +10,17 @@
 
 | Item | Nilai |
 |---|---|
-| Versi (pyproject.toml) | **3.6.0** |
-| Versi (sam.__version__) | **3.6.0** |
-| Identitas rilis | **Baseline Release 3.6.0** (SAM 3.x COMPLETE 6/6, 100% roadmap) · git tag `v3.6.0` |
-| CHANGELOG.md | **3.6.0** (baseline release) |
-| Misi selesai | MISSION-3.1 s/d 3.6 SEMUA COMPLETE & Architecture Accepted · baseline CI resmi (tests/platform/ 141 test) |
+| Versi (pyproject.toml) | **4.0.0** |
+| Versi (sam.__version__) | **4.0.0** |
+| Identitas rilis | **Baseline Release 4.0.0** (SAM 4.0 - Federated Governance Platform, Architecture Accepted) · git tag `v4.0.0` |
+| CHANGELOG.md | **4.0.0** (baseline release) |
+| Misi selesai | MISSION-4.1 s/d 4.6 SEMUA COMPLETE & ARCHITECTURE ACCEPTED · baseline resmi arsitektur SAM 4.0 |
 | Status saat ini | **SAM 4.0 — Federated Governance Platform = ARCHITECTURE ACCEPTED** (verdict resmi Chief Architect di `docs/decisions` · MISSION-4.1 CLOSED · MISSION-4.2..4.6 ACCEPTED) · seluruh capability 4.0 (Real Execution, Operational Intelligence, Operational Learning, Governed AI Reasoning, Autonomous Operations, Human Operational Experience) = **baseline resmi arsitektur SAM** · roadmap lanjut ke SAM 5 — Universal Governance Platform |
-| Branch / HEAD | `main` / `0b4e45b` (rilis v3.6.0) |
+| Branch / HEAD | `main` / `8e64b57` (rilis v4.0.0) |
 | Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) · **SAM 4.0: 3543 passed (unit+5 BC 4.x+observation) + 559 compliance, lint & ASCII bersih** · Architecture Review: NONE (drift/impact/conflict/leakage) |
 | Tanggal update | 2026-08-10 (00:16 WITA) |
 | Berat repo | 3985 file · 765 commit · 1 author (VanM-Hub) |
-| History note | 2026-08-09: ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo; backup di `D:\Project AI\_backup_SAM_prerw`); **rilis v3.6.0** (release notes + manifest + version-history + tag) **dan Close Order AO-2.0-001/AO-3.0-001** ditambahkan di `docs/decisions` |
+| History note | 2026-08-10: **rilis v4.0.0** (SAM 4.0 Federated Governance Platform, Architecture Accepted) - release notes + manifest + version-history + tag; **verdict Chief Architect** ditambahkan di `docs/decisions/`; web UI live server (presentation layer) ditambahkan di `src/sam/operational_workspace/`. 2026-08-09: ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo; backup di `D:\Project AI\_backup_SAM_prerw`); **rilis v3.6.0** (release notes + manifest + version-history + tag) **dan Close Order AO-2.0-001/AO-3.0-001** ditambahkan di `docs/decisions` |
 
 ---
 
@@ -85,6 +85,7 @@
 | Governed AI Reasoning | `src\sam\governed_reasoning\` | Aktif | **IP-4.4: Governed LLM Integration (provider-agnostic, credential-safe, approval-gated, validated prompt), Structured Reasoning (evidence-backed, confidence, verify, explain), Operational AI (investigation/diagnosis/recommendation/learning/conversation)** — AI assistance-only |
 | Autonomous Operations | `src\sam\autonomous_operations\` | Aktif | **IP-4.5: Autonomous Investigation (trigger/context/verify/plan), Autonomous Recovery (plan/validate/execute approval-gated/verify/self-debug/optimize), Continuous Autonomous Operations (verify/health/recommend/readiness/metrics)** — autonomous = rekomendasi, no authority |
 | Operational Workspace | `src\sam\operational_workspace\` | Aktif | **IP-4.6: Unified Operational Workspace (session/explorers/context/API), End-to-End Operations (ASK->INVESTIGATE->EXPLAIN->RECOMMEND->APPROVE->EXECUTE->VERIFY->LEARN), Production Platform (dashboard/trust/history/metrics/certification)** — presentation/integration only |
+| Web UI Live Server | `src\sam\operational_workspace\web_ui_server.py` | Aktif | Presentation layer FastAPI (Article XVI) - mengonsumsi capability 4.x nyata (EndToEndFlow, ProductionAPI) |
 | Runtime Service | `src\sam\runtime_service\` | Aktif | runtime services & deployment |
 | Intelligence Runtime | `src\sam\intelligence_runtime\` | Aktif | graph + context + certification (preview-only) |
 | Presentation Layer | `src\sam\presentation\` | Aktif | Program F/G/H/I + host REST |
