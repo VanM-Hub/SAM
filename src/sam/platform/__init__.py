@@ -122,6 +122,21 @@ from sam.platform.explain_api import (
 )
 from sam.platform.compliance import explainability_compliance_check
 
+# IP-3.5-005 - Platform Integration (WP-29..33)
+from sam.platform.integration import (
+    PlatformEngine,
+    PlatformPresentation,
+)
+from sam.platform.platform_check import (
+    GateResult,
+    IntegrationCertification,
+    ReadinessAttributes,
+    certification_gate,
+    compliance_gate,
+    production_readiness_check,
+    regression_gate,
+)
+
 __version__ = "3.5.0"
 
 __all__ = [
@@ -219,4 +234,15 @@ __all__ = [
     "ExplainabilitySnapshot",
     # WP-28 compliance
     "explainability_compliance_check",
+    # WP-29 integration
+    "PlatformEngine",
+    "PlatformPresentation",
+    # WP-30..33 platform check gates
+    "GateResult",
+    "IntegrationCertification",
+    "ReadinessAttributes",
+    "certification_gate",
+    "compliance_gate",
+    "production_readiness_check",
+    "regression_gate",
 ]
