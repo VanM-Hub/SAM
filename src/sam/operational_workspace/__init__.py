@@ -51,6 +51,19 @@ from .workspace_compliance import (
     WorkspaceComplianceChecker,
     WorkspaceComplianceResult,
 )
+from .end_to_end_flow import (
+    ApprovalContext,
+    AskSAMResult,
+    EndToEndFlow,
+    FlowEvidence,
+    FlowStage,
+    FlowStep,
+    OperationalFlow,
+)
+from .flow_compliance import (
+    FlowComplianceResult,
+    OperationalFlowCompliance,
+)
 
 __all__ = [
     "UnifiedWorkspace",
@@ -84,4 +97,13 @@ __all__ = [
     "WorkspaceComplianceCheck",
     "WorkspaceComplianceChecker",
     "WorkspaceComplianceResult",
+    "ApprovalContext",
+    "AskSAMResult",
+    "EndToEndFlow",
+    "FlowEvidence",
+    "FlowStage",
+    "FlowStep",
+    "OperationalFlow",
+    "FlowComplianceResult",
+    "OperationalFlowCompliance",
 ]
