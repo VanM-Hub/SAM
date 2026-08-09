@@ -15,7 +15,7 @@
 | Identitas rilis | **Baseline Release 3.6.0** (SAM 3.x COMPLETE 6/6, 100% roadmap) · git tag `v3.6.0` |
 | CHANGELOG.md | **3.6.0** (baseline release) |
 | Misi selesai | MISSION-3.1 s/d 3.6 SEMUA COMPLETE & Architecture Accepted · baseline CI resmi (tests/platform/ 141 test) |
-| Status saat ini | **SAM 4.x BERJALAN** — SAM 3.x COMPLETE (baseline 3.6.0); AO-4.0-001 aktif · MISSION-4.1 Real Execution CLOSED · MISSION-4.2 Operational Intelligence COMPLETE · MISSION-4.3 Operational Learning COMPLETE · MISSION-4.4 Governed AI Reasoning IMPLEMENTATION COMPLETE (IP-4.4-001/002/003, bounded context governed_reasoning) · menunggu Architecture Review Chief Architect |
+| Status saat ini | **SAM 4.x BERJALAN** — SAM 3.x COMPLETE (baseline 3.6.0); AO-4.0-001 aktif · MISSION-4.1 Real Execution CLOSED · MISSION-4.2 Operational Intelligence COMPLETE · MISSION-4.3 Operational Learning COMPLETE · MISSION-4.4 Governed AI Reasoning COMPLETE · MISSION-4.5 Autonomous Operations IMPLEMENTATION COMPLETE (IP-4.5-001/002/003, bounded context autonomous_operations) · menunggu Architecture Review Chief Architect |
 | Branch / HEAD | `main` / `0b4e45b` (rilis v3.6.0) |
 | Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) |
 | Tanggal update | 2026-08-09 (15:54 WITA) |
@@ -83,6 +83,7 @@
 | Operational Intelligence | `src\sam\operational_intelligence\` | Aktif | **IP-4.2: Investigation (model/session/evidence/observation/timeline/API), Diagnosis (RCA/correlation/dependency/impact/confidence/API), Prediction (consequence/simulation/recommendation/trust/risk/API)** — read-only, no execution/approval |
 | Operational Learning | `src\sam\operational_learning\` | Aktif | **IP-4.3: Persistent Experience Repository (storage persisten, investigation/execution/verification history), Operational Knowledge (case/similarity/lesson/knowledge index), Continuous Learning (feedback/improvement/validation/metrics)** — append-only immutable |
 | Governed AI Reasoning | `src\sam\governed_reasoning\` | Aktif | **IP-4.4: Governed LLM Integration (provider-agnostic, credential-safe, approval-gated, validated prompt), Structured Reasoning (evidence-backed, confidence, verify, explain), Operational AI (investigation/diagnosis/recommendation/learning/conversation)** — AI assistance-only |
+| Autonomous Operations | `src\sam\autonomous_operations\` | Aktif | **IP-4.5: Autonomous Investigation (trigger/context/verify/plan), Autonomous Recovery (plan/validate/execute approval-gated/verify/self-debug/optimize), Continuous Autonomous Operations (verify/health/recommend/readiness/metrics)** — autonomous = rekomendasi, no authority |
 | Runtime Service | `src\sam\runtime_service\` | Aktif | runtime services & deployment |
 | Intelligence Runtime | `src\sam\intelligence_runtime\` | Aktif | graph + context + certification (preview-only) |
 | Presentation Layer | `src\sam\presentation\` | Aktif | Program F/G/H/I + host REST |
