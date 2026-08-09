@@ -15,7 +15,7 @@
 | Identitas rilis | **Baseline Release 3.6.0** (SAM 3.x COMPLETE 6/6, 100% roadmap) · git tag `v3.6.0` |
 | CHANGELOG.md | **3.6.0** (baseline release) |
 | Misi selesai | MISSION-3.1 s/d 3.6 SEMUA COMPLETE & Architecture Accepted · baseline CI resmi (tests/platform/ 141 test) |
-| Status saat ini | **SAM 3.x COMPLETE** — baseline release 3.6.0 + git tag `v3.6.0` (2026-08-09); AO-2.0-001 (SAM 2.x CLOSED) & AO-3.0-001 (SAM 3.0 CLOSED) memberikan kewenangan perbaikan SAM 2/3 tanpa mengubah Foundation; menunggu Architecture Order SAM 4.x Federation Operations |
+| Status saat ini | **SAM 4.x BERJALAN** — SAM 3.x COMPLETE (baseline release 3.6.0); AO-4.0-001 (Mission-oriented Engineering) aktif · MISSION-4.1 Real Execution IMPLEMENTATION COMPLETE (IP-4.1-001/002/003) · menunggu Architecture Review Chief Architect |
 | Branch / HEAD | `main` / `0b4e45b` (rilis v3.6.0) |
 | Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) |
 | Tanggal update | 2026-08-09 (15:54 WITA) |
@@ -79,7 +79,7 @@
 | Connector Runtime | `src\sam\connectors\` | Aktif | preview-only |
 | Provider Runtime | `src\sam\providers\` | Aktif | framework + provider (preview-only) |
 | Model Runtime | `src\sam\model_runtime\` | Aktif | preview-only, no live call |
-| Execution Runtime | `src\sam\execution_runtime\` | Aktif | real execution via Approval Gate · + Simulation Capability |
+| Execution Runtime | `src\sam\execution_runtime\` | Aktif | real execution via Approval Gate · Simulation Capability · **+IP-4.1: Credential Mgmt, Session, Connection, Context, Audit, Compliance, Governed Execution, Production Execution, Execution API** |
 | Runtime Service | `src\sam\runtime_service\` | Aktif | runtime services & deployment |
 | Intelligence Runtime | `src\sam\intelligence_runtime\` | Aktif | graph + context + certification (preview-only) |
 | Presentation Layer | `src\sam\presentation\` | Aktif | Program F/G/H/I + host REST |
@@ -107,7 +107,7 @@
 | Status | Item | Keterangan |
 |---|---|---|
 | Arah arsitektur (resolved) | **ARC-001** — Simulation = Capability di Execution Runtime (bukan runtime terpisah) | DIIMPLEMENTASIKAN (Program G V1: simulation_evidence/engine/integration + 14 test) |
-| Arah arsitektur (terbuka) | **ARC-002** — Real Execution: gap = Approval buta; buka Simulation dulu, baru Real Execution | Simulation V1 SELESAI; Real Execution menunggu maturasi |
+| Arah arsitektur (resolved) | **ARC-002** — Real Execution: gap = Approval buta; buka Simulation dulu, baru Real Execution | Simulation V1 SELESAI; **Real Execution MISSION-4.1 SELESAI (IP-4.1-001/002/003)** — jalur execute nyata tersedia; verifikasi provider HTTP sungguhan jadi observasi transisi MISSION-4.2 |
 | [OPEN] | UI Operational Intelligence Console belum dibangun | — |
 | [OPEN] | `test_two_runs_same_structure` flaky (Test Stability, Low) | backlog engineering |
 | [OPEN] | `src/sam/runtime/discovery.py` import `sam.validation` (tidak ada di repo) = dead import (Low) | — |
