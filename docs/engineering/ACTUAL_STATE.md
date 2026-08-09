@@ -15,7 +15,7 @@
 | Identitas rilis | **Baseline Release 3.6.0** (SAM 3.x COMPLETE 6/6, 100% roadmap) · git tag `v3.6.0` |
 | CHANGELOG.md | **3.6.0** (baseline release) |
 | Misi selesai | MISSION-3.1 s/d 3.6 SEMUA COMPLETE & Architecture Accepted · baseline CI resmi (tests/platform/ 141 test) |
-| Status saat ini | **SAM 4.x BERJALAN** — SAM 3.x COMPLETE (baseline release 3.6.0); AO-4.0-001 (Mission-oriented Engineering) aktif · MISSION-4.1 Real Execution IMPLEMENTATION COMPLETE (IP-4.1-001/002/003) · menunggu Architecture Review Chief Architect |
+| Status saat ini | **SAM 4.x BERJALAN** — SAM 3.x COMPLETE (baseline 3.6.0); AO-4.0-001 aktif · MISSION-4.1 Real Execution CLOSED (jallan execute nyata tersedia) · MISSION-4.2 Operational Intelligence IMPLEMENTATION COMPLETE (IP-4.2-001/002/003, bounded context operational_intelligence) · menunggu Architecture Review Chief Architect |
 | Branch / HEAD | `main` / `0b4e45b` (rilis v3.6.0) |
 | Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) |
 | Tanggal update | 2026-08-09 (15:54 WITA) |
@@ -80,6 +80,7 @@
 | Provider Runtime | `src\sam\providers\` | Aktif | framework + provider (preview-only) |
 | Model Runtime | `src\sam\model_runtime\` | Aktif | preview-only, no live call |
 | Execution Runtime | `src\sam\execution_runtime\` | Aktif | real execution via Approval Gate · Simulation Capability · **+IP-4.1: Credential Mgmt, Session, Connection, Context, Audit, Compliance, Governed Execution, Production Execution, Execution API** |
+| Operational Intelligence | `src\sam\operational_intelligence\` | Aktif | **IP-4.2: Investigation (model/session/evidence/observation/timeline/API), Diagnosis (RCA/correlation/dependency/impact/confidence/API), Prediction (consequence/simulation/recommendation/trust/risk/API)** — read-only, no execution/approval |
 | Runtime Service | `src\sam\runtime_service\` | Aktif | runtime services & deployment |
 | Intelligence Runtime | `src\sam\intelligence_runtime\` | Aktif | graph + context + certification (preview-only) |
 | Presentation Layer | `src\sam\presentation\` | Aktif | Program F/G/H/I + host REST |
