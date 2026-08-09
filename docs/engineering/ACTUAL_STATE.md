@@ -15,10 +15,10 @@
 | Identitas rilis | **Baseline Release 3.6.0** (SAM 3.x COMPLETE 6/6, 100% roadmap) · git tag `v3.6.0` |
 | CHANGELOG.md | **3.6.0** (baseline release) |
 | Misi selesai | MISSION-3.1 s/d 3.6 SEMUA COMPLETE & Architecture Accepted · baseline CI resmi (tests/platform/ 141 test) |
-| Status saat ini | **SAM 4.x BERJALAN — MISSION-4.1 s/d 4.6 seluruh IMPLEMENTATION COMPLETE** (AO-4.0-001 aktif) · MISSION-4.1 Real Execution CLOSED · MISSION-4.2..4.6 COMPLETE · **Mission Engineering Report MISSION-4.6 menutup SAM 4.0** (rekomendasi: Mission Accepted + SAM 4.0 COMPLETE) · menunggu Architecture Review Chief Architect |
+| Status saat ini | **SAM 4.0 — Federated Governance Platform = ARCHITECTURE ACCEPTED** (verdict resmi Chief Architect di `docs/decisions` · MISSION-4.1 CLOSED · MISSION-4.2..4.6 ACCEPTED) · seluruh capability 4.0 (Real Execution, Operational Intelligence, Operational Learning, Governed AI Reasoning, Autonomous Operations, Human Operational Experience) = **baseline resmi arsitektur SAM** · roadmap lanjut ke SAM 5 — Universal Governance Platform |
 | Branch / HEAD | `main` / `0b4e45b` (rilis v3.6.0) |
-| Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) |
-| Tanggal update | 2026-08-09 (15:54 WITA) |
+| Verifikasi independen | MISSION-3.6 Production Governance ACCEPTED · CI passing · 511 test hijau (platform 141/citizen 157/autonomy 91/gov 122) · **SAM 4.0: 3543 passed (unit+5 BC 4.x+observation) + 559 compliance, lint & ASCII bersih** · Architecture Review: NONE (drift/impact/conflict/leakage) |
+| Tanggal update | 2026-08-10 (00:16 WITA) |
 | Berat repo | 3985 file · 765 commit · 1 author (VanM-Hub) |
 | History note | 2026-08-09: ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo; backup di `D:\Project AI\_backup_SAM_prerw`); **rilis v3.6.0** (release notes + manifest + version-history + tag) **dan Close Order AO-2.0-001/AO-3.0-001** ditambahkan di `docs/decisions` |
 

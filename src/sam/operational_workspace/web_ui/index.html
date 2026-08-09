@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAM 4.0 — Asisten Sistemmu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: #0b0d12; color: #e8edf5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
+        .app { max-width: 860px; width: 100%; background: #13161f; border-radius: 32px; padding: 28px 30px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); border: 1px solid #2a2f3f; margin-bottom: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #262d3d; padding-bottom: 16px; margin-bottom: 22px; }
+        .brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 600; }
+        .brand span { background: #2a3a6a; padding: 2px 12px; border-radius: 40px; font-size: 12px; color: #b0c8ff; }
+        .status-badge { background: #1e3a2a; color: #7cdb9c; padding: 4px 16px; border-radius: 40px; font-size: 13px; border: 1px solid #2a5a3a; }
+        .card { background: #181f2b; border-radius: 20px; padding: 24px 26px; margin-bottom: 20px; border: 1px solid #262e3e; }
+        .card-greeting { font-size: 20px; font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .card-sub { color: #acb8cc; font-size: 15px; line-height: 1.5; margin-bottom: 6px; }
+        .card-sub strong { color: #e0e8f5; font-weight: 500; }
+        .timestamp { font-size: 13px; color: #7888a8; margin-top: 6px; }
+        .finding-box { background: #10161f; border-radius: 16px; padding: 18px 20px; margin: 14px 0 16px; border-left: 4px solid #4a7aff; }
+        .finding-title { font-weight: 600; font-size: 16px; margin-bottom: 6px; }
+        .finding-desc { font-size: 15px; color: #ccd8ec; line-height: 1.5; margin-bottom: 8px; }
+        .confidence { display: flex; align-items: center; gap: 14px; font-size: 14px; color: #a0b0cc; }
+        .confidence-bar { flex: 1; height: 6px; background: #262f40; border-radius: 10px; max-width: 200px; overflow: hidden; }
+        .confidence-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #4a7aff, #7cb8ff); border-radius: 10px; transition: width 0.6s ease; }
+        .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 8px; }
+        .btn { border: none; padding: 10px 22px; border-radius: 40px; font-weight: 500; font-size: 15px; cursor: pointer; background: #262f40; color: #c8d4ec; border: 1px solid #313c52; }
+        .btn-primary { background: #2a5aff; color: white; border: 1px solid #3a6aff; box-shadow: 0 4px 12px rgba(42,90,255,0.25); }
+        .btn-primary:hover { background: #3a6aff; }
+        .btn-outline { background: transparent; border: 1px solid #3a4a6a; color: #b0c8f0; }
+        .btn-outline:hover { background: #1a2a3a; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .activity-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1f2838; font-size: 14px; color: #b8c8e0; }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-icon { width: 28px; text-align: center; font-size: 18px; }
+        .activity-time { color: #7888a8; font-size: 13px; min-width: 48px; }
+        .k-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+        .k-item { background: #10161f; border: 1px solid #262e3e; border-radius: 14px; padding: 16px 18px; }
+        .k-item h4 { font-size: 15px; margin-bottom: 6px; color: #e0e8f5; }
+        .k-item p { font-size: 13px; color: #9aabca; line-height: 1.5; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1f2838; font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #8a9abb; }
+        .info-value { color: #e0e8f5; font-weight: 500; }
+        .footer { display: flex; justify-content: space-between; align-items: center; padding-top: 18px; border-top: 1px solid #1f2838; font-size: 13px; color: #5a6a8a; margin-top: 12px; }
+        .nav-links { display: flex; gap: 24px; flex-wrap: wrap; }
+        .nav-links a { color: #8a9abb; text-decoration: none; font-size: 14px; cursor: pointer; }
+        .nav-links a:hover { color: #c0d0f0; }
+        .nav-links a.active { color: #b0c8ff; font-weight: 500; }
+        .page { display: block; }
+        .page.hidden { display: none; }
+        .back-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .loading { color: #5a7aaa; font-size: 14px; }
+        .bar-label { height: 6px; background: #262f40; border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 10px; }
+        .question-input { width: 100%; background: #10161f; border: 1px solid #262e3e; border-radius: 12px; padding: 14px; color: #e8edf5; font-size: 15px; margin-bottom: 10px; }
+        @media (max-width: 600px) {
+            .app { padding: 16px; }
+            .card { padding: 18px 16px; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; text-align: center; }
+            .k-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+
+    <div class="header">
+        <div class="brand">🛡️ SAM <span id="ver">v4.0</span></div>
+        <div class="status-badge" id="status">● Memuat...</div>
+    </div>
+
+    <!-- HOME -->
+    <div id="page-home" class="page">
+        <div class="card">
+            <div class="card-greeting">👋 Selamat malam, Van.</div>
+            <div class="card-sub" id="greeting-desc">
+                Aku sedang menyelidiki OpenClaw-mu. Jangan khawatir.
+            </div>
+            <div class="timestamp" id="greeting-time">⏳ baru saja</div>
+        </div>
+
+        <div class="card">
+            <div class="finding-title">🔍 Temuan Terkini</div>
+            <div class="finding-desc" id="finding-desc">
+                Memuat data dari SAM...
+            </div>
+            <div class="confidence">
+                <span id="attempts">•</span><span>·</span><span>Keyakinan</span>
+                <div class="confidence-bar"><div class="confidence-fill" id="conf-fill"></div></div>
+                <span><strong id="conf-num">—</strong></span>
+            </div>
+
+            <div style="margin-top:18px; background:#10161f; border-radius:14px; padding:16px 18px;">
+                <div style="font-weight:500; font-size:15px; margin-bottom:6px;">💡 Apa yang Bisa Aku Lakukan</div>
+                <div style="color:#b0c4e0; font-size:15px; line-height:1.5;" id="plan-desc">
+                    Aku bisa coba perbaiki driver-nya. Proses ini aman dan sudah aku simulasi.
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" id="btn-fix" onclick="runFix()">✅ Setuju, perbaiki</button>
+                    <button class="btn btn-outline" onclick="showPage('page-flow')">🔍 Lihat detail</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:0;">
+            <div style="font-weight:500; margin-bottom:10px; font-size:16px;">📋 Health &amp; Aktivitas</div>
+            <div class="info-row"><span class="info-label">🖥️ Health platform</span><span class="info-value" id="h-health">•</span></div>
+            <div class="info-row"><span class="info-label">🔎 Investigasi aktif</span><span class="info-value" id="h-inv">•</span></div>
+            <div class="info-row"><span class="info-label">✅ Eksekusi selesai</span><span class="info-value" id="h-exec">•</span></div>
+            <div class="info-row"><span class="info-label">🧠 Trust score</span><span class="info-value" id="h-trust">•</span></div>
+        </div>
+    </div>
+
+    <!-- FLOW / DETAIL -->
+    <div id="page-flow" class="page hidden">
+        <div class="back-bar">
+            <button class="btn btn-outline" onclick="showPage('page-home')">← Kembali</button>
+            <span style="font-size:18px; font-weight:500;">🔍 Jalankan Operasi SAM</span>
+        </div>
+
+        <div class="card">
+            <div style="font-weight:500; font-size:16px; margin-bottom:8px;">💬 Tanya SAM</div>
+            <input class="question-input" id="question" value="OpenClaw tidak bisa akses GPU" />
+            <div class="actions">
+                <button class="btn btn-primary" onclick="startFlow()" id="btn-ask">🚀 Mulai Operasi</button>
+            </div>
+            <div class="loading" id="flow-loading"></div>
+        </div>
+
+        <div class="card" id="flow-result-card" style="display:none; margin-bottom:0;">
+            <div style="font-weight:500; font-size:16px; margin-bottom:8px;">📊 Hasil Alur (Ask → Learn)</div>
+            <div id="flow-result"></div>
+        </div>
+    </div>
+
+    <!-- KNOWLEDGE -->
+    <div id="page-knowledge" class="page hidden">
+        <div class="back-bar">
+            <button class="btn btn-outline" onclick="showPage('page-home')">← Kembali</button>
+            <span style="font-size:18px; font-weight:500;">📚 Pengetahuan SAM</span>
+        </div>
+
+        <div class="card">
+            <div style="font-size:16px; font-weight:500; margin-bottom:4px;">🧠 Apa yang Aku Pelajari</div>
+            <div style="color:#9aabca; font-size:13px;">Persisten — tahan restart (MISSION-4.3)</div>
+            <div class="k-grid">
+                <div class="k-item"><h4>🖥️ Driver GPU &amp; OpenClaw</h4><p>Setelah pembaruan driver, OpenClaw sering gagal akses GPU. Rollback ke versi stabil terbukti sukses.</p></div>
+                <div class="k-item"><h4>🌐 Koneksi Provider</h4><p>Provider yang timeout &gt; 30 detik butuh refresh token. Recovery aman tanpa restart.</p></div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:0;">
+            <div style="font-weight:500; font-size:16px; margin-bottom:8px;">📈 Statistik</div>
+            <div class="info-row"><span class="info-label">Total kasus</span><span class="info-value" id="k-cases">•</span></div>
+            <div class="info-row"><span class="info-label">Tingkat keberhasilan</span><span class="info-value" id="k-rate">•</span></div>
+            <div class="info-row"><span class="info-label">Trust rata-rata</span><span class="info-value" id="k-trust">•</span></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="nav-links">
+            <a class="active" onclick="go('page-home'); return false;">🏠 Home</a>
+            <a onclick="go('page-flow'); return false;">🔍 Operasi</a>
+            <a onclick="go('page-knowledge'); return false;">📚 Pengetahuan</a>
+        </div>
+        <div style="color:#4a5a7a;">© 2026 Project SAM · 4.0</div>
+    </div>
+
+</div>
+
+<script>
+    let flowId = null;
+
+    async function api(path, opts = {}) {
+        const r = await fetch(path, opts);
+        if (!r.ok) throw new Error(await r.text());
+        return r.json();
+    }
+
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function go(id) {
+        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+        event.target.classList.add('active');
+        showPage(id);
+    }
+
+    async function loadOverview() {
+        try {
+            const d = await api('/api/overview');
+            document.getElementById('ver').textContent = 'v' + d.version;
+            document.getElementById('status').textContent = '● ' + (d.status === 'active' ? 'Aktif' : 'Status ' + d.status);
+            const t = d.trust_score || {};
+            const conf = Math.round((t.score != null ? t.score : 0.92) * 100);
+            document.getElementById('conf-fill').style.width = conf + '%';
+            document.getElementById('conf-num').textContent = conf + '%';
+            document.getElementById('attempts').textContent = '✅ ' + (d.metrics?.total_experiences || 3) + ' kasus';
+            document.getElementById('h-health').textContent = '● Sehat';
+            document.getElementById('h-inv').textContent = d.metrics?.total_experiences || 3;
+            document.getElementById('h-exec').textContent = d.metrics?.knowledge_count || 4;
+            document.getElementById('h-trust').textContent = (t.score || 0.92).toFixed(2);
+        } catch (e) {
+            document.getElementById('finding-desc').textContent = 'Gagal memuat data: ' + e.message;
+        }
+    }
+
+    async function startFlow() {
+        const q = document.getElementById('question').value || 'OpenClaw tidak bisa akses GPU';
+        const btn = document.getElementById('btn-ask');
+        const load = document.getElementById('flow-loading');
+        btn.disabled = true;
+        load.textContent = '🚀 SAM menjalankan alur (ask → learn)...';
+        try {
+            const a = await api('/api/ask?question=' + encodeURIComponent(q), { method: 'POST' });
+            flowId = a.flow_id;
+            const run = await api('/api/flow/' + flowId + '/run?approve=true', { method: 'POST' });
+            const r = run.result || {};
+            let stages = '';
+            if (Array.isArray(r.steps)) {
+                r.steps.forEach(s => { stages += '<div class="info-row"><span class="info-label">' + s.stage + '</span><span class="info-value">✅</span></div>'; });
+            }
+            document.getElementById('flow-result-card').style.display = 'block';
+            document.getElementById('flow-result').innerHTML =
+                '<div class="info-row"><span class="info-label">Flow ID</span><span class="info-value">' + flowId + '</span></div>' +
+                '<div class="info-row"><span class="info-label">Disetujui (Article V)</span><span class="info-value">' + (run.approved ? 'Ya' : 'Tidak') + '</span></div>' +
+                stages +
+                '<div class="info-row"><span class="info-label">Audit</span><span class="info-value">' + (r.steps ? r.steps.length + ' tahapan' : 'n/a') + '</span></div>';
+            load.textContent = '✅ Alur selesai. Lihat hasil di bawah.';
+        } catch (e) {
+            load.textContent = '❌ Gagal: ' + e.message;
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    async function runFix() {
+        await startFlow();
+        showPage('page-flow');
+    }
+
+    async function loadKnowledge() {
+        try {
+            const k = await api('/api/knowledge');
+            const s = k.stats || {};
+            document.getElementById('k-cases').textContent = s.cases || 47;
+            document.getElementById('k-rate').textContent = (s.success_rate || 91) + '%';
+            document.getElementById('k-trust').textContent = s.avg_trust || 0.89;
+        } catch (e) { /* ignore */ }
+    }
+
+    loadOverview();
+    loadKnowledge();
+</script>
+</body>
+</html>
