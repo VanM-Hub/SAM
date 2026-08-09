@@ -97,6 +97,42 @@ from .diagnosis_compliance import (
     DiagnosisComplianceChecker,
     DiagnosisComplianceResult,
 )
+from .consequence_prediction import (
+    ConsequencePredictionResult,
+    ConsequencePredictor,
+    PredictedConsequence,
+)
+from .operational_simulation import (
+    OperationalSimulator,
+    SimulationOutcome,
+    SimulationProposal,
+)
+from .recommendation_engine import (
+    EvidenceBasedRecommendationEngine,
+    Recommendation,
+    RecommendationResult,
+)
+from .trust_assessment import (
+    TrustAssessment,
+    TrustAssessor,
+)
+from .risk_evaluation import (
+    RiskEvaluation,
+    RiskEvaluator,
+    RiskFactor,
+)
+from .recommendation_explainability import (
+    RecommendationExplanation,
+    RecommendationExplainer,
+)
+from .operational_intelligence_api import (
+    IntelligenceSummary,
+    OperationalIntelligenceAPI,
+)
+from .intelligence_compliance import (
+    IntelligenceComplianceChecker,
+    IntelligenceComplianceResult,
+)
 
 __all__ = [
     "Investigation",
@@ -160,4 +196,24 @@ __all__ = [
     "DiagnosisNotFoundError",
     "DiagnosisComplianceChecker",
     "DiagnosisComplianceResult",
+    "ConsequencePredictionResult",
+    "ConsequencePredictor",
+    "PredictedConsequence",
+    "OperationalSimulator",
+    "SimulationOutcome",
+    "SimulationProposal",
+    "EvidenceBasedRecommendationEngine",
+    "Recommendation",
+    "RecommendationResult",
+    "TrustAssessment",
+    "TrustAssessor",
+    "RiskEvaluation",
+    "RiskEvaluator",
+    "RiskFactor",
+    "RecommendationExplanation",
+    "RecommendationExplainer",
+    "IntelligenceSummary",
+    "OperationalIntelligenceAPI",
+    "IntelligenceComplianceChecker",
+    "IntelligenceComplianceResult",
 ]
