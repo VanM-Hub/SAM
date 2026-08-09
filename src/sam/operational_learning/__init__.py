@@ -51,6 +51,30 @@ from .repository_compliance import (
     ComplianceFinding,
     RepositoryComplianceChecker,
 )
+from .case_repository import Case, CaseRepository
+from .case_retrieval import CaseRetriever, RetrievedCase
+from .similarity_engine import SimilarityEngine, SimilarityScore
+from .lesson_extraction import Lesson, LessonExtractor
+from .operational_knowledge import (
+    KnowledgeEntry,
+    KnowledgeIndex,
+    OperationalKnowledge,
+)
+from .knowledge_api import (
+    CaseQueryAPI,
+    KnowledgeAPI,
+    KnowledgeQueryAPI,
+    KnowledgeQueryResult,
+)
+from .knowledge_explainability import (
+    KnowledgeExplanation,
+    KnowledgeExplainer,
+    KnowledgeTrace,
+)
+from .knowledge_compliance import (
+    KnowledgeComplianceChecker,
+    KnowledgeComplianceResult,
+)
 
 __all__ = [
     "Experience",
@@ -83,4 +107,24 @@ __all__ = [
     "ComplianceCheckResult",
     "ComplianceFinding",
     "RepositoryComplianceChecker",
+    "Case",
+    "CaseRepository",
+    "CaseRetriever",
+    "RetrievedCase",
+    "SimilarityEngine",
+    "SimilarityScore",
+    "Lesson",
+    "LessonExtractor",
+    "KnowledgeEntry",
+    "KnowledgeIndex",
+    "OperationalKnowledge",
+    "CaseQueryAPI",
+    "KnowledgeAPI",
+    "KnowledgeQueryAPI",
+    "KnowledgeQueryResult",
+    "KnowledgeExplanation",
+    "KnowledgeExplainer",
+    "KnowledgeTrace",
+    "KnowledgeComplianceChecker",
+    "KnowledgeComplianceResult",
 ]
