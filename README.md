@@ -2,7 +2,7 @@
 
 The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
-**Versi:** SAM 3.x Complete - Production Governance Platform (3.6.0) 
+**Versi:** SAM 4.0 - Federated Governance Platform (4.0.0) - Architecture Accepted 
 
 ---
 
@@ -175,6 +175,8 @@ python -m pytest tests/ -q --tb=short
 ```
 
 Baseline CI: 4,017 tests passed, 1 skipped, 2 xfailed (9 folder, 8 runtime suites + unit). The test suite runs locally and in CI. Metrics history was archived to **[docs/history/reports/Repository_Metrics.md](docs/history/reports/Repository_Metrics.md)**.
+
+SAM 4.0 (bonus): 3,543 passed, 1 skipped (unit + 5 BC 4.x baru + observation); regression 571 passed, 2 xfailed; compliance 559; 362 test baru mission 4.1..4.6; lint & ASCII bersih.
 
 ---
 

@@ -92,6 +92,15 @@
    │     knowledge_runtime / workflow_runtime / artifact_runtime /
    │     memory / policy_runtime / audit_runtime   ← 6 capability AKTIF
    │
+   ├── 4.0 (SAM 4.0 - Federated Governance Platform, baseline resmi)
+   │     operational_intelligence   ← Investigasi/diagnosis/evidence/RCA/risk/trust (4.2)
+   │     operational_learning       ← Persistence + operational knowledge (4.3)
+   │     governed_reasoning         ← Governed AI reasoning (4.4)
+   │     autonomous_operations      ← Investigate/diagnose/recommend/verify (4.5)
+   │     operational_workspace      ← Integration layer + EndToEndFlow + ProductionPlatform (4.6)
+   │       └── web_ui_server.py     ← Presentation layer FastAPI (UI produksi, Article XVI)
+   │       └── web_ui/              ← Host web UI (index.html)
+   │
    ├── legacy (HISTORIS — jangan tambah dependency baru)
    │     operations / execution / runtime / reasoning
    │
@@ -148,6 +157,7 @@
    Operationalization ◉  ← KAMU DI SINI (M3 Observable Platform; 6 capability active)
    Production         ✓   (SAM 2.0 COMPLETE - Program A-F finished, M1-M6 achieved, Milestone M6 ACHIEVED)
    Ecosystem          ✓   (SAM 3.x COMPLETE 6/6 - release v3.6.0, 2026-08-09)
+   Federation         ✓   (SAM 4.0 - Federated Governance Platform - release v4.0.0, 2026-08-10 - ARCHITECTURE ACCEPTED, CA verdict: 4.1 CLOSED, 4.2..4.6 ACCEPTED)
 ```
 > Fase: **Product Integration & Operationalization** (Tahap 2). Execution = preview (ADR-024).
 > Observability: Observation Layer (C-Phase 1-4) sudah observasi 5 pipeline + Platform Intelligence (C6-C10) secara read-only (M3).

@@ -31,9 +31,9 @@ Karakteristik kunci:
 
 ## Status Saat Ini
 
-> ✅ **SAM 3.x Complete (versi teknis 3.6.0, 2026-08-09) — BASELINE RELEASE TERBARU.**
-> Roadmap SAM 3.x (MISSION-3.1 .. MISSION-3.6) **COMPLETE 6/6** dengan Production Readiness CERTIFIED
-> dan Federation Readiness CERTIFIED. Foundation tetap IMMUTABLE (tanpa perubahan identitas sejak SAM 1.x).
+> **SAM 4.0 Complete (4.0.0, 2026-08-10) - ARCHITECTURE ACCEPTED - BASELINE RELEASE TERBARU.**
+> Roadmap SAM 4.0 (MISSION-4.1 .. MISSION-4.6) **COMPLETE + ARCHITECTURE ACCEPTED** (CA verdict: 4.1 CLOSED, 4.2..4.6 ACCEPTED).
+> Federated Governance Platform - seluruh capability 4.0 = baseline resmi arsitektur. Foundation tetap IMMUTABLE (tanpa perubahan identitas sejak SAM 1.x).
 
 Seluruh perjalanan pengembangan (Foundation 0.01 → 0.30, 279 sprint + Program A–K + SAM 1.0/2.0 + SAM 3.x)
 menghasilkan platform **Deterministic Operational Intelligence** yang:
@@ -43,10 +43,12 @@ menghasilkan platform **Deterministic Operational Intelligence** yang:
 - **SAM 3.x** — membangun ekosistem "Bagaimana banyak capability bekerja sebagai satu ekosistem?"
   (Governance Intelligence, Autonomous Runtime, Citizen Ecosystem, Federation, Platform Experience,
   Production Governance) — tanpa mengubah Foundation.
+- **SAM 4.0** - membangun platform operasional nyata "Bagaimana capability dijalankan & dioperasikan?"
+  (Real Execution, Operational Intelligence, Operational Learning, Governed AI Reasoning,
+  Autonomous Operations, Human Operational Experience) - tanpa mengubah Foundation.
 
-Lalu ditutup dengan MISSION-3.6 (Production Governance, 2026-08-09) yang memastikan seluruh capability
-SAM 3.x dapat dioperasikan, diverifikasi, diaudit, diukur, dipelihara, dan disertifikasi. Platform siap
-memasuki **SAM 4.x — Federation Operations** sesuai Roadmap.
+Lalu ditutup dengan MISSION-4.6 (Human Operational Experience) dan **Architecture Accepted** oleh Chief
+Architect (2026-08-10). Platform kini memasuki **SAM 5 - Universal Governance Platform** sesuai Roadmap.
 
 
 ### Ringkasan Fase I–XXIII (0.01 → 0.23)

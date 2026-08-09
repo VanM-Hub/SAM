@@ -1,8 +1,26 @@
 ﻿# Changelog
 
-> Riwayat perubahan rilis SAM. **SAM 3.x (3.6.0, 2026-08-09) adalah rilis terbaru** - Production Governance Platform
-> yang menuntup seluruh Roadmap SAM 3.x. **SAM 2.0 (2.0.0, 2026-08-08)** adalah rilis Operational Governance
-> Platform (Program A-F).
+> Riwayat perubahan rilis SAM. **SAM 4.0.0 (2026-08-10) adalah rilis terbaru** - Federated Governance Platform
+> (MISSION-4.1..4.6 COMPLETE, Architecture Accepted). **SAM 3.6.0 (2026-08-09)** adalah rilis Production Governance
+> Platform yang menuntup Roadmap SAM 3.x.
+
+## 4.0.0 (2026-08-10) - SAM 4.0 Complete - Federated Governance Platform
+
+### SAM 4.0 ARCHITECTURE ACCEPTED (Chief Architect verdict)
+- **Seluruh MISSION-4.1..4.6 IMPLEMENTATION COMPLETE + Architecture ACCEPTED.**
+- **MISSION-4.1 Real Execution CLOSED; MISSION-4.2..4.6 ACCEPTED** (verdict resmi di `docs/decisions/SAM 4.0 Federated Governance Platform.txt`).
+- **Bounded context baru (Evolution by Extension):** execution_runtime, operational_intelligence, operational_learning, governed_reasoning, autonomous_operations, operational_workspace.
+- **Real Execution (4.1):** eksekusi provider nyata via approval gate (Article V), tanpa bypass authority.
+- **Operational Intelligence (4.2):** investigasi, diagnosis, evidence, RCA, risk, trust - observasi jadi investigasi.
+- **Operational Learning (4.3):** persistence + operational knowledge (case/knowledge repository, persistent storage).
+- **Governed AI Reasoning (4.4):** integrasi AI tanpa melanggar Governance; reasoning berubah, authority tidak.
+- **Autonomous Operations (4.5):** investigate/diagnose/recommend/verify (bukan govern/approve/override).
+- **Human Operational Experience (4.6):** workspace integration layer; Ask->Learn end-to-end; production platform (dashboard/trust/history/metrics).
+- **Web UI live server:** presentation layer FastAPI (`web_ui_server.py` + `web_ui/`) mengonsumsi capability 4.x nyata (EndToEndFlow, ProductionAPI) - langkah UI produksi/deployment.
+- **Test:** 3543 passed, 1 skipped (unit + 5 BC 4.x + observation); regression 571 passed, 2 xfailed; compliance 559; 362 test baru mission 4.1..4.6; 0 regresi.
+- **Lint & ASCII:** ruff bersih; file publik ASCII-clean; Foundation immutable (K-0).
+- **Architecture:** drift NONE, foundation impact NONE, conflict NONE, responsibility/authority leakage NONE.
+- **Version bump:** 3.6.0 -> 4.0.0 (sejajar baseline SAM 4.0).
 
 ## 3.6.0 (2026-08-09) - SAM 3.x Complete - Production Governance Platform
 

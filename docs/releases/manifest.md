@@ -5,16 +5,17 @@ Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      SAM 3.0 Ecosystem - Production Governance Platform (versi teknis 3.6.0)
-Release:      3 - Ecosystem / Governance Production Platform (SAM 3.x COMPLETE 6/6)
+Current:      SAM 4.0 - Federated Governance Platform (versi teknis 4.0.0)
+Release:      4 - Federated Governance Platform (SAM 4.0 ARCHITECTURE ACCEPTED, CA verdict: 4.1 CLOSED, 4.2..4.6 ACCEPTED)
 Baseline:     SAM 1.0 Foundation (rilis pertama, 2026-08-07) -> SAM 2.0
               Operational Governance Platform (rilis kedua, 2026-08-08, Program A-F COMPLETE,
               M1-M6 ACHIEVED) -> SAM 3.6.0 Baseline Release (rilis ketiga, 2026-08-09,
-              SAM 3.x COMPLETE 6/6, 100% roadmap, AO-3.0-001 Close Order);
-              seluruh 6 mission SAM 3.x selesai, no architecture drift, Foundation immutable.
+              SAM 3.x COMPLETE 6/6, AO-3.0-001 Close Order) -> SAM 4.0.0 Baseline Release
+              (rilis keempat, 2026-08-10, Federated Governance Platform, Architecture Accepted);
+              seluruh 6 mission SAM 4.0 selesai, no architecture drift, Foundation immutable.
 Framework:    Python
 Build:        setuptools
-Test:         pytest (modern suite; 2964 collected, 2922 passed, 42 skipped; legacy folder eksklusif)
+Test:         pytest (unit + 5 BC 4.x + observation: 3543 passed, 1 skipped; regression 571, 2 xfailed; compliance 559; lint ruff bersih)
 Lint:         ruff
 CI:           GitHub Actions (core + server + desktop)
 ```
