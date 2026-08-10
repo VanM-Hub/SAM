@@ -17,7 +17,7 @@
 - **MISSION-5.6 Adaptive Governance:** learning, effectiveness, simulation, impact assessment, recommendation (authority tetap di manusia), evolution workspace, certification.
 
 ### Engineering
-- **82 test baru** di 6 BC (25 file test).
+- **158 test baru** di 6 BC (12 file test).
 - **Full regression green: 4817 passed, 1 skipped, 2 xfailed.**
 - **Ruff bersih** di seluruh bounded context baru.
 
