@@ -37,10 +37,18 @@ class TestP2ARestMissionEntry:
     """Mission route adalah production entry point (HTTP -> MissionBuilder)."""
 
     def test_route_terdaftar_di_server(self) -> None:
-        """Endpoint /mission/{id} tersedia di aplikasi produksi (IMPORTABLE)."""
+        """
+        Endpoint /mission/{id} tersedia di aplikasi produksi (IMPORTABLE).
+
+        Verikasi berbasis perilaku (bukan introspeksi `app.routes`): FastAPI/
+        Starlette versi baru mengubah struktur `app.routes` (lazy `_IncludedRouter`),
+        sehingga iterasi flat tidak lagi valid. POST sampai ke route (bukan 404/405)
+        membuktikan route terdaftar & routable tanpa meregangkan struktur internal.
+        """
         client = _client()
-        paths = [r.path for r in app.routes]
-        assert "/mission/{mission_id}" in paths, "mission POST route harus terdaftar"
+        resp = client.post("/mission/route-probe", json=None)
+        assert resp.status_code != 404, "route /mission/{mission_id} tidak terdaftar"
+        assert resp.status_code != 405, "route /mission/{mission_id} salah method (harus POST)"
 
     def test_mission_post_menjalankan_MissionBuilder(self) -> None:
         """HTTP request -> MissionBuilder menghasilkan plan (CALLED + REACHABLE)."""
