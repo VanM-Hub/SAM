@@ -107,12 +107,13 @@ class TestPortableLauncher:
 
     def test_python_entry_point_intact(self):
         """Entry point Python tetap memanggil jalur resmi sam.launcher.cli_entry.
-        SAM_Web.bat memakai jalur berbeda (sam.web.server via uvicorn) — sesuai desain.
+        SAM_Web.bat memakai jalur berbeda (sam.operational_workspace.web_ui_server
+        via uvicorn) — sesuai desain (UI produksi SAM Produk menggantikan UI lama).
         """
         for name in LAUNCHER_BATS:
             content = self._check(name)
             if name == "SAM_Web.bat":
-                assert "sam.web.server" in content
+                assert "sam.operational_workspace.web_ui_server" in content
                 assert "uvicorn" in content
             else:
                 assert "sam.launcher.cli_entry" in content, (
