@@ -3,258 +3,852 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SAM 4.0 — Asisten Sistemmu</title>
+    <title>SAM — Produk</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" />
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-        body { background: #0b0d12; color: #e8edf5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
-        .app { max-width: 860px; width: 100%; background: #13161f; border-radius: 32px; padding: 28px 30px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); border: 1px solid #2a2f3f; margin-bottom: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #262d3d; padding-bottom: 16px; margin-bottom: 22px; }
-        .brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 600; }
-        .brand span { background: #2a3a6a; padding: 2px 12px; border-radius: 40px; font-size: 12px; color: #b0c8ff; }
-        .status-badge { background: #1e3a2a; color: #7cdb9c; padding: 4px 16px; border-radius: 40px; font-size: 13px; border: 1px solid #2a5a3a; }
-        .card { background: #181f2b; border-radius: 20px; padding: 24px 26px; margin-bottom: 20px; border: 1px solid #262e3e; }
-        .card-greeting { font-size: 20px; font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .card-sub { color: #acb8cc; font-size: 15px; line-height: 1.5; margin-bottom: 6px; }
-        .card-sub strong { color: #e0e8f5; font-weight: 500; }
-        .timestamp { font-size: 13px; color: #7888a8; margin-top: 6px; }
-        .finding-box { background: #10161f; border-radius: 16px; padding: 18px 20px; margin: 14px 0 16px; border-left: 4px solid #4a7aff; }
-        .finding-title { font-weight: 600; font-size: 16px; margin-bottom: 6px; }
-        .finding-desc { font-size: 15px; color: #ccd8ec; line-height: 1.5; margin-bottom: 8px; }
-        .confidence { display: flex; align-items: center; gap: 14px; font-size: 14px; color: #a0b0cc; }
-        .confidence-bar { flex: 1; height: 6px; background: #262f40; border-radius: 10px; max-width: 200px; overflow: hidden; }
-        .confidence-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #4a7aff, #7cb8ff); border-radius: 10px; transition: width 0.6s ease; }
-        .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 8px; }
-        .btn { border: none; padding: 10px 22px; border-radius: 40px; font-weight: 500; font-size: 15px; cursor: pointer; background: #262f40; color: #c8d4ec; border: 1px solid #313c52; }
-        .btn-primary { background: #2a5aff; color: white; border: 1px solid #3a6aff; box-shadow: 0 4px 12px rgba(42,90,255,0.25); }
-        .btn-primary:hover { background: #3a6aff; }
-        .btn-outline { background: transparent; border: 1px solid #3a4a6a; color: #b0c8f0; }
-        .btn-outline:hover { background: #1a2a3a; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .activity-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1f2838; font-size: 14px; color: #b8c8e0; }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-icon { width: 28px; text-align: center; font-size: 18px; }
-        .activity-time { color: #7888a8; font-size: 13px; min-width: 48px; }
-        .k-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
-        .k-item { background: #10161f; border: 1px solid #262e3e; border-radius: 14px; padding: 16px 18px; }
-        .k-item h4 { font-size: 15px; margin-bottom: 6px; color: #e0e8f5; }
-        .k-item p { font-size: 13px; color: #9aabca; line-height: 1.5; }
-        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1f2838; font-size: 14px; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { color: #8a9abb; }
-        .info-value { color: #e0e8f5; font-weight: 500; }
-        .footer { display: flex; justify-content: space-between; align-items: center; padding-top: 18px; border-top: 1px solid #1f2838; font-size: 13px; color: #5a6a8a; margin-top: 12px; }
-        .nav-links { display: flex; gap: 24px; flex-wrap: wrap; }
-        .nav-links a { color: #8a9abb; text-decoration: none; font-size: 14px; cursor: pointer; }
-        .nav-links a:hover { color: #c0d0f0; }
-        .nav-links a.active { color: #b0c8ff; font-weight: 500; }
-        .page { display: block; }
-        .page.hidden { display: none; }
-        .back-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .loading { color: #5a7aaa; font-size: 14px; }
-        .bar-label { height: 6px; background: #262f40; border-radius: 10px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 10px; }
-        .question-input { width: 100%; background: #10161f; border: 1px solid #262e3e; border-radius: 12px; padding: 14px; color: #e8edf5; font-size: 15px; margin-bottom: 10px; }
-        @media (max-width: 600px) {
-            .app { padding: 16px; }
-            .card { padding: 18px 16px; }
-            .actions { flex-direction: column; }
-            .btn { width: 100%; text-align: center; }
-            .k-grid { grid-template-columns: 1fr; }
+        /* --- Reset & Variables --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-app: #0a0c12;
+            --surface-0: #10141e;
+            --surface-1: #181e2b;
+            --surface-2: #202838;
+            --border: #2a3246;
+            --border-soft: #1e2638;
+            --border-success: #2a5a3a;
+            --border-warning: #5a4a2a;
+            --border-danger: #5a2a2a;
+            --border-accent: #2a4a6a;
+
+            --text-primary: #eef2f8;
+            --text-secondary: #b8c8e8;
+            --text-muted: #6a7a9a;
+            --text-success: #7cdb9c;
+            --text-warning: #e0c06a;
+            --text-danger: #e06a6a;
+            --text-accent: #8ab4f0;
+
+            --fill-success: #2a8a4a;
+            --fill-warning: #c09a3a;
+            --fill-danger: #8a3a3a;
+            --fill-accent: #3a6aff;
+
+            --bg-success: #0f2a1a;
+            --bg-warning: #2a2a0f;
+            --bg-danger: #2a0f0f;
+            --bg-accent: #0f1a2a;
+
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --transition: 0.2s ease;
+        }
+
+        body {
+            background: var(--bg-app);
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app {
+            max-width: 1200px;
+            width: 100%;
+            max-height: 960px;
+            height: 92vh;
+            background: var(--surface-0);
+            border-radius: 32px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 28px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: -0.3px;
+        }
+        .brand small {
+            font-weight: 400;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .brand .badge-version {
+            background: var(--surface-2);
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            border: 0.5px solid var(--border);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .header-right .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--fill-success);
+            animation: pulse-dot 2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .header-right .trust-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg-accent);
+            padding: 2px 12px;
+            border-radius: 40px;
+            border: 0.5px solid var(--border-accent);
+            color: var(--text-accent);
+            font-size: 12px;
+        }
+        .header-right .clock {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* --- NAVIGASI --- */
+        .nav {
+            display: flex;
+            gap: 4px;
+            padding: 8px 28px 0 28px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: var(--font);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background var(--transition), color var(--transition);
+            border-bottom: 2px solid transparent;
+        }
+        .nav-btn:hover {
+            color: var(--text-secondary);
+            background: var(--surface-1);
+        }
+        .nav-btn.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--fill-accent);
+            background: var(--surface-1);
+        }
+        .nav-btn i {
+            font-size: 16px;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- KARTU GREETING --- */
+        .greeting-card {
+            background: var(--surface-1);
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            border: 0.5px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .greeting-card .text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .greeting-card .text .title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .greeting-card .text .sub {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .greeting-card .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn {
+            border: none;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface-2);
+            color: var(--text-secondary);
+            border: 0.5px solid var(--border);
+            transition: background var(--transition), transform 0.1s;
+        }
+        .btn:hover {
+            background: var(--border);
+            transform: scale(1.02);
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn-primary {
+            background: var(--fill-accent);
+            color: white;
+            border-color: var(--fill-accent);
+        }
+        .btn-primary:hover {
+            background: #4a7aff;
+        }
+        .btn-success {
+            background: var(--fill-success);
+            color: white;
+            border-color: var(--fill-success);
+        }
+        .btn-success:hover {
+            background: #3a9a5a;
+        }
+        .btn-danger {
+            background: var(--fill-danger);
+            color: white;
+            border-color: var(--fill-danger);
+        }
+        .btn-danger:hover {
+            background: #9a4a4a;
+        }
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border);
+        }
+
+        /* --- KARTU STATUS (ringkasan) --- */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .status-item {
+            background: var(--surface-1);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            border: 0.5px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .status-item .label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .status-item .value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .status-item .value.green { color: var(--text-success); }
+        .status-item .value.yellow { color: var(--text-warning); }
+        .status-item .value.red { color: var(--text-danger); }
+        .status-item .sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* --- KARTU SAM BICARA --- */
+        .sam-card {
+            background: var(--surface-1);
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            border: 0.5px solid var(--border);
+            border-left: 4px solid var(--fill-accent);
+        }
+        .sam-card .header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .sam-card .header .name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .sam-card .message {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+        .sam-card .message strong {
+            color: var(--text-primary);
+        }
+        .sam-card .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        /* --- KARTU MASALAH (jika ada) --- */
+        .issue-card {
+            background: var(--surface-1);
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            border: 0.5px solid var(--border-warning);
+            border-left: 4px solid var(--fill-warning);
+        }
+        .issue-card .header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .issue-card .title {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-warning);
+        }
+        .issue-card .desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 4px 0 8px;
+        }
+        .issue-card .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* --- KARTU MISI --- */
+        .mission-card {
+            background: var(--surface-1);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            border: 0.5px solid var(--border-accent);
+        }
+        .mission-card .top {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+        .mission-card .progress-track {
+            height: 4px;
+            background: var(--border-strong);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .mission-card .progress-fill {
+            height: 100%;
+            background: var(--fill-accent);
+            border-radius: 2px;
+            width: 70%;
+        }
+        .mission-card .sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* --- CHAT INPUT --- */
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+        .chat-input input {
+            flex: 1;
+            background: var(--surface-1);
+            border: 0.5px solid var(--border);
+            border-radius: 40px;
+            padding: 10px 18px;
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 14px;
+            outline: none;
+        }
+        .chat-input input::placeholder {
+            color: var(--text-muted);
+        }
+        .chat-input input:focus {
+            border-color: var(--fill-accent);
+        }
+        .chat-input button {
+            background: var(--fill-accent);
+            border: none;
+            border-radius: 40px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background var(--transition);
+        }
+        .chat-input button:hover {
+            background: #4a7aff;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        /* --- RESPONSIF --- */
+        @media (max-width: 700px) {
+            body { padding: 10px; }
+            .app { max-height: none; height: auto; border-radius: 20px; }
+            .app-header { padding: 14px 16px; flex-direction: column; align-items: stretch; }
+            .brand { font-size: 18px; }
+            .header-right { justify-content: space-between; flex-wrap: wrap; }
+            .nav { padding: 6px 16px 0; gap: 2px; }
+            .nav-btn { font-size: 13px; padding: 6px 12px; }
+            .main-content { padding: 16px; }
+            .greeting-card { flex-direction: column; align-items: stretch; }
+            .greeting-card .actions { justify-content: flex-start; }
+            .status-grid { grid-template-columns: 1fr 1fr; }
+            .sam-card { padding: 14px 16px; }
+            .issue-card { padding: 14px 16px; }
+            .chat-input { flex-wrap: wrap; }
+            .chat-input input { flex: 1 1 100%; }
+            .chat-input button { width: 100%; justify-content: center; }
+            .footer { padding: 10px 16px; flex-direction: column; align-items: center; text-align: center; }
+        }
+
+        @media (max-width: 420px) {
+            .status-grid { grid-template-columns: 1fr; }
+            .greeting-card .text .title { font-size: 18px; }
         }
     </style>
 </head>
 <body>
-<div class="app" id="app">
 
-    <div class="header">
-        <div class="brand">🛡️ SAM <span id="ver">v4.0</span></div>
-        <div class="status-badge" id="status">● Memuat...</div>
-    </div>
+<div class="app">
 
-    <!-- HOME -->
-    <div id="page-home" class="page">
-        <div class="card">
-            <div class="card-greeting">👋 Selamat malam, Van.</div>
-            <div class="card-sub" id="greeting-desc">
-                Aku sedang menyelidiki OpenClaw-mu. Jangan khawatir.
-            </div>
-            <div class="timestamp" id="greeting-time">⏳ baru saja</div>
+    <!-- HEADER -->
+    <header class="app-header">
+        <div class="brand">
+            🛡️ SAM <small>Produk</small>
+            <span class="badge-version">v5.0</span>
         </div>
-
-        <div class="card">
-            <div class="finding-title">🔍 Temuan Terkini</div>
-            <div class="finding-desc" id="finding-desc">
-                Memuat data dari SAM...
-            </div>
-            <div class="confidence">
-                <span id="attempts">•</span><span>·</span><span>Keyakinan</span>
-                <div class="confidence-bar"><div class="confidence-fill" id="conf-fill"></div></div>
-                <span><strong id="conf-num">—</strong></span>
-            </div>
-
-            <div style="margin-top:18px; background:#10161f; border-radius:14px; padding:16px 18px;">
-                <div style="font-weight:500; font-size:15px; margin-bottom:6px;">💡 Apa yang Bisa Aku Lakukan</div>
-                <div style="color:#b0c4e0; font-size:15px; line-height:1.5;" id="plan-desc">
-                    Aku bisa coba perbaiki driver-nya. Proses ini aman dan sudah aku simulasi.
-                </div>
-                <div class="actions">
-                    <button class="btn btn-primary" id="btn-fix" onclick="runFix()">✅ Setuju, perbaiki</button>
-                    <button class="btn btn-outline" onclick="showPage('page-flow')">🔍 Lihat detail</button>
-                </div>
-            </div>
+        <div class="header-right">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="status-label">Sehat · memantau</span>
+            <span class="trust-badge">🔒 Trust 94%</span>
+            <span class="clock" id="clock-display">10:42</span>
         </div>
+    </header>
 
-        <div class="card" style="margin-bottom:0;">
-            <div style="font-weight:500; margin-bottom:10px; font-size:16px;">📋 Health &amp; Aktivitas</div>
-            <div class="info-row"><span class="info-label">🖥️ Health platform</span><span class="info-value" id="h-health">•</span></div>
-            <div class="info-row"><span class="info-label">🔎 Investigasi aktif</span><span class="info-value" id="h-inv">•</span></div>
-            <div class="info-row"><span class="info-label">✅ Eksekusi selesai</span><span class="info-value" id="h-exec">•</span></div>
-            <div class="info-row"><span class="info-label">🧠 Trust score</span><span class="info-value" id="h-trust">•</span></div>
-        </div>
-    </div>
+    <!-- NAVIGASI -->
+    <nav class="nav" role="tablist">
+        <button class="nav-btn active" data-page="home" role="tab"><i class="ti ti-home"></i> Beranda</button>
+        <button class="nav-btn" data-page="devices" role="tab"><i class="ti ti-server"></i> Perangkat</button>
+        <button class="nav-btn" data-page="knowledge" role="tab"><i class="ti ti-book"></i> Pengetahuan</button>
+        <button class="nav-btn" data-page="history" role="tab"><i class="ti ti-history"></i> Riwayat</button>
+        <button class="nav-btn" data-page="settings" role="tab"><i class="ti ti-settings"></i> Pengaturan</button>
+    </nav>
 
-    <!-- FLOW / DETAIL -->
-    <div id="page-flow" class="page hidden">
-        <div class="back-bar">
-            <button class="btn btn-outline" onclick="showPage('page-home')">← Kembali</button>
-            <span style="font-size:18px; font-weight:500;">🔍 Jalankan Operasi SAM</span>
-        </div>
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="main-content">
 
-        <div class="card">
-            <div style="font-weight:500; font-size:16px; margin-bottom:8px;">💬 Tanya SAM</div>
-            <input class="question-input" id="question" value="OpenClaw tidak bisa akses GPU" />
+        <!-- GREETING -->
+        <div class="greeting-card">
+            <div class="text">
+                <div class="title">👋 Selamat sore, Van.</div>
+                <div class="sub">OpenClaw berjalan normal. SAM dalam keadaan siaga.</div>
+            </div>
             <div class="actions">
-                <button class="btn btn-primary" onclick="startFlow()" id="btn-ask">🚀 Mulai Operasi</button>
-            </div>
-            <div class="loading" id="flow-loading"></div>
-        </div>
-
-        <div class="card" id="flow-result-card" style="display:none; margin-bottom:0;">
-            <div style="font-weight:500; font-size:16px; margin-bottom:8px;">📊 Hasil Alur (Ask → Learn)</div>
-            <div id="flow-result"></div>
-        </div>
-    </div>
-
-    <!-- KNOWLEDGE -->
-    <div id="page-knowledge" class="page hidden">
-        <div class="back-bar">
-            <button class="btn btn-outline" onclick="showPage('page-home')">← Kembali</button>
-            <span style="font-size:18px; font-weight:500;">📚 Pengetahuan SAM</span>
-        </div>
-
-        <div class="card">
-            <div style="font-size:16px; font-weight:500; margin-bottom:4px;">🧠 Apa yang Aku Pelajari</div>
-            <div style="color:#9aabca; font-size:13px;">Persisten — tahan restart (MISSION-4.3)</div>
-            <div class="k-grid">
-                <div class="k-item"><h4>🖥️ Driver GPU &amp; OpenClaw</h4><p>Setelah pembaruan driver, OpenClaw sering gagal akses GPU. Rollback ke versi stabil terbukti sukses.</p></div>
-                <div class="k-item"><h4>🌐 Koneksi Provider</h4><p>Provider yang timeout &gt; 30 detik butuh refresh token. Recovery aman tanpa restart.</p></div>
+                <button class="btn btn-primary" id="btn-run-cycle"><i class="ti ti-bolt"></i> Jalankan siklus</button>
+                <button class="btn btn-outline" id="btn-check"><i class="ti ti-refresh"></i> Periksa</button>
             </div>
         </div>
 
-        <div class="card" style="margin-bottom:0;">
-            <div style="font-weight:500; font-size:16px; margin-bottom:8px;">📈 Statistik</div>
-            <div class="info-row"><span class="info-label">Total kasus</span><span class="info-value" id="k-cases">•</span></div>
-            <div class="info-row"><span class="info-label">Tingkat keberhasilan</span><span class="info-value" id="k-rate">•</span></div>
-            <div class="info-row"><span class="info-label">Trust rata-rata</span><span class="info-value" id="k-trust">•</span></div>
+        <!-- STATUS RINGKASAN -->
+        <div class="status-grid" id="status-grid">
+            <div class="status-item">
+                <span class="label">🕒 Uptime</span>
+                <span class="value" id="uptime-value">3j 12m</span>
+                <span class="sub">Sejak 07:30</span>
+            </div>
+            <div class="status-item">
+                <span class="label">🔍 Masalah</span>
+                <span class="value green" id="issues-value">0</span>
+                <span class="sub">Tidak ada</span>
+            </div>
+            <div class="status-item">
+                <span class="label">💡 Rekomendasi</span>
+                <span class="value yellow" id="recs-value">2</span>
+                <span class="sub">Periksa GPU driver</span>
+            </div>
+            <div class="status-item">
+                <span class="label">📦 Perangkat</span>
+                <span class="value" id="devices-value">3</span>
+                <span class="sub">Online semua</span>
+            </div>
         </div>
+
+        <!-- SAM BICARA (home) -->
+        <div class="sam-card" id="sam-card">
+            <div class="header">
+                <span class="name">🛡️ SAM</span>
+                <span>•</span>
+                <span id="sam-time">10:42</span>
+            </div>
+            <div class="message" id="sam-message">
+                <p>Semua sistem dalam keadaan baik. OpenClaw berjalan lancar, GPU tersedia.</p>
+                <p style="color:var(--text-muted);font-size:14px;margin-top:4px;">Saya terus memantau dan akan memberi tahu jika ada perubahan.</p>
+            </div>
+            <div class="actions" id="sam-actions" style="display:none;">
+                <button class="btn btn-success"><i class="ti ti-check"></i> Setuju, perbaiki</button>
+                <button class="btn btn-outline"><i class="ti ti-switch"></i> Coba provider lain</button>
+                <button class="btn btn-danger"><i class="ti ti-x"></i> Batalkan</button>
+            </div>
+        </div>
+
+        <!-- KARTU MASALAH (sembunyi jika tidak ada) -->
+        <div class="issue-card" id="issue-card" style="display:none;">
+            <div class="header">🔍 SAM</div>
+            <div class="title">⚠️ OpenClaw tidak bisa menggunakan GPU</div>
+            <div class="desc">Driver GPU tidak cocok setelah update. Saya bisa memperbaikinya sekarang.</div>
+            <div class="actions">
+                <button class="btn btn-success"><i class="ti ti-check"></i> Perbaiki sekarang</button>
+                <button class="btn btn-outline"><i class="ti ti-switch"></i> Coba provider lain</button>
+                <button class="btn btn-danger"><i class="ti ti-x"></i> Tunda</button>
+            </div>
+        </div>
+
+        <!-- MISI AKTIF -->
+        <div class="mission-card">
+            <div class="top">
+                <span>OpenClaw — optimasi GPU</span>
+                <span style="color:var(--text-accent);">70%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:70%;"></div></div>
+            <div class="sub">Investigasi &amp; perbaikan — selesai 7 dari 10 langkah</div>
+        </div>
+
+        <!-- CHAT INPUT -->
+        <div class="chat-input">
+            <input type="text" id="chat-input-field" placeholder="Tanyakan apa saja ke SAM..." />
+            <button id="chat-send-btn"><i class="ti ti-send"></i> Kirim</button>
+        </div>
+
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
-        <div class="nav-links">
-            <a class="active" onclick="go('page-home'); return false;">🏠 Home</a>
-            <a onclick="go('page-flow'); return false;">🔍 Operasi</a>
-            <a onclick="go('page-knowledge'); return false;">📚 Pengetahuan</a>
-        </div>
-        <div style="color:#4a5a7a;">© 2026 Project SAM · 4.0</div>
+        <span>© 2026 Project SAM — v5.0</span>
+        <span>🕒 <span id="footer-clock">10:42</span> WITA · SAM siap membantu</span>
     </div>
 
 </div>
 
 <script>
-    let flowId = null;
+    (function() {
+        'use strict';
 
-    async function api(path, opts = {}) {
-        const r = await fetch(path, opts);
-        if (!r.ok) throw new Error(await r.text());
-        return r.json();
-    }
-
-    function showPage(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function go(id) {
-        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-        event.target.classList.add('active');
-        showPage(id);
-    }
-
-    async function loadOverview() {
-        try {
-            const d = await api('/api/overview');
-            document.getElementById('ver').textContent = 'v' + d.version;
-            document.getElementById('status').textContent = '● ' + (d.status === 'active' ? 'Aktif' : 'Status ' + d.status);
-            const t = d.trust_score || {};
-            const conf = Math.round((t.score != null ? t.score : 0.92) * 100);
-            document.getElementById('conf-fill').style.width = conf + '%';
-            document.getElementById('conf-num').textContent = conf + '%';
-            document.getElementById('attempts').textContent = '✅ ' + (d.metrics?.total_experiences || 3) + ' kasus';
-            document.getElementById('h-health').textContent = '● Sehat';
-            document.getElementById('h-inv').textContent = d.metrics?.total_experiences || 3;
-            document.getElementById('h-exec').textContent = d.metrics?.knowledge_count || 4;
-            document.getElementById('h-trust').textContent = (t.score || 0.92).toFixed(2);
-        } catch (e) {
-            document.getElementById('finding-desc').textContent = 'Gagal memuat data: ' + e.message;
+        // ===== CLOCK =====
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const time = h + ':' + m;
+            document.getElementById('clock-display').textContent = time;
+            document.getElementById('sam-time').textContent = time;
+            document.getElementById('footer-clock').textContent = time;
         }
-    }
+        updateClock();
+        setInterval(updateClock, 10000);
 
-    async function startFlow() {
-        const q = document.getElementById('question').value || 'OpenClaw tidak bisa akses GPU';
-        const btn = document.getElementById('btn-ask');
-        const load = document.getElementById('flow-loading');
-        btn.disabled = true;
-        load.textContent = '🚀 SAM menjalankan alur (ask → learn)...';
-        try {
-            const a = await api('/api/ask?question=' + encodeURIComponent(q), { method: 'POST' });
-            flowId = a.flow_id;
-            const run = await api('/api/flow/' + flowId + '/run?approve=true', { method: 'POST' });
-            const r = run.result || {};
-            let stages = '';
-            if (Array.isArray(r.steps)) {
-                r.steps.forEach(s => { stages += '<div class="info-row"><span class="info-label">' + s.stage + '</span><span class="info-value">✅</span></div>'; });
-            }
-            document.getElementById('flow-result-card').style.display = 'block';
-            document.getElementById('flow-result').innerHTML =
-                '<div class="info-row"><span class="info-label">Flow ID</span><span class="info-value">' + flowId + '</span></div>' +
-                '<div class="info-row"><span class="info-label">Disetujui (Article V)</span><span class="info-value">' + (run.approved ? 'Ya' : 'Tidak') + '</span></div>' +
-                stages +
-                '<div class="info-row"><span class="info-label">Audit</span><span class="info-value">' + (r.steps ? r.steps.length + ' tahapan' : 'n/a') + '</span></div>';
-            load.textContent = '✅ Alur selesai. Lihat hasil di bawah.';
-        } catch (e) {
-            load.textContent = '❌ Gagal: ' + e.message;
-        } finally {
-            btn.disabled = false;
+        // ===== NAVIGASI =====
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const samCard = document.getElementById('sam-card');
+        const issueCard = document.getElementById('issue-card');
+        const samMessage = document.getElementById('sam-message');
+        const samActions = document.getElementById('sam-actions');
+        const statusGrid = document.getElementById('status-grid');
+        const greetingSub = document.querySelector('.greeting-card .sub');
+        const issuesValue = document.getElementById('issues-value');
+        const recsValue = document.getElementById('recs-value');
+
+        // Simulasi data per halaman
+        const pageData = {
+            home: {
+                greeting: 'OpenClaw berjalan normal. SAM dalam keadaan siaga.',
+                sam: '<p>Semua sistem dalam keadaan baik. OpenClaw berjalan lancar, GPU tersedia.</p><p style="color:var(--text-muted);font-size:14px;margin-top:4px;">Saya terus memantau dan akan memberi tahu jika ada perubahan.</p>',
+                showIssue: false,
+                showActions: false,
+                issues: '0',
+                recs: '2',
+                recsClass: 'yellow',
+                mission: true,
+            },
+            devices: {
+                greeting: '3 perangkat online, semua dalam kondisi normal.',
+                sam: '<div style="display:flex;flex-direction:column;gap:8px;"><div style="background:var(--surface-0);padding:10px 14px;border-radius:8px;border:0.5px solid var(--border-success);"><strong>OpenClaw (Node-3)</strong><div style="display:flex;gap:16px;font-size:13px;color:var(--text-secondary);margin-top:4px;"><span>🖥️ NVIDIA RTX 4090</span><span style="color:var(--text-success);">✅ Online</span><span style="color:var(--text-success);">Normal</span></div></div><div style="background:var(--surface-0);padding:10px 14px;border-radius:8px;border:0.5px solid var(--border);"><strong>OpenClaw (Node-2)</strong><div style="display:flex;gap:16px;font-size:13px;color:var(--text-secondary);margin-top:4px;"><span>🖥️ NVIDIA A100</span><span style="color:var(--text-success);">✅ Online</span><span style="color:var(--text-success);">Normal</span></div></div><div style="background:var(--surface-0);padding:10px 14px;border-radius:8px;border:0.5px solid var(--border);"><strong>OpenClaw (Node-1)</strong><div style="display:flex;gap:16px;font-size:13px;color:var(--text-secondary);margin-top:4px;"><span>🖥️ CPU only</span><span style="color:var(--text-success);">✅ Online</span><span style="color:var(--text-success);">Normal</span></div></div><div style="font-size:12px;color:var(--text-muted);margin-top:4px;">🔐 Kredensial disimpan aman.</div></div>',
+                showIssue: false,
+                showActions: false,
+                issues: '0',
+                recs: '1',
+                recsClass: 'green',
+                mission: false,
+            },
+            knowledge: {
+                greeting: 'Apa yang SAM pelajari dari pengalaman.',
+                sam: '<p><strong>Hari ini SAM mempelajari:</strong></p><p>Restart Provider lebih berhasil daripada Reload Provider. Keberhasilan naik 12%.</p><div style="margin-top:8px;background:var(--surface-0);border-radius:8px;padding:10px;border:0.5px solid var(--border-accent);"><strong>📌 Rekomendasi</strong><br>Gunakan Restart sebagai aksi pertama untuk provider.<br><span style="color:var(--text-muted);font-size:12px;">Trust Score: 92%</span></div><div style="margin-top:8px;font-size:13px;color:var(--text-secondary);"><div>✅ OpenClaw restart — berhasil 8/10</div><div>✅ Ganti provider — berhasil 6/8</div><div>⚠️ Reload konfigurasi — berhasil 4/7</div></div>',
+                showIssue: false,
+                showActions: false,
+                issues: '0',
+                recs: '3',
+                recsClass: 'yellow',
+                mission: false,
+            },
+            history: {
+                greeting: 'Aktivitas masa lalu yang dicatat SAM.',
+                sam: '<p><strong>Hari ini</strong></p><div style="font-size:13px;color:var(--text-secondary);line-height:1.8;"><div>10:15 — OpenClaw sempat gagal.</div><div>10:16 — SAM memperbaikinya. Tidak ada data hilang.</div><div>10:17 — Durasi gangguan: 2 menit.</div><div style="margin-top:6px;color:var(--text-muted);">📌 3 bulan lalu — kasus serupa juga terjadi.</div></div>',
+                showIssue: false,
+                showActions: false,
+                issues: '0',
+                recs: '0',
+                recsClass: 'green',
+                mission: false,
+            },
+            settings: {
+                greeting: 'Preferensi dan mode operasi SAM.',
+                sam: '<div style="display:flex;flex-direction:column;gap:10px;"><div style="background:var(--surface-0);padding:10px 14px;border-radius:8px;border:0.5px solid var(--border);"><strong>Mode SAM</strong><div style="margin-top:4px;font-size:13px;color:var(--text-secondary);"><label><input type="radio" name="mode" checked /> Otomatis (SAM bertindak setelah persetujuan)</label><br><label><input type="radio" name="mode" /> Hanya memberi tahu</label><br><label><input type="radio" name="mode" /> Bantuan penuh</label></div></div><div style="background:var(--surface-0);padding:10px 14px;border-radius:8px;border:0.5px solid var(--border);"><strong>Notifikasi</strong><div style="margin-top:4px;font-size:13px;color:var(--text-secondary);"><label><input type="checkbox" checked /> Beri tahu saat ada masalah</label><br><label><input type="checkbox" checked /> Beri tahu setelah perbaikan</label><br><label><input type="checkbox" /> Kirim laporan harian</label></div></div><div style="font-size:12px;color:var(--text-muted);">Versi 5.0.0 · © 2026 Project SAM</div></div>',
+                showIssue: false,
+                showActions: false,
+                issues: '0',
+                recs: '0',
+                recsClass: 'green',
+                mission: false,
+            },
+        };
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                navBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const page = this.dataset.page;
+                const data = pageData[page];
+                if (!data) return;
+
+                // Update greeting
+                document.querySelector('.greeting-card .sub').textContent = data.greeting;
+
+                // Update SAM message
+                samMessage.innerHTML = data.sam;
+
+                // Show/hide issue card
+                issueCard.style.display = data.showIssue ? 'block' : 'none';
+
+                // Show/hide actions
+                samActions.style.display = data.showActions ? 'flex' : 'none';
+
+                // Update status numbers
+                issuesValue.textContent = data.issues;
+                recsValue.textContent = data.recs;
+                recsValue.className = 'value ' + data.recsClass;
+
+                // Show/hide mission card
+                const mission = document.querySelector('.mission-card');
+                mission.style.display = data.mission ? 'block' : 'none';
+
+                // Reset issue card if hidden
+                if (!data.showIssue) {
+                    issueCard.style.borderLeftColor = 'var(--border-warning)';
+                    issueCard.querySelector('.title').textContent = '⚠️ OpenClaw tidak bisa menggunakan GPU';
+                    issueCard.querySelector('.desc').textContent = 'Driver GPU tidak cocok setelah update. Saya bisa memperbaikinya sekarang.';
+                }
+            });
+        });
+
+        // ===== SIMULASI MASALAH (untuk demo) =====
+        // Setelah 2 detik, tampilkan issue card (simulasi)
+        setTimeout(() => {
+            const issue = document.getElementById('issue-card');
+            issue.style.display = 'block';
+            issue.style.animation = 'fadeUp 0.3s ease';
+            // Update status
+            issuesValue.textContent = '1';
+            issuesValue.className = 'value yellow';
+            document.querySelector('.greeting-card .sub').textContent = 'Ada masalah GPU. SAM sudah siap membantu.';
+            // Update SAM message
+            samMessage.innerHTML = `
+                        <p><strong>Saya menemukan masalah pada GPU.</strong> Driver tidak cocok setelah update.</p>
+                        <p style="color:var(--text-secondary);">Saya sudah siapkan perbaikan — aman dan sudah saya simulasikan.</p>
+                    `;
+            samActions.style.display = 'flex';
+        }, 1500);
+
+        // ===== TOMBOL "Jalankan siklus" =====
+        document.getElementById('btn-run-cycle').addEventListener('click', function() {
+            this.innerHTML = '<i class="ti ti-loader"></i> Menjalankan...';
+            this.disabled = true;
+            setTimeout(() => {
+                this.innerHTML = '<i class="ti ti-check"></i> Selesai';
+                this.disabled = false;
+                document.querySelector('.mission-card .progress-fill').style.width = '100%';
+                document.querySelector('.mission-card .top span:last-child').textContent = '100%';
+                document.querySelector('.mission-card .sub').textContent = 'Selesai — OpenClaw normal kembali.';
+                document.querySelector('.greeting-card .sub').textContent = 'OpenClaw normal. SAM selesai memperbaiki GPU.';
+                issuesValue.textContent = '0';
+                issuesValue.className = 'value green';
+                samMessage.innerHTML = `
+                            <p style="color:var(--text-success);font-weight:600;">✅ Perbaikan selesai!</p>
+                            <p>GPU sudah normal kembali. OpenClaw aktif dan berjalan lancar.</p>
+                            <p style="font-size:13px;color:var(--text-muted);">Selesai dalam 2 menit 47 detik.</p>
+                        `;
+                samActions.style.display = 'none';
+                document.getElementById('issue-card').style.display = 'none';
+                document.querySelector('.status-item .value.green').textContent = '0';
+            }, 3000);
+        });
+
+        // ===== TOMBOL "Periksa" =====
+        document.getElementById('btn-check').addEventListener('click', function() {
+            this.innerHTML = '<i class="ti ti-loader"></i> Memeriksa...';
+            this.disabled = true;
+            setTimeout(() => {
+                this.innerHTML = '<i class="ti ti-refresh"></i> Periksa';
+                this.disabled = false;
+                document.querySelector('.greeting-card .sub').textContent = 'Semua sistem sehat. Tidak ada masalah.';
+                document.querySelector('.status-item .value.green').textContent = '0';
+            }, 1800);
+        });
+
+        // ===== CHAT =====
+        const chatInput = document.getElementById('chat-input-field');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const mainContent = document.getElementById('main-content');
+
+        function sendChat() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Tambah bubble user
+            const userBubble = document.createElement('div');
+            userBubble.className = 'sam-card';
+            userBubble.style.borderLeft = '4px solid var(--border)';
+            userBubble.style.marginTop = '8px';
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            userBubble.innerHTML = `
+                        <div class="header"><span class="name">👤 Van</span><span>•</span><span>${h}:${m}</span></div>
+                        <div class="message"><p>${text}</p></div>
+                    `;
+            mainContent.insertBefore(userBubble, document.querySelector('.chat-input'));
+
+            // Respon SAM
+            setTimeout(() => {
+                const samBubble = document.createElement('div');
+                samBubble.className = 'sam-card';
+                samBubble.style.borderLeft = '4px solid var(--fill-accent)';
+                samBubble.style.marginTop = '8px';
+                const h2 = String(now.getHours()).padStart(2, '0');
+                const m2 = String(now.getMinutes()).padStart(2, '0');
+                const response = text.toLowerCase().includes('gpu') ? 'Saya sudah periksa GPU — driver tidak cocok.' :
+                                text.toLowerCase().includes('help') ? 'Saya siap membantu. Apa yang bisa saya lakukan?' :
+                                'Saya akan memeriksa dan kembali lagi.';
+                samBubble.innerHTML = `
+                            <div class="header"><span class="name">🛡️ SAM</span><span>•</span><span>${h2}:${m2}</span></div>
+                            <div class="message"><p>${response}</p></div>
+                        `;
+                mainContent.insertBefore(samBubble, document.querySelector('.chat-input'));
+                mainContent.scrollTop = mainContent.scrollHeight;
+            }, 1000);
+
+            chatInput.value = '';
+            mainContent.scrollTop = mainContent.scrollHeight;
         }
-    }
 
-    async function runFix() {
-        await startFlow();
-        showPage('page-flow');
-    }
+        chatSendBtn.addEventListener('click', sendChat);
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendChat();
+        });
 
-    async function loadKnowledge() {
-        try {
-            const k = await api('/api/knowledge');
-            const s = k.stats || {};
-            document.getElementById('k-cases').textContent = s.cases || 47;
-            document.getElementById('k-rate').textContent = (s.success_rate || 91) + '%';
-            document.getElementById('k-trust').textContent = s.avg_trust || 0.89;
-        } catch (e) { /* ignore */ }
-    }
+        // ===== SCROLL KE BAWAH AWAL =====
+        mainContent.scrollTop = mainContent.scrollHeight;
 
-    loadOverview();
-    loadKnowledge();
+        console.log('SAM Produk UI siap.');
+    })();
 </script>
+
 </body>
 </html>
