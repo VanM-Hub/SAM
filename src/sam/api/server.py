@@ -26,8 +26,11 @@ Run:
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 
 from .routes import health, runtime, events, metrics, mission
 from .wiring import rest_app
@@ -56,6 +59,13 @@ app.include_router(mission.router, prefix="/mission", tags=["mission"])
 # artifact/approval/status) - composition-only, via runtime_service.api.
 for _router in rest_app.routers:
     app.include_router(_router.router)
+
+
+@app.get("/ui", response_class=HTMLResponse)
+async def mission_workspace_ui():
+    """SAM Mission Workspace --- thin client UI ke SAM production capability."""
+    ui_file = Path(__file__).resolve().parent / "static" / "mission_workspace.html"
+    return FileResponse(ui_file, media_type="text/html")
 
 
 @app.get("/")

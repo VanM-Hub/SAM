@@ -98,8 +98,13 @@
    │     governed_reasoning         ← Governed AI reasoning (4.4)
    │     autonomous_operations      ← Investigate/diagnose/recommend/verify (4.5)
    │     operational_workspace      ← Integration layer + EndToEndFlow + ProductionPlatform (4.6)
-   │       └── web_ui_server.py     ← Presentation layer FastAPI (UI produksi, Article XVI)
-   │       └── web_ui/              ← Host web UI (index.html)
+   │
+   ├── api                         ← REST API host + UI (canonical production host, 2026-08-11)
+   │     server.py                  ← FastAPI app (GET /ui → static UI, POST /mission, /health, /runtime, ...)
+   │     wiring.py                  ← Composition root (RESTApplication J3-J9)
+   │     routes/                    ← Route modules (health, runtime, events, metrics, mission)
+   │     static/
+   │       └── mission_workspace.html  ← Mission Workspace thin client UI (40,692 bytes; semua fetch ke route canonical)
    │
    ├── 5.x (SAM 5.x - Universal Governance Platform, citizen governance)
    │     universal_ai             ← Multi-provider AI platform (5.1)

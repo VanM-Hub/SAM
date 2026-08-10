@@ -115,7 +115,7 @@ class TestPortableLauncher:
         for name in LAUNCHER_BATS:
             content = self._check(name)
             if name == "SAM_Web.bat":
-                assert "sam.operational_workspace.web_ui_server" in content
+                assert "sam.api.server" in content
                 assert "uvicorn" in content
             else:
                 assert "sam.launcher.cli_entry" in content, (

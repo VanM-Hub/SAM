@@ -6,6 +6,17 @@
 
 ## 5.0.0 (2026-08-10) - SAM 5.x Implementation Start - Universal Governance Platform
 
+### MCR Baseline & Production Wiring (2026-08-10 to 2026-08-11)
+- **P2A REST Mission Route:** `POST /mission/{id}` (production entry via AgentBridge -> MCR -> MissionBuilder).
+- **P3 MCR-MissionBuilder integration:** MissionBuilder dipanggil EXACTLY ONCE per cycle, plan diserahkan ke governance.
+- **T1 ConfidenceAssessor contract:** Confidence dihitung dari reasoning object (bukan string), ReflectionManager mencatat reflection.
+- **T2 Observation optional:** Observation best-effort (cycle tetap completed meskipun unavailable).
+- **T3 Execution contract:** MCR membangun ExecutionRequest, pakai execute + summarize results.
+- **P4A Production MCR Wiring:** AgentBridge -> MCR -> MissionBuilder -> governance -> execution -> reflection. RESTApplication di wiring.py di-rewire (J2/J3-J9).
+- **AgentRuntime RETIRED (Step 9B):** `agent/runtime/` DELETED, `AgentRunResult` dipindah ke `mission_cognition/result.py` (REST DTO kontrak dipreserve). MCR = single cognitive owner.
+- **UI Mission Workspace (Thin Client Production):** UI di-serve via `GET /ui` di production host (`sam.api.server:app`). Semua interaksi fetch ke route canonical. Demo callables + hard-coded values dihilangkan. Status jujur (UNAVAILABLE/READ_ONLY). `SAM_Web.bat` -> `api.server:app` + `/ui`. Mock `web_ui_server.py` + `web_ui/index.html` deleted.
+- **Regression 62/62 GREEN** (P2A/P3/T1/T2/T3/P4A guardrails/launcher).
+
 ### MISSION-5.x (Universal Governance) - Implementation bertahap (Work In Progress)
 - **SAM 5 PRINCIPLE:** perluasan di atas Foundation SAM 1-4 (Foundation immutable). Build by Integration, Extend by Capability, Govern by Contract, Certify by Evidence, Explain Every Decision, Human Owns Authority, Foundation Never Changes.
 - **Bounded context baru (Citizen governance):** `universal_ai` (5.1), `universal_tool` (5.2), `universal_agent` (5.3), `universal_workflow` (5.4), `enterprise_governance` (5.5), `adaptive_governance` (5.6).
@@ -83,14 +94,14 @@
 
 ### Kemampuan yang dirilis
 - **Conversation** sebagai Presentation Capability (bridge read-only, preview-first).
-- **Dashboard** sebagai konsol operasional (Mission · Workflow · Execution · Approval · Audit · Connector · Provider · Runtime · Health · Telemetry).
+- **Dashboard** sebagai konsol operasional (Mission ï¿½ Workflow ï¿½ Execution ï¿½ Approval ï¿½ Audit ï¿½ Connector ï¿½ Provider ï¿½ Runtime ï¿½ Health ï¿½ Telemetry).
 - **CLI** (11 command resmi: mission, workflow, policy, audit, artifact, connector, provider, execution, preview, dashboard).
 - **REST API** via `runtime_service.api` (endpoint `/missions`, `/workflow`, `/approval`, `/execution-preview`, `/audit`, `/artifact`, `/policy`).
-- **LLM Runtime Activation** — 5 provider (OpenAI · Anthropic · Gemini · DeepSeek · Ollama) via Connector ? Provider ? Agent.
+- **LLM Runtime Activation** ï¿½ 5 provider (OpenAI ï¿½ Anthropic ï¿½ Gemini ï¿½ DeepSeek ï¿½ Ollama) via Connector ? Provider ? Agent.
 - Arsitektur deterministik: preview-first, approval mandatory sebelum execute, eksekusi cancellable, rollback metadata, full audit, DTO immutable, kredensial hanya dari environment.
 
 ### Catatan
-- Seluruh fase pengembangan fondasi (Foundation 0.01 ? 0.30, 279 sprint + Program A–K) tercatat di `SPRINT_TRACKER.md` sebagai konteks pengembangan, bukan riwayat rilis.
+- Seluruh fase pengembangan fondasi (Foundation 0.01 ? 0.30, 279 sprint + Program Aï¿½K) tercatat di `SPRINT_TRACKER.md` sebagai konteks pengembangan, bukan riwayat rilis.
 - Rencana ke depan di `docs/foundation/ROADMAP.md` (post-1.0).
 
 ## SAM 1.0.1 (2026-08-08) - Baseline CI Expansion
@@ -110,32 +121,32 @@
 ### Test Baseline Convergence (Program A Phase 4)
 - Execution Runtime masuk baseline CI dengan 2 test pre-existing di-xfail.
 - Total baseline: 4,017 tests passed, 1 skipped, 2 xfailed.
-- 8 runtime OPERATIONAL: Knowledge · Memory · Policy · Workflow · Artifact · Audit · Mission · Execution.
+- 8 runtime OPERATIONAL: Knowledge ï¿½ Memory ï¿½ Policy ï¿½ Workflow ï¿½ Artifact ï¿½ Audit ï¿½ Mission ï¿½ Execution.
 - 2 xfail: `test_no_hardcoded_secrets_in_provider_executor_source` (false positive pada prefix "Bearer") dan `test_provider_executor_non_auth_execute_ok` (filesystem provider belum memenuhi syarat base_url).
 
-## SAM 1.0.2 (2026-08-08) — C-Phase 1 Observation Layer
+## SAM 1.0.2 (2026-08-08) ï¿½ C-Phase 1 Observation Layer
 
-### Operational Intelligence — Wiring & Integration (Program C)
+### Operational Intelligence ï¿½ Wiring & Integration (Program C)
 - Observation Layer: `src/sam/observation/` (publication, adapters, timeline, capability, evidence).
 - 10 Runtime Publication Adapter (mission, workflow, policy, execution, approval, audit, knowledge, memory, artifact, runtime_service).
 - Unified TimelineAggregator (4 sumber timeline: mission, execution, approval, audit).
-- CapabilityStatusReader — 10 runtime, 8 capability axis per runtime.
-- EvidenceExplorer — 10 evidence entries, by-category/by-runtime navigation.
-- ObservationGateway — unified REST endpoint via `runtime_service.api.observation_endpoint`.
-- Observation Wiring — singleton composition root.
+- CapabilityStatusReader ï¿½ 10 runtime, 8 capability axis per runtime.
+- EvidenceExplorer ï¿½ 10 evidence entries, by-category/by-runtime navigation.
+- ObservationGateway ï¿½ unified REST endpoint via `runtime_service.api.observation_endpoint`.
+- Observation Wiring ï¿½ singleton composition root.
 - Total baseline (lokal): 4,096 tests (unit + 8 runtime suites + observation 79 tests).
 - Constraint: read-only, no new runtime, no governance change, no business logic.
 
-## SAM 1.0.2 (2026-08-08) — C-Phase 2 Gap Resolution
+## SAM 1.0.2 (2026-08-08) ï¿½ C-Phase 2 Gap Resolution
 
-### Operational Intelligence — Gap Resolution (Program C)
-- GAP-001: UnifiedHealthReporter — enhanced health overview per-runtime + rekomendasi otomatis.
-- GAP-002: PreviewConsumerIndex — mapping preview?consumer (5 consumer: desktop, console, web, cli, rest_api).
-- GAP-003: EventBusInspector — unified event bus facade (read-only, 3 bus teridentifikasi).
-- GAP-004: ReadinessReporter — readiness endpoint aggregation + gap detection.
-- GAP-005: OperationalAnalytics — trend + pattern detection (metric density, dashboard coverage, insights).
-- GAP-006: ApprovalHealthInspector — approval engine self-reporting assessment.
-- GapResolutionCoordinator — resolve_all_gaps() aggregator (1 panggilan, 6 laporan).
+### Operational Intelligence ï¿½ Gap Resolution (Program C)
+- GAP-001: UnifiedHealthReporter ï¿½ enhanced health overview per-runtime + rekomendasi otomatis.
+- GAP-002: PreviewConsumerIndex ï¿½ mapping preview?consumer (5 consumer: desktop, console, web, cli, rest_api).
+- GAP-003: EventBusInspector ï¿½ unified event bus facade (read-only, 3 bus teridentifikasi).
+- GAP-004: ReadinessReporter ï¿½ readiness endpoint aggregation + gap detection.
+- GAP-005: OperationalAnalytics ï¿½ trend + pattern detection (metric density, dashboard coverage, insights).
+- GAP-006: ApprovalHealthInspector ï¿½ approval engine self-reporting assessment.
+- GapResolutionCoordinator ï¿½ resolve_all_gaps() aggregator (1 panggilan, 6 laporan).
 - ObservationWiring diperluas: `get_gap_coordinator()` + `resolve_all_gaps()` singleton.
 - Total baseline (lokal): 4,157 tests (unit + 8 runtime suites + observation 142 tests).
 - Constraint: read-only, no new runtime, no governance change.
@@ -153,12 +164,12 @@
 - Hasil: **CI hijau 7/7** (core 3.10/3.11/3.12, server, desktop, validation, coverage).
 - Total baseline (lokal): 4,159 tests (unit + 8 runtime suites + observation 142 tests).
 
-## SAM 1.0.2 (2026-08-08) — C-Phase 1 & 2 Fully Verified
+## SAM 1.0.2 (2026-08-08) ï¿½ C-Phase 1 & 2 Fully Verified
 
 ### Verifikasi Independen (Evidence Before Assumption)
 - Diff commit `978f89d` (C-Phase 1) & `74f6a72` (C-Phase 2) diinspeksi langsung: perubahan terkonsentrasi di `src/sam/observation/` + endpoint wiring + test; **tidak ada perubahan** pada runtime boundary, governance flow, approval, execution, audit, atau ADR-001..007.
 - Engineering Concern Lead Engineer ditegakkan dari kode: `GapResolutionCoordinator` hanya punya 1 method publik `resolve_all()` (query read-only); **0 panggilan** approve/execute/submit/register/publish/emit/transition/write di seluruh `observation/`; **0 import** ke governance/approval/execution/events/runtime; registry terbukti tidak berubah (10 -> 10) sebelum & sesudah `resolve_all()`.
-- 142/142 test observation dijalankan ulang lokal — hijau.
+- 142/142 test observation dijalankan ulang lokal ï¿½ hijau.
 - CI commit `e6c514b` (HEAD) terkonfirmasi **hijau 7/7** (core 3.10/3.11/3.12, server, desktop, validation, coverage).
 - Hasil: **Engineering Report Accepted** -> **Lead Engineer Verdict: Fully Verified**. Zero Architecture Drift dikonfirmasi.
 
