@@ -1,0 +1,373 @@
+"""Mission Cognitive Runtime (MCR) — Cognitive Kernel / Program C (MISSION 4.6+).
+
+Pure orchestrator. MCR TIDAK meniru OpenClaw, TIDAK meng-embed GPT, dan TIDAK
+menjadi God Object. Ia hanya mengorkestrasi kemampuan SAM yang sudah ada
+(foundation immutable) dan mewajibkan handoff governance ke kernel eksternal.
+
+Alur satu siklus misi:
+    Mission -> Reason -> Govern -> Execute -> Observe -> Reflect -> Learn
+
+Prinsip yang dijaga (AD-ENG-001/002, AO-ENG-001):
+- Foundational capability: ReasoningEngine = StructuredReasoningEngine (governed_reasoning).
+- Governance WAJIB di level MCR. Authority tetap di Governance Kernel (eksternal).
+- Observation read-only (Observe, never govern).
+- Reflection memakai ReflectionManager healing (cycle_id/symptom/hypothesis/...).
+- MCR memanggil capability; tidak mengganti atau menulis ulang apa pun.
+"""
+from __future__ import annotations
+
+import asyncio
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
+
+import structlog
+
+# ── Foundational capabilities (panci B / existing) ──────────────────
+from sam.governed_reasoning.structured_reasoning import (
+    EvidenceRef,
+    ReasoningStep,
+    StructuredReasoning,
+    StructuredReasoningEngine,
+)
+from sam.governed_reasoning.confidence_assessment import ConfidenceAssessor
+from sam.observation.recommendation import ObservationRecommendationEngine
+from sam.healing.reflection import ReflectionManager
+
+
+logger = structlog.get_logger()
+
+
+def _now_utc() -> str:
+    return datetime.utcnow().isoformat() + "Z"
+
+
+def _new_id(prefix: str) -> str:
+    return f"{prefix}_{uuid.uuid4().hex[:12]}"
+
+
+class MissionCycleStatus(str, Enum):
+    CREATED = "created"
+    REASONING = "reasoning"
+    GOVERNANCE = "governance"
+    EXECUTING = "executing"
+    OBSERVING = "observing"
+    REFLECTING = "reflecting"
+    COMPLETED = "completed"
+    BLOCKED = "blocked"
+    FAILED = "failed"
+
+
+@dataclass
+class MissionCycleResult:
+    """Hasil satu siklus misi — audit-friendly, tanpa authority."""
+
+    cycle_id: str
+    status: MissionCycleStatus
+    mission: str
+    reasoning_id: str = ""
+    conclusion: str = ""
+    governance_decision: str = ""
+    governance_reason: str = ""
+    execution_summary: str = ""
+    observation_summary: Any = None
+    reflection_id: str = ""
+    lesson: str = ""
+    error: str = ""
+    created_at: str = field(default_factory=_now_utc)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "cycle_id": self.cycle_id,
+            "status": self.status.value,
+            "mission": self.mission,
+            "reasoning_id": self.reasoning_id,
+            "conclusion": self.conclusion,
+            "governance_decision": self.governance_decision,
+            "governance_reason": self.governance_reason,
+            "execution_summary": self.execution_summary,
+            "observation_summary": self.observation_summary,
+            "reflection_id": self.reflection_id,
+            "lesson": self.lesson,
+            "error": self.error,
+            "created_at": self.created_at,
+        }
+
+
+def _default_reasoning_fn(
+    context: Any, evidences: Tuple[EvidenceRef, ...]
+) -> Tuple[List[ReasoningStep], str]:
+    """Reasoning_fn bawaan berbasis evidence (mirip pola test panci B).
+
+    Membuat premis dari tiap evidence, lalu menyimpulkan jumlah evidence.
+    Dapat diganti caller lewat injeksi `reasoning_fn`.
+    """
+    steps: List[ReasoningStep] = []
+    for i, ev in enumerate(evidences, start=1):
+        steps.append(
+            ReasoningStep(
+                step_id=f"s{i}",
+                kind="premise" if i < len(evidences) else "conclusion",
+                content=f"observed {ev.evidence_id}",
+                evidence_refs=(ev.evidence_id,),
+            )
+        )
+    conclusion = "conclusion from " + str(len(evidences)) + " evidence"
+    return steps, conclusion
+
+
+class MissionCognitiveRuntime:
+    """Orkestrator siklus kognitif misi.
+
+    Pure orchestrator: memanggil ReasoningEngine (panci B), Governance Kernel
+    (eksternal, wajib), Execution, Observation (read-only), ReflectionManager
+    (healing). Tidak memiliki logic governance; tidak mengganti capability.
+    """
+
+    def __init__(
+        self,
+        reasoning_engine: Optional[StructuredReasoningEngine] = None,
+        observation_engine: Optional[ObservationRecommendationEngine] = None,
+        reflection_manager: Optional[ReflectionManager] = None,
+        confidence_assessor: Optional[ConfidenceAssessor] = None,
+        governance_engine: Any = None,
+        execution_runtime: Any = None,
+        governance_required: bool = True,
+        reasoning_fn: Optional[Any] = None,
+    ) -> None:
+        self._reasoning_engine = reasoning_engine or StructuredReasoningEngine(
+            reasoning_fn or _default_reasoning_fn
+        )
+        self._observation_engine = observation_engine
+        self._reflection_manager = reflection_manager or ReflectionManager()
+        self._confidence_assessor = confidence_assessor or ConfidenceAssessor()
+        # Governance kernel EKSTERNAL — MCR tidak punya logic governance.
+        self._governance_engine = governance_engine
+        self._execution_runtime = execution_runtime
+        self._governance_required = governance_required
+        self._last_lesson: str = ""
+        self._logger = logger.bind(component="MissionCognitiveRuntime")
+
+    # ── Public ──────────────────────────────────────────────────────────
+
+    async def run_cycle(
+        self,
+        mission: str,
+        evidences: Tuple[EvidenceRef, ...] = (),
+        context: Optional[Dict[str, Any]] = None,
+    ) -> MissionCycleResult:
+        """Jalankan satu siklus misi penuh (reason->govern->execute->observe->reflect->learn)."""
+        if not mission or not str(mission).strip():
+            return self._fail(
+                MissionCycleResult(cycle_id=_new_id("mc"), status=MissionCycleStatus.FAILED, mission=""),
+                "mission is empty",
+            )
+
+        ctx = context or {}
+        cycle_id = _new_id("mc")
+        result = MissionCycleResult(
+            cycle_id=cycle_id,
+            status=MissionCycleStatus.CREATED,
+            mission=mission,
+        )
+        self._logger.info("MCR cycle started", cycle_id=cycle_id, mission=mission)
+
+        # 1) REASON ──────────────────────────────────────────────────────
+        result.status = MissionCycleStatus.REASONING
+        try:
+            reasoning: StructuredReasoning = self._reasoning_engine.reason(
+                question=mission, evidences=evidences, **ctx
+            )
+            result.reasoning_id = reasoning.reasoning_id
+            result.conclusion = reasoning.conclusion
+        except Exception as exc:  # pragma: no cover - defensive
+            return self._fail(result, f"reasoning failed: {exc}")
+
+        # 2) GOVERN (WAJIB — authority tetap eksternal) ───────────────────
+        result.status = MissionCycleStatus.GOVERNANCE
+        decision = await self._enforce_governance(result, ctx)
+        if decision != "allow":
+            result.governance_decision = decision
+            result.status = MissionCycleStatus.BLOCKED
+            self._last_lesson = f"governance blocked ({decision}): {result.governance_reason}"
+            return result
+
+        # 3) EXECUTE (serah ke jalur eksekusi resmi) ──────────────────────
+        result.status = MissionCycleStatus.EXECUTING
+        result.execution_summary = self._summarize_execution(cycle_id, mission, result.conclusion)
+        self._logger.info("MCR governance allowed", cycle_id=cycle_id, decision=decision)
+
+        # 4) OBSERVE (read-only, best-effort) ─────────────────────────────
+        result.status = MissionCycleStatus.OBSERVING
+        result.observation_summary = self._observe(cycle_id, mission)
+
+        # 5) REFLECT + LEARN (best-effort) ────────────────────────────────
+        result.status = MissionCycleStatus.REFLECTING
+        await self._reflect(result)
+
+        result.status = MissionCycleStatus.COMPLETED
+        result.lesson = self._last_lesson
+        self._logger.info(
+            "MCR cycle completed",
+            cycle_id=cycle_id,
+            status=result.status.value,
+            lesson=result.lesson,
+        )
+        return result
+
+    def get_last_lesson(self) -> str:
+        """Lesson dari keputusan/siklus terakhir — untuk keputusan berikutnya."""
+        return self._last_lesson
+
+    # ── Governance (handoff WAJIB, authority eksternal) ─────────────────
+
+    async def _enforce_governance(
+        self, result: MissionCycleResult, ctx: Dict[str, Any]
+    ) -> str:
+        """Meminta keputusan ke Governance Kernel eksternal.
+
+        MCR TIDAK memiliki logic governance. Ia menyerahkan graph + konteks ke
+        governance_engine; kewenangan tetap di kernel eksternal.
+        """
+        if self._governance_engine is None:
+            if self._governance_required:
+                result.governance_reason = (
+                    "governance engine required but not provided (MCR enforces governance)"
+                )
+                return "blocked"
+            # dev/ops mode: dibolehkan hanya untuk pengujian, bukan produksi.
+            return "allow"
+
+        try:
+            graph = self._build_decision_graph(result, ctx)
+            if asyncio.iscoroutinefunction(self._governance_engine.evaluate):
+                verdict = await self._governance_engine.evaluate(graph, {})
+            else:
+                verdict = self._governance_engine.evaluate(graph, {})
+        except Exception as exc:  # pragma: no cover - defensive
+            result.governance_reason = f"governance evaluation error: {exc}"
+            return "error"
+
+        decision = getattr(verdict, "decision", verdict)
+        result.governance_decision = str(decision)
+        result.governance_reason = str(getattr(verdict, "reason", ""))
+        return str(decision)
+
+    def _build_decision_graph(self, result: MissionCycleResult, ctx: Dict[str, Any]) -> Any:
+        """Membangun representasi keputusan untuk governance kernel.
+
+        Kontrak longgar (dict) agar tidak terikat ke tipe plugin tertentu.
+        Governance kernel yang menentukan bentuk evaluasinya.
+        """
+        return {
+            "cycle_id": result.cycle_id,
+            "mission": result.mission,
+            "reasoning_id": result.reasoning_id,
+            "conclusion": result.conclusion,
+            "context": ctx,
+        }
+
+    # ── Execution (serah ke jalur resmi) ────────────────────────────────
+
+    def _summarize_execution(
+        self, cycle_id: str, mission: str, conclusion: str
+    ) -> str:
+        """Serah eksekusi ke execution_runtime resmi.
+
+        Jika execution_runtime tersedia, MCR memanggilnya. Jika tidak, MCR
+        mencatat bahwa eksekusi diserahkan (journaled) — tidak berpura-pura
+        mengeksekusi sendiri (bukan God Object).
+        """
+        summary = f"instruction:{mission} | conclusion:{conclusion}"
+        if self._execution_runtime is not None:
+            try:
+                # contract longgar: runtime resmi menentukan cara invoke.
+                invoke = getattr(self._execution_runtime, "invoke", None) or getattr(
+                    self._execution_runtime, "execute", None
+                )
+                if invoke is not None:
+                    outcome = invoke(mission, conclusion=conclusion, cycle_id=cycle_id)
+                    summary = f"{summary} | result:{outcome}"
+            except Exception as exc:  # pragma: no cover - defensive
+                summary = f"{summary} | execute-error:{exc}"
+        return summary
+
+    # ── Observation (read-only, best-effort) ────────────────────────────
+
+    def _observe(self, cycle_id: str, mission: str) -> Any:
+        """Mengamati hasil via ObservationRecommendationEngine (read-only).
+
+        Gagal observasi TIDAK menggagalkan siklus — orchestrator tetap jalan
+        (graceful degradation).
+        """
+        if self._observation_engine is None:
+            return None
+        try:
+            # ObservationRecommendationEngine menyediakan `recommend()` (read-only),
+            # bukan `observe()`. Panggil method yang benar sesuai kontrak panci B.
+            recom = self._observation_engine.recommend()
+            # Selalu ratakan jadi dict agar auditable & konsisten dengan to_dict().
+            if hasattr(recom, "as_dict"):
+                return recom.as_dict()
+            if hasattr(recom, "to_dict"):
+                return recom.to_dict()
+            return vars(recom) if hasattr(recom, "__dict__") else str(recom)
+        except Exception:  # pragma: no cover - defensive
+            return None
+
+    # ── Reflection + Learning (reuse ReflectionManager healing) ─────────
+
+    async def _reflect(self, result: MissionCycleResult) -> None:
+        """Merekam refleksi memakai ReflectionManager healing.
+
+        Memakai semantik healing (cycle_id/symptom/hypothesis/action_taken/
+        gap_analysis). Gagal refleksi TIDAK menggagalkan siklus (best-effort).
+        """
+        try:
+            # pastikan SEMUA field str (ReflectionRecord=extra forbid, butuh str bukan None)
+            obs_str = result.observation_summary
+            if obs_str is None:
+                obs_str = ""
+            else:
+                obs_str = str(obs_str)
+            record = await self._reflection_manager.record_reflection(
+                cycle_id=result.cycle_id,
+                symptom=str(result.observation_summary or result.execution_summary or ""),
+                hypothesis=str(result.conclusion or ""),
+                action_taken=f"execute:{result.execution_summary}",
+                expected_outcome=f"govern:{result.governance_decision}",
+                actual_outcome=obs_str,
+                gap_analysis="",
+                lessons=[result.lesson] if result.lesson else [],
+                confidence=await self._assess_confidence(result),
+                success=(result.status is MissionCycleStatus.COMPLETED),
+                metadata={"mission": result.mission},
+            )
+            result.reflection_id = record.id
+        except Exception as exc:  # pragma: no cover - defensive
+            self._logger.warning("MCR reflection skipped", cycle_id=result.cycle_id, error=str(exc))
+
+    async def _assess_confidence(self, result: MissionCycleResult) -> float:
+        try:
+            value = self._confidence_assessor.assess(
+                result.conclusion, {"status": result.status.value}
+            )
+            return float(getattr(value, "confidence", value))
+        except Exception:  # pragma: no cover - defensive
+            return 0.0
+
+    def _fail(self, result: MissionCycleResult, error: str) -> MissionCycleResult:
+        result.status = MissionCycleStatus.FAILED
+        result.error = error
+        self._last_lesson = f"cycle failed: {error}"
+        self._logger.error("MCR cycle failed", cycle_id=result.cycle_id, error=error)
+        return result
+
+
+__all__ = [
+    "MissionCognitiveRuntime",
+    "MissionCycleResult",
+    "MissionCycleStatus",
+]
