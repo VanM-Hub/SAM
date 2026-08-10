@@ -81,5 +81,8 @@ class TestP2AVerificationTrace:
         body = re.sub(r'""".*?"""', "", src, flags=re.DOTALL)
         calls = re.findall(r"\b(?:[A-Za-z_]\w*\.)+build_default\(", body)
         assert calls == [], f"route tidak boleh memanggil build_default: {calls}"
-        # Route mengandalkan llm_agent_bridge (application use case).
-        assert "run_mission_from_provider" in src
+        # Route mengandalkan llm_agent_bridge (application use case) - P4A: MCR path.
+        assert "llm_agent_bridge" in src
+        # Route TIDAK memanggil use case legacy AgentRuntime orchestration di kode aktif
+        # (jalur production kini memakai run_mission_cognitive -> MCR single owner).
+        assert "run_mission_cognitive" in src

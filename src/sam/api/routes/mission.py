@@ -3,15 +3,18 @@
 Production Mission Entry Point: HTTP adapter untuk MissionBuilder.
 
 Clean Architecture (keputusan P2A):
-    HTTP -> REST Route (adapter) -> Application Use Case -> AgentBridge/AgentRuntime -> MissionBuilder
+    HTTP -> REST Route (adapter) -> Application Use Case -> AgentBridge -> MissionCognitiveRuntime
 
 Modul ini HANYA adapter: memetakan HTTP request menjadi panggilan Application Use Case
-(`AgentBridge.run_mission_from_provider` dari `api.llm_wiring`). AgentBridge adalah
+(`AgentBridge.run_mission_cognitive` dari `api.llm_wiring`). AgentBridge adalah
 application-level use case yang memegang wiring:
-    build_plan -> MissionBuilder.build_default() -> PlanResult -> AgentRuntime.run_mission().
+    run_mission_cognitive -> MCR.run_cycle -> (Reason -> Plan via MissionBuilder
+    -> Govern eksternal -> Execute official -> Observe -> Reflect -> Learn).
 
 Route TIDAK mengambil alih orchestration. TIDAK mengubah RuntimeService, Governance,
 Execution, maupun reasoning/engine.py. External_calls tetap 0 (preview-only, deterministik).
+AgentRuntime tidak lagi menjadi orchestration owner jalur ini (P4A), namun tetap ada
+sebagai legacy (migration safety); orchestration jalur production dimiliki MissionCognitiveRuntime.
 """
 from __future__ import annotations
 
@@ -58,13 +61,17 @@ router = APIRouter(tags=["mission"])
 
 @router.post("/{mission_id}")
 async def run_mission(mission_id: str, request: Optional[MissionRequest] = None):
-    """Jalankan mission via Application Use Case (AgentBridge -> MissionBuilder).
+    """Jalankan mission via Application Use Case (AgentBridge -> MCR).
 
     - Pilih mission_id dari path; jika body ada, provider_id diambil dari body.
-    - Ini production mission entry point pertama (P2A).
+    - Ini production mission entry point pertama (P2A) yang kini diorkestrasi
+      oleh MissionCognitiveRuntime (satu cognitive owner, Architecture Acceptance
+      P4A). AgentRuntime TIDAK lagi menjadi orchestration owner jalur ini.
+    - Route tetap adapter: memanggil use case, tidak mengambil alih orchestration.
+    - Kontrak REST dipertahankan (AgentRunResult-compatible mapping).
     """
     provider_id = request.provider_id if request else "openai"
-    result = _bridge().run_mission_from_provider(provider_id, mission_id)
+    result = await _bridge().run_mission_cognitive(provider_id, mission_id)
     return _result_details(result)
 
 

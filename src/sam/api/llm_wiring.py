@@ -280,6 +280,19 @@ from ..agent.foundation.agent_descriptor import AgentDescriptor
 from ..agent.foundation.agent_capability import AgentCapability, AgentOperation
 from ..agent.foundation.agent_contract import AgentContract
 
+# --- Mission Cognitive Runtime (P4A) — canonical cognitive orchestrator --------- #
+from ..mission_cognition import (
+    MissionCognitiveRuntime,
+    MissionCycleResult,
+    MissionCycleStatus,
+)
+from ..agent.planner.mission_builder import MissionBuilder
+
+# --- Governance + Execution official path (P4A, T3) ----------------------------- #
+from ..execution_runtime.approval_gate import ApprovalGate
+from ..execution_runtime.execution_request import ExecutionRequest
+from ..execution_runtime.governed_execution import GovernedExecution
+
 
 class LLMAgentLayer:
     """Composition root untuk layer Agent jalur LLM (K3)."""
@@ -336,19 +349,128 @@ class LLMAgentLayer:
         return self._registry.count() >= 1
 
 
-class AgentBridge:
-    """Jembatan wiring: hasil Provider Runtime -> mission AgentRuntime.
+class _MissionGovernanceAdapter:
+    """Adapter kontrak (composition-only) antara MCR dan Governance Kernel.
 
-    BUKAN runtime baru / orkestrator; hanya memetakan output provider menjadi
-    mission agent dan menjalankan AgentRuntime yang SUDAH ADA (preview-only).
-    AgentRuntime tidak diubah; external_calls tetap 0 di jalur agent.
+    MCR `_enforce_governance` memanggil `governance_engine.evaluate(graph, ctx)`
+    dan mengharapkan verdict dengan `.decision` / `.reason`. ApprovalGate
+    (kernel governance jalur execution resmi) punya kontrak `.evaluate(request)`
+    berbeda. Adapter ini hanya MENERJEMAHKAN kontrak — TIDAK menambah logic
+    governance, TIDAK mengubah authority (keputusan tetap di ApprovalGate).
+
+    Mode preview (ADR-008 sec 12): ApprovalGate otomatis approved (tidak eksekusi
+    nyata, external_calls tetap 0).
+    """
+
+    def __init__(self, gate: Optional[ApprovalGate] = None) -> None:
+        self._gate = gate or ApprovalGate()
+
+    def evaluate(self, graph, _ctx=None):
+        cycle_id = str(graph.get("cycle_id", "mc-governance")) if isinstance(graph, dict) else "mc-governance"
+        request = ExecutionRequest(
+            execution_id=cycle_id,
+            provider_id="openai",
+            operation="mission_governance",
+            mode="preview",  # preview: approval tidak dibutuhkan, external_calls=0
+            payload=dict(graph) if isinstance(graph, dict) else {},
+        )
+        decision = self._gate.evaluate(request)
+        return _GovernanceVerdict(
+            decision="allow" if decision.approved else "blocked",
+            reason=decision.reason or "approved (preview)",
+        )
+
+
+class _GovernanceVerdict:
+    """Hasil keputusan governance (kontrak longgar MCR: .decision + .reason)."""
+
+    def __init__(self, decision: str, reason: str = "") -> None:
+        self.decision = decision
+        self.reason = reason
+
+
+class AgentBridge:
+    """Jembatan wiring: hasil Provider Runtime -> mission cognitive runtime.
+
+    Application Use Case (boundary aplikasi, PREserve kontrak REST).
+
+    Sesuai Architecture Acceptance P4A (responsibility-based migration):
+    - Signature `run_mission_from_provider` + hasil `AgentRunResult` di-PREserve
+      (kontrak REST bergantung padanya).
+    - Orchestration kognitif jalur production dialihkan ke MissionCognitiveRuntime
+      (single cognitive owner) — BUKAN AgentRuntime.
+    - AgentRuntime tetap ada (tidak dihapus); orchestration-nya pada jalur
+      production mission di-stop (legacy method dipertahankan utk compat test).
+    - Governance tetap eksternal (ApprovalGate via adapter); execution via
+      official path (GovernedExecution); observation read-only; reflection via
+      ReflectionManager.
     """
 
     def __init__(self, agent_layer: LLMAgentLayer) -> None:
         self._layer = agent_layer
+        # Composition root MCR (DI penuh; governance/execution official).
+        self._execution = GovernedExecution()
+        self._mcr = MissionCognitiveRuntime(
+            governance_engine=_MissionGovernanceAdapter(
+                gate=ApprovalGate()
+            ),
+            governance_required=True,
+            execution_runtime=self._execution,
+            execution_provider_id="openai",
+            mission_builder=MissionBuilder(),
+        )
+
+    # ── Production mission path (P4A) — MCR single cognitive owner ──────
+
+    async def run_mission_cognitive(self, provider_id: str,
+                                    mission_id: str) -> AgentRunResult:
+        """Jalankan mission via MCR di balik boundary aplikasi.
+
+        MissionBuilder di-invoke SEKALI (oleh MCR). Provider TIDAK dieksekusi
+        (preview, ADR-008). Governance eksternal + execution official path.
+
+        Mengembalikan `AgentRunResult` (kontrak REST dipre-serve) — serializer
+        route tidak perlu mengetahui internal MCR / MissionCycleResult.
+        """
+        result: MissionCycleResult = await self._mcr.run_cycle(
+            mission="mission " + mission_id,
+            evidences=(),
+            context={"mission_id": mission_id, "provider_id": provider_id},
+        )
+        return self.map_cognitive_result(result, mission_id)
+
+    def map_cognitive_result(self, result: MissionCycleResult, mission_id: str) -> AgentRunResult:
+        """Map MissionCycleResult -> AgentRunResult (kontrak REST kompatibel).
+
+        Route REST (`_result_details`) tetap membaca mission_id/ok/final_state/
+        external_calls/steps/detail — TIDAK dipaksa tahu internal MCR.
+        """
+        ok = result.status is MissionCycleStatus.COMPLETED
+        return AgentRunResult(
+            mission_id=mission_id,
+            ok=ok,
+            final_state=result.status.value.capitalize(),  # 'Completed' bila COMPLETED
+            steps=result.plan_step_count,
+            external_calls=0,  # preview: provider tidak dieksekusi
+            detail="; ".join(
+                str(x) for x in (
+                    result.conclusion or "",
+                    ("gov:" + result.governance_decision) if result.governance_decision else "",
+                    result.lesson or "",
+                    result.error or "",
+                ) if x
+            ) or "preview pipeline complete",
+        )
 
     def run_mission_from_provider(self, provider_id: str,
                                   mission_id: str) -> AgentRunResult:
+        """Legacy sync path (AgentRuntime) — DI-PERTAHANKAN utk compat/test.
+
+        Jalur production TIDAK lagi memanggil ini (bukan orchestration owner
+        jalur produksi mission). Dipertahankan agar kontrak/boundary aplikasi
+        tidak patah & test P2A legacy tetap hijau, sambil 'retire' orchestration
+        pada jalur production. Langkah 9 (hapus) tidak dilakukan (menunggu).
+        """
         runtime = self._layer.runtime
         runtime.register_runtimes(["provider"])
         runtime.enqueue_route([provider_id])
