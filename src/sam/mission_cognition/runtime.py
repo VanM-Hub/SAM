@@ -227,7 +227,7 @@ class MissionCognitiveRuntime:
 
         # 6) REFLECT + LEARN (best-effort) ────────────────────────────────
         result.status = MissionCycleStatus.REFLECTING
-        await self._reflect(result)
+        await self._reflect(result, reasoning)
 
         result.status = MissionCycleStatus.COMPLETED
         result.lesson = self._last_lesson
@@ -384,11 +384,16 @@ class MissionCognitiveRuntime:
 
     # ── Reflection + Learning (reuse ReflectionManager healing) ─────────
 
-    async def _reflect(self, result: MissionCycleResult) -> None:
+    async def _reflect(self, result: MissionCycleResult,
+                       reasoning: Optional[StructuredReasoning] = None) -> None:
         """Merekam refleksi memakai ReflectionManager healing.
 
         Memakai semantik healing (cycle_id/symptom/hypothesis/action_taken/
         gap_analysis). Gagal refleksi TIDAK menggagalkan siklus (best-effort).
+
+        `reasoning` (objek StructuredReasoning) diteruskan ke confidence assessor
+        agar cocok dengan kontrak assessor yang membutuhkan objek reasoning,
+        bukan string conclusion (lihat T1).
         """
         try:
             # pastikan SEMUA field str (ReflectionRecord=extra forbid, butuh str bukan None)
@@ -406,7 +411,7 @@ class MissionCognitiveRuntime:
                 actual_outcome=obs_str,
                 gap_analysis="",
                 lessons=[result.lesson] if result.lesson else [],
-                confidence=await self._assess_confidence(result),
+                confidence=await self._assess_confidence(result, reasoning),
                 success=(result.status is MissionCycleStatus.COMPLETED),
                 metadata={"mission": result.mission},
             )
@@ -414,12 +419,22 @@ class MissionCognitiveRuntime:
         except Exception as exc:  # pragma: no cover - defensive
             self._logger.warning("MCR reflection skipped", cycle_id=result.cycle_id, error=str(exc))
 
-    async def _assess_confidence(self, result: MissionCycleResult) -> float:
+    async def _assess_confidence(
+        self,
+        result: MissionCycleResult,
+        reasoning: Optional[StructuredReasoning] = None,
+    ) -> float:
+        """Menilai confidence sesuai kontrak ConfidenceAssessor (T1).
+
+        Assessor (governed_reasoning) membutuhkan objek `StructuredReasoning`,
+        bukan string conclusion. Sebelum T1, MCR memanggil assess(benar, salah)
+        dengan 2 arg sehingga selalu dicegat except -> confidence 0.0 (silent).
+        Setelah T1: MCR meneruskan objek reasoning & membaca atribut `value`.
+        """
         try:
-            value = self._confidence_assessor.assess(
-                result.conclusion, {"status": result.status.value}
-            )
-            return float(getattr(value, "confidence", value))
+            assert reasoning is not None, "reasoning required for confidence assessment"
+            assessment = self._confidence_assessor.assess(reasoning)
+            return float(getattr(assessment, "value", 0.0) or 0.0)
         except Exception:  # pragma: no cover - defensive
             return 0.0
 
