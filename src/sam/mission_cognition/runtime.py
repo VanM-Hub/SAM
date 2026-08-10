@@ -36,6 +36,7 @@ from sam.governed_reasoning.confidence_assessment import ConfidenceAssessor
 from sam.observation.recommendation import ObservationRecommendationEngine
 from sam.healing.reflection import ReflectionManager
 from sam.agent.planner.mission_builder import MissionBuilder, PlanResult
+from sam.execution_runtime.execution_request import ExecutionRequest
 
 
 logger = structlog.get_logger()
@@ -144,6 +145,8 @@ class MissionCognitiveRuntime:
         confidence_assessor: Optional[ConfidenceAssessor] = None,
         governance_engine: Any = None,
         execution_runtime: Any = None,
+        execution_provider_id: str = "filesystem",
+        execution_operation: str = "mission_execute",
         governance_required: bool = True,
         reasoning_fn: Optional[Any] = None,
         mission_builder: Optional[MissionBuilder] = None,
@@ -159,6 +162,9 @@ class MissionCognitiveRuntime:
         # Governance kernel EKSTERNAL — MCR tidak punya logic governance.
         self._governance_engine = governance_engine
         self._execution_runtime = execution_runtime
+        # provider/operation di-pass dari wiring (DI), mode tetap preview (ADR-008).
+        self._execution_provider_id = execution_provider_id
+        self._execution_operation = execution_operation
         self._governance_required = governance_required
         self._last_lesson: str = ""
         self._logger = logger.bind(component="MissionCognitiveRuntime")
@@ -346,29 +352,57 @@ class MissionCognitiveRuntime:
             "context": ctx,
         }
 
-    # ── Execution (serah ke jalur resmi) ────────────────────────────────
+    # ── Execution (serah ke jalur resmi — ADR-008 Real Execution Runtime) ──
 
     def _summarize_execution(
         self, cycle_id: str, mission: str, conclusion: str
     ) -> str:
-        """Serah eksekusi ke execution_runtime resmi.
+        """Serah eksekusi ke jalur resmi (ExecutionRuntime / ExecutionEngine).
 
-        Jika execution_runtime tersedia, MCR memanggilnya. Jika tidak, MCR
-        mencatat bahwa eksekusi diserahkan (journaled) — tidak berpura-pura
-        mengeksekusi sendiri (bukan God Object).
+        T3 (keputusan CA): MCR TIDAK mengeksekusi sendiri dan TIDAK memanggil
+        method khayalan. Ia membangun `ExecutionRequest` (mode='preview', ADR-008
+        section 12: provider TIDAK dieksekusi, external_calls=0) dan menyerahkan
+        ke jalur resmi lewat `execute(request)` (ExecutionEngine) atau
+        `run(runtime_id, request)` (ExecutionRuntime).
+
+        Jika execution engine tersedia tapi TIDAK punya method resmi, MCR mencatat
+        eksplisit "no-execution-method" (bukan silent no-op) dan TIDAK berpura-
+        pura mengeksekusi (bukan God Object).
         """
         summary = f"instruction:{mission} | conclusion:{conclusion}"
-        if self._execution_runtime is not None:
-            try:
-                # contract longgar: runtime resmi menentukan cara invoke.
-                invoke = getattr(self._execution_runtime, "invoke", None) or getattr(
-                    self._execution_runtime, "execute", None
-                )
-                if invoke is not None:
-                    outcome = invoke(mission, conclusion=conclusion, cycle_id=cycle_id)
-                    summary = f"{summary} | result:{outcome}"
-            except Exception as exc:  # pragma: no cover - defensive
-                summary = f"{summary} | execute-error:{exc}"
+        if self._execution_runtime is None:
+            return summary
+
+        # Bangun request resmi (immutable, preview-only sesuai ADR-008):
+        request = ExecutionRequest(
+            execution_id=f"mc-{cycle_id}",
+            provider_id=self._execution_provider_id,
+            operation=self._execution_operation,
+            mode="preview",  # ADR-008 sec 12: provider tidak dieksekusi
+            payload={
+                "mission": mission,
+                "conclusion": conclusion,
+                "cycle_id": cycle_id,
+            },
+        )
+        try:
+            execute = getattr(self._execution_runtime, "execute", None)
+            run = getattr(self._execution_runtime, "run", None)
+            if callable(execute):
+                outcome = execute(request)
+            elif callable(run):
+                outcome = run(f"mc-{cycle_id}-run", request)
+            else:
+                # engine ada tapi tak punya method resmi -> tandai (bukan silent)
+                summary = f"{summary} | no-execution-method"
+                return summary
+            # Ringkas hasil (ExecutionOutcome / ExecutionResponse-like):
+            if hasattr(outcome, "as_dict"):
+                summary = f"{summary} | result:{outcome.as_dict()}"
+            else:
+                summary = f"{summary} | result:{outcome}"
+        except Exception as exc:  # pragma: no cover - defensive
+            summary = f"{summary} | execute-error:{exc}"
         return summary
 
     # ── Observation (read-only, best-effort / OPTIONAL — T2) ─────────────
