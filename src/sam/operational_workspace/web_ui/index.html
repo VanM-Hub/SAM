@@ -1,15 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SAM — Produk</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" />
-
+    
     <style>
         /* --- Reset & Variables --- */
         * {
@@ -51,7 +47,7 @@
             --radius: 16px;
             --radius-sm: 10px;
             --shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
-            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             --transition: 0.2s ease;
         }
 
@@ -516,11 +512,11 @@
 
     <!-- NAVIGASI -->
     <nav class="nav" role="tablist">
-        <button class="nav-btn active" data-page="home" role="tab"><i class="ti ti-home"></i> Beranda</button>
-        <button class="nav-btn" data-page="devices" role="tab"><i class="ti ti-server"></i> Perangkat</button>
-        <button class="nav-btn" data-page="knowledge" role="tab"><i class="ti ti-book"></i> Pengetahuan</button>
-        <button class="nav-btn" data-page="history" role="tab"><i class="ti ti-history"></i> Riwayat</button>
-        <button class="nav-btn" data-page="settings" role="tab"><i class="ti ti-settings"></i> Pengaturan</button>
+        <button class="nav-btn active" data-page="home" role="tab">🏠 Beranda</button>
+        <button class="nav-btn" data-page="devices" role="tab">🖥️ Perangkat</button>
+        <button class="nav-btn" data-page="knowledge" role="tab">📚 Pengetahuan</button>
+        <button class="nav-btn" data-page="history" role="tab">🕘 Riwayat</button>
+        <button class="nav-btn" data-page="settings" role="tab">⚙️ Pengaturan</button>
     </nav>
 
     <!-- MAIN CONTENT -->
@@ -533,8 +529,8 @@
                 <div class="sub">OpenClaw berjalan normal. SAM dalam keadaan siaga.</div>
             </div>
             <div class="actions">
-                <button class="btn btn-primary" id="btn-run-cycle"><i class="ti ti-bolt"></i> Jalankan siklus</button>
-                <button class="btn btn-outline" id="btn-check"><i class="ti ti-refresh"></i> Periksa</button>
+                <button class="btn btn-primary" id="btn-run-cycle">⚡ Jalankan siklus</button>
+                <button class="btn btn-outline" id="btn-check">🔄 Periksa</button>
             </div>
         </div>
 
@@ -574,9 +570,9 @@
                 <p style="color:var(--text-muted);font-size:14px;margin-top:4px;">Saya terus memantau dan akan memberi tahu jika ada perubahan.</p>
             </div>
             <div class="actions" id="sam-actions" style="display:none;">
-                <button class="btn btn-success"><i class="ti ti-check"></i> Setuju, perbaiki</button>
-                <button class="btn btn-outline"><i class="ti ti-switch"></i> Coba provider lain</button>
-                <button class="btn btn-danger"><i class="ti ti-x"></i> Batalkan</button>
+                <button class="btn btn-success">✅ Setuju, perbaiki</button>
+                <button class="btn btn-outline">🔁 Coba provider lain</button>
+                <button class="btn btn-danger">✖️ Batalkan</button>
             </div>
         </div>
 
@@ -586,9 +582,9 @@
             <div class="title">⚠️ OpenClaw tidak bisa menggunakan GPU</div>
             <div class="desc">Driver GPU tidak cocok setelah update. Saya bisa memperbaikinya sekarang.</div>
             <div class="actions">
-                <button class="btn btn-success"><i class="ti ti-check"></i> Perbaiki sekarang</button>
-                <button class="btn btn-outline"><i class="ti ti-switch"></i> Coba provider lain</button>
-                <button class="btn btn-danger"><i class="ti ti-x"></i> Tunda</button>
+                <button class="btn btn-success">✅ Perbaiki sekarang</button>
+                <button class="btn btn-outline">🔁 Coba provider lain</button>
+                <button class="btn btn-danger">✖️ Tunda</button>
             </div>
         </div>
 
@@ -605,7 +601,7 @@
         <!-- CHAT INPUT -->
         <div class="chat-input">
             <input type="text" id="chat-input-field" placeholder="Tanyakan apa saja ke SAM..." />
-            <button id="chat-send-btn"><i class="ti ti-send"></i> Kirim</button>
+            <button id="chat-send-btn">📤 Kirim</button>
         </div>
 
     </div>
@@ -758,10 +754,10 @@
 
         // ===== TOMBOL "Jalankan siklus" =====
         document.getElementById('btn-run-cycle').addEventListener('click', function() {
-            this.innerHTML = '<i class="ti ti-loader"></i> Menjalankan...';
+            this.innerHTML = '⏳ Menjalankan...';
             this.disabled = true;
             setTimeout(() => {
-                this.innerHTML = '<i class="ti ti-check"></i> Selesai';
+                this.innerHTML = '✅ Selesai';
                 this.disabled = false;
                 document.querySelector('.mission-card .progress-fill').style.width = '100%';
                 document.querySelector('.mission-card .top span:last-child').textContent = '100%';
@@ -782,10 +778,10 @@
 
         // ===== TOMBOL "Periksa" =====
         document.getElementById('btn-check').addEventListener('click', function() {
-            this.innerHTML = '<i class="ti ti-loader"></i> Memeriksa...';
+            this.innerHTML = '⏳ Memeriksa...';
             this.disabled = true;
             setTimeout(() => {
-                this.innerHTML = '<i class="ti ti-refresh"></i> Periksa';
+                this.innerHTML = '🔄 Periksa';
                 this.disabled = false;
                 document.querySelector('.greeting-card .sub').textContent = 'Semua sistem sehat. Tidak ada masalah.';
                 document.querySelector('.status-item .value.green').textContent = '0';
