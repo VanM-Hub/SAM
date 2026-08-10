@@ -38,14 +38,18 @@ def _bridge():
 
 
 def _result_details(result) -> dict:
-    """Petakan AgentRunResult -> dict (serializer adapter, composition-only)."""
+    """Petakan AgentRunResult -> dict (serializer adapter, composition-only).
+
+    AgentRunResult mengekspos `steps` (jumlah langkah yang dijalankan) + `detail`,
+    bukan objek plan (plan hanya hidup selama eksekusi internal AgentRuntime).
+    """
     return {
         "mission_id": getattr(result, "mission_id", ""),
         "ok": bool(getattr(result, "ok", False)),
         "final_state": getattr(result, "final_state", ""),
         "external_calls": int(getattr(result, "external_calls", 0)),
-        "plan": getattr(getattr(result, "plan", None), "to_dict", lambda: {})()
-        if hasattr(result, "plan") else {},
+        "steps": int(getattr(result, "steps", 0)),
+        "detail": str(getattr(result, "detail", "")),
     }
 
 
