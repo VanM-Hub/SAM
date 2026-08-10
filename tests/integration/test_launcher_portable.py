@@ -62,13 +62,15 @@ class TestPortableLauncher:
         """Tidak boleh ada drive letter C:/D:/ dll sebagai path dasar."""
         for name in LAUNCHER_BATS:
             content = self._check(name)
-            # cari absolute Windows drive path di baris perintah non-komentar
+            # cari absolute Windows drive path di baris perintah non-komentar.
+            # \b (word boundary) menghindari false-positive pada URL seperti
+            # http:// (substring "p:/") yang bukan drive path.
             for line in content.splitlines():
                 line = line.strip()
                 if not line or line.startswith("rem") or line.startswith("@echo") \
                         or line.startswith("echo"):
                     continue
-                assert not re.search(r"[A-Za-z]:[\\/]", line), (
+                assert not re.search(r"\b[A-Za-z]:[\\/]", line), (
                     f"{name}: absolute drive path ditemukan -> {line}"
                 )
                 assert not line.startswith("/"), (
