@@ -78,6 +78,7 @@ class MissionCycleResult:
     governance_reason: str = ""
     execution_summary: str = ""
     observation_summary: Any = None
+    observation_available: bool = False
     reflection_id: str = ""
     lesson: str = ""
     error: str = ""
@@ -97,6 +98,7 @@ class MissionCycleResult:
             "governance_reason": self.governance_reason,
             "execution_summary": self.execution_summary,
             "observation_summary": self.observation_summary,
+            "observation_available": self.observation_available,
             "reflection_id": self.reflection_id,
             "lesson": self.lesson,
             "error": self.error,
@@ -221,9 +223,19 @@ class MissionCognitiveRuntime:
         result.execution_summary = self._summarize_execution(cycle_id, mission, result.conclusion)
         self._logger.info("MCR governance allowed", cycle_id=cycle_id, decision=decision)
 
-        # 5) OBSERVE (read-only, best-effort) ─────────────────────────────
+        # 5) OBSERVE (read-only, OPTIONAL/best-effort — T2) ───────────────
+        # Observation TIDAK menggagalkan siklus (Observe, never govern / tanpa
+        # authority, EA-C04/IP-3.2). Siklus tetap COMPLETED walau observasi
+        # gagal; kegagalan dicatat via observation_available=False (auditable).
         result.status = MissionCycleStatus.OBSERVING
-        result.observation_summary = self._observe(cycle_id, mission)
+        result.observation_available, result.observation_summary = self._observe(
+            cycle_id, mission
+        )
+        if not result.observation_available:
+            self._logger.info(
+                "MCR observation unavailable (best-effort, cycle proceeds)",
+                cycle_id=cycle_id,
+            )
 
         # 6) REFLECT + LEARN (best-effort) ────────────────────────────────
         result.status = MissionCycleStatus.REFLECTING
@@ -359,28 +371,35 @@ class MissionCognitiveRuntime:
                 summary = f"{summary} | execute-error:{exc}"
         return summary
 
-    # ── Observation (read-only, best-effort) ────────────────────────────
+    # ── Observation (read-only, best-effort / OPTIONAL — T2) ─────────────
 
-    def _observe(self, cycle_id: str, mission: str) -> Any:
+    def _observe(self, cycle_id: str, mission: str) -> Tuple[bool, Any]:
         """Mengamati hasil via ObservationRecommendationEngine (read-only).
 
-        Gagal observasi TIDAK menggagalkan siklus — orchestrator tetap jalan
-        (graceful degradation).
+        T2 (keputusan CA): Observation bersifat OPTIONAL (best-effort) mengikuti
+        prinsip "Observe, never govern" + "tanpa authority" (EA-C04, IP-3.2).
+        Gagal/tanpa engine TIDAK menggagalkan siklus — siklus tetap COMPLETED.
+        Namun kegagalan dicatat eksplisit lewat flag `available` agar auditable
+        (bukan diam-diam None). Return (available: bool, summary: Any).
         """
         if self._observation_engine is None:
-            return None
+            return False, None
         try:
             # ObservationRecommendationEngine menyediakan `recommend()` (read-only),
             # bukan `observe()`. Panggil method yang benar sesuai kontrak panci B.
             recom = self._observation_engine.recommend()
             # Selalu ratakan jadi dict agar auditable & konsisten dengan to_dict().
+            if isinstance(recom, dict):
+                return True, recom
             if hasattr(recom, "as_dict"):
-                return recom.as_dict()
+                return True, recom.as_dict()
             if hasattr(recom, "to_dict"):
-                return recom.to_dict()
-            return vars(recom) if hasattr(recom, "__dict__") else str(recom)
+                return True, recom.to_dict()
+            if hasattr(recom, "__dict__"):
+                return True, vars(recom)
+            return True, str(recom)
         except Exception:  # pragma: no cover - defensive
-            return None
+            return False, None
 
     # ── Reflection + Learning (reuse ReflectionManager healing) ─────────
 
