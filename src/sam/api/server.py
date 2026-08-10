@@ -29,7 +29,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes import health, runtime, events, metrics
+from .routes import health, runtime, events, metrics, mission
 from .wiring import rest_app
 
 app = FastAPI(
@@ -50,6 +50,7 @@ app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(runtime.router, prefix="/runtime", tags=["runtime"])
 app.include_router(events.router, prefix="/events", tags=["events"])
 app.include_router(metrics.router, prefix="/metrics", tags=["metrics"])
+app.include_router(mission.router, prefix="/mission", tags=["mission"])
 
 # Program J: capability REST (workflow/policy/audit/preview/knowledge/memory/
 # artifact/approval/status) - composition-only, via runtime_service.api.
@@ -77,5 +78,6 @@ async def root():
             "artifact": "/artifact",
             "approval": "/approval/{execution_id}",
             "status": "/status",
+            "mission": "/mission/{mission_id}",
         },
     }

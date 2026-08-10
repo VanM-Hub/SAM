@@ -190,8 +190,9 @@ class TestTidakAdaImportIlegal:
             banned = self._forbidden_imports_present(only_imports)
             assert not banned, f"import ilegal di {mod.__name__}: {banned}"
 
-    def test_no_mission_bypass(self):
-        # mission deferred - tidak ada endpoint /mission dan tidak ada workaround
+    def test_mission_route_aktif(self):
+        # Mission kini DI-AKTIFKAN sebagai Production Mission Entry Point (keputusan P2A / AD-P2A).
+        # Route /mission/{mission_id} tersedia sebagai adapter ke MissionBuilder.
         paths = set(app.openapi()["paths"].keys())
-        assert "/mission" not in paths
-        assert "/mission/" not in paths
+        assert "/mission/{mission_id}" in paths
+        assert "/mission/" in paths
