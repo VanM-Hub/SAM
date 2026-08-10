@@ -35,6 +35,7 @@ from sam.governed_reasoning.structured_reasoning import (
 from sam.governed_reasoning.confidence_assessment import ConfidenceAssessor
 from sam.observation.recommendation import ObservationRecommendationEngine
 from sam.healing.reflection import ReflectionManager
+from sam.agent.planner.mission_builder import MissionBuilder, PlanResult
 
 
 logger = structlog.get_logger()
@@ -51,6 +52,7 @@ def _new_id(prefix: str) -> str:
 class MissionCycleStatus(str, Enum):
     CREATED = "created"
     REASONING = "reasoning"
+    PLANNING = "planning"
     GOVERNANCE = "governance"
     EXECUTING = "executing"
     OBSERVING = "observing"
@@ -69,6 +71,9 @@ class MissionCycleResult:
     mission: str
     reasoning_id: str = ""
     conclusion: str = ""
+    plan_id: str = ""
+    plan_step_count: int = 0
+    plan_runtimes: tuple = ()  # urutan runtime pipeline dari MissionBuilder
     governance_decision: str = ""
     governance_reason: str = ""
     execution_summary: str = ""
@@ -85,6 +90,9 @@ class MissionCycleResult:
             "mission": self.mission,
             "reasoning_id": self.reasoning_id,
             "conclusion": self.conclusion,
+            "plan_id": self.plan_id,
+            "plan_step_count": self.plan_step_count,
+            "plan_runtimes": list(self.plan_runtimes),
             "governance_decision": self.governance_decision,
             "governance_reason": self.governance_reason,
             "execution_summary": self.execution_summary,
@@ -136,6 +144,7 @@ class MissionCognitiveRuntime:
         execution_runtime: Any = None,
         governance_required: bool = True,
         reasoning_fn: Optional[Any] = None,
+        mission_builder: Optional[MissionBuilder] = None,
     ) -> None:
         self._reasoning_engine = reasoning_engine or StructuredReasoningEngine(
             reasoning_fn or _default_reasoning_fn
@@ -143,6 +152,8 @@ class MissionCognitiveRuntime:
         self._observation_engine = observation_engine
         self._reflection_manager = reflection_manager or ReflectionManager()
         self._confidence_assessor = confidence_assessor or ConfidenceAssessor()
+        # Plan Construction HANYA via MissionBuilder — MCR tidak membuat plan sendiri.
+        self._mission_builder = mission_builder or MissionBuilder()
         # Governance kernel EKSTERNAL — MCR tidak punya logic governance.
         self._governance_engine = governance_engine
         self._execution_runtime = execution_runtime
@@ -185,7 +196,18 @@ class MissionCognitiveRuntime:
         except Exception as exc:  # pragma: no cover - defensive
             return self._fail(result, f"reasoning failed: {exc}")
 
-        # 2) GOVERN (WAJIB — authority tetap eksternal) ───────────────────
+        # 2) PLAN — Plan Construction HANYA via MissionBuilder (P3) ───────
+        # MCR TIDAK membuat MissionPlan/MissionStep sendiri. Ia hanya invoke
+        # MissionBuilder, consume structured plan, dan siapkan handoff ke
+        # Governance. Gagal membangun plan = jalur terblokir (tidak mengeksekusi
+        # dengan plan tidak valid).
+        result.status = MissionCycleStatus.PLANNING
+        if not self._build_plan(result, ctx):
+            result.status = MissionCycleStatus.BLOCKED
+            self._last_lesson = f"plan invalid: {result.error}"
+            return result
+
+        # 3) GOVERN (WAJIB — authority tetap eksternal) ───────────────────
         result.status = MissionCycleStatus.GOVERNANCE
         decision = await self._enforce_governance(result, ctx)
         if decision != "allow":
@@ -194,16 +216,16 @@ class MissionCognitiveRuntime:
             self._last_lesson = f"governance blocked ({decision}): {result.governance_reason}"
             return result
 
-        # 3) EXECUTE (serah ke jalur eksekusi resmi) ──────────────────────
+        # 4) EXECUTE (serah ke jalur eksekusi resmi) ──────────────────────
         result.status = MissionCycleStatus.EXECUTING
         result.execution_summary = self._summarize_execution(cycle_id, mission, result.conclusion)
         self._logger.info("MCR governance allowed", cycle_id=cycle_id, decision=decision)
 
-        # 4) OBSERVE (read-only, best-effort) ─────────────────────────────
+        # 5) OBSERVE (read-only, best-effort) ─────────────────────────────
         result.status = MissionCycleStatus.OBSERVING
         result.observation_summary = self._observe(cycle_id, mission)
 
-        # 5) REFLECT + LEARN (best-effort) ────────────────────────────────
+        # 6) REFLECT + LEARN (best-effort) ────────────────────────────────
         result.status = MissionCycleStatus.REFLECTING
         await self._reflect(result)
 
@@ -220,6 +242,43 @@ class MissionCognitiveRuntime:
     def get_last_lesson(self) -> str:
         """Lesson dari keputusan/siklus terakhir — untuk keputusan berikutnya."""
         return self._last_lesson
+
+    # ── Planning (P3) — Plan Construction via MissionBuilder ─────────────
+
+    def _build_plan(self, result: MissionCycleResult, ctx: Dict[str, Any]) -> bool:
+        """Invoke MissionBuilder untuk membangun structured mission plan.
+
+        MCR TIDAK membuat MissionPlan/MissionStep sendiri. Ia hanya memanggil
+        MissionBuilder.build_default, consume hasilnya, dan menyiapkan summary
+        yang auditable serta handoff ke governance. Gagal/plan invalid -> False
+        (jalur terblokir, tidak dieksekusi).
+        """
+        mission_id = str(ctx.get("mission_id", "mcr")) if isinstance(ctx, dict) else "mcr"
+        plan_id = f"plan-{result.cycle_id}"
+        try:
+            plan_result: PlanResult = self._mission_builder.build_default(
+                plan_id, mission_id
+            )
+        except Exception as exc:  # pragma: no cover - defensive
+            result.error = f"plan construction failed: {exc}"
+            return False
+        if not plan_result.valid or plan_result.plan is None:
+            result.error = "mission plan invalid"
+            return False
+        plan = plan_result.plan
+        runtimes = tuple(
+            getattr(s, "runtime_name", "") for s in getattr(plan, "steps", []) or []
+        )
+        result.plan_id = plan_id
+        result.plan_step_count = len(runtimes)
+        result.plan_runtimes = runtimes
+        self._logger.info(
+            "MCR plan built via MissionBuilder",
+            cycle_id=result.cycle_id,
+            plan_id=plan_id,
+            step_count=result.plan_step_count,
+        )
+        return True
 
     # ── Governance (handoff WAJIB, authority eksternal) ─────────────────
 
@@ -258,14 +317,20 @@ class MissionCognitiveRuntime:
     def _build_decision_graph(self, result: MissionCycleResult, ctx: Dict[str, Any]) -> Any:
         """Membangun representasi keputusan untuk governance kernel.
 
-        Kontrak longgar (dict) agar tidak terikat ke tipe plugin tertentu.
-        Governance kernel yang menentukan bentuk evaluasinya.
+        Termasuk handoff plan (dari MissionBuilder) agar governance menilai
+        keputusan dengan konteks rencana yang diusulkan. Kontrak longgar (dict)
+        agar tidak terikat ke tipe plugin tertentu.
         """
         return {
             "cycle_id": result.cycle_id,
             "mission": result.mission,
             "reasoning_id": result.reasoning_id,
             "conclusion": result.conclusion,
+            "plan": {
+                "plan_id": result.plan_id,
+                "step_count": result.plan_step_count,
+                "runtimes": list(result.plan_runtimes),
+            },
             "context": ctx,
         }
 
