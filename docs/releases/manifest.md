@@ -1,11 +1,11 @@
-﻿# SAM Manifest
+# SAM Manifest
 
 ```
 Repository:   github.com/VanM-Hub/SAM
 License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
-Current:      SAM 5.x - Universal Governance Platform (versi teknis 4.1.0)
+Current:      SAM 5.x - Universal Governance Platform (versi teknis 5.0.0)
 Release:      5 - Universal Governance Platform (SAM 5.x Engineering Implementation Complete,
               MISSION-5.1..5.6 selesai, 158 test, 4817 regression passed)
 Baseline:     SAM 1.0 Foundation (rilis pertama, 2026-08-07) -> SAM 2.0
@@ -13,7 +13,7 @@ Baseline:     SAM 1.0 Foundation (rilis pertama, 2026-08-07) -> SAM 2.0
               M1-M6 ACHIEVED) -> SAM 3.6.0 Baseline Release (rilis ketiga, 2026-08-09,
               SAM 3.x COMPLETE 6/6, AO-3.0-001 Close Order) -> SAM 4.0.0 Baseline Release
               (rilis keempat, 2026-08-10, Federated Governance Platform, Architecture Accepted)
-              -> SAM 4.1.0 (rilis kelima, 2026-08-10, Universal Governance Platform,
+              -> SAM 5.0.0 (rilis kelima, 2026-08-10, Universal Governance Platform,
               MISSION-5.1..5.6 implementation complete); seluruh 6 mission SAM 5.x selesai,
               no architecture drift, Foundation immutable.
 Framework:    Python

@@ -1,10 +1,10 @@
-ï»¿# Changelog
+# Changelog
 
-> Riwayat perubahan rilis SAM. **SAM 4.1.0 (2026-08-10)** memulai Universal Governance (SAM 5.x).
+> Riwayat perubahan rilis SAM. **SAM 5.0.0 (2026-08-10)** memulai Universal Governance (SAM 5.x).
 > **SAM 4.0.0 (2026-08-10) adalah rilis Federated Governance Platform terakhir yang Architecture Accepted**
 > (MISSION-4.1..4.6 COMPLETE).
 
-## 4.1.0 (2026-08-10) - SAM 5.x Implementation Start - Universal Governance Platform
+## 5.0.0 (2026-08-10) - SAM 5.x Implementation Start - Universal Governance Platform
 
 ### MISSION-5.x (Universal Governance) - Implementation bertahap (Work In Progress)
 - **SAM 5 PRINCIPLE:** perluasan di atas Foundation SAM 1-4 (Foundation immutable). Build by Integration, Extend by Capability, Govern by Contract, Certify by Evidence, Explain Every Decision, Human Owns Authority, Foundation Never Changes.
@@ -83,14 +83,14 @@
 
 ### Kemampuan yang dirilis
 - **Conversation** sebagai Presentation Capability (bridge read-only, preview-first).
-- **Dashboard** sebagai konsol operasional (Mission Â· Workflow Â· Execution Â· Approval Â· Audit Â· Connector Â· Provider Â· Runtime Â· Health Â· Telemetry).
+- **Dashboard** sebagai konsol operasional (Mission · Workflow · Execution · Approval · Audit · Connector · Provider · Runtime · Health · Telemetry).
 - **CLI** (11 command resmi: mission, workflow, policy, audit, artifact, connector, provider, execution, preview, dashboard).
 - **REST API** via `runtime_service.api` (endpoint `/missions`, `/workflow`, `/approval`, `/execution-preview`, `/audit`, `/artifact`, `/policy`).
-- **LLM Runtime Activation** â€” 5 provider (OpenAI Â· Anthropic Â· Gemini Â· DeepSeek Â· Ollama) via Connector â†’ Provider â†’ Agent.
+- **LLM Runtime Activation** — 5 provider (OpenAI · Anthropic · Gemini · DeepSeek · Ollama) via Connector ? Provider ? Agent.
 - Arsitektur deterministik: preview-first, approval mandatory sebelum execute, eksekusi cancellable, rollback metadata, full audit, DTO immutable, kredensial hanya dari environment.
 
 ### Catatan
-- Seluruh fase pengembangan fondasi (Foundation 0.01 â†’ 0.30, 279 sprint + Program Aâ€“K) tercatat di `SPRINT_TRACKER.md` sebagai konteks pengembangan, bukan riwayat rilis.
+- Seluruh fase pengembangan fondasi (Foundation 0.01 ? 0.30, 279 sprint + Program A–K) tercatat di `SPRINT_TRACKER.md` sebagai konteks pengembangan, bukan riwayat rilis.
 - Rencana ke depan di `docs/foundation/ROADMAP.md` (post-1.0).
 
 ## SAM 1.0.1 (2026-08-08) - Baseline CI Expansion
@@ -110,32 +110,32 @@
 ### Test Baseline Convergence (Program A Phase 4)
 - Execution Runtime masuk baseline CI dengan 2 test pre-existing di-xfail.
 - Total baseline: 4,017 tests passed, 1 skipped, 2 xfailed.
-- 8 runtime OPERATIONAL: Knowledge Â· Memory Â· Policy Â· Workflow Â· Artifact Â· Audit Â· Mission Â· Execution.
+- 8 runtime OPERATIONAL: Knowledge · Memory · Policy · Workflow · Artifact · Audit · Mission · Execution.
 - 2 xfail: `test_no_hardcoded_secrets_in_provider_executor_source` (false positive pada prefix "Bearer") dan `test_provider_executor_non_auth_execute_ok` (filesystem provider belum memenuhi syarat base_url).
 
-## SAM 1.0.2 (2026-08-08) â€” C-Phase 1 Observation Layer
+## SAM 1.0.2 (2026-08-08) — C-Phase 1 Observation Layer
 
-### Operational Intelligence â€” Wiring & Integration (Program C)
+### Operational Intelligence — Wiring & Integration (Program C)
 - Observation Layer: `src/sam/observation/` (publication, adapters, timeline, capability, evidence).
 - 10 Runtime Publication Adapter (mission, workflow, policy, execution, approval, audit, knowledge, memory, artifact, runtime_service).
 - Unified TimelineAggregator (4 sumber timeline: mission, execution, approval, audit).
-- CapabilityStatusReader â€” 10 runtime, 8 capability axis per runtime.
-- EvidenceExplorer â€” 10 evidence entries, by-category/by-runtime navigation.
-- ObservationGateway â€” unified REST endpoint via `runtime_service.api.observation_endpoint`.
-- Observation Wiring â€” singleton composition root.
+- CapabilityStatusReader — 10 runtime, 8 capability axis per runtime.
+- EvidenceExplorer — 10 evidence entries, by-category/by-runtime navigation.
+- ObservationGateway — unified REST endpoint via `runtime_service.api.observation_endpoint`.
+- Observation Wiring — singleton composition root.
 - Total baseline (lokal): 4,096 tests (unit + 8 runtime suites + observation 79 tests).
 - Constraint: read-only, no new runtime, no governance change, no business logic.
 
-## SAM 1.0.2 (2026-08-08) â€” C-Phase 2 Gap Resolution
+## SAM 1.0.2 (2026-08-08) — C-Phase 2 Gap Resolution
 
-### Operational Intelligence â€” Gap Resolution (Program C)
-- GAP-001: UnifiedHealthReporter â€” enhanced health overview per-runtime + rekomendasi otomatis.
-- GAP-002: PreviewConsumerIndex â€” mapping previewâ†’consumer (5 consumer: desktop, console, web, cli, rest_api).
-- GAP-003: EventBusInspector â€” unified event bus facade (read-only, 3 bus teridentifikasi).
-- GAP-004: ReadinessReporter â€” readiness endpoint aggregation + gap detection.
-- GAP-005: OperationalAnalytics â€” trend + pattern detection (metric density, dashboard coverage, insights).
-- GAP-006: ApprovalHealthInspector â€” approval engine self-reporting assessment.
-- GapResolutionCoordinator â€” resolve_all_gaps() aggregator (1 panggilan, 6 laporan).
+### Operational Intelligence — Gap Resolution (Program C)
+- GAP-001: UnifiedHealthReporter — enhanced health overview per-runtime + rekomendasi otomatis.
+- GAP-002: PreviewConsumerIndex — mapping preview?consumer (5 consumer: desktop, console, web, cli, rest_api).
+- GAP-003: EventBusInspector — unified event bus facade (read-only, 3 bus teridentifikasi).
+- GAP-004: ReadinessReporter — readiness endpoint aggregation + gap detection.
+- GAP-005: OperationalAnalytics — trend + pattern detection (metric density, dashboard coverage, insights).
+- GAP-006: ApprovalHealthInspector — approval engine self-reporting assessment.
+- GapResolutionCoordinator — resolve_all_gaps() aggregator (1 panggilan, 6 laporan).
 - ObservationWiring diperluas: `get_gap_coordinator()` + `resolve_all_gaps()` singleton.
 - Total baseline (lokal): 4,157 tests (unit + 8 runtime suites + observation 142 tests).
 - Constraint: read-only, no new runtime, no governance change.
@@ -153,12 +153,12 @@
 - Hasil: **CI hijau 7/7** (core 3.10/3.11/3.12, server, desktop, validation, coverage).
 - Total baseline (lokal): 4,159 tests (unit + 8 runtime suites + observation 142 tests).
 
-## SAM 1.0.2 (2026-08-08) â€” C-Phase 1 & 2 Fully Verified
+## SAM 1.0.2 (2026-08-08) — C-Phase 1 & 2 Fully Verified
 
 ### Verifikasi Independen (Evidence Before Assumption)
 - Diff commit `978f89d` (C-Phase 1) & `74f6a72` (C-Phase 2) diinspeksi langsung: perubahan terkonsentrasi di `src/sam/observation/` + endpoint wiring + test; **tidak ada perubahan** pada runtime boundary, governance flow, approval, execution, audit, atau ADR-001..007.
 - Engineering Concern Lead Engineer ditegakkan dari kode: `GapResolutionCoordinator` hanya punya 1 method publik `resolve_all()` (query read-only); **0 panggilan** approve/execute/submit/register/publish/emit/transition/write di seluruh `observation/`; **0 import** ke governance/approval/execution/events/runtime; registry terbukti tidak berubah (10 -> 10) sebelum & sesudah `resolve_all()`.
-- 142/142 test observation dijalankan ulang lokal â€” hijau.
+- 142/142 test observation dijalankan ulang lokal — hijau.
 - CI commit `e6c514b` (HEAD) terkonfirmasi **hijau 7/7** (core 3.10/3.11/3.12, server, desktop, validation, coverage).
 - Hasil: **Engineering Report Accepted** -> **Lead Engineer Verdict: Fully Verified**. Zero Architecture Drift dikonfirmasi.
 
@@ -252,7 +252,7 @@
 ### Verdict EA-002 (decision)
 - docs/engineering/decisions/EA-002_Lead_Engineer_Verdict_Production_Readiness_Implementation.md
 - EA-001 ditutup (diterima Chief Architect, no drift, no foundation impact); engineering diotorisasi masuk EA-002.
-- Official Implementation Order: P1 H1 â†’ P2 H5 â†’ P3 H2 â†’ P4 H3 â†’ P5 H4.
+- Official Implementation Order: P1 H1 ? P2 H5 ? P3 H2 ? P4 H3 ? P5 H4.
 
 ### Implementasi P1/H1 Portable Deployment
 - 5 launcher `.bat` root di-refactor portable: `cd /d "%~dp0"`, `PYTHONPATH=%CD%\src`; hilangkan absolute path `D:\Project AI\SAM`.
