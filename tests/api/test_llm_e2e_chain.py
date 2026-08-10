@@ -19,6 +19,17 @@ from sam.api.llm_wiring import (
     llm_agent_bridge,
 )
 
+import asyncio
+
+
+def _run(coro):
+    """Jalankan coroutine deterministik (anti-flaky di Python 3.8)."""
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
+
 
 class TestE2EChain:
     """Urutan Connector -> Provider -> Agent terhubung lewat contract id sama."""
@@ -51,16 +62,16 @@ class TestE2EChain:
     def test_chain_eksekusi_tanpa_bypass(self) -> None:
         """Alur data connector->provider->agent memakai wiring resmi.
 
-        Provider (executor, adapter OpenAI) -> Agent (mission preview).
-        Agent Runtime tetap preview: external_calls SELALU 0 di jalur agent.
+        Provider (executor, adapter OpenAI) -> Agent (mission via MCR preview).
+        Jalur agent tetap preview: external_calls SELALU 0.
         Ini membuktikan rantai terhubung, tanpa panggilan langsung yang
         melewati layer (bypass), dan tanpa mengubah RuntimeService.
         """
         # Rantai: connector aktif -> provider (via executor) -> agent (via bridge)
-        res = llm_agent_bridge.run_mission_from_provider("openai", "mis-k6-e2e")
+        res = _run(llm_agent_bridge.run_mission_cognitive("openai", "mis-k6-e2e"))
         assert res.ok is True
         assert res.final_state == "Completed"
-        assert res.external_calls == 0  # Agent Runtime tetap preview-only
+        assert res.external_calls == 0  # jalur mission tetap preview-only
 
     def test_no_bypass_bukti_layer_saling_terhubung_via_contract(self) -> None:
         """Semua layer berbagi contract id -> rantai resmi, bukan paralel."""

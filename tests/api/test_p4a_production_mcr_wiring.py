@@ -24,8 +24,7 @@ from fastapi.testclient import TestClient
 
 from sam.api.server import app
 from sam.api.llm_wiring import llm_agent_bridge
-from sam.agent.runtime.agent_runtime import AgentRunResult
-from sam.mission_cognition import MissionCycleStatus
+from sam.mission_cognition import AgentRunResult, MissionCycleStatus
 
 
 def _run(coro):

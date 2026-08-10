@@ -15,9 +15,11 @@ from sam.mission_cognition.runtime import (
     MissionCycleResult,
     MissionCycleStatus,
 )
+from sam.mission_cognition.result import AgentRunResult
 
 __all__ = [
     "MissionCognitiveRuntime",
     "MissionCycleResult",
     "MissionCycleStatus",
+    "AgentRunResult",
 ]

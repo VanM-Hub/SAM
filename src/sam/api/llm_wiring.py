@@ -274,7 +274,6 @@ class LLMProviderLayer:
 # TIDAK menjadikan Agent Runtime orchestrator baru, TIDAK mengubah RuntimeService.
 # Link Provider -> Agent dijaga via `AgentDescriptor.implements`.
 # --------------------------------------------------------------------------- #
-from ..agent.runtime.agent_runtime import AgentRuntime, AgentRunResult
 from ..agent.foundation.agent_registry import AgentRegistry
 from ..agent.foundation.agent_descriptor import AgentDescriptor
 from ..agent.foundation.agent_capability import AgentCapability, AgentOperation
@@ -285,6 +284,7 @@ from ..mission_cognition import (
     MissionCognitiveRuntime,
     MissionCycleResult,
     MissionCycleStatus,
+    AgentRunResult,
 )
 from ..agent.planner.mission_builder import MissionBuilder
 
@@ -300,7 +300,6 @@ class LLMAgentLayer:
     def __init__(self) -> None:
         self._registry = AgentRegistry()
         self._register_baseline_agent()
-        self._runtime = AgentRuntime(self._registry)
 
     def _register_baseline_agent(self) -> None:
         desc = AgentDescriptor(
@@ -332,10 +331,6 @@ class LLMAgentLayer:
     @property
     def registry(self) -> AgentRegistry:
         return self._registry
-
-    @property
-    def runtime(self) -> AgentRuntime:
-        return self._runtime
 
     def summary(self) -> dict:
         s = self._registry.summary()
@@ -394,13 +389,11 @@ class AgentBridge:
 
     Application Use Case (boundary aplikasi, PREserve kontrak REST).
 
-    Sesuai Architecture Acceptance P4A (responsibility-based migration):
-    - Signature `run_mission_from_provider` + hasil `AgentRunResult` di-PREserve
-      (kontrak REST bergantung padanya).
-    - Orchestration kognitif jalur production dialihkan ke MissionCognitiveRuntime
-      (single cognitive owner) — BUKAN AgentRuntime.
-    - AgentRuntime tetap ada (tidak dihapus); orchestration-nya pada jalur
-      production mission di-stop (legacy method dipertahankan utk compat test).
+    Sesuai Architecture Acceptance P4A + Step 9B (responsibility-based migration):
+    - Kontrak REST dipre-serve via `AgentRunResult` (canonical location di
+      `mission_cognition`), serializer route tidak perlu tahu internal MCR.
+    - Orchestration kognitif jalur production dimiliki MissionCognitiveRuntime
+      (single cognitive owner) — AgentRuntime retired (Step 9B).
     - Governance tetap eksternal (ApprovalGate via adapter); execution via
       official path (GovernedExecution); observation read-only; reflection via
       ReflectionManager.
@@ -461,22 +454,6 @@ class AgentBridge:
                 ) if x
             ) or "preview pipeline complete",
         )
-
-    def run_mission_from_provider(self, provider_id: str,
-                                  mission_id: str) -> AgentRunResult:
-        """Legacy sync path (AgentRuntime) — DI-PERTAHANKAN utk compat/test.
-
-        Jalur production TIDAK lagi memanggil ini (bukan orchestration owner
-        jalur produksi mission). Dipertahankan agar kontrak/boundary aplikasi
-        tidak patah & test P2A legacy tetap hijau, sambil 'retire' orchestration
-        pada jalur production. Langkah 9 (hapus) tidak dilakukan (menunggu).
-        """
-        runtime = self._layer.runtime
-        runtime.register_runtimes(["provider"])
-        runtime.enqueue_route([provider_id])
-        runtime.machine.create(mission_id)
-        runtime.build_plan(f"plan-{mission_id}", mission_id)
-        return runtime.run_mission(mission_id)
 
 
 # Instance composition root (module-level, konsisten pola Program J).

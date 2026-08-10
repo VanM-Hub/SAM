@@ -6,8 +6,8 @@ HTTP (produksi), bukan hanya dari test langsung:
     HTTP Request
        -> Mission Route (adapter)
        -> Composition Root (api.llm_wiring)
-       -> AgentBridge / AgentRuntime
-       -> MissionBuilder  (build_plan -> MissionBuilder.build_default)
+       -> AgentBridge -> MissionCognitiveRuntime
+       -> MissionBuilder  (via MCR, EXACTLY ONCE)
 
 Guardrail P2A (scope ketat):
     - HANYA mengaktifkan MissionBuilder. TIDAK menyentuh MCR, Governance,
@@ -27,6 +27,17 @@ from fastapi.testclient import TestClient
 
 from sam.api.server import app
 from sam.api.llm_wiring import llm_agent_bridge, llm_agent_layer, llm_provider_layer
+
+import asyncio
+
+
+def _run(coro):
+    """Jalankan coroutine deterministik (anti-flaky di Python 3.8)."""
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
 
 
 def _client() -> TestClient:
@@ -99,6 +110,6 @@ class TestP2AExistingUnchanged:
 
     def test_bridge_masih_dipakai(self) -> None:
         """Jalur mission produksi memakai AgentBridge yang sama (tidak duplikat)."""
-        res = llm_agent_bridge.run_mission_from_provider("openai", "mis-p2a-guar")
+        res = _run(llm_agent_bridge.run_mission_cognitive("openai", "mis-p2a-guar"))
         assert res.ok is True
         assert res.external_calls == 0

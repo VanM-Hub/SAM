@@ -6,8 +6,8 @@ request masuk ke /mission/{id}, dan bahwa plan yang dibangun VALID + berisi 11
 steps pipeline (MISSION-REACHABLE).
 
 Catatan: AgentRunResult hanya mengekspos `steps` (count) + `detail`; objek plan
-hanya hidup selama eksekusi internal AgentRuntime. Karena itu bukti isi plan
-(11 steps) ditangkap DI DALAM spy build_default, bukan dari respons HTTP.
+tidak terekspos pada respons HTTP. Karena itu bukti isi plan (11 steps) ditangkap
+DI DALAM spy build_default, bukan dari respons HTTP.
 """
 import re
 

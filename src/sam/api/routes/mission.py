@@ -13,8 +13,8 @@ application-level use case yang memegang wiring:
 
 Route TIDAK mengambil alih orchestration. TIDAK mengubah RuntimeService, Governance,
 Execution, maupun reasoning/engine.py. External_calls tetap 0 (preview-only, deterministik).
-AgentRuntime tidak lagi menjadi orchestration owner jalur ini (P4A), namun tetap ada
-sebagai legacy (migration safety); orchestration jalur production dimiliki MissionCognitiveRuntime.
+Orchestration jalur production dimiliki MissionCognitiveRuntime (single cognitive owner,
+P4A + Step 9B); AgentRuntime legacy telah di-retire.
 """
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def _bridge():
     """Application Use Case (AgentBridge) - lazy import agar tidak circular.
 
     Composition root di `api.llm_wiring` membangun `llm_agent_bridge` (AgentBridge)
-    yang memegang AgentRuntime + MissionBuilder (Mission Builder).
+    yang memegang MissionCognitiveRuntime + MissionBuilder (Mission Builder).
     """
     from ..llm_wiring import llm_agent_bridge
     return llm_agent_bridge
@@ -43,8 +43,8 @@ def _bridge():
 def _result_details(result) -> dict:
     """Petakan AgentRunResult -> dict (serializer adapter, composition-only).
 
-    AgentRunResult mengekspos `steps` (jumlah langkah yang dijalankan) + `detail`,
-    bukan objek plan (plan hanya hidup selama eksekusi internal AgentRuntime).
+    AgentRunResult (kontrak REST) mengekspos `steps` (jumlah langkah) +
+    `detail`, bukan objek plan.
     """
     return {
         "mission_id": getattr(result, "mission_id", ""),
@@ -64,11 +64,10 @@ async def run_mission(mission_id: str, request: Optional[MissionRequest] = None)
     """Jalankan mission via Application Use Case (AgentBridge -> MCR).
 
     - Pilih mission_id dari path; jika body ada, provider_id diambil dari body.
-    - Ini production mission entry point pertama (P2A) yang kini diorkestrasi
-      oleh MissionCognitiveRuntime (satu cognitive owner, Architecture Acceptance
-      P4A). AgentRuntime TIDAK lagi menjadi orchestration owner jalur ini.
+    - Ini production mission entry point (P2A) yang diorkestrasi oleh
+      MissionCognitiveRuntime (satu cognitive owner, Architecture Acceptance P4A).
     - Route tetap adapter: memanggil use case, tidak mengambil alih orchestration.
-    - Kontrak REST dipertahankan (AgentRunResult-compatible mapping).
+    - Kontrak REST dipertahankan (AgentRunResult-compatible mapping, Step 9B).
     """
     provider_id = request.provider_id if request else "openai"
     result = await _bridge().run_mission_cognitive(provider_id, mission_id)
