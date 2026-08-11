@@ -12,7 +12,7 @@
 > **Aturan:** IMPLEMENTED ≠ OPERATIONAL. Mock/preview/unit-test/HTTP-construction/success=True TIDAK menaikkan ke PROVEN.
 > Ledger detail: `docs/engineering/reports/CAPABILITY_TRUTH_MATRIX.md`.
 
-**Sembilan capability real execution kini PROVEN** (real external effect + verification + audit + repeatable):
+**Dua belas capability real execution kini PROVEN** (real external effect + verification + audit + repeatable):
 
 | Capability | Bukti nyata |
 |---|---|
@@ -25,6 +25,9 @@
 | Recovery (P9) | state eksternal berubah nyata (stopped→running) + independent verification |
 | Learning (P10) | experience dipersist ke disk + retrieved setelah restart |
 | Full Mission (P11) | request→reason→investigate→recommend→approve→recover→verify→artifact→audit→learn |
+| HTTP Connector (M6-001) | GET nyata ke 2 API eksternal berbeda (JSONPlaceholder+httpbin), 200+JSON valid ('6f1ffed') |
+| SQLite Database (M6-002) | SQL genuine (SELECT users/posts nyata, limit), audit, tanp mock ('a15e18e') |
+| Process Connector (M6-003) | subprocess NYATA via allowlist read-only (hostname=VM, python--version), exit 0 ('5d4d507') |
 
 **Catatan jujur:** ini membuktikan *real execution substrate* (mampu melakukan kerja nyata), BUKAN klaim "SAM selesai" secara keseluruhan. Kerangka verifikasi (P2-B) + harness di `src/sam/execution_runtime/real_harness*.py`.
 
@@ -40,7 +43,7 @@ Hasil M1-M5 — detail: `docs/engineering/audits/Canonical_Execution_Consolidati
 - M5 agent universal_agent -> `canonical_agent_governance.py` (5/5; contract violation denied, agent tak pegang adapter).
 
 Regression (execution_runtime + universal_*): **429 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
-**Capability Truth ≠ Architecture Inventory**: 9 capability PROVEN; universal_* (inventory) kini bisa dipakai via canonical bridge.
+**Capability Truth ≠ Architecture Inventory**: 12 capability PROVEN; universal_* (inventory) kini bisa dipakai via canonical bridge. **Email & Browser Connector = PARTIAL** (lihat M6-004/M6-005): kirim SMTP nyata & render headless belum terbukti.
 
 ## M6-001 — Universal HTTP Connector (2026-08-12, PROVEN)
 
@@ -66,21 +69,23 @@ Satu jalur eksekusi = `RealExecutionHarness` / capability `process`; bukan free-
 Tanpa command valid -> BLOCKED (NO SIDE EFFECT); eksekusi NYATA via subprocess, output diverifikasi (exit 0 + stdout).
 Test `test_m6_process_connector.py` **7/7 passed**; proof JSON `docs/engineering/reports/M6-003_Process_Connector_E2E_Proof.json` (hostname=VM, exit=0); regression execution_runtime 318 passed, 1 skipped, 2 xfailed.
 
-## M6-004 — Universal Email Connector (2026-08-12, PROVEN - validasi + gate SMTP)
+## M6-004 — Universal Email Connector (2026-08-12, PARTIAL — kirim nyata PENDING)
 
 Connector email keempat — `src/sam/execution_runtime/canonical_email_connector.py` (canonical path).
 Satu jalur eksekusi = `RealExecutionHarness` / capability `email`; kirim nyata via SMTP (smtplib) bila `SMTP_HOST/PORT/USER/PASS` ada; tanpa SMTP -> BLOCKED (`credential_email`, NO SIDE EFFECT). `dry_run` = validasi eksplisit (sent:false, DRY_RUN) — bukan mock sukses. Validate op + validasi format email real.
 Test `test_m6_email_connector.py` **10/10 passed**; proof JSON dry_run `docs/engineering/reports/M6-004_Email_Connector_E2E_Proof.json`;
-regression execution_runtime 328 passed, 1 skipped, 2 xfailed. E2E SMTP kirim-nyata PENDING (tanpa server/kredensial) — gate ketat pastikan tidak diklaim sukses sampai SMTP diisi.
+regression execution_runtime 328 passed, 1 skipped, 2 xfailed.
+**Status arsitektur: PARTIAL (bukan PROVEN)** — sesuai definisi DoD, `sent:false` dan tanpa SMTP server/kredensial nyata berarti kirim SMTP NYATA belum terbukti. Syarat naik ke PROVEN (pasca-M7): real SMTP + real sent message + independent verification.
 
-## M6-005 — Universal Browser Connector (2026-08-12, PROVEN - fetch real)
+## M6-005 — Universal Browser Connector (2026-08-12, PARTIAL — render headless PENDING)
 
 Connector browser kelima — `src/sam/execution_runtime/canonical_browser_connector.py` (canonical path).
 Satu jalur eksekusi = `RealExecutionHarness` / capability `browser`; `fetch_url` = HTTP nyata read-only (httpx, verifikasi 200+HTML non-kosong, BUKAN mock); `render` = kontrak headless — tanpa playwright/selenium -> BLOCKED (jujur, tidak diklaim). URL wajib https valid.
 Test `test_m6_browser_connector.py` **9/9 passed**; proof JSON fetch nyata `docs/engineering/reports/M6-005_Browser_Connector_E2E_Proof.json` (httpbin 200, html_len 3739);
-regression execution_runtime 337 passed, 1 skipped, 2 xfailed. Render headless PENDING (driver belum terinstall); fetch real terbukti.
+regression execution_runtime 337 passed, 1 skipped, 2 xfailed.
+**Status arsitektur: PARTIAL (bukan PROVEN)** — fetch HTTP ≠ browser automation; render/headless Chromium (real navigation + real interaction) BELUM terbukti (platwright/selenium belum terinstall). Syarat naik ke PROVEN (pasca-M7): real Chromium + real navigation + real interaction + verification.
 
-M6 selesai (HTTP/DB/Process/Email/Browser): minimal 2 external API terpenuhi luas; semua connector hanya di canonical path, tidak ada mock default, tidak ada executor kedua.
+M6 selesai (HTTP/DB/Process/Email/Browser): minimal 2 external API terpenuhi luas; semua connector hanya di canonical path, tidak ada mock default, tidak ada executor kedua. Namun per Truth Matrix: hanya HTTP/SQLite/Process yang PROVEN; Email & Browser PARTIAL (dijelaskan di atas).
 
 ---
 

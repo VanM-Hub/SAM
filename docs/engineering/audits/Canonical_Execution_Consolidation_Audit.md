@@ -190,7 +190,7 @@ Test `tests/execution_runtime/test_m6_process_connector.py` **7/7 passed**.
 Proof JSON: `docs/engineering/reports/M6-003_Process_Connector_E2E_Proof.json` (ok=True, exit=0, hostname=VM, 20 audit).
 Regression execution_runtime: **318 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
 
-## 11. M6-004 — Universal Email Connector (2026-08-12) — PROVEN (validasi + gate SMTP)
+## 11. M6-004 — Universal Email Connector (2026-08-12) — PARTIAL (validasi+gate OK, kirim nyata PENDING)
 
 Connector email keempat. `src/sam/execution_runtime/canonical_email_connector.py`:
 - SATU jalur eksekusi = `RealExecutionHarness` / capability `email` (no second executor).
@@ -209,7 +209,11 @@ Regression execution_runtime: **328 passed, 1 skipped, 2 xfailed** — tidak ada
 Catatan jujur: E2E SMTP kirim-nyata masih PENDING (tidak ada server SMTP lokal + belum ada kredensial).
 Gate ketat memastikan sampai SMTP diisi, TIDAK ada email terkirim/diklaim sukses.
 
-## 12. M6-005 — Universal Browser Connector (2026-08-12) — PROVEN (fetch real)
+**Status arsitektur: PARTIAL (bukan PROVEN)** — sesuai definisi DoD, `sent:false` dan tanpa SMTP server/kredensial
+nyata = kirim SMTP NYATA belum terbukti. Naik ke PROVEN hanya setelah real SMTP + real sent message +
+independent verification.
+
+## 12. M6-005 — Universal Browser Connector (2026-08-12) — PARTIAL (fetch real, render headless PENDING)
 
 Connector browser kelima (terakhir M6). `src/sam/execution_runtime/canonical_browser_connector.py`:
 - SATU jalur eksekusi = `RealExecutionHarness` / capability `browser` (no second executor).
@@ -227,6 +231,10 @@ Regression execution_runtime: **337 passed, 1 skipped, 2 xfailed** — tidak ada
 Catatan jujur: render headless (Chromium) masih PENDING (driver playwright/selenium belum terinstall);
 fetch real sudah terbukti. Minimal 2 external API/endpoint pada M6 insgesamt: HTTP (JSONPlaceholder+httpbin),
 DB (SQLite), Process (OS), Browser (httpbin fetch) — syarat M6 terpenuhi.
+
+**Status arsitektur: PARTIAL (bukan PROVEN)** — fetch HTTP ≠ browser automation. Render/headless Chromium
+(real navigation + real interaction) BELUM terbukti (playwright/selenium belum terinstall). Naik ke PROVEN
+hanya setelah real Chromium + real navigation + real interaction + verification.
 
 ## 7. Status akhir canonical execution consolidation
 
