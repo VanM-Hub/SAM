@@ -209,6 +209,25 @@ Regression execution_runtime: **328 passed, 1 skipped, 2 xfailed** — tidak ada
 Catatan jujur: E2E SMTP kirim-nyata masih PENDING (tidak ada server SMTP lokal + belum ada kredensial).
 Gate ketat memastikan sampai SMTP diisi, TIDAK ada email terkirim/diklaim sukses.
 
+## 12. M6-005 — Universal Browser Connector (2026-08-12) — PROVEN (fetch real)
+
+Connector browser kelima (terakhir M6). `src/sam/execution_runtime/canonical_browser_connector.py`:
+- SATU jalur eksekusi = `RealExecutionHarness` / capability `browser` (no second executor).
+- `fetch_url` = primitive render-agnostik NYATA via httpx (HTTP GET read-only) ke server eksternal;
+  HTML diverifikasi (200 + non-kosong). BUKAN mock — ada HTTP request + respons nyata.
+- `render` = kontrak headless browser; tanpa playwright/selenium -> BLOCKED (jujur, TIDAK diklaim).
+- URL wajib https valid; URL invalid/unknown -> RAISE/BLOCKED (NO SIDE EFFECT).
+- PREVIEW explicit simulated.
+
+**Bukti E2E fetch nyata:** httpbin.org/html -> HTTP 200, html_len 3739, content_type set, audited.
+Test `tests/execution_runtime/test_m6_browser_connector.py` **9/9 passed** (7 structural + 2 E2E fetch).
+Proof JSON: `docs/engineering/reports/M6-005_Browser_Connector_E2E_Proof.json` (ok=True, 200, fetch_real, 21 audit).
+Regression execution_runtime: **337 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
+
+Catatan jujur: render headless (Chromium) masih PENDING (driver playwright/selenium belum terinstall);
+fetch real sudah terbukti. Minimal 2 external API/endpoint pada M6 insgesamt: HTTP (JSONPlaceholder+httpbin),
+DB (SQLite), Process (OS), Browser (httpbin fetch) — syarat M6 terpenuhi.
+
 ## 7. Status akhir canonical execution consolidation
 
 - Execution Core canonical (RealExecutionHarness) = single execution authority (M1, proven P0-P11).

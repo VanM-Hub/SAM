@@ -73,6 +73,15 @@ Satu jalur eksekusi = `RealExecutionHarness` / capability `email`; kirim nyata v
 Test `test_m6_email_connector.py` **10/10 passed**; proof JSON dry_run `docs/engineering/reports/M6-004_Email_Connector_E2E_Proof.json`;
 regression execution_runtime 328 passed, 1 skipped, 2 xfailed. E2E SMTP kirim-nyata PENDING (tanpa server/kredensial) — gate ketat pastikan tidak diklaim sukses sampai SMTP diisi.
 
+## M6-005 — Universal Browser Connector (2026-08-12, PROVEN - fetch real)
+
+Connector browser kelima — `src/sam/execution_runtime/canonical_browser_connector.py` (canonical path).
+Satu jalur eksekusi = `RealExecutionHarness` / capability `browser`; `fetch_url` = HTTP nyata read-only (httpx, verifikasi 200+HTML non-kosong, BUKAN mock); `render` = kontrak headless — tanpa playwright/selenium -> BLOCKED (jujur, tidak diklaim). URL wajib https valid.
+Test `test_m6_browser_connector.py` **9/9 passed**; proof JSON fetch nyata `docs/engineering/reports/M6-005_Browser_Connector_E2E_Proof.json` (httpbin 200, html_len 3739);
+regression execution_runtime 337 passed, 1 skipped, 2 xfailed. Render headless PENDING (driver belum terinstall); fetch real terbukti.
+
+M6 selesai (HTTP/DB/Process/Email/Browser): minimal 2 external API terpenuhi luas; semua connector hanya di canonical path, tidak ada mock default, tidak ada executor kedua.
+
 ---
 
 ## Snapshot Terkini
