@@ -86,7 +86,7 @@
    ├── world (AKTIF, jalur resmi — ubah di sini utk capability baru)
    │     runtime_service       ← GATEWAY (konsumen: 6 capability)
    │     observation           ← OBSERVATION LAYER (C-Phase 1-4, read-only + gap resolution + recommendation + C1-C10 intel)
-   │     execution_runtime     ← Execution (preview, ADR-024)
+   │     execution_runtime     <- Execution CANONICAL (real_harness + canonical_* connector M6/M7; verified side-effect)
    │     presentation          ← UI entry (memakai RuntimeService)
    │     web / desktop         ← host UI
    │     knowledge_runtime / workflow_runtime / artifact_runtime /
@@ -172,7 +172,7 @@
    Ecosystem          ✓   (SAM 3.x COMPLETE 6/6 - release v3.6.0, 2026-08-09)
    Federation         ✓   (SAM 4.0 - Federated Governance Platform - release v4.0.0, 2026-08-10 - ARCHITECTURE ACCEPTED, CA verdict: 4.1 CLOSED, 4.2..4.6 ACCEPTED)
 ```
-> Fase: **Product Integration & Operationalization** (Tahap 2). Execution = preview (ADR-024).
+> Fase: **Product Integration & Operationalization** (Tahap 2). Execution = CANONICAL (RealExecutionHarness, data real, ADR-024 resolved via P2-B gate).
 > Observability: Observation Layer (C-Phase 1-4) sudah observasi 5 pipeline + Platform Intelligence (C6-C10) secara read-only (M3).
 > Program C **CLOSED** (Verdict EA-C06); M3 Observable Platform tercapai.
 > **Program D (MISSION-2D) EA-002 Production Readiness Implementation SELESAI** - Verdict EA-002/EA-003; Official Order P1-P5. **Kelima High gap DONE** (H1 portable + H5 IAM + H2 recovery + H3 deploy rollback + H4 operational alerting; modul sam/iam + sam/recovery + sam/deploy_rollback + sam/operational_alerting; 8+30+23+24+25 test). EA-002 Implementation COMPLETE, menunggu Verdict Lead Engineer. Menuju Production Platform (M4).

@@ -4,6 +4,24 @@
 > **SAM 4.0.0 (2026-08-10) adalah rilis Federated Governance Platform terakhir yang Architecture Accepted**
 > (MISSION-4.1..4.6 COMPLETE).
 
+## Unreleased (2026-08-12) - M6 Operational Expansion + M7 Real Operational Work
+
+### M6 - Universal External Connector (5 canonical connector)
+- **HTTP Connector (`canonical_http_connector.py`)** - GET real ke JSONPlaceholder + httpbin, 200+JSON valid, gate+verify+audit.
+- **Database Connector (`canonical_db_connector.py`)** - SQLite SELECT real (users/posts), read-only; postgres = kontrak BLOCKED tanpa driver.
+- **Process Connector (`canonical_process_connector.py`)** - subprocess nyata allowlist read-only (`hostname`, `python --version`, `whoami`), exit 0.
+- **Email Connector (`canonical_email_connector.py`)** - PARTIAL: validasi+gate SMTP; kirim nyata belum terbukti (tanpa SMTP server/kredensial).
+- **Browser Connector (`canonical_browser_connector.py`)** - PARTIAL: fetch HTTP real; render/headless Chromium belum terbukti.
+- Semua connector dieksekusi HANYA via `RealExecutionHarness` (single authority, 14 gate P2-B, no mock default, no second executor).
+
+### M7 - Real Operational Work (keputusan Van 2026-08-12)
+- **Framework `m7_mission_framework.py`** (canonical, orchestrator bukan executor kedua): chain observe->reason->approve->act->verify->artifact->learn, `PersistedExperience` disk-repeatable, `CredentialGate` jujur (tanpa key -> BLOCKED, bukan mock).
+- **M7-001 Real Research** - 2 HTTP eksternal (JSONPlaceholder + httpbin) dibaca nyata -> evidence -> reasoning -> report. REAL. (Stage AI-LLM BLOCKED terpisah tanpa NVIDIA key, jujur.)
+- **M7-002 Real Repo Ops (GitHub)** - gate `GITHUB_TOKEN` jujur; tanpa token -> BLOCKED (NO SIDE EFFECT), verdict "BLOCKED/PARTIAL". Harness selesai teruji.
+- **M7-003 Real System Ops** - Process hostname=VM + SQLite 3 users -> diagnosis -> approval -> snapshot disk (real effect) -> independent verify. REAL.
+- **Truth Matrix 12 PROVEN / 2 PARTIAL / 6 UNPROVEN**: HTTP(6f1ffed)/SQLite(a15e18e)/Process(5d4d507) PROVEN; Email(41a31dc)/Browser(c61deb8) PARTIAL (kirim SMTP & render belum terbukti).
+- Test M7 7/7; regression cross-module 481 passed / 1 skipped / 2 xfailed. E2E proof `docs/engineering/reports/M7-00{1,2,3}_*E2E_Proof.json`.
+
 ## 5.0.0 (2026-08-10) - SAM 5.x Implementation Start - Universal Governance Platform
 
 ### MCR Baseline & Production Wiring (2026-08-10 to 2026-08-11)
