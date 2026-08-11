@@ -51,6 +51,14 @@ E2E nyata terbukti **minimal 2 API berbeda**: JSONPlaceholder /posts/1 (200, id=
 Test `test_m6_http_connector.py` **9/9 passed**; proof JSON `docs/engineering/reports/M6-001_HTTP_Connector_E2E_Proof.json`; regression execution_runtime 301 passed, 1 skipped, 2 xfailed.
 Syarat 2 external API TERPENUHI -> lanjut Database Connector (M6-002).
 
+## M6-002 — Universal Database Connector (2026-08-12, PROVEN - SQLite)
+
+Connector database kedua — `src/sam/execution_runtime/canonical_db_connector.py` (canonical path, read-only SELECT).
+Satu jalur eksekusi = `RealExecutionHarness` / capability `db`; tanpa mock default (tabel tak dikenal / target kosong / file tak ada -> BLOCKED, NO SIDE EFFECT).
+Backend-agnostik: `sqlite` TERBUKTI (SQL genuine, 3 baris users nyata + posts + limit); `postgres` = kontrak tapi tanpa driver -> BLOCKED (tidak diklaim).
+Test `test_m6_db_connector.py` **10/10 passed**; proof JSON `docs/engineering/reports/M6-002_DB_Connector_E2E_Proof.json`; regression execution_runtime 311 passed, 1 skipped, 2 xfailed.
+Catatan jujur: PostgreSQL belum diverifikasi (tanpa driver/server) — aktif saat driver+DSN ada, sampai itu tidak diklaim.
+
 ---
 
 ## Snapshot Terkini

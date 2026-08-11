@@ -152,6 +152,30 @@ Regression execution_runtime: **301 passed, 1 skipped, 2 xfailed** — tidak ada
 
 Syarat "HTTP connector terbukti dengan minimal dua external API berbeda" TERPENUHI -> berhak lanjut Database Connector (M6-002).
 
+## 9. M6-002 — Universal Database Connector (2026-08-12) — PROVEN (SQLite)
+
+Connector database kedua. `src/sam/execution_runtime/canonical_db_connector.py`:
+- SATU jalur eksekusi = `RealExecutionHarness` / capability `db` (no second executor).
+- Backend-agnostik: dialektur `sqlite` TERBUKTI; `postgres` = kontrak tapi tanpa driver/koneksi -> BLOCKED (tidak diklaim sukses).
+- Tanpa mock default: tabel tak dikenal / target kosong / target file tak ada -> BLOCKED (NO SIDE EFFECT).
+- READ-ONLY (SELECT) dulu; query SQL genuine dieksekusi dan hasil tiap baris diverifikasi.
+- PREVIEW explicit simulated, TIDAK menyamar sebagai execution.
+
+**Bukti E2E nyata (SQLite genuine, bukan mock/hardcode):**
+
+| Tabel | Result | Verified |
+|---|---|---|
+| users | SELECT nyata -> 3 baris (Aster, Zara, VanM) | ya |
+| posts | SELECT nyata -> 2 baris (title+body) | ya |
+| users LIMIT 1 | 1 baris (limit diterapkan) | ya |
+
+Test `tests/execution_runtime/test_m6_db_connector.py` **10/10 passed** (7 structural + E2E).
+Proof JSON: `docs/engineering/reports/M6-002_DB_Connector_E2E_Proof.json` (ok=True, count=3, 22 audit).
+Regression execution_runtime: **311 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
+
+Catatan jujur: PostgreSQL belum diverifikasi (tidak ada driver psycopg2/asyncpg & server lokal).
+Saat driver+DSN tersedia, dialektur `postgres` aktif; sampai saat itu TIDAK diklaim.
+
 ## 7. Status akhir canonical execution consolidation
 
 - Execution Core canonical (RealExecutionHarness) = single execution authority (M1, proven P0-P11).
