@@ -107,3 +107,6 @@ docs/engineering/templates/*
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md
 !docs/engineering/decisions/.gitkeep
+
+# M8 runner sementara (utility lokal, bukan produk)
+_m8_*.py

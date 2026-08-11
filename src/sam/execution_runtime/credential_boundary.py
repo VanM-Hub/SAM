@@ -41,6 +41,18 @@ from sam.execution_runtime.credential import (
 from sam.runtime_service.secrets.secret_provider import SecretProvider
 
 
+def _mask_full(value: str) -> str:
+    """Masking boundary yang AMAN: TIDAK menampilkan karakter asli.
+
+    Berbeda dari `mask_secret` (yang menampilkan 4 karakter terakhir utk
+    debugging layer lain) — boundary TIDAK boleh mengekspos suffix key ke
+    timeline/audit/artifact. Hanya menampilkan panjang token, tanpa isi.
+    """
+    if not value:
+        return ""
+    return f"{'*' * 8}[len={len(value)}]"
+
+
 # ---------------------------------------------------------------------------
 # Status boundary (klasifikasi kegagalan jujur)
 # ---------------------------------------------------------------------------
@@ -123,7 +135,7 @@ class SecretScrubber:
         for k, v in data.items():
             if isinstance(v, str):
                 if self._looks_secret(k) and v:
-                    out[k] = mask_secret(v, 2) if self._looks_secret(k) else self.scrub(v)
+                    out[k] = _mask_full(v) if self._looks_secret(k) else self.scrub(v)
                 else:
                     out[k] = self.scrub(v)
             elif isinstance(v, dict):
@@ -184,7 +196,7 @@ class CredentialBoundary:
             provider_id=req.provider_id,
             status=status,
             available=(status == BoundaryStatus.AVAILABLE),
-            masked=mask_secret(raw) if raw else "",
+            masked=_mask_full(raw) if raw else "",
             reason=reason,
             action=action,
         )

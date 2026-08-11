@@ -149,16 +149,27 @@ def m8_001_build(audit, artifact_dir: str = "docs/engineering/reports") -> Crede
 
     # NVIDIA reasoning real — boundary; tanpa key -> BLOCKED, bukan mock
     def nvidia_executor(raw_key: str) -> Dict[str, Any]:
-        from sam.providers.execution.provider_executor import ProviderExecutor
+        from sam.providers.execution.provider_executor import (
+            ProviderExecutor, ProviderExecutionConfig,
+        )
 
-        pe = ProviderExecutor()
+        # nvidia tidak ada di PROVIDER_ENV bawaan -> config eksplisit (base_url
+        # + env var); NO key value di sini, hanya nama env.
+        pe = ProviderExecutor(configs={
+            "nvidia": ProviderExecutionConfig(
+                provider_id="nvidia",
+                base_url="https://integrate.api.nvidia.com/v1",
+                api_key_env="NVIDIA_API_KEY",
+            ),
+        })
         payload = {
-            "model": "nvidia/nemotron-3-ultra-550b-a55b",
+            "model": "meta/llama-3.1-8b-instruct",
             "prompt": "Summarize the evidence in one sentence.",
             "evidence": "postid=3",
         }
-        return pe.execute_sync(payload, api_key_env="NVIDIA_API_KEY",
-                               base_url="https://integrate.api.nvidia.com/v1")
+        # panggil API nyata ProviderExecutor.execute(provider_id, operation,
+        # payload); nvidia config + key datang dari env/boundary.
+        return pe.execute("nvidia", "chat", payload=payload, timeout_seconds=60)
 
     mission.add_credential_stage(req_nvidia(), "reason_ai", nvidia_executor,
                                  note="NVIDIA real reasoning (boundary gated)")
