@@ -190,6 +190,25 @@ Test `tests/execution_runtime/test_m6_process_connector.py` **7/7 passed**.
 Proof JSON: `docs/engineering/reports/M6-003_Process_Connector_E2E_Proof.json` (ok=True, exit=0, hostname=VM, 20 audit).
 Regression execution_runtime: **318 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
 
+## 11. M6-004 — Universal Email Connector (2026-08-12) — PROVEN (validasi + gate SMTP)
+
+Connector email keempat. `src/sam/execution_runtime/canonical_email_connector.py`:
+- SATU jalur eksekusi = `RealExecutionHarness` / capability `email` (no second executor).
+- Kirim NYATA via SMTP (smtplib) BILA `SMTP_HOST/PORT/USER/PASS` tersedia di env.
+- Tanpa SMTP terkonfigurasi -> gate `credential_email` FAIL -> BLOCKED (NO SIDE EFFECT),
+  BUKAN mock yang seolah terkirim.
+- `dry_run=True` = VALIDASI eksplisit (sent:false, mode:DRY_RUN) — tanda jelas beda dari kirim nyata.
+- Validasi format email real (regex) + kontrak kosong -> GAGAL/RAISE.
+- PREVIEW explicit simulated.
+
+**Bukti:** dry_run validasi OK (sent:false), validate op true/bad, kirim nyata tanpa SMTP -> BLOCKED.
+Test `tests/execution_runtime/test_m6_email_connector.py` **10/10 passed**.
+Proof JSON: `docs/engineering/reports/M6-004_Email_Connector_E2E_Proof.json` (dry_run=True, sent=False, mode=DRY_RUN).
+Regression execution_runtime: **328 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
+
+Catatan jujur: E2E SMTP kirim-nyata masih PENDING (tidak ada server SMTP lokal + belum ada kredensial).
+Gate ketat memastikan sampai SMTP diisi, TIDAK ada email terkirim/diklaim sukses.
+
 ## 7. Status akhir canonical execution consolidation
 
 - Execution Core canonical (RealExecutionHarness) = single execution authority (M1, proven P0-P11).

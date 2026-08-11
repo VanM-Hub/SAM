@@ -66,6 +66,13 @@ Satu jalur eksekusi = `RealExecutionHarness` / capability `process`; bukan free-
 Tanpa command valid -> BLOCKED (NO SIDE EFFECT); eksekusi NYATA via subprocess, output diverifikasi (exit 0 + stdout).
 Test `test_m6_process_connector.py` **7/7 passed**; proof JSON `docs/engineering/reports/M6-003_Process_Connector_E2E_Proof.json` (hostname=VM, exit=0); regression execution_runtime 318 passed, 1 skipped, 2 xfailed.
 
+## M6-004 — Universal Email Connector (2026-08-12, PROVEN - validasi + gate SMTP)
+
+Connector email keempat — `src/sam/execution_runtime/canonical_email_connector.py` (canonical path).
+Satu jalur eksekusi = `RealExecutionHarness` / capability `email`; kirim nyata via SMTP (smtplib) bila `SMTP_HOST/PORT/USER/PASS` ada; tanpa SMTP -> BLOCKED (`credential_email`, NO SIDE EFFECT). `dry_run` = validasi eksplisit (sent:false, DRY_RUN) — bukan mock sukses. Validate op + validasi format email real.
+Test `test_m6_email_connector.py` **10/10 passed**; proof JSON dry_run `docs/engineering/reports/M6-004_Email_Connector_E2E_Proof.json`;
+regression execution_runtime 328 passed, 1 skipped, 2 xfailed. E2E SMTP kirim-nyata PENDING (tanpa server/kredensial) — gate ketat pastikan tidak diklaim sukses sampai SMTP diisi.
+
 ---
 
 ## Snapshot Terkini
