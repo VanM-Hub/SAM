@@ -40,8 +40,13 @@
 | **17** | **Full Mission** | `execution_runtime/real_harness_mission.py` | ✅ | ✅ | ✅ E2E real | ✅ | **PROVEN** ✅ | **request→reason→investigate→recommend→approve→recover→verify→artifact→audit→learn (P11)** |
 | **18** | **Tool GitHub (RealAdapter)** | `execution_runtime/real_harness_tool.py` | ✅ | ✅ | ✅ E2E real | ✅ | **PROVEN** ✅ | **HTTP nyata get_repo ke GitHub, respon 200, data asli (P5, dengan token valid)** |
 | **19** | **AI Provider NVIDIA (Real)** | `execution_runtime/real_harness_nvidia.py` | ✅ | ✅ | ✅ E2E real | ✅ | **PROVEN** ✅ | **HTTP nyata ke Nvidia NIM, model 'minimaxai/minimax-m3' (favorit Van) menjawab 'PROVEN', finish=stop (P4)** |
+| **20** | **HTTP Connector (M6)** | `execution_runtime/canonical_http_connector.py` | ✅ | ✅ | ✅ E2E real | ✅ | **PROVEN** ✅ | **HTTP nyata GET ke 2 API eksternal berbeda (JSONPlaceholder + httpbin), 200+JSON valid, gate P2-B, verifikasi kontrak, audit; generic config-based endpoint (6f1ffed)** |
+| **21** | **SQLite Database Connector (M6)** | `execution_runtime/canonical_db_connector.py` | ✅ | ✅ | ✅ E2E real | ✅ | **PROVEN** ✅ | **SQL genuine di SQLite: SELECT users/posts nyata (3 baris Aster/Zara/VanM), limit, audit; tanpa mock (a15e18e)** |
+| **22** | **Process Connector (M6)** | `execution_runtime/canonical_process_connector.py` | ✅ | ✅ | ✅ E2E real | ✅ | **PROVEN** ✅ | **subprocess NYATA via allowlist read-only (hostname=VM, python --version), exit 0, output diverifikasi,audit (5d4d507)** |
+| **23** | **Email Connector (M6)** | `execution_runtime/canonical_email_connector.py` | ✅ | ✅ | ⚠️ dry_run only (sent:false) | ❌ | **PARTIAL** | **Validas format real + gate SMTP + dry_run jujur; kirim SMTP NYATA belum terbukti (tanpa server/kredensial) -> sent:false (41a31dc)** |
+| **24** | **Browser Connector (M6)** | `execution_runtime/canonical_browser_connector.py` | ✅ | ✅ | ⚠️ fetch HTTP only | ❌ | **PARTIAL** | **fetch_url HTTP nyata (httpbin 200); render headless Chromium (browser automation) belum terbukti (c61deb8)** |
 
-**Kesimpulan ledger:** 6 UNPROVEN · 0 PARTIAL · **9 PROVEN** (Filesystem, Workflow-harness, Agent, Investigation, Recovery, Learning, Mission, Tool-GitHub, AI-NVIDIA).
+**Kesimpulan ledger:** 6 UNPROVEN (legacy universal_*) · 2 PARTIAL (Email Connector, Browser Connector) · **12 PROVEN** (Filesystem, Workflow-harness, Agent, Investigation, Recovery, Learning, Mission, Tool-GitHub, AI-NVIDIA, **HTTP Connector, SQLite Database, Process Connector**).
 
 ---
 
@@ -179,6 +184,19 @@ Menurut model Readiness SAM sendiri (0 Defined → 6 Certified), kondisi nyata a
 - **Full Mission (P11):** rantai lengkap pada satu mission nyata "pulihkan svc-orders":
   request→reason→investigate→recommend→approve→recover(stopped→running)→verify(healthy)→artifact(tulisan disk)
   →audit(13) →learn(experience di-store). Bukti: `_demo/mission_out/M-DEMO01_report.txt` + `_evidence.json`.
+
+### 2.10 HTTP / SQLite / Process Connector (M6) → PROVEN ⭐
+Connector M6 dibangun di canonical path (`execution_runtime/canonical_*.py`), dieksekusi hanya via `RealExecutionHarness`, gate P2-B + verifikasi + audit.
+- **HTTP (`canonical_http_connector.py`):** GET nyata ke **2 API eksternal berbeda** — JSONPlaceholder (`/posts/1`, 200, userId 1) + httpbin (`/json`, 200, json non-kosong). Response diverifikasi (kontrak), audit lengkap. Bukti: `docs/engineering/reports/M6-001_*`. Commit `6f1ffed` (9/9 test).
+- **SQLite DB (`canonical_db_connector.py`):** SQL genuine—`SELECT` users/posts real (3 baris Aster/Zara/VanM), `LIMIT`. Tidak ada mock; db file nyata. Audit. Commit `a15e18e` (10/10 test).
+- **Process (`canonical_process_connector.py`):** subprocess NYATA via allowlist read-only (`hostname`→VM, `python --version`→Python), exit 0, stdout diverifikasi, audit. Commit `5d4d507` (7/7 test).
+- **Status: PROVEN** — real external effect + verification + audit + repeatable (masing-masing).
+
+### 2.11 Email / Browser Connector (M6) → PARTIAL (bukan PROVEN)
+Kedua connector mengikuti definisi kita: **tanpa real external effect penuh → PARTIAL, bukan PROVEN** (meski M6 ditandai complete).
+- **Email (`canonical_email_connector.py`):** validasi format real (regex), gate SMTP, dry_run = validasi eksplisit (`sent:false`, mode DRY_RUN). **Kirim SMTP NYATA belum terbukti** — tanpa server SMTP lokal + kredensial → BLOCKED, `sent:false`. Commit `41a31dc` (10/10 test). **→ PARTIAL.**
+- **Browser (`canonical_browser_connector.py`):** `fetch_url` HTTP nyata read-only (httpbin.org/html, 200, html_len 3739). **Render/browser automation (headless Chromium) belum terbukti** — playwright/selenium belum terinstall → BLOCKED (jujur, tidak diklaim). fetch HTTP ≠ browser automation. Commit `c61deb8` (9/9 test). **→ PARTIAL.**
+- **Syarat naik ke PROVEN (pasca-M7):** Email→ real SMTP + real sent message + independent verification; Browser→ real Chromium + real navigation + real interaction + verification.
 
 ---
 
