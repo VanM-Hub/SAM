@@ -176,6 +176,20 @@ Regression execution_runtime: **311 passed, 1 skipped, 2 xfailed** — tidak ada
 Catatan jujur: PostgreSQL belum diverifikasi (tidak ada driver psycopg2/asyncpg & server lokal).
 Saat driver+DSN tersedia, dialektur `postgres` aktif; sampai saat itu TIDAK diklaim.
 
+## 10. M6-003 — Universal Process Connector (2026-08-12) — PROVEN
+
+Connector proses ketiga. `src/sam/execution_runtime/canonical_process_connector.py`:
+- SATU jalur eksekusi = `RealExecutionHarness` / capability `process` (no second executor).
+- Bukan free-run: command HANYA dari allowlist READ-ONLY (hostname, python_version, whoami) —
+  tidak ada rm/del/format/write/pipe. Tanpa command valid -> BLOCKED (NO SIDE EFFECT).
+- Eksekusi NYATA via subprocess; output diverifikasi (exit 0 + stdout). Gagal -> dianggap GAGAL.
+- PREVIEW explicit simulated, TIDAK menyamar sebagai execution.
+
+**Bukti E2E nyata:** hostname dieksekusi -> exit 0, nama host asli VM; python --version -> exit 0, versi.
+Test `tests/execution_runtime/test_m6_process_connector.py` **7/7 passed**.
+Proof JSON: `docs/engineering/reports/M6-003_Process_Connector_E2E_Proof.json` (ok=True, exit=0, hostname=VM, 20 audit).
+Regression execution_runtime: **318 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
+
 ## 7. Status akhir canonical execution consolidation
 
 - Execution Core canonical (RealExecutionHarness) = single execution authority (M1, proven P0-P11).

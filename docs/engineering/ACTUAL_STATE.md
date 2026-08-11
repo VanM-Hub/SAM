@@ -59,6 +59,13 @@ Backend-agnostik: `sqlite` TERBUKTI (SQL genuine, 3 baris users nyata + posts + 
 Test `test_m6_db_connector.py` **10/10 passed**; proof JSON `docs/engineering/reports/M6-002_DB_Connector_E2E_Proof.json`; regression execution_runtime 311 passed, 1 skipped, 2 xfailed.
 Catatan jujur: PostgreSQL belum diverifikasi (tanpa driver/server) — aktif saat driver+DSN ada, sampai itu tidak diklaim.
 
+## M6-003 — Universal Process Connector (2026-08-12, PROVEN)
+
+Connector proses ketiga — `src/sam/execution_runtime/canonical_process_connector.py` (canonical path, read-only observasi).
+Satu jalur eksekusi = `RealExecutionHarness` / capability `process`; bukan free-run (command HANYA dari allowlist read-only: hostname/python_version/whoami; tanpa rm/del/write/pipe).
+Tanpa command valid -> BLOCKED (NO SIDE EFFECT); eksekusi NYATA via subprocess, output diverifikasi (exit 0 + stdout).
+Test `test_m6_process_connector.py` **7/7 passed**; proof JSON `docs/engineering/reports/M6-003_Process_Connector_E2E_Proof.json` (hostname=VM, exit=0); regression execution_runtime 318 passed, 1 skipped, 2 xfailed.
+
 ---
 
 ## Snapshot Terkini
