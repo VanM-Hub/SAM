@@ -86,7 +86,7 @@
    ├── world (AKTIF, jalur resmi — ubah di sini utk capability baru)
    │     runtime_service       ← GATEWAY (konsumen: 6 capability)
    │     observation           ← OBSERVATION LAYER (C-Phase 1-4, read-only + gap resolution + recommendation + C1-C10 intel)
-   │     execution_runtime     <- Execution CANONICAL (real_harness + canonical_* connector M6/M7; verified side-effect)
+   │     execution_runtime     <- Execution CANONICAL (real_harness + canonical_* connector M6/M7 + credential_boundary M8-005; verified side-effect)
    │     presentation          ← UI entry (memakai RuntimeService)
    │     web / desktop         ← host UI
    │     knowledge_runtime / workflow_runtime / artifact_runtime /

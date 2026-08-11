@@ -4,7 +4,16 @@
 > **SAM 4.0.0 (2026-08-10) adalah rilis Federated Governance Platform terakhir yang Architecture Accepted**
 > (MISSION-4.1..4.6 COMPLETE).
 
-## Unreleased (2026-08-12) - M6 Operational Expansion + M7 Real Operational Work
+## Unreleased (2026-08-12) - M6 Operational Expansion + M7 Real Operational Work + M8 Credentialed Operational Integration
+
+### M8 - Credentialed Operational Integration (2026-08-12)
+- **M8-005 Production Credential Boundary** - `credential_boundary.py`: enforcement deterministik; aliran Credential->Boundary->Connector; TIDAK pernah masuk Mission/Prompt/Audit/Artifact. 9 syarat (missing=BLOCKED, invalid=FAILED, timeout=FAILED, no cred=zero side effect, scrub) teruji 9/9. **PROVEN (produksi-grade).**
+- **M8-001 AI Mission Completion** - NVIDIA real di M7-001 (HTTP evidence + NVIDIA reasoning); harness BLOCKED jujur tanpa key.
+- **M8-002 GitHub Real Mutation** - create+get real issue di repo TEST (bukan production); harness BLOCKED jujur tanpa token.
+- **M8-003 SMTP Real Send** - kirim ke dedicated mailbox (bukan pribadi); harness BLOCKED jujur tanpa SMTP. (Email tetap PARTIAL.)
+- **M8-004 Browser Real Runtime** - headless Chromium navigation+interaction (fetch ≠ automation); harness BLOCKED jujur tanpa playwright. (Browser tetap PARTIAL.)
+- **M8-006 Real Mission Certification** - chain multi-external NVIDIA+HTTP+GitHub (6 stage); test + proof jujur; http_evidence REAL, NVIDIA/GitHub BLOCKED.
+- Test M8 20/20; regression cross-module 501 passed / 1 skipped / 2 xfailed (naik dari 481, +20 M8).
 
 ### M6 - Universal External Connector (5 canonical connector)
 - **HTTP Connector (`canonical_http_connector.py`)** - GET real ke JSONPlaceholder + httpbin, 200+JSON valid, gate+verify+audit.
