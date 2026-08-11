@@ -28,6 +28,20 @@
 
 **Catatan jujur:** ini membuktikan *real execution substrate* (mampu melakukan kerja nyata), BUKAN klaim "SAM selesai" secara keseluruhan. Kerangka verifikasi (P2-B) + harness di `src/sam/execution_runtime/real_harness*.py`.
 
+## Canonical Execution Consolidation (2026-08-12)
+
+Keputusan arsitektural (Van): **Real Execution Path = CANONICAL**; `universal_*` (77 file) di-downgrade ke **LEGACY / MIGRATION SOURCE** — bukan execution authority. Migrasi bertahap, tanpa penghapusan massal, connector baru hanya di canonical.
+
+Hasil M1-M5 — detail: `docs/engineering/audits/Canonical_Execution_Consolidation_Audit.md`:
+- M1 Execution Core (`RealExecutionHarness`) **sudah stabil** = single execution authority (14 gate P2-B, proven P0-P11).
+- M2 contract tool universal_tool -> `canonical_tool_contract.py` (7/7 test).
+- M3 adapter AI universal_ai (mock) -> `canonical_ai_bridge.py` ke ProviderExecutor HTTP (4/4+1 skip; tanpa kredensial -> ProviderUnavailableError, bukan mock).
+- M4 workflow universal_workflow -> `canonical_workflow_bridge.py` (5/5; fail-fast, no partial commit).
+- M5 agent universal_agent -> `canonical_agent_governance.py` (5/5; contract violation denied, agent tak pegang adapter).
+
+Regression (execution_runtime + universal_*): **429 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
+**Capability Truth ≠ Architecture Inventory**: 9 capability PROVEN; universal_* (inventory) kini bisa dipakai via canonical bridge.
+
 ---
 
 ## Snapshot Terkini
