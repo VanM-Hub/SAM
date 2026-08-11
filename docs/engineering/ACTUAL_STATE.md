@@ -87,6 +87,18 @@ regression execution_runtime 337 passed, 1 skipped, 2 xfailed.
 
 M6 selesai (HTTP/DB/Process/Email/Browser): minimal 2 external API terpenuhi luas; semua connector hanya di canonical path, tidak ada mock default, tidak ada executor kedua. Namun per Truth Matrix: hanya HTTP/SQLite/Process yang PROVEN; Email & Browser PARTIAL (dijelaskan di atas).
 
+## M7 — Real Operational Work (2026-08-12)
+
+Keputusan Van: **JANGAN tambah connector dulu.** Pakai connector PROVEN untuk membuktikan SAM melakukan pekerjaan bernilai nyata. Framework `src/sam/execution_runtime/m7_mission_framework.py` (orchestrator, bukan executor kedua — ia memanggil connector canonical yang dieksekusi via RealExecutionHarness).
+
+| Mission | Hasil runtime | Status |
+|---|---|---|
+| **M7-001 Real Research** | 2 HTTP eksternal nyata (JSONPlaceholder: post "sunt aut..." + user "Leanne Graham"; httpbin) -> evidence -> reasoning -> approval -> report + experience | 🟢 REAL PROVEN (stage AI-LLM BLOCKED terpisah tanpa NVIDIA key, jujur) |
+| **M7-002 Real Repo Ops (GitHub)** | gate `GITHUB_TOKEN`: tanpa token -> BLOCKED (NO SIDE EFFECT), verdict "BLOCKED/PARTIAL" | 🟡 harness selesai teruji; runtime BLOCKED jujur (menunggu token) |
+| **M7-003 Real System Ops** | Process hostname=VM + SQLite 3 users -> diagnose -> approve -> act (snapshot disk) -> independent verify -> report + experience | 🟢 REAL PROVEN |
+
+Test `tests/execution_runtime/test_m7_mission_framework.py` **7/7 passed**; regression cross-module **481 passed, 1 skipped, 2 xfailed**. E2E proof `docs/engineering/reports/M7-00{1,2,3}_*E2E_Proof.json`. Experience persist `_demo/m7_learning_store.json`.
+
 ---
 
 ## Snapshot Terkini

@@ -247,6 +247,44 @@ Next (bila Van setuju): buka area operasional baru (HTTP Universal Connector, Da
 
 ---
 
+## 13. M7 — Real Operational Work (2026-08-12)
+
+Keputusan Van: setelah M6 (5 connector canonical) selesai, JANGAN tambah connector
+dulu. Bottleneck pindah ke "bisa melakukan pekerjaan bernilai dengan kombinasi
+capability". Framework: `src/sam/execution_runtime/m7_mission_framework.py`.
+
+Prinsip M7 (jujur):
+- Mission TIDAK punya executor kedua — ia orchestrator yang memanggil connector
+  canonical (HTTP/Process/DB), yang masing-masing dieksekusi HANYA via
+  RealExecutionHarness (single authority).
+- Real Input -> Real External Observation -> Real Reasoning -> Real Governance ->
+  Real Approval -> Real External Effect -> Independent Verification -> Audit ->
+  Artifact -> Persisted Experience. Repeatable, bukan sekadar response=success.
+- Tanpa kredensial (NVIDIA/GitHub/SMTP) -> stage BLOCKED (NO SIDE EFFECT), TIDAK
+  pernah mock/pass palsu.
+
+Tiga mission:
+- **M7-001 Real Research** — 2 sumber HTTP eksternal (JSONPlaceholder + httpbin)
+  dibaca NYATA -> evidence (post "sunt aut..." + user "Leanne Graham") -> reasoning
+  -> approval -> verifikasi -> laporan tertulis -> experience di-store. **REAL.
+  (Stage AI-reasoning via LLM BLOCKED terpisah karena NVIDIA key kosong — jujur,
+  bukan dipalsukan.)**
+- **M7-002 Real Repository Operations (GitHub)** — gate credential `GITHUB_TOKEN`
+  jujur: tanpa token -> stage BLOCKED (NO SIDE EFFECT), verdict "BLOCKED/PARTIAL".
+  Tidak pernah diklaim sukses. Bila token diisi, mission siap eksekusi real.
+- **M7-003 Real System Operations** — observasi nyata: Process hostname=VM + SQLite
+  3 users terbaca -> diagnosis -> approval -> act (snapshot tertulis ke disk, real
+  external effect) -> independent verify snapshot -> laporan + experience. **REAL.**
+
+Verifikasi: test `tests/execution_runtime/test_m7_mission_framework.py` **7/7 passed**;
+regression cross-module **481 passed, 1 skipped, 2 xfailed** (naik dari 474, +7 M7),
+tidak ada regresi. E2E proof: `docs/engineering/reports/M7-00{1,2,3}_*E2E_Proof.json`.
+
+M7 status: framework + M7-001 + M7-003 **REAL PROVEN**; M7-002 harness selesai
+teruji, runtime BLOCKED jujur tanpa token (menunggu GITHUB_TOKEN).
+
+---
+
 ## 5. Catatan penting
 
 - **Capability Truth ≠ Architecture Inventory.** 9 capability PROVEN ≠ 77 file universal_* operational.
