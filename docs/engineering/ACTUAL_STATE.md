@@ -101,6 +101,22 @@ Test `tests/execution_runtime/test_m7_mission_framework.py` **7/7 passed**; regr
 
 ---
 
+## M8 — Credentialed Operational Integration (2026-08-12)
+
+Keputusan Van: jangan buat capability baru; tutup gap yang tersisa dengan mengaktifkan kredensial NYATA + memperkuat boundary. Target: M7-001/002 -> PROVEN penuh, Email/Browser PARTIAL -> PROVEN, mission sertifikasi multi-external, Truth Matrix 16/0/6.
+
+### M8-005 — Production Credential Boundary (SELESAI PENUH, produksi-grade)
+`src/sam/execution_runtime/credential_boundary.py` — enforcement deterministik di atas `credential.py` + SecretProvider. Jaminan aliran KOREKT `Credential -> Boundary -> Connector`; TIDAK pernah `Credential -> Mission/Prompt/Audit/Artifact`. **9 test lulus** (tidak bocor ke log/audit/artifact/prompt; missing=BLOCKED; invalid=FAILED; timeout=FAILED; no credential=zero side effect; hasil di-scrub sebelum keluar).
+
+### M8-001..004 + M8-006 — harness lengkap, runtime jujur BLOCKED tanpa kredensial
+`src/sam/execution_runtime/m8_mission_framework.py` — `CredentialedMission` (boundary di tiap stage kredensial) + builder per mission: M8-001 NVIDIA real di M7-001; M8-002 GitHub create+get real issue (repo TEST); M8-003 SMTP real send (dedicated mailbox); M8-004 headless Chromium nav+interaction; M8-006 multi-external NVIDIA+HTTP+GitHub certification.
+
+Test M8: **20/20 passed** (005=9 + framework=11). Regression cross-module **501 passed / 1 skipped / 2 xfailed** (naik dari 481, +20 M8). E2E proof jujur `docs/engineering/reports/M8-00{1,2,3,4,6}_*E2E_Proof.json` — http_evidence REAL (post id=7 'magnam facilis autem'), stage NVIDIA/GitHub/SMTP/Browser BLOCKED jujur, verdict BLOCKED/PARTIAL.
+
+**STATUS JUJUR**: M8-005 = **PROVEN**. M8-001..004 & M8-006 = harness selesai + test + proof, tapi **runtime BLOCKED jujur** — PROVEN penuh hanya tercapai setelah Van menyediakan: `NVIDIA_API_KEY`, `GITHUB_TOKEN`+`GITHUB_TEST_REPO` (repo test), SMTP ded + `TEST_MAILBOX`, dan playwright+Chromium terinstall. Truth Matrix tetap 12/2/6 (belum naik) sampai bukti real external effect terverifikasi; Email/Browser belum naik dari PARTIAL.
+
+---
+
 ## Snapshot Terkini
 
 | Item | Nilai |

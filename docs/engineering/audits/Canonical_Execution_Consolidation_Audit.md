@@ -285,6 +285,42 @@ teruji, runtime BLOCKED jujur tanpa token (menunggu GITHUB_TOKEN).
 
 ---
 
+## 14. M8 — Credentialed Operational Integration (2026-08-12)
+
+Keputusan Van: jangan buat capability baru; tutup gap dengan mengaktifkan
+kredensial NYATA + perkuat boundary. Target: M7-001/002 -> PROVEN penuh
+(M8-001/002), Email & Browser PARTIAL -> PROVEN (M8-003/004), mission
+sertifikasi multi-external NVIDIA+HTTP+GitHub (M8-006), Truth Matrix 16/0/6.
+
+**M8-005 — Production Credential Boundary (SELESAI PENUH, produksi-grade):**
+`execution_runtime/credential_boundary.py` — enforcement deterministik di atas
+`credential.py` + SecretProvider. Jaminan: Credential -> Boundary -> Connector;
+TIDAK pernah masuk Mission/Prompt/Audit/Artifact. 9 syarat Van teruji: tidak
+bocor ke log/audit/artifact/prompt; missing=BLOCKED; invalid=FAILED;
+timeout=FAILED; no credential=zero side effect; scrub sebelum keluar.
+
+**M8-001..004 + M8-006 harness:** `execution_runtime/m8_mission_framework.py`
+menyediakan CredentialedMission (boundary di tiap stage kredensial) + builder:
+- M8-001: NVIDIA real di M7-001 (HTTP evidence + NVIDIA reasoning).
+- M8-002: GitHub create+get real issue di repo TEST (BUKAN production).
+- M8-003: SMTP real send ke dedicated mailbox (BUKAN email pribadi).
+- M8-004: headless Chromium navigation + DOM + interaction (fetch ≠ automation).
+- M8-006: chain 6 stage multi-external NVIDIA+HTTP+GitHub.
+
+Tanpa kredensial/driver -> stage BLOCKED (NO SIDE EFFECT), bukan mock;
+verdict jujur BLOCKED/PARTIAL. Test M8 = 20/20; regression cross-module
+501 passed / 1 skipped / 2 xfailed (naik dari 481, +20). E2E proof jujur
+`docs/engineering/reports/M8-00{1,2,3,4,6}_*E2E_Proof.json`: http_evidence
+REAL (post id=7), stage NVIDIA/GitHub/SMTP/Browser BLOCKED jujur.
+
+**STATUS JUJUR:** M8-005 = PROVEN. M8-001..004 & M8-006 = harness selesai +
+teruji, tapi runtime BLOCKED — PROVEN penuh tercapai hanya setelah Van
+menyediakan: NVIDIA_API_KEY, GITHUB_TOKEN+GITHUB_TEST_REPO (repo test), SMTP
+dedicated + TEST_MAILBOX, playwright+Chromium terinstall. Truth Matrix tetap
+12/2/6 sampai bukti real external effect terverifikasi.
+
+---
+
 ## 5. Catatan penting
 
 - **Capability Truth ≠ Architecture Inventory.** 9 capability PROVEN ≠ 77 file universal_* operational.
