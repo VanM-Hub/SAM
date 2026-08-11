@@ -6,6 +6,30 @@
 
 ---
 
+## Operational Truth Audit — Real Execution Substrate (2026-08-12)
+
+> Klaim lama "capability berfungsi" diganti status berbasis bukti (source + real external effect).
+> **Aturan:** IMPLEMENTED ≠ OPERATIONAL. Mock/preview/unit-test/HTTP-construction/success=True TIDAK menaikkan ke PROVEN.
+> Ledger detail: `docs/engineering/reports/CAPABILITY_TRUTH_MATRIX.md`.
+
+**Sembilan capability real execution kini PROVEN** (real external effect + verification + audit + repeatable):
+
+| Capability | Bukti nyata |
+|---|---|
+| Filesystem (P3) | real read/hash/meta/analyze + verify + audit, deterministik |
+| AI Provider NVIDIA (P4) | E2E HTTP nyata ke Nvidia NIM, model favorit Van minimax-m3 menjawab 'PROVEN', finish=stop |
+| GitHub Tool (P5) | HTTP nyata get_repo ke GitHub, respon 200, data repo asli diterima |
+| Workflow (P6) | orchestration nyata 3 langkah, produk tertulis di disk |
+| Agent (P7) | discovery→request→governance→approve→real tool→verify, bypass DENIED |
+| Investigation (P8) | real observation→evidence→diagnosis→root-cause→recommendation→lineage |
+| Recovery (P9) | state eksternal berubah nyata (stopped→running) + independent verification |
+| Learning (P10) | experience dipersist ke disk + retrieved setelah restart |
+| Full Mission (P11) | request→reason→investigate→recommend→approve→recover→verify→artifact→audit→learn |
+
+**Catatan jujur:** ini membuktikan *real execution substrate* (mampu melakukan kerja nyata), BUKAN klaim "SAM selesai" secara keseluruhan. Kerangka verifikasi (P2-B) + harness di `src/sam/execution_runtime/real_harness*.py`.
+
+---
+
 ## Snapshot Terkini
 
 | Item | Nilai |

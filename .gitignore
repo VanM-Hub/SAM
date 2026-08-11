@@ -45,6 +45,10 @@ ACC/
 *.temp
 temp_screenshot.png
 
+# Runtime demo/sandbox dir (dibuat otomatis oleh real harness saat jalan) - jangan commit
+_demo/
+docs/_demo/
+
 # Coverage
 .coverage
 htmlcov/
@@ -85,6 +89,20 @@ docs/engineering/reports/*
 docs/engineering/references/*
 docs/engineering/templates/*
 !docs/engineering/**/.gitkeep
+
+# Laporan audit nyata (P0-P11) + Truth Matrix WAJIB ter-track (override ignore SAM lama)
+!docs/engineering/reports/CAPABILITY_TRUTH_MATRIX.md
+!docs/engineering/reports/Daftar_Capability_Potensi_Fungsi_SAM.md
+!docs/engineering/reports/P2A_*.md
+!docs/engineering/reports/P2C_*.md
+!docs/engineering/reports/P3_*.md
+!docs/engineering/reports/P4_*.md
+!docs/engineering/reports/P5_*.md
+!docs/engineering/reports/P6_*.md
+!docs/engineering/reports/P8_*.md
+!docs/engineering/reports/P9_*.md
+!docs/engineering/reports/P10_*.md
+!docs/engineering/reports/P11_*.md
 
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md

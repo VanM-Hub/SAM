@@ -40,7 +40,6 @@ contain unique decisions. Each decision lives in exactly one canonical ADR file 
 | ADR-021 | Overall Architecture | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
 | ADR-022 | Runtime Isolation | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
 | ADR-023 | Immutable DTO | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
-| ADR-024 | Preview Only Execution | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
 | ADR-025 | Approval Boundary | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
 | ADR-026 | Subsystem Independence | **Accepted** | `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` *(consolidated into ADR-008)* |
 | ADR-027 | Repository Structure | **Accepted** | `docs/architecture/Module_Ownership.md` *(canonical ownership map)* |
@@ -83,4 +82,4 @@ canonical ADR set, and their details are preserved in git history.
 
 ## Consolidation note
 
-Under the one-decision-one-ADR rule, the active Runtime/Platform decisions (ADR-011..013, ADR-015..028) were consolidated into a single canonical baseline `ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` (Decision Authority: Chief Architect). Their individual historical files are preserved in git history.
+Under the one-decision-one-ADR rule, the active Runtime/Platform decisions (ADR-011..013, ADR-015..023, ADR-025..028; ADR-024 Preview Only Execution retired) were consolidated into a single canonical baseline `docs/adr/ADR-008_Consolidated Runtime & Platform Architecture Decisions.md` (Decision Authority: Chief Architect). Their individual historical files are preserved in git history.
