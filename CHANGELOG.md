@@ -8,12 +8,13 @@
 
 ### M8 - Credentialed Operational Integration (2026-08-12)
 - **M8-005 Production Credential Boundary** - `credential_boundary.py`: enforcement deterministik; aliran Credential->Boundary->Connector; TIDAK pernah masuk Mission/Prompt/Audit/Artifact. 9 syarat (missing=BLOCKED, invalid=FAILED, timeout=FAILED, no cred=zero side effect, scrub) teruji 9/9. **PROVEN (produksi-grade).**
-- **M8-001 AI Mission Completion** - NVIDIA real di M7-001 (HTTP evidence + NVIDIA reasoning); harness BLOCKED jujur tanpa key.
-- **M8-002 GitHub Real Mutation** - create+get real issue di repo TEST (bukan production); harness BLOCKED jujur tanpa token.
-- **M8-003 SMTP Real Send** - kirim ke dedicated mailbox (bukan pribadi); harness BLOCKED jujur tanpa SMTP. (Email tetap PARTIAL.)
-- **M8-004 Browser Real Runtime** - headless Chromium navigation+interaction (fetch ≠ automation); harness BLOCKED jujur tanpa playwright. (Browser tetap PARTIAL.)
-- **M8-006 Real Mission Certification** - chain multi-external NVIDIA+HTTP+GitHub (6 stage); test + proof jujur; http_evidence REAL, NVIDIA/GitHub BLOCKED.
+- **M8-001 AI Mission Completion** - NVIDIA real di M7-001 (HTTP evidence + NVIDIA reasoning). **REAL PROVEN**: model `meta/llama-3.1-8b-instruct`, key SAM resmi, HTTP 200, verify + leak_free. (Pakai `ProviderExecutor(configs={...})` eksplisit untuk `nvidia`.)
+- **M8-002 GitHub Real Mutation** - create+get real issue di repo **TEST `VanM-Hub/test-issues`** (bukan production). **REAL PROVEN**: issue #3 dibuat & terkonfirmasi via API eksternal (verifikasi independen).
+- **M8-003 SMTP Real Send** - kirim ke dedicated mailbox (bukan pribadi). **Menunggu Van**: keputusan SMTP login/penerima + Gmail App Password 16-char. **Tetap BLOCKED/PARTIAL** (Email row 23 belum PROVEN).
+- **M8-004 Browser Real Runtime** - headless Chromium navigation+interaction. **REAL PROVEN**: nav example.com, DOM h1='Example Domain', boundary BROWSER_DRIVER_OK.
+- **M8-006 Real Mission Certification** - chain multi-external NVIDIA+HTTP+GitHub (6 stage). **REAL PROVEN**: HTTP evidence real -> NVIDIA reasoning (completed) -> recommend -> approve -> GitHub create real issue #5 -> verify; issue #5 terkonfirmasi eksternal.
 - Test M8 20/20; regression cross-module 501 passed / 1 skipped / 2 xfailed (naik dari 481, +20 M8).
+- **Status Truth Matrix: 16 PROVEN / 0 PARTIAL / 6 UNPROVEN**, satu-satunya belum lunas = **Email (M8-003)**.
 
 ### M6 - Universal External Connector (5 canonical connector)
 - **HTTP Connector (`canonical_http_connector.py`)** - GET real ke JSONPlaceholder + httpbin, 200+JSON valid, gate+verify+audit.

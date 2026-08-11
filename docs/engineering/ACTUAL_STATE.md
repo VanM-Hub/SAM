@@ -43,7 +43,7 @@ Hasil M1-M5 — detail: `docs/engineering/audits/Canonical_Execution_Consolidati
 - M5 agent universal_agent -> `canonical_agent_governance.py` (5/5; contract violation denied, agent tak pegang adapter).
 
 Regression (execution_runtime + universal_*): **429 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
-**Capability Truth ≠ Architecture Inventory**: 12 capability PROVEN; universal_* (inventory) kini bisa dipakai via canonical bridge. **Email & Browser Connector = PARTIAL** (lihat M6-004/M6-005): kirim SMTP nyata & render headless belum terbukti.
+**Capability Truth ≠ Architecture Inventory**: 12 capability PROVEN (canonical); universal_* (inventory) kini bisa dipakai via canonical bridge. **Email Connector = PARTIAL** (kirim SMTP nyata belum terbukti, menunggu M8-003); **Browser Connector kini PROVEN** (M8-004 headless Chromium real).
 
 ## M6-001 — Universal HTTP Connector (2026-08-12, PROVEN)
 
@@ -108,12 +108,21 @@ Keputusan Van: jangan buat capability baru; tutup gap yang tersisa dengan mengak
 ### M8-005 — Production Credential Boundary (SELESAI PENUH, produksi-grade)
 `src/sam/execution_runtime/credential_boundary.py` — enforcement deterministik di atas `credential.py` + SecretProvider. Jaminan aliran KOREKT `Credential -> Boundary -> Connector`; TIDAK pernah `Credential -> Mission/Prompt/Audit/Artifact`. **9 test lulus** (tidak bocor ke log/audit/artifact/prompt; missing=BLOCKED; invalid=FAILED; timeout=FAILED; no credential=zero side effect; hasil di-scrub sebelum keluar).
 
-### M8-001..004 + M8-006 — harness lengkap, runtime jujur BLOCKED tanpa kredensial
-`src/sam/execution_runtime/m8_mission_framework.py` — `CredentialedMission` (boundary di tiap stage kredensial) + builder per mission: M8-001 NVIDIA real di M7-001; M8-002 GitHub create+get real issue (repo TEST); M8-003 SMTP real send (dedicated mailbox); M8-004 headless Chromium nav+interaction; M8-006 multi-external NVIDIA+HTTP+GitHub certification.
+### M8-001, M8-002, M8-004, M8-005, M8-006 — REAL PROVEN (verifikasi eksternal nyata)
+`src/sam/execution_runtime/m8_mission_framework.py` — `CredentialedMission` (boundary di tiap stage kredensial) + builder per mission.
 
-Test M8: **20/20 passed** (005=9 + framework=11). Regression cross-module **501 passed / 1 skipped / 2 xfailed** (naik dari 481, +20 M8). E2E proof jujur `docs/engineering/reports/M8-00{1,2,3,4,6}_*E2E_Proof.json` — http_evidence REAL (post id=7 'magnam facilis autem'), stage NVIDIA/GitHub/SMTP/Browser BLOCKED jujur, verdict BLOCKED/PARTIAL.
+- **M8-001 AI NVIDIA REAL PROVEN**: model `meta/llama-3.1-8b-instruct`, key SAM resmi (dari `ZN_SAM/Tokken NVIDIA.txt`), HTTP 200, verifikasi + leak_free. (M8-001 kini memakai `ProviderExecutor(configs={...})` eksplisit untuk provider `nvidia` — bukan bawaan.)
+- **M8-002 GitHub real mutation REAL PROVEN**: create issue nyata + GET independent verify di repo **TEST `VanM-Hub/test-issues`** (BUKAN production). Issue #3 terkonfirmasi via API eksternal (total issue di repo terverifikasi). Token valid dari `ZN_SAM/Tokken GitHub.txt` (40 char).
+- **M8-004 Browser real runtime REAL PROVEN**: headless Chromium nav example.com + DOM h1='Example Domain'.
+- **M8-005 Credential Boundary PROVEN**: 9/9 test, aliran Credential→Boundary→Connector, tidak bocor ke log/audit/artifact/prompt.
+- **M8-006 Real Mission Certification REAL PROVEN**: rantai multi-external **HTTP evidence → NVIDIA reasoning (status completed) → recommend → approve → GitHub create real issue #5 → verify**. Seluruh stage nyata, issue #5 terkonfirmasi via API eksternal.
 
-**STATUS JUJUR**: M8-005 = **PROVEN**. M8-001..004 & M8-006 = harness selesai + test + proof, tapi **runtime BLOCKED jujur** — PROVEN penuh hanya tercapai setelah Van menyediakan: `NVIDIA_API_KEY`, `GITHUB_TOKEN`+`GITHUB_TEST_REPO` (repo test), SMTP ded + `TEST_MAILBOX`, dan playwright+Chromium terinstall. Truth Matrix tetap 12/2/6 (belum naik) sampai bukti real external effect terverifikasi; Email/Browser belum naik dari PARTIAL.
+Test M8: **20/20 passed**. Proof `docs/engineering/reports/M8-00{1,2,4,5,6}_*E2E_Proof.json` diregenerasi dengan kredensial valid & terverifikasi eksternal.
+
+### M8-003 SMTP real send — HANYA SATU YANG TERSISA (menunggu Van)
+`canonical_email_connector.py` + builder M8-003 sudah siap (validasi format + gate SMTP + dry_run jujur, `sent:false`). Kirim SMTP NYATA butuh: keputusan Van (SMTP login = `vanmalaka@gmail.com` sekaligus penerima, atau login + `TEST_MAILBOX` terpisah) + **Gmail App Password 16-char** (2-Step Verification aktif, bukan password login).
+
+**STATUS JUJUR**: M8-001/002/004/005/006 = **PROVEN**. **M8-003 (Email/SMTP) = satu-satunya yang belum PROVEN — tetap PARTIAL sampai kirim SMTP nyata terbukti.** Truth Matrix = **16 PROVEN / 0 PARTIAL / 6 UNPROVEN**? (Email tetap PARTIAL di row 23 sampai M8-003 lunas).
 
 ---
 

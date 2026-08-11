@@ -379,15 +379,25 @@ def m8_006_build(audit, artifact_dir: str = "docs/engineering/reports",
 
     # 2) NVIDIA reasoning (boundary) atas evidence
     def nvidia_executor(raw_key: str) -> Dict[str, Any]:
-        from sam.providers.execution.provider_executor import ProviderExecutor
-        pe = ProviderExecutor()
+        from sam.providers.execution.provider_executor import (
+            ProviderExecutor, ProviderExecutionConfig,
+        )
+        # sama seperti M8-001: nvidia tidak ada di PROVIDER_ENV bawaan -> config
+        # eksplisit (base_url + env var); NO key value di sini, hanya nama env.
+        pe = ProviderExecutor(configs={
+            "nvidia": ProviderExecutionConfig(
+                provider_id="nvidia",
+                base_url="https://integrate.api.nvidia.com/v1",
+                api_key_env="NVIDIA_API_KEY",
+            ),
+        })
         payload = {
-            "model": "nvidia/nemotron-3-ultra-550b-a55b",
+            "model": "meta/llama-3.1-8b-instruct",
             "prompt": "Dari evidence post id=7, buat satu kesimpulan singkat siap lapor untuk issue GitHub.",
             "evidence": "evidence dari JSONPlaceholder post id=7",
         }
-        return pe.execute_sync(payload, api_key_env="NVIDIA_API_KEY",
-                               base_url="https://integrate.api.nvidia.com/v1")
+        return pe.execute("nvidia", "chat", payload=payload, timeout_seconds=60)
+
     mission.add_credential_stage(req_nvidia(), "nvidia_reasoning", nvidia_executor,
                                  note="NVIDIA real reasoning (boundary gated)")
 
