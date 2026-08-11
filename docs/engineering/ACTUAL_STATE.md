@@ -42,6 +42,15 @@ Hasil M1-M5 — detail: `docs/engineering/audits/Canonical_Execution_Consolidati
 Regression (execution_runtime + universal_*): **429 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
 **Capability Truth ≠ Architecture Inventory**: 9 capability PROVEN; universal_* (inventory) kini bisa dipakai via canonical bridge.
 
+## M6-001 — Universal HTTP Connector (2026-08-12, PROVEN)
+
+Connector pertama Operational Expansion — `src/sam/execution_runtime/canonical_http_connector.py` (canonical path, READ-ONLY GET).
+Satu jalur eksekusi = `RealExecutionHarness` / capability `http`; tanpa mock default (endpoint tak dikenal / param kosong / kredensial kosong -> BLOCKED/RAISE, NO SIDE EFFECT).
+
+E2E nyata terbukti **minimal 2 API berbeda**: JSONPlaceholder /posts/1 (200, id=1, title real), httpbin /get (200, echo url), JSONPlaceholder /users/1 (200, id=1, email real).
+Test `test_m6_http_connector.py` **9/9 passed**; proof JSON `docs/engineering/reports/M6-001_HTTP_Connector_E2E_Proof.json`; regression execution_runtime 301 passed, 1 skipped, 2 xfailed.
+Syarat 2 external API TERPENUHI -> lanjut Database Connector (M6-002).
+
 ---
 
 ## Snapshot Terkini

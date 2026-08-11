@@ -129,6 +129,29 @@ Garansi yang dibuktikan semua bridge (bukan mock):
 
 Regression (seluruh execution_runtime + universal_*): **429 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
 
+## 8. M6-001 — Universal HTTP Connector (2026-08-12) — PROVEN
+
+Primitive connector pertama Operational Expansion. `src/sam/execution_runtime/canonical_http_connector.py`:
+- SATU jalur eksekusi = `RealExecutionHarness` / capability `http` (no second executor).
+- Endpoint = konfigurasi (`HttpEndpoint`: name/method/url_template/auth_env/required_params) — generik, bukan hardcoded per API.
+- Tanpa mock default: endpoint tak dikenal / param wajib kosong / kredensial ber-auth kosong -> RAISE/BLOCKED (NO SIDE EFFECT).
+- Verification nyata: HTTP 200 + JSON valid + payload sesuai kontrak wajib; selain itu dianggap gagal.
+- PREVIEW explicit simulated, TIDAK menyamar sebagai execution.
+
+**Bukti E2E nyata (minimal 2 API berbeda):**
+
+| External API | Result | Verified |
+|---|---|---|
+| JSONPlaceholder GET /posts/1 | 200, id=1, title real | ya |
+| httpbin GET /get | 200, echo url=https://httpbin.org/get | ya |
+| JSONPlaceholder GET /users/1 | 200, id=1, email real | ya |
+
+Test `tests/execution_runtime/test_m6_http_connector.py` **9/9 passed** (5 structural + 4 E2E).
+Executed E2E proof JSON: `docs/engineering/reports/M6-001_HTTP_Connector_E2E_Proof.json` (ok=True, http_status=200, 22 audit entries).
+Regression execution_runtime: **301 passed, 1 skipped, 2 xfailed** — tidak ada regresi.
+
+Syarat "HTTP connector terbukti dengan minimal dua external API berbeda" TERPENUHI -> berhak lanjut Database Connector (M6-002).
+
 ## 7. Status akhir canonical execution consolidation
 
 - Execution Core canonical (RealExecutionHarness) = single execution authority (M1, proven P0-P11).
