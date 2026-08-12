@@ -411,19 +411,21 @@ async function rejectMission() {
   renderOutcome(res);
 }
 
-// Render hasil nyata (evidence/artifact/audit/failure semantics) dari /ux.
-function renderOutcome(res) {
-  if (!res.ok) {
-    _('objProgress').textContent = 'ERR';
-    _('cycleResult').innerHTML = '<p><strong>Server error</strong> ' + res.status + ': ' + esc(res.raw||'').substring(0,200) + '</p>';
-    return;
-  }
-  var d = res.data;
+// M9-008.3: evidence-first result. Setelah mission selesai user melihat:
+//   What SAM did / What changed externally / How SAM verified it /
+//   Evidence / Artifact / Audit — bukan sekadar "Mission completed ✓".
+// Render dari STATE SERVER (source of truth), bukan dari JS memory.
+// M9-008.4: evidence & audit diambil eksplisit dari /ux/evidence + /ux/audit
+// (runtime source), bukan hanya dari state embedding.
+async function renderOutcomeFromState(d) {
+  if (!d) return;
   _state.lastResult = d;
   var ex = d.execution || {};
   var st = ex.status;
+  var appr = (d.approval && d.approval.status) || '';
 
-  // failure / blocked / rejected / completed semantics
+  // failure / blocked / rejected / completed semantics (M9-008.5):
+  // nilai dari runtime state, bukan hardcoded UI.
   if (st === 'completed') {
     _('objProgress').textContent = 'OK';
     _('progBar').innerHTML = '<i style="width:100%"></i>';
@@ -432,31 +434,59 @@ function renderOutcome(res) {
     _('objProgress').textContent = 'BLOCKED';
     _('progBar').innerHTML = '<i style="width:40%;background:var(--amber, #f0b429)"></i>';
     _('mSub').textContent = 'BLOCKED: ' + (ex.failure_message||'');
-  } else if (st === 'rejected') {
+  } else if (st === 'rejected' || appr === 'rejected') {
     _('objProgress').textContent = 'REJECTED';
     _('progBar').innerHTML = '<i style="width:20%;background:#e77d84"></i>';
     _('mSub').textContent = 'Mission ditolak pengguna. Tidak ada eksekusi.';
   } else {
-    _('objProgress').textContent = 'FAILED';
+    _('objProgress').textContent = st ? st.toUpperCase() : 'FAILED';
     _('progBar').innerHTML = '<i style="width:50%;background:#e77d84"></i>';
-    _('mSub').textContent = 'FAILED: ' + (ex.failure_message||'eksekusi gagal');
+    _('mSub').textContent = (st ? st.toUpperCase() + ': ' : 'FAILED: ') + (ex.failure_message||'eksekusi gagal');
   }
-
   _('objDesc').textContent = ex.result_summary || '';
 
-  // evidence chain + artifact + audit
-  var ev = (d.evidence || []).length
-    ? d.evidence.map(function(e){ return '&#9679; ' + esc(e.kind||'') + ': ' + esc(e.url || e.detail || ''); }).join('<br>')
+  // ----- Evidence-first blocks (M9-008.3) -----
+  var understanding = (d.understanding && d.understanding.what_sam_understood) || '--';
+  var steps = (d.plan && d.plan.planned_steps) || [];
+  var stepHtml = steps.map(function(s,i){ return (i+1) + '. ' + esc(s); }).join('<br>') || '--';
+
+  // M9-008.4: tarik evidence & audit penuh dari endpoint runtime (bukan hanya
+  // dari state embedding). Kalau request refresh cukup cepat dan route belum
+  // siap, fallback ke nilai yang sudah ada di state.
+  var evList = [];
+  var audList = [];
+  try {
+    var evRes = await apiGet('/ux/evidence');
+    if (evRes.ok && evRes.data && Array.isArray(evRes.data.evidence)) evList = evRes.data.evidence;
+    var auRes = await apiGet('/ux/audit');
+    if (auRes.ok && auRes.data && Array.isArray(auRes.data.audit)) audList = auRes.data.audit;
+  } catch (e) { /* fallback di bawah */ }
+  if (evList.length === 0) evList = d.evidence || [];
+  if (audList.length === 0) audList = d.timeline || [];
+
+  var ev = evList.length
+    ? evList.map(function(e){ return '&#9679; ' + esc(e.kind||e.stage||'') + ': ' + esc(e.url || e.detail || ''); }).join('<br>')
     : 'Tidak ada evidence eksternal.';
   var art = d.artifact_ref ? esc(d.artifact_ref) : '--';
-  var aud = d.audit_ref ? esc(d.audit_ref) : '--';
+  var aud = audList.length
+    ? audList.map(function(t){ return '&middot; ' + esc(t.stage||'') + ': ' + (t.ok ? 'ok' : (t.blocked ? 'blocked' : 'err')) + (t.detail ? ' — ' + esc(t.detail) : ''); }).join('<br>')
+    : (d.audit_ref ? esc(d.audit_ref) : '--');
+  // opsional: timeline yang sudah di-scrub (what actually happened, verified)
+  var tl = (d.timeline || []).map(function(t){
+    return esc(t.stage||'') + ': ' + (t.ok ? 'ok' : (t.blocked ? 'blocked' : 'err'))
+      + (t.detail ? ' — ' + esc(t.detail) : '');
+  }).join('<br>');
+
+  _('objTitle').textContent = understanding;
   _('cycleResult').innerHTML =
     '<p><strong>Status</strong>: ' + esc(st) +
     (ex.failure_kind ? ' <span style="color:#e77d84">(' + esc(ex.failure_kind) + ')</span>' : '') +
-    '<br><br><strong>Hasil</strong><br>' + esc(ex.result_summary||'--') +
-    '<br><br><strong>Evidence</strong><br>' + ev +
-    '<br><br><strong>Artifact</strong>: ' + art +
-    '<br><strong>Audit</strong>: ' + aud + '</p>';
+    '<br><br><strong>Yang SAM lakukan (rencana)</strong><br>' + stepHtml +
+    '<br><br><strong>Perubahan eksternal &amp; verifikasi</strong><br>' +
+      (ev === 'Tidak ada evidence eksternal.' ? ev : ev) +
+    '<br><br><strong>Artifact yang dihasilkan</strong>: ' + art +
+    '<br><strong>Audit trail</strong>: ' + aud +
+    (tl ? '<br><br><strong>Timeline (sanitized)</strong><br>' + tl : '') + '</p>';
   _('cycleTime').textContent = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
 
   _('continueBtn').textContent = 'Mission Baru';
@@ -465,6 +495,17 @@ function renderOutcome(res) {
   _('pauseBtn').style.display = 'none';
 
   refreshMissionState();
+}
+
+// Render hasil nyata (success/failure semantics) dari /ux.
+// Delegasi ke renderOutcomeFromState — UI selalu menampilkan state server.
+async function renderOutcome(res) {
+  if (!res.ok) {
+    _('objProgress').textContent = 'ERR';
+    _('cycleResult').innerHTML = '<p><strong>Server error</strong> ' + res.status + ': ' + esc(res.raw||'').substring(0,200) + '</p>';
+    return;
+  }
+  await renderOutcomeFromState(res.data);
 }
 
 async function startMissionForce(g) {
@@ -569,7 +610,7 @@ var _phaseInfo = {
   observe: {
     title: 'Observe (fase internal MCR, best-effort)',
     lead: 'MCR mengumpulkan observasi runtime sebagai bagian dari cycle. Observasi bersifat best-effort &mdash; cycle tetap berlanjut meskipun observasi tidak tersedia.',
-    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Observation dikumpulkan otomatis oleh MCR. Saat probe terakhir: <strong>observation unavailable (best-effort, cycle proceeds)</strong>. Ini normal dalam preview mode. Tidak ada endpoint mandiri untuk observation.</p>'+
+    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Observation dikumpulkan otomatis oleh MCR. Saat probe terakhir: <strong>observation unavailable (best-effort, cycle proceeds)</strong>. Ini adalah perilaku runtime yang sebenarnya — bukan simulasi. Tidak ada endpoint mandiri untuk observation.</p>'+
       '<div style="margin-top:10px"><span class="tag-ro">BEST-EFFORT</span> <span style="font-size:8px;color:#798aa0;margin-left:6px">tidak menghalangi cycle</span></div>',
     route: 'Internal MCR &mdash; observasi otomatis. Tidak ada route mandiri.',
     tag: 'READ-ONLY (internal)'
@@ -709,8 +750,63 @@ async function probeAdvanced() {
 function init() {
   probeRuntime();
   renderRecent();
+  // M9-008.4: refresh/reload resilience — pulihkan state mission DARI SERVER
+  // (source of truth), bukan dari JS memory/session. Setelah browser refresh,
+  // mission yang sudah di-submit tetap tampil (WAITING_APPROVAL/COMPLETED/...)
+  // beserta evidence/audit, selama server masih menyimpan request.
+  hydrateFromServer();
   // periodic runtime check
   setInterval(probeRuntime, 30000);
+}
+
+// M9-008.2 + M9-008.4: pull state canonical dari /ux/state dan render ulang UI.
+// UI TIDAK menciptakan state sendiri — apapun yang tampil berasal dari server.
+async function hydrateFromServer() {
+  var res = await apiGet('/ux/state');
+  var d = res.ok && res.data ? res.data : null;
+  if (!d || !d.request_id) { return; } // tidak ada mission aktif di server
+
+  // Restore konteks mission.
+  _state.missionGoal = d.request || _state.missionGoal;
+  _('missionTitle').textContent = d.request || 'Mission';
+  _('mEyebrow').textContent = 'Misi';
+  _('mSub').textContent = 'Dipulihkan dari server (source of truth).';
+  _('objTitle').textContent = (d.understanding && d.understanding.what_sam_understood) || d.request;
+  var steps = (d.plan && d.plan.planned_steps) || [];
+  _('objDesc').textContent = (d.plan && d.plan.action_summary) || 'SAM menyusun rencana.';
+  _('objProgress').textContent = steps.length + ' steps';
+  var stepHtml = steps.map(function(s,i){ return (i+1) + '. ' + esc(s); }).join('<br>');
+  _('cycleResult').innerHTML = '<p><strong>Yang SAM pahami</strong><br>' + esc(d.understanding && d.understanding.what_sam_understood || '') +
+    '<br><br><strong>Rencana SAM</strong><br>' + stepHtml + '</p>';
+
+  // Status approval di server menentukan tombol (bukan JS).
+  var appr = (d.approval && d.approval.status) || '';
+  var ex = (d.execution && d.execution.status) || '';
+  if (appr === 'waiting_approval') {
+    // belum diputuskan — tampilkan gate approval canonical.
+    _('continueBtn').disabled = false;
+    _('continueBtn').textContent = 'Approve & Jalankan';
+    _('continueBtn').onclick = function(){ approveMission(); };
+    _('pauseBtn').disabled = false;
+    _('pauseBtn').textContent = 'Tolak';
+    _('pauseBtn').onclick = function(){ rejectMission(); };
+    _('pauseBtn').style.display = '';
+    _('objProgress').textContent = 'Menunggu persetujuan';
+    _('mSub').textContent = 'Menunggu persetujuan Anda untuk eksekusi nyata.';
+  } else if (ex === 'completed' || ex === 'blocked' || ex === 'failed' || ex === 'rejected' || appr === 'rejected') {
+    // sudah selesai/ditolak — render hasil evidence-first dari server state.
+    await renderOutcomeFromState(d);
+  } else {
+    // approved/running/executing — sedang jalan.
+    _('continueBtn').disabled = true;
+    _('continueBtn').textContent = 'Sedang berjalan...';
+    _('pauseBtn').disabled = true;
+    _('pauseBtn').style.display = '';
+    _('objProgress').textContent = 'MENGEKSEKUSI';
+    _('mSub').textContent = 'Eksekusi sedang berjalan di runtime canonical.';
+  }
+  refreshMissionState();
+  showView('missions');
 }
 
 document.addEventListener('DOMContentLoaded', init);

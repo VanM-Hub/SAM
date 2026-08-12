@@ -28,6 +28,13 @@
 - **M9-007 Navigation (route/state nyata)** - `showView('missions')` me-refresh state dari `/ux/state` (bukan toast/prototype); sidebar Mission state + Last Activity di-wire ke actual runtime state. **PROVEN.**
 - **Acceptance E2E (2 perjalanan lengkap)** - `tests/api/test_ux_acceptance_e2e.py`: (1) submit -> plan -> approve -> ApprovalGate canonical -> GitHub real mutation (issue #12) -> GET verify -> evidence + artifact + audit -> COMPLETED; (2) submit -> reject -> REJECTED -> **0 mutation (count GitHub sebelum == sesudah, bukti eksternal)**. **3/3 PASSED** (2 acceptancerequires token, skip jujur di CI).
 - Test UX 17 pass / 2 skip (8 service + 6 route + 3 acceptance E2E); execution_runtime regression 358 passed / 7 skipped / 2 xfailed (tanpa regresi).
+- **M9-008 Operational Workspace Hardening** (UI vertical slice di-hardening ke production-facing, tanpa capability baru):
+  - **M9-008.1 Remove prototype semantics**: bukti otomatis UI TIDAK punya `previewMode` state, `0 external calls`, tombol `>Preview Mode<`/`>Pause<`/`>Simulasi<`; TIDAK pakai `localStorage`/`sessionStorage` sbg source of truth; semua fetch ke `/ux` (bukan GitHub/eksternal). `tests/api/test_ux_hardening.py`.
+  - **M9-008.4 Refresh/reload resilience**: `hydrateFromServer()` di init me-rehydrate FULL UI dari `GET /ux/state` (server = source of truth, bukan JS memory); renderOutcomeFromState fetch eksplisit `GET /ux/evidence` + `GET /ux/audit`. **PROVEN server nyata**: submit -> refresh-equiv GET /ux/state (state tetap) -> approve -> refresh-equiv evidence & audit tetap tersedia (issue #19 real di `VanM-Hub/test-issues`, verify eksternal = open).
+  - **M9-008.2 State machine UX**: UI render ulang dari `/ux/state` (SUBMITTED/WAITING_APPROVAL/APPROVED/EXECUTING/COMPLETED/FAILED/BLOCKED/REJECTED) — UI TIDAK menciptakan state sendiri (renderOutcomeFromState baca ex.status runtime).
+  - **M9-008.3 Evidence-first result**: hasil menampilkan What SAM did (rencana) / perubahan eksternal + verifikasi (evidence url) / artifact / audit trail / timeline sanitized — bukan sekadar "completed ✓".
+  - **M9-008.5 Failure recovery UX**: BLOCKED/FAILED/REJECTED/COMPLETED dari runtime state; UI state (via /ux/state) == runtime state (teruji reject -> /ux/state konsisten).
+  - Test `test_ux_hardening.py` 9 pass / 2 skip (butuh token); dengan token 11 run all pass. Full UX suite 28 pass (acceptance real + hardening real). execution_runtime regression 358 passed / 7 skipped / 2 xfailed (tanpa regresi).
 
 ### M6 - Universal External Connector (5 canonical connector)
 - **HTTP Connector (`canonical_http_connector.py`)** - GET real ke JSONPlaceholder + httpbin, 200+JSON valid, gate+verify+audit.

@@ -132,6 +132,13 @@ Jalur canonical diperluas ke **user-facing operational path**: UI (browser) HANY
 
 - **Fake operational controls DIHAPUS**: tombol Pause (`no real pause`), state 'Preview Mode / 0 external calls', dead-code `updatePhaseBadges`, teks panel Act 'preview mode ADR-008' diganti jalur real canonical M9. UI kini menampilkan state nyata dari `GET /ux/state`, evidence dari `/ux/evidence`, audit dari `/ux/audit`, approval dari `/ux/decide`.
 - **Acceptance E2E (2 perjalanan lengkap)**: submit -> plan -> approve -> ApprovalGate canonical -> **GitHub issue NYATA #12** -> GET verify -> evidence + artifact + audit -> COMPLETED; dan submit -> reject -> REJECTED -> **0 mutation (count GitHub sebelum == sesudah, bukti eksternal)**. **3/3 PASSED** (acceptance butuh token, skip jujur di CI).
+- **M9-008 Operational Workspace Hardening (production-facing, tanpa capability baru)**:
+  - **M9-008.1** Tidak ada prototype/fake/preview/mock semantics yang operational (oto-test: no `previewMode`, no `0 external calls`, no `>Preview Mode<`; no `localStorage`/`sessionStorage` sbg state; browser hanya fetch `/ux`). `tests/api/test_ux_hardening.py`.
+  - **M9-008.2** UI render state canonical dari `/ux/state` (UI tidak menciptakan state sendiri — `renderOutcomeFromState` baca `ex.status` runtime).
+  - **M9-008.3** Evidence-first result: What SAM did / perubahan eksternal + verifikasi / evidence / artifact / audit / timeline sanitized.
+  - **M9-008.4** Refresh/reload resilience: `hydrateFromServer()` me-rehydrate FULL UI dari `GET /ux/state` (server = source of truth, bukan JS memory); render fetch eksplisit `/ux/evidence` + `/ux/audit`. **PROVEN server nyata**: submit -> refresh-equiv GET /ux/state (state tetap) -> approve -> refresh-equiv evidence & audit tetap (issue #19 real di `VanM-Hub/test-issues`, verify eksternal = open).
+  - **M9-008.5** Failure recovery UX: BLOCKED/FAILED/REJECTED/COMPLETED dari runtime; UI state (via /ux/state) == runtime state.
+  - Test `test_ux_hardening.py` 9 pass/2 skip (butuh token); dengan token 11 all pass. Full UX 28 pass; execution_runtime regression 358 passed/7 skip/2 xfailed (tanpa regresi).
 - **Server produksi nyata (uvicorn 8099)** diuji: UI served (HTTP 200, 43.5KB), `/ux/submit` waiting_approval, `/ux/decide reject` -> REJECTED.
 - Test UX 17 pass / 2 skip (8 service + 6 route + 3 acceptance); execution_runtime regression 358 passed / 7 skipped / 2 xfailed (tanpa regresi).
 
