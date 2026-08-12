@@ -51,6 +51,7 @@ class MissionUXService:
         self._approval = ApprovalCoordinator()
         self._state: Optional[UxMissionState] = None
         self._last_result: Optional[Dict[str, Any]] = None
+        self._audit: List[Dict[str, Any]] = []
 
     # ------------------------------------------------------------------
     # 1) submit — terima request manusia, SAM pahami, susun rencana, TARUH
@@ -125,6 +126,14 @@ class MissionUXService:
             state.failure_kind = UxFailureKind.REJECTED
             state.failure_message = "Mission ditolak oleh pengguna — tidak ada eksekusi."
             state.approval_decision = outcome.as_dict()
+            # M9-004: audit terekam untuk SEMUA keputusan, termasuk reject.
+            self._audit.append({
+                "stage": "approval",
+                "event": "rejected",
+                "ok": True,
+                "blocked": True,
+                "detail": "Approval ditolak user — tanpa eksekusi (0 mutation)",
+            })
             return state
 
         # outcome == APPROVED -> jalankan mission nyata via jalur canonical.
@@ -183,6 +192,14 @@ class MissionUXService:
             }]
         state.artifact_ref = result.get("artifact_path", "")
         state.audit_ref = f"audit_count={result.get('audit_count', 0)}"
+        # M9-004: append mission timeline ke audit trail (sanitized, no secret).
+        for t in (result.get("timeline") or []):
+            self._audit.append({
+                "stage": t.get("stage"),
+                "ok": t.get("ok"),
+                "blocked": t.get("blocked"),
+                "detail": t.get("detail", ""),
+            })
         return state
 
     # ------------------------------------------------------------------
@@ -198,14 +215,9 @@ class MissionUXService:
         return list(self._state.evidence) if self._state else []
 
     def get_audit(self) -> List[Dict[str, Any]]:
-        if not self._last_result:
-            return []
-        # Sanitize: tidak pernah masukkan secret (timeline step bukan tempat secret).
-        return [
-            {"stage": t.get("stage"), "ok": t.get("ok"), "blocked": t.get("blocked"),
-             "detail": t.get("detail", "")}
-            for t in (self._last_result.get("timeline") or [])
-        ]
+        # M9-004: audit trail runut untuk SEMUA keputusan (approve & reject),
+        # sanitized — tidak pernah memuat secret.
+        return list(self._audit)
 
     # ------------------------------------------------------------------
     # internal: interpret request jadi rencana sederhana (vertical slice)

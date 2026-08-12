@@ -152,7 +152,7 @@ z-index:11;transform:translateX(100%);transition:.22s;padding:22px;overflow:auto
 <section id="missions" class="view">
   <div class="mission-head">
     <div class="row"><div><div class="eyebrow" id="mEyebrow">Mission</div><h1 id="missionTitle">Belum ada mission</h1><div class="sub" id="mSub">Klik "Continue" untuk menjalankan. Semua aksi melalui jalur MCR production.</div></div>
-    <div><button class="btn" id="pauseBtn" onclick="pauseMission()" disabled>Pause</button> <button class="btn primary" id="continueBtn" onclick="runMission()">Continue</button></div></div>
+    <div><button class="btn" id="pauseBtn" onclick="rejectMission()" disabled>Tolak</button> <button class="btn primary" id="continueBtn" onclick="runMission()">Continue</button></div></div>
   </div>
 
   <div class="mission-layout">
@@ -182,9 +182,8 @@ z-index:11;transform:translateX(100%);transition:.22s;padding:22px;overflow:auto
     </div>
 
     <div>
-      <div class="card side-card"><div class="card-head"><h3>Mission state</h3><span>dari cycle</span></div><div class="side-list" id="missionState">
-        <div class="side-row"><span>Final State</span><b>--</b></div><div class="side-row"><span>Steps</span><b>--</b></div><div class="side-row"><span>External Calls</span><b>--</b></div><div class="side-row"><span>OK</span><b>--</b></div><div class="side-row"><span>Preview Mode</span><b>--</b></div>
-      </div></div>
+      <div class="card side-card"><div class="card-head"><h3>Mission state</h3><span>dari /ux/state</span></div><div class="side-list" id="missionState">
+        <div class="side-row"><span>Menunggu</span><b>belum ada mission</b></div></div></div>
       <div class="card side-card"><div class="card-head"><h3>Last Activity</h3><span></span></div><div class="activity" id="lastActivity">
         <div class="event"><i class="dot"></i><div><b>Menunggu</b><small>Belum ada cycle dijalankan</small></div><time>--</time></div>
       </div></div>
@@ -310,7 +309,8 @@ function showView(v) {
   var el = _(v);
   if (el) el.classList.add('active');
   document.querySelectorAll('.nav button').forEach(function(b){ b.classList.toggle('active', b.dataset.view === v); });
-  // probe per view
+  // Priority #7: state nyata, bukan toast/prototype.
+  if (v === 'missions') refreshMissionState();
   if (v === 'knowledge') probeKnowledge();
   if (v === 'agents') probeAgents();
   if (v === 'advanced') probeAdvanced();
@@ -383,6 +383,7 @@ async function startMission() {
   _('pauseBtn').onclick = function(){ rejectMission(); };
   _('pauseBtn').title = 'Tolak mission (tidak ada eksekusi)';
 
+  refreshMissionState();
   addRecent(g, false);
 }
 
@@ -458,11 +459,12 @@ function renderOutcome(res) {
     '<br><strong>Audit</strong>: ' + aud + '</p>';
   _('cycleTime').textContent = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
 
-  _('continueBtn').textContent = 'Run Again';
+  _('continueBtn').textContent = 'Mission Baru';
   _('continueBtn').disabled = false;
   _('continueBtn').onclick = function(){ startMissionForce(_state.missionGoal); };
-  _('pauseBtn').disabled = true;
-  _('pauseBtn').textContent = 'Pause';
+  _('pauseBtn').style.display = 'none';
+
+  refreshMissionState();
 }
 
 async function startMissionForce(g) {
@@ -479,41 +481,36 @@ function runMission() {
   startMissionForce(_state.missionGoal);
 }
 
-function pauseMission() { /* session-scoped, no real pause */ }
-
-function updateMissionState(d, err) {
+// Priority #2: UI -> /ux/state -> actual runtime state (bukan state hardcoded).
+async function refreshMissionState() {
+  var res = await apiGet('/ux/state');
   var el = _('missionState');
-  if (err && !d) { el.innerHTML = '<div class="side-row"><span>Error</span><b class="red">'+esc(err.raw||'fetch gagal').substring(0,40)+'</b></div>'; return; }
-  if (!d) { el.innerHTML = '<div class="side-row"><span>Status</span><b>Belum ada cycle</b></div>'; return; }
-  el.innerHTML =
-    '<div class="side-row"><span>Final State</span><b>'+(d.ok?'green':'red')+'" style="color:'+(d.ok?'var(--green)':'var(--red)')+'">' +esc(d.final_state||'--')+'</b></div>'+
-    '<div class="side-row"><span>Steps</span><b>'+(d.steps||0)+'</b></div>'+
-    '<div class="side-row"><span>External Calls</span><b>'+(d.external_calls||0)+'</b></div>'+
-    '<div class="side-row"><span>OK</span><b class="'+(d.ok?'green':'red')+'">'+(d.ok?'Yes':'No')+'</b></div>'+
-    '<div class="side-row"><span>Preview Mode</span><b class="yellow">Active</b></div>';
+  var act = _('lastActivity');
+  if (!res.ok || !res.data || res.data.request_id == null) {
+    var empty = '<div class="side-row"><span>Final State</span><b>--</b></div>'+
+      '<div class="side-row"><span>Approval</span><b>--</b></div>'+
+      '<div class="side-row"><span>Execution</span><b>--</b></div>';
+    if (el) el.innerHTML = empty;
+    if (act) act.innerHTML = '<div class="event"><i class="dot"></i><div><b>Menunggu</b><small>Belum ada mission</small></div><time>--</time></div>';
+    return;
+  }
+  var d = res.data;
+  var appr = (d.approval && d.approval.status) || '--';
+  var ex = (d.execution && d.execution.status) || '--';
+  var fs = (d.execution && d.execution.final_state) || ex || '--';
+  var apprColor = appr === 'approved' ? 'var(--green)' : (appr === 'rejected' ? 'var(--red)' : 'var(--yellow)');
+  if (el) el.innerHTML =
+    '<div class="side-row"><span>Request ID</span><b>' + esc(d.request_id) + '</b></div>'+
+    '<div class="side-row"><span>Status</span><b>' + esc(d.mission_status || '--') + '</b></div>'+
+    '<div class="side-row"><span>Approval</span><b style="color:' + apprColor + '">' + esc(appr) + '</b></div>'+
+    '<div class="side-row"><span>Execution</span><b>' + esc(fs) + '</b></div>'+
+    '<div class="side-row"><span>Kenapa</span><b>' + esc((d.approval && d.approval.reason) || '--') + '</b></div>';
+  if (act) act.innerHTML =
+    '<div class="event"><i class="dot" style="background:' + apprColor + '"></i><div><b>' + esc(appr) + '</b><small>' + esc((d.understanding && d.understanding.what_sam_understood) || 'terima mission') + '</small></div><time>' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) + '</time></div>';
 }
 
-function updateLastActivity(d) {
-  var el = _('lastActivity');
-  if (!d) { el.innerHTML = '<div class="event"><i class="dot"></i><div><b>Menunggu</b><small>Belum ada cycle</small></div><time>--</time></div>'; return; }
-  var t = _state.cycleTime || '--';
-  el.innerHTML =
-    '<div class="event"><i class="dot" style="background:'+(d.ok?'var(--green)':'var(--red)')+'"></i><div><b>Mission cycle</b><small>'+esc(d.final_state||'completed')+'</small></div><time>'+t+'</time></div>'+
-    '<div class="event"><i class="dot"></i><div><b>MissionBuilder</b><small>plan step_count='+(d.steps||0)+'</small></div><time>'+t+'</time></div>'+
-    '<div class="event"><i class="dot" style="background:'+(d.ok?'var(--green)':'var(--red)')+'"></i><div><b>Governance</b><small>'+(d.ok?'allow':'deny')+'</small></div><time>'+t+'</time></div>'+
-    '<div class="event"><i class="dot" style="background:var(--yellow)"></i><div><b>Preview</b><small>0 external calls</small></div><time>'+t+'</time></div>';
-}
-
-function updatePhaseBadges(d) {
-  // Semua fase adalah internal MCR dalam satu cycle. Node menunjukkan status dari cycle terakhir.
-  // Understand punya kontrak GET /knowledge/ (read-only). Act dijalankan MCR, bukan mandiri.
-  _('phRemember').textContent = 'internal';
-  _('phInvestigate').textContent = 'internal';
-  _('phObserve').textContent = d ? 'best-effort' : 'internal';
-  _('phUnderstand').textContent = d ? 'GET /knowledge/' : '/knowledge/';
-  _('phAct').textContent = d ? 'governed' : 'governed';
-  _('phVerify').textContent = 'internal';
-}
+// Priority #2: Last activity dari /ux/state (actual). updateLastActivity tidak dipakai lagi
+function updateLastActivity(d) { refreshMissionState(); }
 
 // ----- Recent missions (session-scoped) -----
 var _recent = [];
@@ -586,12 +583,12 @@ var _phaseInfo = {
     probe: true
   },
   act: {
-    title: 'Act (Execution via MCR)',
-    lead: 'Execution hanya terjadi melalui jalur MCR governed &mdash; <code>POST /mission/{id}</code>. Tidak ada tombol eksekusi mandiri.',
-    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Semua tindakan dijalankan oleh MCR dalam satu cycle Mission, tunduk pada governance boundary. Preview mode: <strong>0 external calls, providers tidak dieksekusi</strong> (ADR-008 section 12). Untuk menjalankan, gunakan tombol <strong>Continue</strong> di Mission view.</p>'+
-      '<div style="margin-top:10px"><span class="tag-live">GOVERNED</span> <span style="font-size:8px;color:#798aa0;margin-left:6px">POST /mission/{id}</span></div>',
-    route: 'POST /mission/{id} &rarr; MCR dengan MissionBuilder & governance. Preview mode (ADR-008).',
-    tag: 'CONNECTED (via MCR)'
+    title: 'Act (Execution) — real jalur canonical (M9)',
+    lead: 'Eksekusi hanya terjadi melalui jalur canonical: <code>MissionUXService → ApprovalGate → mission canonical</code>. Tidak ada tombol eksekusi mandiri dan tidak ada executor kedua.',
+    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Setelah user memberi persetujuan (<code>POST /ux/decide approve</code>), SAM menjalankan eksekusi NYATA via mission canonical (mis. GitHub create issue di repo test) dengan verifikasi independen GET. Tanpa approval → WAITING_APPROVAL; tanpa kredensial → BLOCKED (bukan fake success).</p>'+
+      '<div style="margin-top:10px"><span class="tag-live">GOVERNED</span> <span style="font-size:8px;color:#798aa0;margin-left:6px">/ux/decide → canonical</span></div>',
+    route: 'MissionUXService → ApprovalGate canonical → mission canonical (m8_002) → GitHub connector; verify GET independen.',
+    tag: 'CONNECTED (via canonical)'
   },
   verify: {
     title: 'Verify (fase internal MCR)',

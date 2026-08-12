@@ -126,6 +126,17 @@ Test M8: **20/20 passed**. Proof `docs/engineering/reports/M8-00{1,2,4,5,6}_*E2E
 
 ---
 
+## M9 — Productization (UX Application Boundary + UI vertical slice) (2026-08-12)
+
+Jalur canonical diperluas ke **user-facing operational path**: UI (browser) HANYA fetch ke `/ux` endpoint -> `MissionUXService` (Application Service) -> ApprovalGate canonical -> mission canonical (`m8_002_build`) -> real external effect. TIDAK ada executor kedua; credential tetap di CredentialBoundary; UI tidak punya authority eksekusi.
+
+- **Fake operational controls DIHAPUS**: tombol Pause (`no real pause`), state 'Preview Mode / 0 external calls', dead-code `updatePhaseBadges`, teks panel Act 'preview mode ADR-008' diganti jalur real canonical M9. UI kini menampilkan state nyata dari `GET /ux/state`, evidence dari `/ux/evidence`, audit dari `/ux/audit`, approval dari `/ux/decide`.
+- **Acceptance E2E (2 perjalanan lengkap)**: submit -> plan -> approve -> ApprovalGate canonical -> **GitHub issue NYATA #12** -> GET verify -> evidence + artifact + audit -> COMPLETED; dan submit -> reject -> REJECTED -> **0 mutation (count GitHub sebelum == sesudah, bukti eksternal)**. **3/3 PASSED** (acceptance butuh token, skip jujur di CI).
+- **Server produksi nyata (uvicorn 8099)** diuji: UI served (HTTP 200, 43.5KB), `/ux/submit` waiting_approval, `/ux/decide reject` -> REJECTED.
+- Test UX 17 pass / 2 skip (8 service + 6 route + 3 acceptance); execution_runtime regression 358 passed / 7 skipped / 2 xfailed (tanpa regresi).
+
+---
+
 ## Snapshot Terkini
 
 | Item | Nilai |

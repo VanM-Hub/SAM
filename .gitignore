@@ -111,3 +111,5 @@ docs/engineering/decisions/*
 # M8 runner sementara (utility lokal, bukan produk)
 _m8_*.py
 _m9_*.py
+tests/_m9_tmp/
+
