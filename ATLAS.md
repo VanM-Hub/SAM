@@ -99,6 +99,7 @@
    │     autonomous_operations      ← Investigate/diagnose/recommend/verify (4.5)
    │     operational_workspace      ← Integration layer + EndToEndFlow + ProductionPlatform (4.6)
    │
+   ├── application/               ← APPLICATION LAYER (M9): ux/ = product entry point (MissionUXService)
    ├── api                         ← REST API host + UI (canonical production host, 2026-08-11)
    │     server.py                  ← FastAPI app (GET /ui → static UI, POST /mission, /health, /runtime, ...)
    │     wiring.py                  ← Composition root (RESTApplication J3-J9)

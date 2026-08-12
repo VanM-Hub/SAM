@@ -6,6 +6,8 @@ The **Deterministic Operational Intelligence Platform** that governs intelligent
 
 Sejak v4.1.0, SAM memperluas platform melalui **Universal Governance (SAM 5.x)**: AI, Tool, Agent, dan Workflow diperlakukan sebagai **Citizen** yang di-govern via kontrak seragam, ditambah Enterprise Governance boundary dan Adaptive Governance (learning/simulation/impact/recommendation) di atasnya. Authority tetap di manusia.
 
+**M9 Productization (2026-08-12):** SAM kini punya *real user-facing operational path* via `src/sam/application/ux/` (`MissionUXService`). UI (browser) memanggil `/ux` endpoint → Application Service → ApprovalGate canonical → mission canonical → real external effect (GitHub, dst), tanpa executor kedua. Lihat `CHANGELOG.md` untuk detail M9.
+
 ---
 
 ## 1. What is SAM?

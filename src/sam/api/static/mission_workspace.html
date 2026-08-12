@@ -333,58 +333,142 @@ async function startMission() {
 
   // update UI ke mission view
   _('missionTitle').textContent = g;
-  _('mEyebrow').textContent = 'Mission';
-  _('mSub').textContent = 'Menjalankan Mission Cognitive Runtime cycle...';
+  _('mEyebrow').textContent = 'Misi';
+  _('mSub').textContent = 'SAM sedang memahami permintaan Anda...';
   _('continueBtn').disabled = true;
   _('continueBtn').textContent = 'Running...';
   _('pauseBtn').disabled = true;
   _('objTitle').textContent = g;
-  _('objDesc').textContent = 'MCR cycle berjalan...';
+  _('objDesc').textContent = 'Menyusun rencana...';
 
   showView('missions');
 
-  // panggil POST /mission/{id}  (encodeURI untuk URL safety)
-  var missionId = encodeURIComponent(g.replace(/\s+/g, '-').substring(0, 60));
-  var res = await apiPost('/mission/' + missionId);
+  // Jalur UX nyata (M9): UI -> MissionUXService -> canonical runtime.
+  // TIDAK bypass ke GitHub/adapter lain. Browser hanya fetch ke /ux.
+  var res = await apiPost('/ux/submit', { text: g });
 
   _state.running = false;
-  _state.cycleTime = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-  _('continueBtn').disabled = false;
-  _('continueBtn').textContent = 'Run Again';
-  _('pauseBtn').disabled = true;
-
   if (!res.ok) {
-    _state.lastResult = null;
-    _('missionTitle').textContent = 'ERROR: ' + g;
-    _('mSub').textContent = 'HTTP ' + res.status + ' -- ' + (res.raw||'').substring(0,120);
-    _('objTitle').textContent = 'Mission gagal';
-    _('objDesc').textContent = 'Server returned: ' + res.status;
-    _('cycleResult').innerHTML = '<p><strong>Error</strong> ' + res.status + ' -- periksa log server.</p>';
+    _('mSub').textContent = 'Server error: ' + res.status + ' -- ' + (res.raw||'').substring(0,120);
+    _('objDesc').textContent = 'server returned: ' + res.status;
+    _('continueBtn').disabled = true;
     _('objProgress').textContent = 'ERR';
-    _('progBar').innerHTML = '<i style="width:0%"></i>';
-    updateMissionState(null, res);
     return;
   }
 
-  _state.lastResult = res.data;
   var d = res.data;
-  var ok = d.ok ? true : false;
+  _state.lastResult = d;
 
-  _('mSub').textContent = 'MCR cycle selesai. final_state=' + (d.final_state||'--') + ', steps=' + (d.steps||0) + ', external_calls=' + (d.external_calls||0);
-  _('objTitle').textContent = g;
-  _('objDesc').textContent = (d.detail || '') + ' (preview mode, 0 external calls)';
-  var pct = ok ? 100 : 50;
-  _('objProgress').textContent = ok ? 'OK' : 'DONE';
-  _('progBar').innerHTML = '<i style="width:'+pct+'%"></i>';
-  _('cycleResult').innerHTML = '<p><strong>Goal</strong> ' + esc(g) + '<br><strong>Final State</strong> ' + esc(d.final_state||'--') + '<br><strong>Steps</strong> ' + (d.steps||0) + '<br><strong>Detail</strong> ' + esc(d.detail||'--') + '<br><strong>External Calls</strong> ' + (d.external_calls||0) + ' (preview mode)</p>';
-  _('cycleTime').textContent = _state.cycleTime;
+  // render rencana (bahasa manusia dari viewmodel)
+  _('objTitle').textContent = d.understanding.what_sam_understood || g;
+  var steps = (d.plan && d.plan.planned_steps) || [];
+  _('objDesc').textContent = d.plan && d.plan.action_summary ? d.plan.action_summary : 'SAM menyusun rencana.';
+  _('objProgress').textContent = steps.length + ' steps';
+  _('progBar').innerHTML = '<i style="width:15%"></i>';
 
-  updateMissionState(d, null);
-  updateLastActivity(d);
-  updatePhaseBadges(d);
+  // tampilkan langkah + approval di cycle result
+  var stepHtml = steps.map(function(s,i){ return (i+1) + '. ' + esc(s); }).join('<br>');
+  _('cycleResult').innerHTML =
+    '<p><strong>Yang SAM pahami</strong><br>' + esc(d.understanding.what_sam_understood||'') +
+    '<br><br><strong>Rencana SAM</strong><br>' + stepHtml +
+    '<br><br><strong>Perlu persetujuan?</strong> ' + (d.plan.approval_required ? 'Ya' : 'Tidak') + '</p>';
+  _('cycleTime').textContent = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
 
-  // update recent di home
-  addRecent(g, ok);
+  // tombol approval nyata (gate)
+  _('continueBtn').disabled = false;
+  _('continueBtn').textContent = 'Approve & Jalankan';
+  _('continueBtn').onclick = function(){ approveMission(); };
+  _('pauseBtn').disabled = false;
+  _('pauseBtn').textContent = 'Tolak';
+  _('pauseBtn').onclick = function(){ rejectMission(); };
+  _('pauseBtn').title = 'Tolak mission (tidak ada eksekusi)';
+
+  addRecent(g, false);
+}
+
+// Approve: real execution gate -> canonical runtime -> real external effect.
+async function approveMission() {
+  if (!_state.missionGoal) { return; }
+  _('continueBtn').disabled = true;
+  _('continueBtn').textContent = 'Menjalankan...';
+  _('pauseBtn').disabled = true;
+  _('objDesc').textContent = 'Approval diterima. SAM menjalankan eksekusi nyata...';
+  _('objProgress').textContent = 'RUN';
+  _('progBar').innerHTML = '<i style="width:60%"></i>';
+
+  var res = await apiPost('/ux/decide', { intent: 'approve', approver: 'user' });
+  renderOutcome(res);
+}
+
+// Reject: no execution.
+async function rejectMission() {
+  if (!_state.missionGoal) { return; }
+  _('continueBtn').disabled = true;
+  _('pauseBtn').disabled = true;
+  _('objDesc').textContent = 'Mission ditolak.';
+  var res = await apiPost('/ux/decide', { intent: 'reject', approver: 'user' });
+  renderOutcome(res);
+}
+
+// Render hasil nyata (evidence/artifact/audit/failure semantics) dari /ux.
+function renderOutcome(res) {
+  if (!res.ok) {
+    _('objProgress').textContent = 'ERR';
+    _('cycleResult').innerHTML = '<p><strong>Server error</strong> ' + res.status + ': ' + esc(res.raw||'').substring(0,200) + '</p>';
+    return;
+  }
+  var d = res.data;
+  _state.lastResult = d;
+  var ex = d.execution || {};
+  var st = ex.status;
+
+  // failure / blocked / rejected / completed semantics
+  if (st === 'completed') {
+    _('objProgress').textContent = 'OK';
+    _('progBar').innerHTML = '<i style="width:100%"></i>';
+    _('mSub').textContent = 'Eksekusi nyata selesai.';
+  } else if (st === 'blocked') {
+    _('objProgress').textContent = 'BLOCKED';
+    _('progBar').innerHTML = '<i style="width:40%;background:var(--amber, #f0b429)"></i>';
+    _('mSub').textContent = 'BLOCKED: ' + (ex.failure_message||'');
+  } else if (st === 'rejected') {
+    _('objProgress').textContent = 'REJECTED';
+    _('progBar').innerHTML = '<i style="width:20%;background:#e77d84"></i>';
+    _('mSub').textContent = 'Mission ditolak pengguna. Tidak ada eksekusi.';
+  } else {
+    _('objProgress').textContent = 'FAILED';
+    _('progBar').innerHTML = '<i style="width:50%;background:#e77d84"></i>';
+    _('mSub').textContent = 'FAILED: ' + (ex.failure_message||'eksekusi gagal');
+  }
+
+  _('objDesc').textContent = ex.result_summary || '';
+
+  // evidence chain + artifact + audit
+  var ev = (d.evidence || []).length
+    ? d.evidence.map(function(e){ return '&#9679; ' + esc(e.kind||'') + ': ' + esc(e.url || e.detail || ''); }).join('<br>')
+    : 'Tidak ada evidence eksternal.';
+  var art = d.artifact_ref ? esc(d.artifact_ref) : '--';
+  var aud = d.audit_ref ? esc(d.audit_ref) : '--';
+  _('cycleResult').innerHTML =
+    '<p><strong>Status</strong>: ' + esc(st) +
+    (ex.failure_kind ? ' <span style="color:#e77d84">(' + esc(ex.failure_kind) + ')</span>' : '') +
+    '<br><br><strong>Hasil</strong><br>' + esc(ex.result_summary||'--') +
+    '<br><br><strong>Evidence</strong><br>' + ev +
+    '<br><br><strong>Artifact</strong>: ' + art +
+    '<br><strong>Audit</strong>: ' + aud + '</p>';
+  _('cycleTime').textContent = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+
+  _('continueBtn').textContent = 'Run Again';
+  _('continueBtn').disabled = false;
+  _('continueBtn').onclick = function(){ startMissionForce(_state.missionGoal); };
+  _('pauseBtn').disabled = true;
+  _('pauseBtn').textContent = 'Pause';
+}
+
+async function startMissionForce(g) {
+  var gi = _('goal');
+  if (gi) gi.value = g;
+  await startMission();
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -393,12 +477,6 @@ function runMission() {
   if (!_state.missionGoal) { _('missionTitle').textContent = 'Tulis tujuan di Home dulu'; return; }
   if (_state.running) return;
   startMissionForce(_state.missionGoal);
-}
-
-async function startMissionForce(g) {
-  var gi = _('goal');
-  if (gi) gi.value = g;
-  await startMission();
 }
 
 function pauseMission() { /* session-scoped, no real pause */ }

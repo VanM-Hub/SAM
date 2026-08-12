@@ -33,6 +33,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 
 from .routes import health, runtime, events, metrics, mission
+from .routes import ux as ux_routes
 from .wiring import rest_app
 
 app = FastAPI(
@@ -54,6 +55,7 @@ app.include_router(runtime.router, prefix="/runtime", tags=["runtime"])
 app.include_router(events.router, prefix="/events", tags=["events"])
 app.include_router(metrics.router, prefix="/metrics", tags=["metrics"])
 app.include_router(mission.router, prefix="/mission", tags=["mission"])
+app.include_router(ux_routes.router, prefix="/ux", tags=["ux"])
 
 # Program J: capability REST (workflow/policy/audit/preview/knowledge/memory/
 # artifact/approval/status) - composition-only, via runtime_service.api.
