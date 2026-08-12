@@ -116,6 +116,14 @@ class TestRejectNoMutation(unittest.TestCase):
 
     @pytest.mark.skipif(not HAVE_TOKEN, reason="butuh token utk membuktikan 0 mutation nyata")
     def test_reject_produces_no_mutation(self):
+        # Sedikit jeda sebelum & sesudah utk men-stabilkan eventual consistency
+        # API GitHub: issue yang dibuat test approve lain (dalam suite yang sama)
+        # baru muncul di count beberapa saat kemudian. Guna menghindari flake
+        # dari lag, settle dulu sebelum hitung before.
+        import time as _t
+        _t.sleep(3)
+        before = _github_issue_count()
+        _t.sleep(2)
         before = _github_issue_count()
         text = "Buat GitHub issue yang tidak boleh jadi (harus 0 mutation)"
         r = self.client.post("/ux/submit", json={"text": text})
@@ -138,7 +146,8 @@ class TestRejectNoMutation(unittest.TestCase):
         # tidak ada stage real mutation di timeline
         for e in s.get("timeline") or []:
             assert e.get("stage") != "execute", "timeline tidak boleh memuat eksekusi nyata saat reject"
-        # BUKTI EKSTERNAL: jumlah issue GitHub TIDAK bertambah setelah reject
+        # BUKTI EKSTERNAL: jumlah issue GitHub TIDAK bertambah dari operasi reject ini.
+        _t.sleep(2)
         after = _github_issue_count()
         assert after == before, (
             f"reject harus menghasilkan 0 mutation: issue count {before} -> {after}"

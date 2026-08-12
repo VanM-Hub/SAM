@@ -29,6 +29,8 @@ from sam.application.ux.service import MissionUXService
 class SubmitRequest(BaseModel):
     """Body request: apa yang manusia minta (bahasa alami, bukan struktur internal)."""
     text: str
+    # M10-005: Idempotency-Key optional — same key -> same logical operation.
+    idempotency_key: Optional[str] = None
 
 
 class DecideRequest(BaseModel):
@@ -54,8 +56,9 @@ async def ux_submit(request: SubmitRequest):
 
     Adapter murni: meneruskan text ke MissionUXService.submit, mengembalikan
     UxMissionState.as_dict() (ViewModel) untuk UI. Tidak ada eksekusi di sini.
+    M10-005: `idempotency_key` memastikan retry TIDAK membuat mission ganda.
     """
-    state = _routes.service.submit(request.text)
+    state = _routes.service.submit(request.text, idempotency_key=request.idempotency_key)
     return state.as_dict()
 
 

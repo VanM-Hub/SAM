@@ -66,6 +66,10 @@ openclaw/status/
 *.sqlite
 *.sqlite3
 
+# Runtime state (M10-007 persistence) — output proses, jangan commit
+/docs/engineering/state/
+*.sam_ux_*.tmp
+
 # Migrations dir tetap di-track
 !data/migrations/
 !data/migrations/*.sql

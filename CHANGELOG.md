@@ -36,6 +36,17 @@
   - **M9-008.5 Failure recovery UX**: BLOCKED/FAILED/REJECTED/COMPLETED dari runtime state; UI state (via /ux/state) == runtime state (teruji reject -> /ux/state konsisten).
   - Test `test_ux_hardening.py` 9 pass / 2 skip (butuh token); dengan token 11 run all pass. Full UX suite 28 pass (acceptance real + hardening real). execution_runtime regression 358 passed / 7 skipped / 2 xfailed (tanpa regresi).
 
+### M10 - Production Operational Readiness (2026-08-12) - SELESAI 001-008
+- **M10-001 Deployment Topology** - arsitektur kanonik Browser->UI/API->Application Layer->Canonical Execution Runtime->Connectors->External World; tanpa bypass (UI thin client, route handler tidak import runtime core, runtime hanya di composition root). **PROVEN 5/5.**
+- **M10-002 Secrets** - `CredentialBoundary`+`SecretScrubber` (M8-005) + lapisan HTTP: resolve tak pernah return raw, audit tak pernah memuat raw, UI HTML tanpa token, approve flow tak bocorkan token ke response/evidence/audit/state, prompt tak memuat secret. **PROVEN 5/5 (dengan token).**
+- **M10-003 Observability** - `UxMissionState.observability`: who/when/result per mission (request_id, mission_id, execution_id, capability, external_target, start/end_time, verification_result, approver). **PROVEN 6/6.**
+- **M10-004 Failure & Recovery** - failure diklasifikasi bukan bool: MISSING->BLOCKED (executor TIDAK dipanggil, 0 side effect), INVALID->FAILED, user-tolak->REJECTED (semantics beda); duplicate/restart tidak korup state. **PROVEN 7/7.**
+- **M10-005 Idempotency** - `Idempotency-Key` -> 1 key = 1 logical op = 1 request_id = 1 mutation; retry (network timeout) TIDAK membuat issue ganda. Route `/ux/submit` terima idempotency_key. **PROVEN 5/5 (dengan token: 1 approve = 1 evidence).**
+- **M10-006 Security Boundary** - adversarial: tidak ada endpoint eksekusi publik (404), invalid capability DENIED, prompt injection tidak bocorkan credential, NO execution before approval. **TEMUAN BUG + fix**: submit request invalid sebelumnya bisa di-approve sehingga mengeksekusi issue nyata - sekarang guard deny (REJECTED, 0 mutation); `record_pending` duplikat dihapus. **PROVEN 8/8.**
+- **M10-007 Persistence** - `MissionStore` JSON atomik + `MissionUXService` persist/recover: restart TIDAK menghilangkan truth (Mission/Approval/Execution/Evidence/Audit survive; secret tidak pernah di-persist). Store OPT-IN (default OFF) agar tidak mengontaminasi dev/test. **PROVEN 7/7.**
+- **M10-008 Production E2E Certification** - satu mission utuh: Browser->UI->Application Service->Governance->Approval->HTTP->GitHub->Verification->Artifact->Audit->Learning, dengan **restart + failure injection + retry** di acceptance test. **REAL PROVEN (dengan token):** issue GitHub NYATA dibuat via jalur kanonik; restart me-recover truth; evidence eksternal tampil. **SAM Production Operational Readiness PROOF.**
+- Regression penuh M10+UX+application **75 passed**; execution_runtime **358 passed / 7 skipped / 2 xfailed** (tanpa regresi).
+
 ### M6 - Universal External Connector (5 canonical connector)
 - **HTTP Connector (`canonical_http_connector.py`)** - GET real ke JSONPlaceholder + httpbin, 200+JSON valid, gate+verify+audit.
 - **Database Connector (`canonical_db_connector.py`)** - SQLite SELECT real (users/posts), read-only; postgres = kontrak BLOCKED tanpa driver.

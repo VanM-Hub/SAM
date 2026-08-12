@@ -70,6 +70,10 @@ class UxMissionState:
     artifact_ref: str = ""
     audit_ref: str = ""
     timeline: List[Dict[str, Any]] = field(default_factory=list)
+    # M10-003 Observability: field yang menjawab "SAM lakukan apa, mengapa,
+    # atas persetujuan siapa, ke sistem mana, bagaimana tahu hasil benar".
+    # Tanpa secret leakage — ini murni metadata operasional.
+    observability: Dict[str, Any] = field(default_factory=dict)
     # metadata
     updated_at: str = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
@@ -103,6 +107,7 @@ class UxMissionState:
             "artifact_ref": self.artifact_ref,
             "audit_ref": self.audit_ref,
             "timeline": list(self.timeline),
+            "observability": dict(self.observability),
             "updated_at": self.updated_at,
         }
 

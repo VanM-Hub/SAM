@@ -142,6 +142,18 @@ Jalur canonical diperluas ke **user-facing operational path**: UI (browser) HANY
 - **Server produksi nyata (uvicorn 8099)** diuji: UI served (HTTP 200, 43.5KB), `/ux/submit` waiting_approval, `/ux/decide reject` -> REJECTED.
 - Test UX 17 pass / 2 skip (8 service + 6 route + 3 acceptance); execution_runtime regression 358 passed / 7 skipped / 2 xfailed (tanpa regresi).
 
+## M10 — Production Operational Readiness (2026-08-12, SELESAI 001-008)
+Fokus beralih dari "Can SAM do X?" ke "Can SAM operate safely and accountably?". Nilai SAM kini diukur dgn: Reliability, Safety, Observability, Recoverability, Idempotency, Human Control, Real-world usefulness.
+- **M10-001 Deployment Topology** — arsitektur kanonik tanpa bypass (UI thin client, route handler tidak import runtime core, runtime hanya di composition root). `tests/api/test_m10_001_topology.py` 5/5 PROVEN.
+- **M10-002 Secrets** — resolve tak pernah return raw; audit/evidence/state/prompt tak memuat raw; approve flow tak bocorkan token. `test_m10_002_secrets.py` 5/5 PROVEN (dgn token).
+- **M10-003 Observability** — `UxMissionState.observability`: who/when/result per mission (approver, start/end_time, execution_id, verification_result, failure_reason). `test_m10_003_observability.py` 6/6 PROVEN.
+- **M10-004 Failure & Recovery** — failure diklasifikasi (MISSING->BLOCKED dgn 0 side effect, INVALID->FAILED, user->REJECTED); duplicate/restart tidak korup state. `test_m10_004_failure_recovery.py` 7/7 PROVEN.
+- **M10-005 Idempotency** — `Idempotency-Key` -> 1 key = 1 logical op = 1 mutation; retry TIDAK bikin issue ganda. `test_m10_005_idempotency.py` 5/5 PROVEN (dgn token: 1 approve = 1 evidence).
+- **M10-006 Security Boundary** — adversarial deny: tanpa endpoint eksekusi publik, invalid capability DENIED, prompt injection tak bocorkan credential. **TEMUAN BUG + fix**: submit request invalid sebelumnya bisa di-approve -> eksekusi issue nyata; kini guard deny (REJECTED, 0 mutation). `test_m10_006_security_boundary.py` 8/8 PROVEN.
+- **M10-007 Persistence** — `store.py` (JSON atomik) + service persist/recover: restart TIDAK menghilangkan truth; secret tak pernah di-persist; store OPT-IN. `test_m10_007_persistence.py` 7/7 PROVEN.
+- **M10-008 Production E2E Certification** — satu mission utuh Browser->UI->Service->Governance->Approval->HTTP->GitHub->Verify->Artifact->Audit->Learning dgn **restart + failure injection + retry** di acceptance test. **REAL PROVEN (dgn token): issue GitHub NYATA via jalur kanonik, restart recover truth. SAM Production Operational Readiness PROOF.** `test_m10_008_production_e2e.py` 3/3 PROVEN.
+- Regression M10+UX+application **75 passed**; execution_runtime **358 passed / 7 skipped / 2 xfailed** (tanpa regresi).
+
 ---
 
 ## Snapshot Terkini
