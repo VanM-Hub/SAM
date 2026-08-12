@@ -29,9 +29,21 @@ from sam.application.ux.approval import (
 )
 from sam.application.ux.mission_request import MissionRequest, MissionRequestStatus
 from sam.application.ux.plan import MissionPlan, MissionPlanStatus
-from sam.application.ux.runner import classify_mission_outcome, run_github_real_mission
+from sam.application.ux.runner import (
+    UnsupportedOperationError,
+    classify_mission_outcome,
+    run_mission,
+)
 from sam.application.ux.state import UxMissionState, UxFailureKind, UxStateStatus
 from sam.application.ux.store import MissionStore
+# M11-002: backend persistent opsional. Bila env SAM_PG_DSN diset, service
+# otomatis memakai PostgresMissionStore (plugin) — JSON tetap default. Semua
+# via API yang sama (load/save/enable/clear), jadi jalur & test lama tidak berubah.
+try:
+    from sam.application.ux.pgstore import PostgresMissionStore
+    _HAS_PG = True
+except Exception:  # pragma: no cover - psycopg2 tidak terpasang
+    _HAS_PG = False
 
 
 # Repo test default untuk GitHub mutation (repo TEST, bukan production).
@@ -56,7 +68,13 @@ class MissionUXService:
         self._last_result: Optional[Dict[str, Any]] = None
         self._audit: List[Dict[str, Any]] = []
         # M10-007: persistensi — restart TIDAK menghilangkan operational truth.
-        self._store = store or MissionStore()
+        # M11-002: bila SAM_PG_DSN diset (produksi), pakai PostgreSQL; selain itu JSON.
+        if store is not None:
+            self._store = store
+        elif _HAS_PG and os.environ.get("SAM_PG_DSN"):
+            self._store = PostgresMissionStore(dsn=os.environ["SAM_PG_DSN"]).enable()
+        else:
+            self._store = MissionStore()
         self._idem: Dict[str, Dict[str, Any]] = {}  # {key: {request_id, text}}
         self._recover_from_store()
 
@@ -292,9 +310,38 @@ class MissionUXService:
         })
         state.observability = obs
 
+        operation = (self._request.operation or "").strip()
         repo = self._request.target or self._test_repo
         try:
-            result = run_github_real_mission(repo=repo, artifact_dir=self._artifact_dir)
+            # Dispatcher eksekusi (B1/B2): pilih jalur canonical sesuai operasi.
+            # GitHub -> m8_002_build (blok existing di bawah). web.*/http.* ->
+            # connector read-only. Operasi lain -> UnsupportedOperationError
+            # (BLOCKED jujur, 0 side effect).
+            result = run_mission(
+                operation=operation,
+                target=self._request.target,
+                repo=repo,
+                artifact_dir=self._artifact_dir,
+                approval_reason=f"APPROVED by {approver or 'user'}",
+            )
+        except UnsupportedOperationError as exc:
+            state.status = UxStateStatus.BLOCKED
+            state.failure_kind = UxFailureKind.BLOCKED
+            state.failure_message = str(exc)
+            obsb = dict(state.observability or {})
+            obsb.update({
+                "status": UxStateStatus.BLOCKED,
+                "end_time": datetime.now(timezone.utc).isoformat(),
+                "verification_result": "none (unsupported - 0 side effect)",
+                "failure_reason": str(exc),
+            })
+            state.observability = obsb
+            self._audit.append({
+                "stage": "execute", "event": "unsupported_operation",
+                "ok": False, "blocked": True, "detail": str(exc),
+            })
+            self._persist()
+            return state
         except Exception as exc:  # noqa: BLE001 — interface harus tetap hidup
             state.status = UxStateStatus.FAILED
             state.failure_kind = UxFailureKind.FAILED
@@ -307,6 +354,10 @@ class MissionUXService:
                 "failure_reason": str(exc),
             })
             state.observability = obs2
+            self._audit.append({
+                "stage": "execute", "event": "mission_failed",
+                "ok": False, "blocked": False, "detail": str(exc),
+            })
             self._persist()
             return state
 
@@ -370,6 +421,14 @@ class MissionUXService:
                 "number": scrubbed.get("number"),
                 "detail": scrubbed.get("detail", ""),
             }]
+        elif result.get("target") and not scrubbed:
+            # Non-GitHub (web.*/http.*): rekam target hasil eksekusi sbg evidence
+            # read-only (tanpa secret).
+            state.evidence = [{
+                "kind": "read_only_result",
+                "target": result.get("target", ""),
+                "detail": result.get("detail", ""),
+            }]
         state.artifact_ref = result.get("artifact_path", "")
         state.audit_ref = f"audit_count={result.get('audit_count', 0)}"
         # M9-004: append mission timeline ke audit trail (sanitized, no secret).
@@ -405,7 +464,10 @@ class MissionUXService:
     # ------------------------------------------------------------------
     @staticmethod
     def _interpret(text: str) -> Tuple[str, str, str, List[str], str, str]:
-        """Deteksi operasi dari teks. Bahasa manusia -> rencana manusia.
+        """Deteksi operasi dari teks.
+
+        Mencoba pemahaman via AI lokal (Gemma/Ollama) dulu; bila Ollama tidak
+        tersedia / gagal / offline -> fallback ke pola regex (mode offline).
 
         Returns: (operation, target, understood, planned_steps, action_summary, reason)
         operation "" -> tidak dikenali, tidak ada eksekusi direncanakan.
@@ -413,7 +475,14 @@ class MissionUXService:
         t = (text or "").strip()
         low = t.lower()
 
-        # Pola "github create issue / buat issue / new issue".
+        # 1) Coba pemahaman cerdas via AI lokal (Gemma3:1b via Ollama).
+        #    Menutup kesenjangan "SAM hanya kenal pola kata" -> SAM bisa
+        #    memahami permintaan bahasa bebas. Fallback aman bila offline.
+        attempt = MissionUXService._interpret_via_ai(t)
+        if attempt is not None and attempt[0]:
+            return attempt
+
+        # Fallback: pola regex (mode offline / Ollama tidak tersedia).
         is_github_issue = bool(
             re.search(r"github", low)
             and re.search(r"(issue|masalah|tiket|new issue|create)", low)
@@ -421,9 +490,7 @@ class MissionUXService:
 
         if is_github_issue:
             operation = "github.create_issue"
-            # Default repo = test repo (repo uji, bukan production). Env override.
-            target = os.environ.get("GITHUB_TEST_REPO") or "VanM-Hub/test-issues"
-            # Judul issue = seluruh request, kecuali terlihat ada judul eksplisit.
+            target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
             title_match = re.search(r'(?:judul|title)\s*[:=]\s*"?([^"\n]+)"?', t, flags=re.I)
             if title_match:
                 title = title_match.group(1).strip()
@@ -446,15 +513,42 @@ class MissionUXService:
                 "Tindakan ini menghasilkan efek eksternal nyata pada GitHub "
                 "(repo uji). Persetujuan Anda diperlukan sebelum eksekusi."
             )
-            # Pakai judul di payload agar mission canonical mengetahui judul.
-            # Disimpan di MissionRequest.payload oleh submit; tapi kita kembalikan
-            # via planned + action. Payload aktual dipasang oleh submit caller
-            # dengan payload={"title": ..., "body": ...}.
             return (
                 operation, target, understood, planned, action_summary, approval_reason
             )
 
-        # Tidak dikenali -> rencana kosong, tidak ada approval.
+        # Fallback web (read-only): "buka website X" / "buka <url>".
+        # Tangkap URL eksplisit atau domain, agar target eksekusi benar.
+        url_match = re.search(
+            r"(https?://[^\s]+|www\.[^\s]+|[a-z0-9-]+\.[a-z]{2,}(?:/[^\s]*)?)",
+            t, flags=re.I,
+        )
+        is_web = bool(re.search(r"(buka|brows|open|web|website|site|halaman)", low))
+        if is_web:
+            operation = "web.open"
+            raw_url = (url_match.group(1) if url_match else "") or ""
+            target = raw_url if raw_url.startswith("http") else f"https://{raw_url}" if raw_url else ""
+            if not target:
+                # Tidak ada URL/domain yang ditangkap -> tidak bisa dieksekusi.
+                return (
+                    "", "", "SAM tidak menemukan URL untuk dibuka pada permintaan ini.",
+                    [], "", "",
+                )
+            understood = f"SAM memahami: membuka halaman web '{target}' (read-only)."
+            planned = [
+                "memverifikasi konektivitas (online check)",
+                f"mengambil konten halaman web '{target}'",
+                "melaporkan hasil baca (tanpa mengubah apapun)",
+            ]
+            action_summary = f"SAM akan membuka dan membaca halaman web '{target}' (read-only)."
+            approval_reason = (
+                "Operasi ini read-only (membaca halaman web) — tidak mengubah state "
+                "eksternal, namun tetap disediakan persetujuan Anda untuk transparansi."
+            )
+            return (
+                operation, target, understood, planned, action_summary, approval_reason
+            )
+
         return (
             "",
             "",
@@ -463,3 +557,122 @@ class MissionUXService:
             "",
             "",
         )
+
+    # ------------------------------------------------------------------
+    # pemahaman cerdas via AI lokal (Gemma3:1b / Ollama) — tanpa internet
+    # ------------------------------------------------------------------
+    _AI_CAPABILITIES = (
+        "Operasi SAM yang diketahui: "
+        "[github.create_issue] buat/tingkat issue GitHub; "
+        "[email.send] kirim email; "
+        "[web.open] buka/baca halaman web; "
+        "[http.call] panggil API/HTTP eksternal; "
+        "[ai.think] minta AI berpikir/menjawab; "
+        "[db.query] baca/tulis database; "
+        "[process.run] jalankan perintah/command lokal."
+    )
+
+    @staticmethod
+    def _interpret_via_ai(text: str) -> Optional[Tuple[str, str, str, List[str], str, str]]:
+        """Pahami permintaan via Gemma3:1b (Ollama lokal, no internet).
+
+        Menghasilkan JSON terstruktur. Bila Ollama tidak tersedia / timeout /
+        hasil tidak valid -> kembalikan None (caller fallback ke regex).
+        Aman offline: tidak ada side effect bila gagal.
+        """
+        if not text.strip():
+            return None
+        try:
+            from sam.providers.execution.provider_executor import (
+                ProviderExecutor,
+                ProviderUnavailableError,
+            )
+            executor = ProviderExecutor()
+            prompt = (
+                f"{MissionUXService._AI_CAPABILITIES}\n\n"
+                "Instruksi: Dari permintaan berikut, tentukan operasi SAM yang paling "
+                "cocok (di antara daftar di atas). Jika tidak cocok sama sekali, pakai "
+                "operation kosong. Jawab HANYA dengan JSON valid tanpa teks lain, format:\n"
+                '{"operation": "<salah satu operation atau \"\">", '
+                '"target": "<objek sasaran, atau kosong>", '
+                '"understood": "<kalimat singkat apa yang SAM pahami>", '
+                '"planned": ["<langkah 1>", "<langkah 2>"]}\n\n'
+                f"Permintaan: {text}"
+            )
+            raw = executor.execute(
+                "ollama",
+                "chat",
+                {"prompt": prompt, "model": "gemma3:1b", "max_tokens": 256},
+                timeout_seconds=90,
+            )
+            content = MissionUXService._extract_ai_text(raw)
+            parsed = MissionUXService._parse_ai_json(content)
+            if not parsed:
+                return None
+            operation = str(parsed.get("operation") or "")
+            if not operation:
+                return None  # belum operasi yang dikenali -> biarkan fallback/tolak
+            target = str(parsed.get("target") or "") or os.environ.get(
+                "GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
+            understood = str(parsed.get("understood") or "")
+            # Normalisasi: selalu awali "SAM memahami:" agar konsisten dengan
+            # mode regex & harapan UI (jangan ubah kalau sudah ada).
+            understood = understood.strip()
+            if understood and not understood.startswith("SAM memahami"):
+                understood = f"SAM memahami: {understood}"
+            elif not understood:
+                understood = (f"SAM memahami: menjalankan operasi '{operation}'.")
+            planned_raw = parsed.get("planned") or []
+            planned = [str(x) for x in planned_raw if str(x)] or [
+                "melakukan operasi {}".format(operation)
+            ]
+            action_summary = f"SAM akan menjalankan operasi '{operation}'"
+            if target:
+                action_summary += f" pada '{target}'"
+            reason = (
+                "Pemahaman dihasilkan AI lokal (Gemma3:1b). Tindakan ini dapat "
+                "menghasilkan efek eksternal; persetujuan Anda diperlukan."
+            )
+            return (operation, target, understood, planned, action_summary, reason)
+        except (ProviderUnavailableError, Exception):  # noqa: BLE001
+            return None
+
+    @staticmethod
+    def _extract_ai_text(raw: Dict[str, Any]) -> str:
+        """Ekstrak teks dari respons ProviderExecutor (ollama OpenAI-compatible)."""
+        try:
+            payload = raw.get("payload") or {}
+            cand = payload.get("raw") or raw
+            choices = cand.get("choices") or []
+            if choices:
+                msg = choices[0].get("message") or {}
+                return str(msg.get("content") or "")
+            content = cand.get("content")
+            if content is not None:
+                return str(content)
+        except Exception:  # noqa: BLE001
+            pass
+        return str(raw)
+
+    @staticmethod
+    def _parse_ai_json(content: str) -> Optional[Dict[str, Any]]:
+        """Parse JSON dari output model; toleran kutipan salah / teks tambahan."""
+        import json as _json
+        if not content:
+            return None
+        try:
+            d = _json.loads(content)
+            if isinstance(d, dict):
+                return d
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            start = content.find("{")
+            end = content.rfind("}")
+            if 0 <= start < end:
+                d = _json.loads(content[start:end + 1])
+                if isinstance(d, dict):
+                    return d
+        except Exception:  # noqa: BLE001
+            pass
+        return None

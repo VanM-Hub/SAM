@@ -35,7 +35,11 @@ PROVIDER_ENV = {
     "anthropic": ("ANTHROPIC_API_KEY", "https://api.anthropic.com"),
     "gemini": ("GEMINI_API_KEY", "https://generativelanguage.googleapis.com"),
     "deepseek": ("DEEPSEEK_API_KEY", "https://api.deepseek.com"),
-    "ollama": ("OLLAMA_HOST", "http://localhost:11434"),
+    # Ollama = provider LOKAL non-auth: TIDAK butuh API key (env key kosong),
+    # base_url cukup host OpenAI-compatible (Ollama: /v1). OLLAMA_HOST env
+    # bisa menimpa host bila Van set (mis. remote), tapi default lokal ini
+    # sudah bisa dipakai tanpa kredensial apa pun.
+    "ollama": ("", "http://localhost:11434/v1"),
     "filesystem": ("", ""),
     "shell": ("", ""),
     "sqlite": ("", ""),
