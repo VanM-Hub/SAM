@@ -10,11 +10,11 @@
 - **M8-005 Production Credential Boundary** - `credential_boundary.py`: enforcement deterministik; aliran Credential->Boundary->Connector; TIDAK pernah masuk Mission/Prompt/Audit/Artifact. 9 syarat (missing=BLOCKED, invalid=FAILED, timeout=FAILED, no cred=zero side effect, scrub) teruji 9/9. **PROVEN (produksi-grade).**
 - **M8-001 AI Mission Completion** - NVIDIA real di M7-001 (HTTP evidence + NVIDIA reasoning). **REAL PROVEN**: model `meta/llama-3.1-8b-instruct`, key SAM resmi, HTTP 200, verify + leak_free. (Pakai `ProviderExecutor(configs={...})` eksplisit untuk `nvidia`.)
 - **M8-002 GitHub Real Mutation** - create+get real issue di repo **TEST `VanM-Hub/test-issues`** (bukan production). **REAL PROVEN**: issue #3 dibuat & terkonfirmasi via API eksternal (verifikasi independen).
-- **M8-003 SMTP Real Send** - kirim ke dedicated mailbox (bukan pribadi). **Menunggu Van**: keputusan SMTP login/penerima + Gmail App Password 16-char. **Tetap BLOCKED/PARTIAL** (Email row 23 belum PROVEN).
+- **M8-003 SMTP Real Send** - kirim ke dedicated mailbox. **REAL PROVEN**: email NYATA via `smtp.gmail.com:587` STARTTLS (App Password dari env), Gmail ack 250 OK, pesan MASUK di inbox penerima (konfirmasi independen). Tanpa SMTP -> BLOCKED jujur.
 - **M8-004 Browser Real Runtime** - headless Chromium navigation+interaction. **REAL PROVEN**: nav example.com, DOM h1='Example Domain', boundary BROWSER_DRIVER_OK.
 - **M8-006 Real Mission Certification** - chain multi-external NVIDIA+HTTP+GitHub (6 stage). **REAL PROVEN**: HTTP evidence real -> NVIDIA reasoning (completed) -> recommend -> approve -> GitHub create real issue #5 -> verify; issue #5 terkonfirmasi eksternal.
 - Test M8 20/20; regression cross-module 501 passed / 1 skipped / 2 xfailed (naik dari 481, +20 M8).
-- **Status Truth Matrix: 16 PROVEN / 0 PARTIAL / 6 UNPROVEN**, satu-satunya belum lunas = **Email (M8-003)**.
+- **Status Truth Matrix: 17 PROVEN / 0 PARTIAL / 6 UNPROVEN** — **semua M8 milestone (001-006) tuntas PROVEN. M8 SELESAI.**
 
 ### M6 - Universal External Connector (5 canonical connector)
 - **HTTP Connector (`canonical_http_connector.py`)** - GET real ke JSONPlaceholder + httpbin, 200+JSON valid, gate+verify+audit.

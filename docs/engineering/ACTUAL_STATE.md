@@ -119,10 +119,10 @@ Keputusan Van: jangan buat capability baru; tutup gap yang tersisa dengan mengak
 
 Test M8: **20/20 passed**. Proof `docs/engineering/reports/M8-00{1,2,4,5,6}_*E2E_Proof.json` diregenerasi dengan kredensial valid & terverifikasi eksternal.
 
-### M8-003 SMTP real send — HANYA SATU YANG TERSISA (menunggu Van)
-`canonical_email_connector.py` + builder M8-003 sudah siap (validasi format + gate SMTP + dry_run jujur, `sent:false`). Kirim SMTP NYATA butuh: keputusan Van (SMTP login = `vanmalaka@gmail.com` sekaligus penerima, atau login + `TEST_MAILBOX` terpisah) + **Gmail App Password 16-char** (2-Step Verification aktif, bukan password login).
+### M8-003 SMTP real send — REAL PROVEN (terverifikasi eksternal)
+`canonical_email_connector.py` + builder M8-003. Kirim email NYATA via SMTP Gmail (`smtp.gmail.com:587` STARTTLS, `smtplib`, App Password dari env — bukan hardcode) → Gmail ack `250 OK` → pesan MASUK di inbox penerima `vanmalaka@gmail.com` (konfirmasi independen Van). Tanpa kredensial -> BLOCKED jujur (`sent:false`, NO SIDE EFFECT). Proof `docs/engineering/reports/M8-003_SMTP_Real_Send_E2E_Proof.json`.
 
-**STATUS JUJUR**: M8-001/002/004/005/006 = **PROVEN**. **M8-003 (Email/SMTP) = satu-satunya yang belum PROVEN — tetap PARTIAL sampai kirim SMTP nyata terbukti.** Truth Matrix = **16 PROVEN / 0 PARTIAL / 6 UNPROVEN**? (Email tetap PARTIAL di row 23 sampai M8-003 lunas).
+**STATUS JUJUR**: M8-001/002/003/004/005/006 = **SEMUA PROVEN**. Truth Matrix = **17 PROVEN / 0 PARTIAL / 6 UNPROVEN**. Email Connector row 23 kini **PROVEN**. **M8 SELESAI TOTAL.**
 
 ---
 
