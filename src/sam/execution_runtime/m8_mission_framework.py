@@ -45,7 +45,7 @@ from sam.execution_runtime.m7_mission_framework import (
     PersistedExperience,
 )
 from sam.execution_runtime.real_harness import AuditTrail  # noqa: F401
-from sam.runtime_service.secrets.secret_provider import SecretProvider
+from sam.runtime_service.secrets.secret_provider import SecretProvider, default_secret_provider
 
 
 # ---------------------------------------------------------------------------
@@ -89,7 +89,7 @@ class CredentialedMission(Mission):
     def __init__(self, mission_id: str, title: str,
                  audit=None) -> None:
         super().__init__(mission_id, title, audit)
-        self._boundary = CredentialBoundary(provider=SecretProvider())
+        self._boundary = CredentialBoundary(provider=default_secret_provider())
 
     def add_credential_stage(self, requirement: CredentialRequirement,
                              stage: str,
