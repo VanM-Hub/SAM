@@ -46,6 +46,7 @@
 - **M10-007 Persistence** - `MissionStore` JSON atomik + `MissionUXService` persist/recover: restart TIDAK menghilangkan truth (Mission/Approval/Execution/Evidence/Audit survive; secret tidak pernah di-persist). Store OPT-IN (default OFF) agar tidak mengontaminasi dev/test. **PROVEN 7/7.**
 - **M10-008 Production E2E Certification** - satu mission utuh: Browser->UI->Application Service->Governance->Approval->HTTP->GitHub->Verification->Artifact->Audit->Learning, dengan **restart + failure injection + retry** di acceptance test. **REAL PROVEN (dengan token):** issue GitHub NYATA dibuat via jalur kanonik; restart me-recover truth; evidence eksternal tampil. **SAM Production Operational Readiness PROOF.**
 - Regression penuh M10+UX+application **75 passed**; execution_runtime **358 passed / 7 skipped / 2 xfailed** (tanpa regresi).
+- **FORMAL CLOSURE M10** — Production Operational Readiness Report (`docs/engineering/reports/M10_Production_Operational_Readiness_Report.md`): 10 item dinilai **PROVEN** atau **EXPLICITLY BLOCKED/DEFERRED** jujur; Deployment Readiness = BLOCKED (masuk M11). M10 ditutup, siap M11 (Production Deployment). Karena laporan berada di folder `reports/` yang di-ignore sebagian, file ini di-commit via force-add sesuai kebutuhan Closure.
 
 ### M6 - Universal External Connector (5 canonical connector)
 - **HTTP Connector (`canonical_http_connector.py`)** - GET real ke JSONPlaceholder + httpbin, 200+JSON valid, gate+verify+audit.

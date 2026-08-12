@@ -153,6 +153,7 @@ Fokus beralih dari "Can SAM do X?" ke "Can SAM operate safely and accountably?".
 - **M10-007 Persistence** — `store.py` (JSON atomik) + service persist/recover: restart TIDAK menghilangkan truth; secret tak pernah di-persist; store OPT-IN. `test_m10_007_persistence.py` 7/7 PROVEN.
 - **M10-008 Production E2E Certification** — satu mission utuh Browser->UI->Service->Governance->Approval->HTTP->GitHub->Verify->Artifact->Audit->Learning dgn **restart + failure injection + retry** di acceptance test. **REAL PROVEN (dgn token): issue GitHub NYATA via jalur kanonik, restart recover truth. SAM Production Operational Readiness PROOF.** `test_m10_008_production_e2e.py` 3/3 PROVEN.
 - Regression M10+UX+application **75 passed**; execution_runtime **358 passed / 7 skipped / 2 xfailed** (tanpa regresi).
+- **FORMAL CLOSURE M10** (2026-08-12): Production Operational Readiness Report — `docs/engineering/reports/M10_Production_Operational_Readiness_Report.md`. 10 item dinilai **PROVEN** atau **EXPLICITLY BLOCKED/DEFERRED** jujur; Deployment Readiness = BLOCKED (masuk M11). Readiness mencapai Trusted (sebagian Learning), **belum Certified** — menunggu M11. **Next: M11 Production Deployment** (Deployment/PostgreSQL/Secrets/Identity/Guardian/Production E2E).
 
 ---
 
