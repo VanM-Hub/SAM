@@ -41,6 +41,19 @@ _DEFAULT_MASTER_KEY = os.path.join(
 PG_DSN_ENV = "SAM_PG_DSN"
 _PG_DEFAULT_DSN = "host=127.0.0.1 port=5432 dbname=sam user=sam"
 
+# env mode produksi (fail-closed secret enforcement)
+PRODUCTION_ENV = "SAM_ENV"
+PRODUCTION_VALUE = "production"
+
+
+class SecretUnavailableError(RuntimeError):
+    """Secret tidak dapat diperoleh dalam mode ketat (produksi).
+
+    Dipakai untuk fail-closed: bila secret store wajib tapi tidak bisa
+    dipakai / master key hilang / decrypt gagal / key tak ada -> BLOCKED,
+    bukan fallback diam-diam ke env.
+    """
+
 
 class InternalSecretAudit:
     """Audit minimal akses secret (masked saja, tanpa raw)."""
@@ -80,6 +93,7 @@ class PgSecretProvider(SecretProvider):
         env: Optional[Dict[str, str]] = None,
         master_key_path: Optional[str] = None,
         allow_auto_key: bool = True,
+        strict: Optional[bool] = None,
     ) -> None:
         super().__init__(env=env)
         self._env = env if env is not None else os.environ
@@ -89,18 +103,43 @@ class PgSecretProvider(SecretProvider):
             or self._env.get(MASTER_KEY_FILE_ENV)
             or _DEFAULT_MASTER_KEY
         )
+        # strict: bila None, deteksi dari SAM_ENV=production (fail-closed)
+        if strict is None:
+            strict = self._env.get(PRODUCTION_ENV) == PRODUCTION_VALUE
+        self._strict = bool(strict)
+        self._allow_auto_key = bool(allow_auto_key)
         self._fernet: Optional[Fernet] = None
         self._audit = InternalSecretAudit()
 
-    # --- master key / kripto ---
+    def is_strict(self) -> bool:
+        """True bila mode ketat (produksi) sedang aktif."""
+        return self._strict
+
     def _load_or_create_key(self) -> bytes:
-        """Load master key dari file; auto-generate bila belum ada (sekali)."""
+        """Load master key dari file.
+
+        strict=True: file Wajib ada -> bila hilang RAISE SecretUnavailableError
+        (BLOCKED, bukan auto-gen). dev (strict=False): auto-generate bila belum
+        ada (perilaku lama).
+        """
         path = os.path.expanduser(self._master_key_path)
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as fh:
                 raw = fh.read().strip()
             if raw:
                 return raw.encode("utf-8")
+            if self._strict:
+                raise SecretUnavailableError(
+                    f"master key file kosong (BLOCKED, produksi): {path}"
+                )
+        if self._strict:
+            raise SecretUnavailableError(
+                f"master key file tidak ada (BLOCKED, produksi): {path}"
+            )
+        if not self._allow_auto_key:
+            raise SecretUnavailableError(
+                f"master key file tidak ada & auto-gen dimatikan: {path}"
+            )
         # generate key baru (Fernet key berbasis urlsafe base64, 32 byte)
         key = Fernet.generate_key()
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -193,17 +232,33 @@ class PgSecretProvider(SecretProvider):
 
     # --- kontrak SecretProvider ---
     def get(self, key: str) -> Optional[str]:
-        """Ambil secret: store (dekripsi) dulu; fallback ke env bila tak ada."""
+        """Ambil secret: store (dekripsi) dulu.
+
+        strict=True (produksi): store WAJIB. Bila store tidak tersedia /
+        key tidak ada di store / decrypt gagal -> RAISE SecretUnavailableError
+        (BLOCKED). TIDAK fallback ke env diam-diam.
+        strict=False (dev): fallback ke env bila tak ada di store (perilaku lama).
+        """
         stored = self._store_get(key)
         if stored is not None:
             try:
                 value = self._decrypt(stored)
             except InvalidToken:
                 self._audit.append(key, "get", "decrypt_failed")
+                if self._strict:
+                    raise SecretUnavailableError(
+                        f"secret decrypt gagal (BLOCKED, produksi): {key}"
+                    )
                 return None
             self._audit.append(key, "get", "store")
             return value
-        # fallback env (kompatibilitas / migrasi bertahap)
+        if self._strict:
+            # store tak punya key ini -> fail-closed, jangan bocorkan env
+            self._audit.append(key, "get", "blocked_missing")
+            raise SecretUnavailableError(
+                f"secret tidak ada di store (BLOCKED, produksi): {key}"
+            )
+        # dev: fallback env (kompatibilitas / migrasi bertahap)
         value = self._env.get(key)
         if value is not None:
             self._audit.append(key, "get", "env")
@@ -212,13 +267,34 @@ class PgSecretProvider(SecretProvider):
         return value
 
     def has(self, key: str) -> bool:
+        if self._strict:
+            # strict: "ada" berarti BISA dibaca dari store secara aman
+            try:
+                stored = self._store_get(key)
+            except Exception:
+                return False
+            if stored is None:
+                return False
+            try:
+                self._decrypt(stored)
+                return True
+            except InvalidToken:
+                return False
         return self.get(key) is not None
 
     def resolve_all(self, keys: list) -> Dict[str, str]:
-        return {k: self._env[k] for k in keys if k in self._env and self.get(k)}
+        out = {}
+        for k in keys:
+            v = self.get(k)  # strict akan raise bila tak tersedia
+            if v is not None:
+                out[k] = v
+        return out
 
     def required(self, key: str) -> str:
-        value = self.get(key)
+        try:
+            value = self.get(key)
+        except SecretUnavailableError:
+            raise
         if not value:
             raise KeyError(f"required secret missing: {key}")
         return value
