@@ -44,10 +44,32 @@ try:
     _HAS_PG = True
 except Exception:  # pragma: no cover - psycopg2 tidak terpasang
     _HAS_PG = False
+# M12-001: Repository Pattern — persistence per-entity opsional. Bila ada
+# `persistence` (PersistenceUnit), state/source-of-truth ditulis per-entity ke
+# repository (per mission_id) agar multi-mission & survive restart. Default:
+# tanpa persistence -> perilaku in-memory/JSON lama (regresi M10 aman).
+try:  # pragma: no cover - import opsional bila jalur repo tidak tersedia
+    from sam.application.ux.persistence import build_persistence_unit
+    from sam.application.ux import repositories as _repositories
+    _HAS_REPO = True
+except Exception:  # pragma: no cover
+    _HAS_REPO = False
 
 
 # Repo test default untuk GitHub mutation (repo TEST, bukan production).
 DEFAULT_TEST_REPO = "VanM-Hub/test-issues"
+
+
+def _blocked_state(reason: str) -> "UxMissionState":
+    """Buat UxMissionState berstatus BLOCKED (M12-004/005 fail-closed).
+    Dipakai saat produksi tidak siap (PG down / tidak ada persistence yang
+    sah), agar operasi baru TIDAK berjalan & state menunjukkan alasan jelas."""
+    st = UxMissionState()
+    st.status = str(UxStateStatus.BLOCKED)
+    st.failure_kind = "persistence-required"
+    st.failure_message = reason
+    st.approval_status = "blocked"
+    return st
 
 
 class MissionUXService:
@@ -58,6 +80,7 @@ class MissionUXService:
         test_repo: str = DEFAULT_TEST_REPO,
         artifact_dir: str = "docs/engineering/reports",
         store: Optional["MissionStore"] = None,
+        persistence: Optional["object"] = None,
     ) -> None:
         self._test_repo = test_repo or DEFAULT_TEST_REPO
         self._artifact_dir = artifact_dir
@@ -67,15 +90,40 @@ class MissionUXService:
         self._state: Optional[UxMissionState] = None
         self._last_result: Optional[Dict[str, Any]] = None
         self._audit: List[Dict[str, Any]] = []
+        # M12-001: PersistenceUnit opsional (Repository Pattern). Bila diberikan
+        # (atau env PG/produksi dikonfigurasi), state ditulis per-entity ke repo.
+        # M12-004/005: produksi (SAM_ENV=production) WAJIB PG ready; bila tidak
+        # siap -> fail-closed (BLOCKED, tanpa fallback diam-diam ke in-memory).
+        self._production_blocked = False
+        self._persistence = getattr(self, "_persistence", None)
+        if persistence is not None:
+            self._persistence = persistence
+        elif _HAS_REPO:
+            _unit, _info = build_persistence_unit()
+            if _info.get("production"):
+                if not _info.get("ready", True):
+                    # Produksi fail-closed: PG tidak siap -> jangan fallback.
+                    self._persistence = None
+                    self._production_blocked = True
+                    if getattr(self, "_state", None) is None:
+                        self._state = _blocked_state(_info.get("reason", "persistence unavailable"))
+                else:
+                    self._persistence = _unit
         # M10-007: persistensi — restart TIDAK menghilangkan operational truth.
         # M11-002: bila SAM_PG_DSN diset (produksi), pakai PostgreSQL; selain itu JSON.
+        # M12-005: saat produksi fail-closed (PG down), JANGAN mencoba konek ke PG
+        # utk _store snapshot — pakai store in-memory KOSONG (operasi tetap diblokir
+        # oleh guard di atas; tidak ada fallback diam-diam untuk truth).
         if store is not None:
             self._store = store
+        elif self._production_blocked:
+            self._store = MissionStore()
         elif _HAS_PG and os.environ.get("SAM_PG_DSN"):
             self._store = PostgresMissionStore(dsn=os.environ["SAM_PG_DSN"]).enable()
         else:
             self._store = MissionStore()
         self._idem: Dict[str, Dict[str, Any]] = {}  # {key: {request_id, text}}
+        self._repo_recovered = False  # M12-003: repo jadi source truth audit/idem
         self._recover_from_store()
 
     # ------------------------------------------------------------------
@@ -85,6 +133,16 @@ class MissionUXService:
         """Restore state mission terakhir dari disk (recovery setelah restart).
         Membangun kembali UxMissionState dari dict yang dipersist. Dipanggil
         dalam __init__; saling toleran bila file belum ada / korup."""
+        # M12-001: bila ada PersistenceUnit, coba pulihkan dari repository
+        # per-entity (source of truth = PG/multi-mission).
+        if self._persistence is not None:
+            try:
+                self._recover_from_repository()
+            except Exception:  # pragma: no cover
+                self._state = None
+                self._audit = []
+            if self._state is not None:
+                return
         data = self._store.load()
         if not data:
             return
@@ -122,13 +180,23 @@ class MissionUXService:
             # File korup / versi lama -> mulai bersih, truth tetap aman (0 aksi).
             self._state = None
         # Restore audit trail (sanitized).
-        self._audit = [dict(e) for e in (data.get("audit") or [])]
-        # Restore idempotency map (request_id + text) utk mencegah retry ganda.
-        for k, v in (data.get("idem") or {}).items():
-            self._idem[k] = dict(v)
+        # Restore audit trail (sanitized). Hanya dari JSON bila repo TIDAK
+        # menjadi sumber (M12-003: repo lebih baru & benar).
+        if not self._repo_recovered:
+            self._audit = [dict(e) for e in (data.get("audit") or [])]
+            # Restore idempotency map (request_id + text) utk cegah retry ganda.
+            for k, v in (data.get("idem") or {}).items():
+                self._idem[k] = dict(v)
 
     def _persist(self) -> None:
-        """Snapshot state mission + audit + idem ke disk (tanpa secret)."""
+        """Snapshot state mission + audit + idem ke disk (tanpa secret).
+        Bila PersistenceUnit ada (M12-001), state juga ditulis per-entity ke
+        repository per mission_id — sehingga multi-mission & survive restart."""
+        if self._state is not None and self._persistence is not None:
+            try:
+                self._persist_entities()
+            except Exception:  # pragma: no cover — jangan blokir jalur lama
+                pass
         if self._state is None:
             return
         payload = {
@@ -142,11 +210,115 @@ class MissionUXService:
         }
         self._store.save(payload)
 
+    # ----------------------------------------------------------------
+    # M12-001 — per-entity persistence ke repository (bila PersistenceUnit ada)
+    # ----------------------------------------------------------------
+    def _persist_entities(self) -> None:
+        """Tulis state mission + execution + approval + audit utk mission saat
+        ini ke repository per-entity (per mission_id), sehingga mission dapat
+        hidup bersamaan tanpa overwrite dan survive restart."""
+        if self._state is None or self._persistence is None:
+            return
+        st = self._state
+        mission_id = (st.observability or {}).get("mission_id") or st.request_id
+        if not mission_id:
+            mission_id = st.request_id or "mission-unknown"
+        self._persistence.missions.save_mission(
+            mission_id, st.as_dict(),
+        )
+        exec_id = (st.observability or {}).get("execution_id")
+        if exec_id:
+            self._persistence.executions.save_execution(
+                exec_id,
+                {
+                    "mission_id": mission_id,
+                    "status": st.status,
+                    "failure_kind": st.failure_kind,
+                    "request_id": st.request_id,
+                    "updated_at": st.updated_at,
+                },
+            )
+        # idempotency keys -> persistent (M12-002 base)
+        for k, v in self._idem.items():
+            self._persistence.idempotency.save_idempotency(
+                k, {"request_id": v.get("request_id", ""), "text": v.get("text", "")},
+                mission_id,
+            )
+
+    def _recover_from_repository(self) -> None:
+        """Pulihkan state mission + audit + idempotency dari repository (per-entity).
+        Mengambil mission terakhir yang tersimpan; tolerance bila belum ada.
+        Audit & idempotency dipulihkan SECARA INDEPENDEN dari ada/tidaknya
+        mission — sehingga keduanya survive restart walau mission kosong."""
+        if self._persistence is None:
+            return
+        # Restore audit trail dari repository (selalu, terlepas dari mission)
+        try:
+            self._audit = self._persistence.audit.load_audit()
+        except Exception:  # pragma: no cover
+            self._audit = []
+        # Restore idempotency map dari repository (M12-002 base; selalu)
+        try:
+            self._idem = {}
+            for k in self._persistence.idempotency.list_keys():
+                rec = self._persistence.idempotency.load_idempotency(k)
+                if rec:
+                    self._idem[k] = {"request_id": rec.get("request_id", ""), "text": rec.get("text", "")}
+        except Exception:  # pragma: no cover
+            self._idem = {}
+        # Tandai: repo sudah jadi sumber audit & idempotency, agar JSON store
+        # (fallback) TIDAK menimpanya di _recover_from_store.
+        self._repo_recovered = True
+        # Restore mission terakhir (bila ada)
+        missions = self._persistence.missions.list_missions()
+        if not missions:
+            return
+        last_id = missions[-1]
+        state_dict = self._persistence.missions.load_mission(last_id)
+        if not state_dict:
+            return
+        try:
+            st = UxMissionState()
+            st.request_id = state_dict.get("request_id", "")
+            st.request_text = state_dict.get("request", "")
+            st.what_sam_understood = (state_dict.get("understanding") or {}).get(
+                "what_sam_understood", "")
+            st.operation = (state_dict.get("understanding") or {}).get("operation", "")
+            st.target = (state_dict.get("understanding") or {}).get("target", "")
+            plan = state_dict.get("plan") or {}
+            st.planned_steps = list(plan.get("planned_steps", []))
+            st.approval_required = bool(plan.get("approval_required"))
+            st.action_summary = plan.get("action_summary", "")
+            appr = state_dict.get("approval") or {}
+            st.approval_status = appr.get("status", "")
+            st.approval_decision = appr.get("decision")
+            ex = state_dict.get("execution") or {}
+            st.status = ex.get("status", "")
+            st.failure_kind = ex.get("failure_kind", "")
+            st.failure_message = ex.get("failure_message", "")
+            st.result_summary = ex.get("result_summary", "")
+            st.evidence = list(state_dict.get("evidence", []))
+            st.artifact_ref = state_dict.get("artifact_ref", "")
+            st.audit_ref = state_dict.get("audit_ref", "")
+            st.timeline = list(state_dict.get("timeline", []))
+            st.observability = dict(state_dict.get("observability", {}) or {})
+            st.updated_at = state_dict.get("updated_at", st.updated_at)
+            self._state = st
+        except Exception:  # pragma: no cover
+            self._state = None
+
     # ------------------------------------------------------------------
     # 1) submit — terima request manusia, SAM pahami, susun rencana, TARUH
     #    di WAITING_APPROVAL. Tidak ada eksekusi di sini.
     # ------------------------------------------------------------------
     def submit(self, text: str, idempotency_key: Optional[str] = None) -> UxMissionState:
+        # M12-005: Fail-closed produksi — bila persistence PG tidak siap,
+        # tolak mission baru (0 operasi, 0 side effect).
+        if self._production_blocked:
+            st = self._state if (self._state and self._state.status == str(UxStateStatus.BLOCKED)) \
+                else _blocked_state("Fail-closed: persistence produksi tidak siap")
+            self._state = st
+            return st
         # M10-005: Idempotency-Key identical -> kembalikan state yg SAMA
         # (same logical operation), TIDAK membuat mission baru. Retry (mis.
         # karena network timeout) dengan key sama TIDAK menimbulkan operasi
@@ -236,6 +408,13 @@ class MissionUXService:
     # 2) decide — user klik Approve/Reject (M9-003). Real gate.
     # ------------------------------------------------------------------
     def decide(self, intent: ApprovalDecisionIntent, approver: str = "user") -> UxMissionState:
+        # M12-005: Fail-closed produksi — tolak keputusan bila persistence
+        # produksi tidak siap (tidak boleh lanjut ke eksekusi).
+        if self._production_blocked:
+            st = self._state if (self._state and self._state.status == str(UxStateStatus.BLOCKED)) \
+                else _blocked_state("Fail-closed: persistence produksi tidak siap")
+            self._state = st
+            return st
         if self._state is None or self._request is None or self._plan is None:
             raise RuntimeError("tidak ada mission yang sedang menunggu approval")
 
