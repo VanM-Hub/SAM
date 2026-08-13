@@ -174,7 +174,7 @@
    Federation         ✓   (SAM 4.0 - Federated Governance Platform - release v4.0.0, 2026-08-10 - ARCHITECTURE ACCEPTED, CA verdict: 4.1 CLOSED, 4.2..4.6 ACCEPTED)
    Universal Governance ✓ (SAM 5.x - release v5.0.0, 2026-08-10; v5.1.0 Self-Preservation 2026-08-13)
 ```
-> Fase: **Self-Preservation (M12)** — durable state + idempotency + restart safety; NSSM service + external watchdog; PostgreSQL persistent + fail-closed; secret manager terenkripsi + identity/auth; multi-mission isolation; backup/restore terenkripsi; failure-injection matrix. M12-016 24h test berjalan (verify besok). HTTPS lokal SELESAI (Caddy self-signed 8443); secure cookie TERBUKTI; autostart Caddy PENDING (UAC).
+> Fase: **Self-Preservation (M12)** - durable state + idempotency + restart safety; NSSM service + external watchdog; PostgreSQL persistent + fail-closed; secret manager terenkripsi + identity/auth; multi-mission isolation; backup/restore terenkripsi; failure-injection matrix. M12-016 12h test berjalan (verify 14 Agu 10:23 WITA, keputusan Van kurangi 24h->12h). HTTPS lokal SELESAI (Caddy self-signed 8443); secure cookie TERBUKTI; autostart Caddy PENDING (UAC).
 > Observability: Observation Layer (C-Phase 1-4) sudah observasi 5 pipeline + Platform Intelligence (C6-C10) secara read-only (M3).
 > Program C **CLOSED** (Verdict EA-C06); M3 Observable Platform tercapai.
 > **Program D (MISSION-2D) EA-002 Production Readiness Implementation SELESAI** - Verdict EA-002/EA-003; Official Order P1-P5. **Kelima High gap DONE** (H1 portable + H5 IAM + H2 recovery + H3 deploy rollback + H4 operational alerting; modul sam/iam + sam/recovery + sam/deploy_rollback + sam/operational_alerting; 8+30+23+24+25 test). EA-002 Implementation COMPLETE, menunggu Verdict Lead Engineer. Menuju Production Platform (M4).
@@ -265,7 +265,7 @@
    │     tools/sam_watchdog.py      — deteksi dead/unhealthy/not-ready/restart-loop
    │     tools/sam_backup.py        — backup PG+identity terenkripsi (Fernet)+retention+integrity
    │     tools/sam_restore.py       — restore dari archive (integrity pre-check, --clean)
-   │     tools/m12_016_24h_test.py  — baseline/seed/verify 24h mission test
+   │     tools/m12_016_24h_test.py  - baseline/seed/verify 12h mission test
    └── History       (docs/history/ — arsip, bukan authority)
 ```
 

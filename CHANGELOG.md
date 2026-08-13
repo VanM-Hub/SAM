@@ -6,7 +6,7 @@
 
 ## SAM 5.1.0 (2026-08-13) - M12 Self-Preservation (Production-Operational Ready)
 
-SAM “tahan banting” untuk operasi produksi nyata: durable state, idempotency, restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix. (M12-016 24h test berjalan otomatis via Task Scheduler; certified besok setelah verify.)
+SAM "tahan banting" untuk operasi produksi nyata: durable state, idempotency, restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix. (M12-016 12h test berjalan otomatis via Task Scheduler; certified setelah verify 14 Agu 10:23 WITA.)
 
 ### M12 P0 (M12-001..005) - Durable State + Idempotency + Restart Safety + Prod Persistence + Fail-Closed
 - **M12-001 Repository Persistence** - `repositories.py` + `build_persistence_unit`: persistence per-entity (mission/approval/execution/evidence/audit), PostgreSQL via `pgstore.py` (SAM_PG_DSN), JSON default. `_recover_from_repository` restore truth saat restart. **PROVEN.**
@@ -31,11 +31,11 @@ SAM “tahan banting” untuk operasi produksi nyata: durable state, idempotency
 - Service SAM -> **SERVICE_AUTO_START**; env produksi `SAM_ENV=production` + `SAM_PG_DSN` + `SAM_ENABLE_PG_SECRETS=1`; `/health/ready` 200 `persistence=ready`. Task `SAM-Watchdog` tiap 5 menit -> live `code=0 OK`.
 - **HTTPS lokal SELESAI (2026-08-13, self-signed, tanpa domain)**: Caddy v2.11.4 (binary di PC, LUAR repo, folder tools Zara) sebagai reverse proxy `tls internal` `https://localhost:8443 -> 127.0.0.1:8080`. **Secure cookie M12-011 TERBUKTI end-to-end**: login produksi via HTTPS => `Set-Cookie: sam_session=...; HttpOnly; Path=/; SameSite=lax; Secure` (flag `Secure` aktif karena `SAM_ENV=production` + koneksi HTTPS). `/health/ready` via HTTPS 8443 = 200 `persistence:ready`. **Caddy tidak menjadi dependency SAM** — HTTPS = lapisan opsional reverse-proxy per-deploy; SAM tetap HTTP di 8080 & portable. **Autostart Caddy (service/task) PENDING** — butuh admin (UAC) yang belum tersedia di sesi ini; untuk sekarang jalan manual via `_start_caddy.bat`.
 
-### M12 P3 (M12-013..017) - Backup / Restore / Failure Injection / 24h / Certification
+### M12 P3 (M12-013..017) - Backup / Restore / Failure Injection / 12h / Certification
 - **M12-013 Backup** - `tools/sam_backup.py`: archive terenkripsi Fernet (PG dump semua tabel + identity users.json), retention (N terakhir), integrity check (sha256 + decrypt + zip + truth). **Terbukti real vs PG produksi: `code=0 BACKUP OK integrity OK`.** Commit `1752a3f`.
 - **M12-014 Restore Drill** - `tools/sam_restore.py`: integrity pre-check (archive rusak/kunci salah DITOLAK), restore `--clean`, verify pasca-restore; identity HANYA ditimpa eksplisit. **Terbukti real sandbox `sam_restoredrill`: truth mission_state identik byte-per-byte dgn produksi.** Commit `05d90b1`.
 - **M12-015 Failure Injection Matrix** - 8 test unit (crash/corrupt state/disk pressure/secret down/invalid credential/duplicate/PG down fail-closed) + **failure injection NYATA: stop PG -> `/health/ready` 503 + submit 422 BLOCKED + service RUNNING; start PG -> ready 200 + truth survive.** Commit `9ea9c2e`.
-- **M12-016 24-Hour Test** - harness `tools/m12_016_24h_test.py`: baseline + seed (restart terkontrol) + verify (NO LOST TRUTH/NO DUPLICATE/NO UNOBSERVED FAILURE/NO UNSAFE CONTINUATION/PERIOD 24h). **BERJALAN** (baseline 2026-08-13 22:23 WITA; verify 14 Agu 22:54 WITA otomatis). Commit `1bb70be`.
+- **M12-016 12-Hour Test** - harness `tools/m12_016_24h_test.py`: baseline + seed (restart terkontrol) + verify (NO LOST TRUTH/NO DUPLICATE/NO UNOBSERVED FAILURE/NO UNSAFE CONTINUATION/PERIOD 12h). **BERJALAN** (baseline 2026-08-13 22:23 WITA; verify 14 Agu 10:23 WITA otomatis via Task Scheduler `SAM-M12-016-B12-Verify`). Commit `1bb70be`. **Catatan kontrak:** periode dikurangi 24h -> 12h atas keputusan Van (2026-08-13); task lama 24h tak bisa di-disable dari sesi non-admin (owner admin) jadi dibiarkan sbg bayangan (verify idempotent & tetap PASS saat lewat 12h).
 - **M12-017 Certification** - menunggu M12-016 verify (besok).
 - **Catatan jujur:** `docs/engineering/state/` di-`.gitignore` (state runtime produksi bukan repo); baseline M12-016 tersimpan lokal.
 

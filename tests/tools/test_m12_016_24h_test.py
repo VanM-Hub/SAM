@@ -1,16 +1,16 @@
-"""test_m12_016_24h_test.py — M12-016 24-Hour Mission Test harness.
+"""test_m12_016_24h_test.py — M12-016 12-Hour Mission Test harness.
 
-Kontrak M12-016: Operator tak sentuh SAM 24 jam + controlled failure.
+Kontrak M12-016: Operator tak sentuh SAM 12 jam + controlled failure.
   NO LOST TRUTH / NO DUPLICATE / NO UNOBSERVED FAILURE /
   NO UNSAFE CONTINUATION / NO MANUAL RECOVERY.
 
 Cakupan unit (mock psql/urllib agar deterministik; TIDAK butuh docker):
   - cmd_begin : baseline tersimpan ke state-dir dgn counts + idempotency.
   - cmd_verify PASS bila: truth konsisten, idem konsisten, ready 200,
-    tidak ada execution running, periode >= 24 jam.
+    tidak ada execution running, periode >= 12 jam.
   - cmd_verify FAIL bila ada: lost truth (count berkurang), duplicate
     (request_id berubah), unobserved failure (ready != 200), unsafe
-    continuation (execution running), atau periode < 24 jam (jujur).
+    continuation (execution running), atau periode < 12 jam (jujur).
 """
 from __future__ import annotations
 
@@ -62,8 +62,8 @@ def test_begin_records_baseline(m, tmp_path, monkeypatch):
     assert bl["idempotency"]["k1"] == "req-A"
 
 
-def test_verify_pass_24h_consistent(m, tmp_path, monkeypatch):
-    started = "2000-01-01T00:00:00+00:00"  # jauh >24 jam lalu
+def test_verify_pass_12h_consistent(m, tmp_path, monkeypatch):
+    started = "2000-01-01T00:00:00+00:00"  # jauh >12 jam lalu
     counts = {"mission_store": 1, "sam_audit": 0, "sam_idempotency": 1}
     _write_baseline(str(tmp_path), m, started, counts, {"k1": "req-A"})
     # kini state sama dgn baseline
@@ -72,7 +72,7 @@ def test_verify_pass_24h_consistent(m, tmp_path, monkeypatch):
     monkeypatch.setattr(m, "_readiness", lambda: {"code": 200, "body": "ready"})
     monkeypatch.setattr(m, "_unsafe_running_executions", lambda: 0)
     rc = m.cmd_verify(type("A", (), {"state_dir": str(tmp_path)})())
-    assert rc == 0  # PASS (semua konsisten + 24h)
+    assert rc == 0  # PASS (semua konsisten + 12h)
 
 
 def test_verify_fail_lost_truth(m, tmp_path, monkeypatch):
@@ -115,8 +115,8 @@ def test_verify_fail_unobserved_failure(m, tmp_path, monkeypatch):
     assert rc == 1  # FAIL
 
 
-def test_verify_fail_period_not_24h(m, tmp_path, monkeypatch):
-    # baseline dibuat 1 jam yg lalu -> elapsed < 24 jam -> PERIOD_24H FAIL
+def test_verify_fail_period_not_12h(m, tmp_path, monkeypatch):
+    # baseline dibuat 1 jam yg lalu -> elapsed < 12 jam -> PERIOD_12H FAIL
     from datetime import datetime, timedelta, timezone
     started = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
     counts = {"mission_store": 1, "sam_audit": 0, "sam_idempotency": 1}
@@ -125,6 +125,6 @@ def test_verify_fail_period_not_24h(m, tmp_path, monkeypatch):
     monkeypatch.setattr(m, "_idempotency_snapshot", lambda: {"k1": "req-A"})
     monkeypatch.setattr(m, "_readiness", lambda: {"code": 200, "body": "ready"})
     monkeypatch.setattr(m, "_unsafe_running_executions", lambda: 0)
-    # elapsed ~1 jam < 24 -> FAIL (jujur: belum lewat periode 24 jam)
+    # elapsed ~1 jam < 12 -> FAIL (jujur: belum lewat periode 12 jam)
     rc = m.cmd_verify(type("A", (), {"state_dir": str(tmp_path)})())
-    assert rc == 1  # belum lolos periode 24 jam
+    assert rc == 1  # belum lolos periode 12 jam

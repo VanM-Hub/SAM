@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-"""m12_016_24h_test.py — M12-016 24-Hour Mission Test harness (proses terpisah).
+"""m12_016_24h_test.py — M12-016 12-Hour Mission Test harness (proses terpisah).
 
-Kontrak M12-016: Operator tak sentuh SAM selama 24 jam + controlled failure.
+Kontrak M12-016: Operator tak sentuh SAM selama 12 jam + controlled failure.
   NO LOST TRUTH / NO DUPLICATE / NO UNOBSERVED FAILURE /
   NO UNSAFE CONTINUATION / NO MANUAL RECOVERY.
 
@@ -15,7 +15,7 @@ Mode:
   --seed       : injeksi failure TERKONTROL: `sc stop SAM` + `sc start SAM`
                  (service SAM restart). Harus dijalankan oleh operator/Task
                  Scheduler utk menguji recovery tanpa sentuhan manual.
-  --verify     : setelah periode (default >=24 jam sejak baseline) bandingkan
+  --verify     : setelah periode (default >=12 jam sejak baseline) bandingkan
                  state saat ini vs baseline:
                    - NO LOST TRUTH: tiap truth baseline masih ADA & value konsisten
                      (mission/execution/approval/audit/evidence/idempotency).
@@ -199,12 +199,12 @@ def cmd_verify(args) -> int:
                     f"running_exec={unsafe}"))
 
     # durasi minimal (periode jujur)
-    results.append(("PERIOD_24H", elapsed_h >= 24.0,
+    results.append(("PERIOD_12H", elapsed_h >= 12.0,
                     f"elapsed_h={elapsed_h:.1f}"))
 
     fails = [r for r in results if not r[1]]
     all_pass = not fails
-    print(f"[code={0 if all_pass else 1}] VERIFY 24H test "
+    print(f"[code={0 if all_pass else 1}] VERIFY 12H test "
           f"(elapsed {elapsed_h:.1f}h) -> "
           f"{'PASS' if all_pass else 'FAIL'}", flush=True)
     for name, ok, info in results:
@@ -213,7 +213,7 @@ def cmd_verify(args) -> int:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="M12-016 24h test harness")
+    ap = argparse.ArgumentParser(description="M12-016 12h test harness")
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--begin", action="store_true")
     g.add_argument("--seed", action="store_true")
