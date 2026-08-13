@@ -50,7 +50,7 @@ menghasilkan platform **Deterministic Operational Intelligence** yang:
 Lalu ditutup dengan MISSION-4.6 (Human Operational Experience) dan **Architecture Accepted** oleh Chief
 Architect (2026-08-10). Platform kini memasuki **SAM 5 - Universal Governance Platform** sesuai Roadmap.
 >
-> **Status SAM 5.x (2026-08-10):** MISSION-5.1..5.6 **sedang diimplementasikan (Work In Progress)** di atas baseline SAM 4.0. Enam bounded context universal citizen telah dibangun (universal_ai, universal_tool, universal_agent, universal_workflow, enterprise_governance, adaptive_governance), 82 test baru, full regression green (4817 passed). Authority tetap di manusia (Adaptive Governance hanya belajar/mengevaluasi/merekomendasikan).
+> **Status SAM 5.x (2026-08-13):** MISSION-5.1..5.6 terimplementasi di atas baseline SAM 4.0 (Universal Governance). **rilis v5.0.0 (2026-08-10) + M12 Self-Preservation v5.1.0 (2026-08-13)**. M12 membuat SAM “tahan banting” untuk operasi produksi: durable state + idempotency + restart safety (PostgreSQL persistent + fail-closed), secret manager terenkripsi + identity/auth, multi-mission isolation, NSSM Windows Service + external watchdog, backup/restore terenkripsi (Fernet), dan failure-injection matrix (crash/PG-down/secret-down/corrupt/disk/duplicate — termasuk injeksi PG-down nyata terhadap produksi: /health/ready 503 + BLOCKED, pulih ke ready 200 setelah PG up, truth survive). **M12-016 (24h mission test) berjalan otomatis via Task Scheduler (verify 2026-08-14 22:54 WITA).** **HTTPS (secure cookie produksi) PENDING** — reverse proxy/self-signed cert belum terpasang.
 
 
 ### Ringkasan Fase I–XXIII (0.01 → 0.23)

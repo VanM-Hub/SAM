@@ -168,12 +168,13 @@
    Specification      ✓
    Reference Runtime  ✓
    Engineering        ✓   (S01-S10 selesai; Program A/B/C closed)
-   Operationalization ◉  ← KAMU DI SINI (M3 Observable Platform; 6 capability active)
+   Operationalization ◉  ← KAMU DI SINI (M12 Self-Preservation; produksi operational-ready)
    Production         ✓   (SAM 2.0 COMPLETE - Program A-F finished, M1-M6 achieved, Milestone M6 ACHIEVED)
    Ecosystem          ✓   (SAM 3.x COMPLETE 6/6 - release v3.6.0, 2026-08-09)
    Federation         ✓   (SAM 4.0 - Federated Governance Platform - release v4.0.0, 2026-08-10 - ARCHITECTURE ACCEPTED, CA verdict: 4.1 CLOSED, 4.2..4.6 ACCEPTED)
+   Universal Governance ✓ (SAM 5.x - release v5.0.0, 2026-08-10; v5.1.0 Self-Preservation 2026-08-13)
 ```
-> Fase: **Product Integration & Operationalization** (Tahap 2). Execution = CANONICAL (RealExecutionHarness, data real, ADR-024 resolved via P2-B gate).
+> Fase: **Self-Preservation (M12)** — durable state + idempotency + restart safety; NSSM service + external watchdog; PostgreSQL persistent + fail-closed; secret manager terenkripsi + identity/auth; multi-mission isolation; backup/restore terenkripsi; failure-injection matrix. M12-016 24h test berjalan (verify besok). HTTPS (secure cookie produksi) PENDING.
 > Observability: Observation Layer (C-Phase 1-4) sudah observasi 5 pipeline + Platform Intelligence (C6-C10) secara read-only (M3).
 > Program C **CLOSED** (Verdict EA-C06); M3 Observable Platform tercapai.
 > **Program D (MISSION-2D) EA-002 Production Readiness Implementation SELESAI** - Verdict EA-002/EA-003; Official Order P1-P5. **Kelima High gap DONE** (H1 portable + H5 IAM + H2 recovery + H3 deploy rollback + H4 operational alerting; modul sam/iam + sam/recovery + sam/deploy_rollback + sam/operational_alerting; 8+30+23+24+25 test). EA-002 Implementation COMPLETE, menunggu Verdict Lead Engineer. Menuju Production Platform (M4).
@@ -260,7 +261,11 @@
    ├── Documentation (docs/ — authority + engineering(docs/engineering) + history)
    ├── Source        (src/sam/ — implementasi: world/legacy/backlog/infra)
    ├── Tests         (tests/ — folder baseline CI: unit + 8 runtime suites + observation layer C1-C10, 273 observation tests)
-   ├── Tools         (scripts/ — validasi; data/ — migrasi)
+   ├── Tools (OPS, proses terpisah, dijadwalkan Task Scheduler):
+   │     tools/sam_watchdog.py      — deteksi dead/unhealthy/not-ready/restart-loop
+   │     tools/sam_backup.py        — backup PG+identity terenkripsi (Fernet)+retention+integrity
+   │     tools/sam_restore.py       — restore dari archive (integrity pre-check, --clean)
+   │     tools/m12_016_24h_test.py  — baseline/seed/verify 24h mission test
    └── History       (docs/history/ — arsip, bukan authority)
 ```
 

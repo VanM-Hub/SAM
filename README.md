@@ -2,11 +2,13 @@
 
 The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
-**Versi:** SAM 4.1 - Universal Governance Platform (4.1.0) - MISSION-5.1..5.6 Implementation (Work In Progress)
+**Versi:** SAM 5.1 - Universal Governance Platform (5.1.0) - M12 Self-Preservation (Production-Operational Ready)
 
 Sejak v4.1.0, SAM memperluas platform melalui **Universal Governance (SAM 5.x)**: AI, Tool, Agent, dan Workflow diperlakukan sebagai **Citizen** yang di-govern via kontrak seragam, ditambah Enterprise Governance boundary dan Adaptive Governance (learning/simulation/impact/recommendation) di atasnya. Authority tetap di manusia.
 
 **M9 Productization (2026-08-12):** SAM kini punya *real user-facing operational path* via `src/sam/application/ux/` (`MissionUXService`). UI (browser) memanggil `/ux` endpoint → Application Service → ApprovalGate canonical → mission canonical → real external effect (GitHub, dst), tanpa executor kedua. Lihat `CHANGELOG.md` untuk detail M9.
+
+**M12 Self-Preservation (2026-08-13):** SAM “tahan banting” untuk operasi produksi — durable state + idempotency + restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix (crash/PG-down/secret-down/corrupt/disk/duplicate). Milestone M12-016 (24h test) sedang berjalan otomatis via Task Scheduler; detail di `CHANGELOG.md`.
 
 ---
 

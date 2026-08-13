@@ -4,6 +4,41 @@
 > **SAM 4.0.0 (2026-08-10) adalah rilis Federated Governance Platform terakhir yang Architecture Accepted**
 > (MISSION-4.1..4.6 COMPLETE).
 
+## SAM 5.1.0 (2026-08-13) - M12 Self-Preservation (Production-Operational Ready)
+
+SAM “tahan banting” untuk operasi produksi nyata: durable state, idempotency, restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix. (M12-016 24h test berjalan otomatis via Task Scheduler; certified besok setelah verify.)
+
+### M12 P0 (M12-001..005) - Durable State + Idempotency + Restart Safety + Prod Persistence + Fail-Closed
+- **M12-001 Repository Persistence** - `repositories.py` + `build_persistence_unit`: persistence per-entity (mission/approval/execution/evidence/audit), PostgreSQL via `pgstore.py` (SAM_PG_DSN), JSON default. `_recover_from_repository` restore truth saat restart. **PROVEN.**
+- **M12-002 Durable Idempotency** - idempotency key persist + dedup lintas-restart; retry TIDAK bikin mutation ganda. **PROVEN (real GitHub issue, tidak dobel).**
+- **M12-003 Restart Safety** - semua state lifecycle (SUBMITTED..REJECTED) survive kill+restart+restore+verify; restart BUKAN reset. **PROVEN.**
+- **M12-004 Production Persistence** - PG REQUIRED di produksi; PG down -> NOT READY; tanpa fallback in-memory diam-diam. **PROVEN.**
+- **M12-005 Fail-Closed Persistence** - PG/secret down -> READINESS BLOCKED; new mission BLOCKED; state TIDAK dihapus saat persistence gagal. **PROVEN (real: stop PG -> /health/ready 503, submit 422, service RUNNING; start PG -> ready 200, truth survive).**
+- Commit: `1fd5bf9`, `7b71936` (006+007), `e9051a4` (008), `adcd0bd` (009).
+
+### M12 P1 (M12-006..009) - Process Supervision + Health + Observability + Watchdog
+- **M12-006 Process Supervision** - SAM jadi Windows Service via NSSM; auto-restart crash; startup backoff; max-loop protection. Terbukti hidup.
+- **M12-007 Health/Readiness** - `/health` liveness + `/health/ready` fail-closed (PG down di produksi -> 503, bukan 200 palsu).
+- **M12-008 Observability** - `/metrics` Prometheus (baseline 500 -> 200; 10 telemetri executión).
+- **M12-009 External Watchdog** - `tools/sam_watchdog.py` (proses terpisah) deteksi dead/unhealthy/not-ready/restart-loop -> alert Event Log + log bounded. Task Scheduler tiap 5 menit.
+
+### M12 P2 (M12-010..012) - Secret Hardening + Identity + Multi-Mission
+- **M12-010 Secret Boundary Hardening** - produksi WAJIB secret store; master key hilang -> BLOCKED (`SecretUnavailableError`, bukan auto-gen / silent env fallback). Commit `173cc83`.
+- **M12-011 Identity Hardening** - secure cookie, CSRF, session TTL, revoke; auth mandatory di produksi; anonymous/expired/revoked/forged DENIED; cross-user DENIED. Commit `bdccb5b`.
+- **M12-012 Multi-Mission Isolation** - state di-key per `(tenant, mission_id, execution_id)` tanpa global authority; cross-tenant/mission tak dikenal -> KeyError. Commit `698d07f`.
+
+### M12 Deploy Produksi (2026-08-13, Van: "pasang")
+- Service SAM -> **SERVICE_AUTO_START**; env produksi `SAM_ENV=production` + `SAM_PG_DSN` + `SAM_ENABLE_PG_SECRETS=1`; `/health/ready` 200 `persistence=ready`. Task `SAM-Watchdog` tiap 5 menit -> live `code=0 OK`.
+- **HTTPS (secure cookie produksi) masih PENDING** (butuh reverse proxy/self-signed cert; belum terpasang).
+
+### M12 P3 (M12-013..017) - Backup / Restore / Failure Injection / 24h / Certification
+- **M12-013 Backup** - `tools/sam_backup.py`: archive terenkripsi Fernet (PG dump semua tabel + identity users.json), retention (N terakhir), integrity check (sha256 + decrypt + zip + truth). **Terbukti real vs PG produksi: `code=0 BACKUP OK integrity OK`.** Commit `1752a3f`.
+- **M12-014 Restore Drill** - `tools/sam_restore.py`: integrity pre-check (archive rusak/kunci salah DITOLAK), restore `--clean`, verify pasca-restore; identity HANYA ditimpa eksplisit. **Terbukti real sandbox `sam_restoredrill`: truth mission_state identik byte-per-byte dgn produksi.** Commit `05d90b1`.
+- **M12-015 Failure Injection Matrix** - 8 test unit (crash/corrupt state/disk pressure/secret down/invalid credential/duplicate/PG down fail-closed) + **failure injection NYATA: stop PG -> `/health/ready` 503 + submit 422 BLOCKED + service RUNNING; start PG -> ready 200 + truth survive.** Commit `9ea9c2e`.
+- **M12-016 24-Hour Test** - harness `tools/m12_016_24h_test.py`: baseline + seed (restart terkontrol) + verify (NO LOST TRUTH/NO DUPLICATE/NO UNOBSERVED FAILURE/NO UNSAFE CONTINUATION/PERIOD 24h). **BERJALAN** (baseline 2026-08-13 22:23 WITA; verify 14 Agu 22:54 WITA otomatis). Commit `1bb70be`.
+- **M12-017 Certification** - menunggu M12-016 verify (besok).
+- **Catatan jujur:** `docs/engineering/state/` di-`.gitignore` (state runtime produksi bukan repo); baseline M12-016 tersimpan lokal.
+
 ## Unreleased (2026-08-12) - M6 Operational Expansion + M7 Real Operational Work + M8 Credentialed Operational Integration
 
 ### M8 - Credentialed Operational Integration (2026-08-12)
