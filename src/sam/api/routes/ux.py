@@ -66,9 +66,18 @@ class UxRoutes:
         self.sessions = SessionStore()
 
     @property
+    def production(self) -> bool:
+        """True saat SAM_ENV=production (M12-011: auth mandatory + secure cookie)."""
+        return os.environ.get("SAM_ENV") == "production"
+
+    @property
     def auth_enabled(self) -> bool:
-        """AUTH aktif bila env SAM_ENABLE_AUTH=1. Dinamis agar test bisa set per-case."""
-        return os.environ.get("SAM_ENABLE_AUTH") == "1"
+        """AUTH aktif bila SAM_ENABLE_AUTH=1 ATAU produksi (M12-011 mandatory).
+
+        Dinamis agar test bisa set per-case. Di produksi, login WAJIB (tidak
+        ada jalur anonymous utk approve).
+        """
+        return os.environ.get("SAM_ENABLE_AUTH") == "1" or self.production
 
     @staticmethod
     def _extract_token(
@@ -85,13 +94,25 @@ class UxRoutes:
         return (cookie or "").strip() or None
 
     def _require_auth(
-        self, authorization: Optional[str], cookie: Optional[str] = None
+        self,
+        authorization: Optional[str],
+        cookie: Optional[str] = None,
+        csrf_header: Optional[str] = None,
     ) -> dict:
         """Wajibkan identitas terverifikasi (M11-004).
 
         Mengembalikan dict {'username','role'} bila token valid & role berwenang,
         else raise HTTPException 401/403. Dipanggil HANYA saat AUTH aktif.
+
+        M12-011 (Identity Hardening):
+          - cookie mode: bila identitas berasal dari cookie httpOnly, mutasi
+            wajib sertakan X-CSRF-Token yang cocok dgn csrf sesi -> DENIED bila
+            salah (cross-site request forge).
+          - expired/revoked/forged token -> 401 (anonymous DENIED).
+          - cross-user: identitas TIDAK pernah diambil dari body; selalu dari
+            sesi terverifikasi.
         """
+        # tanpanya (dev anonymous) -> default utk kompatibilitas regresi
         if not self.auth_enabled:
             return {"username": "user", "role": "operator"}
         token = self._extract_token(authorization, cookie)
@@ -100,6 +121,12 @@ class UxRoutes:
             raise HTTPException(
                 status_code=401, detail="autentikasi diperlukan (login dulu)"
             )
+        # CSRF wajib bila identitas datang via cookie (browser auto-attach
+        # cookie utk request lintas-site); token bearer tidak ter-expose ke
+        # cookie jadi tak butuh CSRF.
+        if authorization is None and cookie:
+            if not self.sessions.verify_csrf(token, csrf_header):
+                raise HTTPException(status_code=403, detail="CSRF token tidak valid")
         if not self.users.can_operate(identity.get("role", "")):
             raise HTTPException(
                 status_code=403,
@@ -142,6 +169,7 @@ async def ux_decide(
     request: DecideRequest,
     authorization: Optional[str] = Header(None),
     sam_session: Optional[str] = Cookie(None),
+    x_csrf_token: Optional[str] = Header(None),
 ):
     """Terapkan keputusan approval user (approve/reject).
 
@@ -152,15 +180,18 @@ async def ux_decide(
     M11-004: bila AUTH aktif (SAM_ENABLE_AUTH=1), identitas diambil dari
     header Authorization (sesi login), BUKAN dari `approver` body. Tanpa token
     valid / role tidak berwenang -> 401/403 (tidak ada eksekusi).
+    M12-011: saat identitas datang via cookie httpOnly, wajib X-CSRF-Token
+    (proteksi CSRF) -> DENIED bila tidak cocok.
     """
     try:
         intent = ApprovalDecisionIntent(request.intent)
     except ValueError:
         return {"error": "intent harus 'approve' atau 'reject'"}
 
-    # M11-004: identitas terverifikasi dari sesi (bila auth aktif). Dalam mode
-    # non-auth (default), `approver` body tetap dipakai utk kompatibilitas regresi.
-    identity = _routes._require_auth(authorization, sam_session)
+    # M11-004/M12-011: identitas terverifikasi dari sesi (bila auth aktif),
+    # dengan proteksi CSRF utk jalur cookie. Dalam mode non-auth (default),
+    # `approver` body tetap dipakai utk kompatibilitas regresi.
+    identity = _routes._require_auth(authorization, sam_session, x_csrf_token)
     approver = (
         identity.get("username", "user")
         if _routes.auth_enabled
@@ -184,14 +215,18 @@ async def ux_login(request: LoginRequest, response: Response):
     if not identity:
         raise HTTPException(status_code=401, detail="username atau password salah")
     token = _routes.sessions.login(identity)
+    # M12-011: `secure` hanya saat produksi (HTTPS). Dev (http) tak set secure
+    # agar cookie tetap bisa dipakai di lokal http. HttpOnly+SameSite tetap.
     response.set_cookie(
         key=SESSION_COOKIE,
         value=token,
         httponly=True,
         samesite="lax",
+        secure=_routes.production,
         path="/",
     )
-    return {"token": token, "user": identity}
+    # kembalikan csrf token sekali (produksi/cookie mode perlu utk mutasi)
+    return {"token": token, "user": identity, "csrf": _routes.sessions.csrf_for(token)}
 
 
 @router.post("/logout")
@@ -200,12 +235,13 @@ async def ux_logout(
     authorization: Optional[str] = Header(None),
     sam_session: Optional[str] = Cookie(None),
 ):
-    """Logout — hapus sesi token + cookie httpOnly (M11-004/M11-005)."""
+    """Logout - revoke sesi token + cookie httpOnly (M11-004/M11-005/M12-011)."""
     token = _routes._extract_token(authorization, sam_session)
-    if _routes.sessions.logout(token):
-        response.delete_cookie(key=SESSION_COOKIE, path="/")
-        return {"ok": True, "message": "logged out"}
-    return {"ok": False, "message": "sudah tidak ada sesi / token tidak valid"}
+    # M12-011: revoke (tandai tak valid) + hapus sesi (defense in depth)
+    _routes.sessions.revoke(token)
+    _routes.sessions.logout(token)
+    response.delete_cookie(key=SESSION_COOKIE, path="/")
+    return {"ok": True, "message": "logged out"}
 
 
 @router.get("/me")

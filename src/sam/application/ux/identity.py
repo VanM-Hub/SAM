@@ -140,30 +140,62 @@ class UserStore:
         return (role or "").strip() in ("operator", "admin")
 
 
+def _now_epoch() -> float:
+    import time
+    return time.time()
+
+
+_SESSION_TTL = 60 * 60  # 1 jam default (env SAM_SESSION_TTL override)
+
+
 class SessionStore:
     """Token sesi Bearer acak (in-memory). Self-host 1-2 user, tanpa store eksternal.
 
-    - login(user)  -> token baru; simpan token -> user.
-    - authenticate(token) -> {'username','role'} utk token valid, else None.
-    - logout(token) -> hapus sesi.
+    M12-011 Identity Hardening menambah:
+      - Session TTL : token kedaluwarsa (default 1 jam; env SAM_SESSION_TTL).
+      - Revocation   : sesi bisa di-revoke (logout eksplisit / admin), revoked DENIED.
+      - CSRF token   : per sesi; utk mode cookie, mutasi wajib kirim X-CSRF-Token.
+      - authenticate() menolak anonymous/expired/revoked/unknown (forged).
+
+    - login(user)       -> token baru {created_at, csrf}.
+    - authenticate(token)-> {'username','role'} utk token valid, else None.
+    - logout(token)     -> hapus sesi.
+    - revoke(token)     -> tandai sesi revoked (langsung tak valid).
+    - csrf_for / verify_csrf -> utk proteksi CSRF pada mutasi cookie.
     """
 
-    def __init__(self) -> None:
-        self._sessions: Dict[str, Dict[str, str]] = {}
+    def __init__(self, ttl: Optional[int] = None) -> None:
+        self._ttl = (
+            ttl if ttl is not None
+            else int(os.environ.get("SAM_SESSION_TTL", str(_SESSION_TTL)))
+        )
+        self._sessions: Dict[str, Dict[str, Any]] = {}
+        self._revoked: Dict[str, float] = {}
 
     def login(self, user: Dict[str, str]) -> str:
         token = secrets.token_urlsafe(32)
         self._sessions[token] = {
             "username": user.get("username", ""),
             "role": user.get("role", "operator"),
+            "created_at": _now_epoch(),
+            "csrf": secrets.token_urlsafe(32),
         }
         return token
 
     def authenticate(self, token: Optional[str]) -> Optional[Dict[str, str]]:
         if not token:
             return None
-        rec = self._sessions.get(token.strip())
+        tok = token.strip()
+        rec = self._sessions.get(tok)
+        # unknown / tidak ada = forged -> DENIED
         if not rec:
+            return None
+        # revoked -> DENIED
+        if tok in self._revoked:
+            return None
+        # expired -> DENIED (juga bersihkan sesi yg kedaluwarsa)
+        if _now_epoch() - rec.get("created_at", 0) > self._ttl:
+            self._sessions.pop(tok, None)
             return None
         return {"username": rec.get("username", ""), "role": rec.get("role", "operator")}
 
@@ -172,3 +204,37 @@ class SessionStore:
             del self._sessions[token.strip()]
             return True
         return False
+
+    def revoke(self, token: Optional[str]) -> bool:
+        """Revoke sesi: langsung tak valid (authenticate menolak)."""
+        if token and token.strip() in self._sessions:
+            self._revoked[token.strip()] = _now_epoch()
+            self._sessions.pop(token.strip(), None)
+            return True
+        return False
+
+    def revoke_user(self, username: str) -> int:
+        """Revoke semua sesi milik user. Return jumlah yang di-revoke."""
+        targets = [t for t, r in self._sessions.items() if r.get("username") == username]
+        for t in targets:
+            self.revoke(t)
+        return len(targets)
+
+    def csrf_for(self, token: Optional[str]) -> Optional[str]:
+        if not token:
+            return None
+        rec = self._sessions.get(token.strip())
+        return rec.get("csrf") if rec else None
+
+    def verify_csrf(self, token: Optional[str], provided: Optional[str]) -> bool:
+        """CSRF: cocokkan token csrf sesi dgn yg dikirim (only valid utk sesi aktif)."""
+        if not token or not provided:
+            return False
+        rec = self._sessions.get(token.strip())
+        if not rec:
+            return False
+        expected = rec.get("csrf")
+        return bool(expected) and hmac.compare_digest(expected, (provided or "").strip())
+
+    def active_count(self) -> int:
+        return len(self._sessions)
