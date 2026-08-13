@@ -100,6 +100,19 @@ z-index:11;transform:translateX(100%);transition:.22s;padding:22px;overflow:auto
 .tag-ro{display:inline-block;font-size:7px;padding:2px 6px;border:1px solid #294976;color:#85a6d6;border-radius:10px;margin-top:4px}
 .tag-live{display:inline-block;font-size:7px;padding:2px 6px;border:1px solid #294938;color:var(--green);border-radius:10px;margin-top:4px}
 
+/* M11-004: login overlay */
+.auth-overlay{display:none;position:fixed;inset:0;background:rgba(4,10,18,.82);z-index:50;align-items:center;justify-content:center}
+.auth-card{width:320px;background:#0d1621;border:1px solid #2b3d55;border-radius:16px;padding:28px;box-shadow:0 18px 60px rgba(0,0,0,.5)}
+.auth-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#3BA7FF,#718aff);display:grid;place-items:center;color:#06101c;font-weight:800;font-size:20px;margin-bottom:14px}
+.auth-card h2{font-size:20px;margin:0 0 4px}
+.auth-sub{font-size:10px;color:#8290a4;line-height:1.55;margin:0 0 18px}
+.auth-card input{width:100%;box-sizing:border-box;padding:12px;margin-bottom:10px;border-radius:10px;border:1px solid #2b3d55;background:#0a1420;color:#e7eef6;font-size:14px;outline:none}
+.auth-card input:focus{border-color:#3BA7FF}
+.auth-card .btn{width:100%;padding:13px;font-size:14px}
+.auth-err{color:#e77d84;font-size:11px;min-height:15px;margin:2px 0 8px}
+.auth-hint{font-size:9px;color:#5c6a7d;margin-top:12px;text-align:center}
+.auth-overlay .close-logout{align-self:flex-end}
+
 /* RESPONSIVE */
 @media(max-width:850px){.mission-layout{grid-template-columns:1fr}.under-grid,.advanced-grid{grid-template-columns:1fr}.recent-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){aside{display:none}.content{padding:16px}.recent-grid{grid-template-columns:1fr}.home{margin-top:4vh}.panel{width:92vw}.topbar{padding:0 15px}}
@@ -122,7 +135,7 @@ z-index:11;transform:translateX(100%);transition:.22s;padding:22px;overflow:auto
 <main>
 <header class="topbar">
   <div class="brand">SAM <small>Mission Workspace</small></div>
-  <div class="top-actions"><span id="rtPill" class="pill">checking...</span><span class="avatar">V</span></div>
+  <div class="top-actions"><span id="rtPill" class="pill">checking...</span><span class="avatar" id="avatarBtn" title="Klik utk logout" onclick="doLogout()">U</span></div>
 </header>
 
 <div class="content">
@@ -237,6 +250,20 @@ z-index:11;transform:translateX(100%);transition:.22s;padding:22px;overflow:auto
  <div class="actionbox"><p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55" id="panelRoute">--</p></div>
 </aside>
 
+<!-- M11-004: login overlay (production identity) -->
+<div class="overlay auth-overlay" id="authOverlay" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">S</div>
+    <h2>Masuk ke SAM</h2>
+    <p class="auth-sub">Produksi memerlukan autentikasi operator sebelum menyetujui misi.</p>
+    <input id="authUser" autocomplete="username" placeholder="Username">
+    <input id="authPass" type="password" autocomplete="current-password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="auth-err" id="authErr"></div>
+    <button class="btn primary " onclick="doLogin()">Login</button>
+    <div class="auth-hint" id="authUserLabel"></div>
+  </div>
+</div>
+
 <script>
 // ===== THIN CLIENT: semua interaksi fetch ke route SAM production =====
 
@@ -251,10 +278,15 @@ var _state = {
 
 function _(id){ return document.getElementById(id); }
 
-// ----- HTTP helpers -----
+// ----- HTTP helpers (M11-004: sertakan Bearer token bila ada) -----
+var _authToken = localStorage.getItem('sam_auth_token') || null;
+function authHeaders() {
+  return _authToken ? { 'Authorization': 'Bearer ' + _authToken } : {};
+}
+
 async function api(method, url, body) {
   try {
-    var init = { method: method, headers: { 'Accept': 'application/json' } };
+    var init = { method: method, headers: Object.assign({ 'Accept': 'application/json' }, authHeaders()) };
     if (body !== undefined) { init.headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(body); }
     var r = await fetch(url, init);
     var txt = await r.text();
@@ -267,6 +299,51 @@ async function api(method, url, body) {
 
 function apiGet(url){ return api('GET', url); }
 function apiPost(url, body){ return api('POST', url, body); }
+
+// ----- M11-004: production identity (login/logout/check) -----
+function doLogin() {
+  var u = _('authUser').value.trim();
+  var p = _('authPass').value;
+  _('authErr').textContent = '';
+  if (!u || !p) { _('authErr').textContent = 'Isi username dan password.'; return; }
+  apiPost('/ux/login', { username: u, password: p }).then(function(res){
+    if (res.ok && res.data && res.data.token) {
+      _authToken = res.data.token;
+      localStorage.setItem('sam_auth_token', _authToken);
+      _('authOverlay').style.display = 'none';
+      _('authPass').value = '';
+      renderAuthUser(res.data.user);
+    } else {
+      _('authErr').textContent = 'Login gagal: ' + (res.data && res.data.detail ? res.data.detail : 'periksa username/password');
+    }
+  });
+}
+
+function doLogout() {
+  apiPost('/ux/logout', {}).then(function(){
+    _authToken = null;
+    localStorage.removeItem('sam_auth_token');
+    showLoginIfNeeded();
+    renderAuthUser(null);
+  });
+}
+
+function renderAuthUser(user) {
+  var av = document.querySelector('.avatar');
+  if (user) { if (av) av.textContent = (user.username || 'U').charAt(0).toUpperCase(); }
+  else if (av) { av.textContent = 'U'; }
+}
+
+// Cek status auth: bila server mewajibkan login (auth aktif) dan belum ada
+// token valid -> tampilkan overlay login.
+async function showLoginIfNeeded() {
+  var me = await apiGet('/ux/me');
+  if (me.status === 401) {
+    _('authOverlay').style.display = 'flex';
+    return;
+  }
+  if (me.ok && me.data && me.data.user) renderAuthUser(me.data.user);
+}
 
 // ----- Runtime status probe -----
 async function probeRuntime() {
@@ -397,7 +474,9 @@ async function approveMission() {
   _('objProgress').textContent = 'RUN';
   _('progBar').innerHTML = '<i style="width:60%"></i>';
 
-  var res = await apiPost('/ux/decide', { intent: 'approve', approver: 'user' });
+  // M11-004: approver TIDAK dikirim dari client — identitas diambil server
+  // dari sesi login (Authorization).
+  var res = await apiPost('/ux/decide', { intent: 'approve' });
   renderOutcome(res);
 }
 
@@ -407,7 +486,7 @@ async function rejectMission() {
   _('continueBtn').disabled = true;
   _('pauseBtn').disabled = true;
   _('objDesc').textContent = 'Mission ditolak.';
-  var res = await apiPost('/ux/decide', { intent: 'reject', approver: 'user' });
+  var res = await apiPost('/ux/decide', { intent: 'reject' });
   renderOutcome(res);
 }
 
@@ -750,6 +829,8 @@ async function probeAdvanced() {
 function init() {
   probeRuntime();
   renderRecent();
+  // M11-004: cek auth session (login overlay bila produksi mewajibkan).
+  showLoginIfNeeded();
   // M9-008.4: refresh/reload resilience — pulihkan state mission DARI SERVER
   // (source of truth), bukan dari JS memory/session. Setelah browser refresh,
   // mission yang sudah di-submit tetap tampil (WAITING_APPROVAL/COMPLETED/...)
