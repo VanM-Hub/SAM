@@ -1,32 +1,24 @@
 """
-Metrics Routes — SAM Runtime API
-"""
+Metrics Routes — SAM Runtime API (M12-008 Observability).
 
-from fastapi import APIRouter
-from ...telemetry.service import TelemetryService
+GET /metrics -> telemetri nyata dalam format Prometheus text (bounded,
+tanpa label unbounded). Sumber: registry `sam.application.ux.metrics` yang
+disuntik dari service/persistence (mission_received, mission_blocked,
+execution_started/completed/failed, idempotency_replay/conflict,
+persistence_error).
+"""
+from fastapi import APIRouter, Response
+
+from sam.application.ux.metrics import metrics as _metrics
 
 router = APIRouter()
 
 
 @router.get("/")
 async def get_metrics():
-    """Ambil metrics runtime terkini."""
-    telemetry = TelemetryService()
-    m = telemetry.get_metrics()
-
-    if m is None:
-        return {
-            "status": "no_data",
-            "message": "No metrics collected yet.",
-        }
-
-    return {
-        "status": "ok",
-        "timestamp": m.timestamp.isoformat(),
-        "cpu_percent": m.cpu_percent,
-        "memory_mb": round(m.memory_mb, 1),
-        "uptime_seconds": round(m.uptime_seconds, 1),
-        "workflow_count": m.workflow_count,
-        "plugin_count": m.plugin_count,
-        "health_score": m.health_score,
-    }
+    """Ekspos telemetri SAM dalam format Prometheus text (M12-008)."""
+    body = _metrics.render_prometheus()
+    return Response(
+        content=body,
+        media_type="text/plain; version=0.0.4",
+    )

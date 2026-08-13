@@ -55,6 +55,9 @@ try:  # pragma: no cover - import opsional bila jalur repo tidak tersedia
 except Exception:  # pragma: no cover
     _HAS_REPO = False
 
+# M12-008: Observability — telemetri nyata (counter) diekspos via /metrics.
+from sam.application.ux.metrics import metrics as _metrics  # type: ignore
+
 
 # Repo test default untuk GitHub mutation (repo TEST, bukan production).
 DEFAULT_TEST_REPO = "VanM-Hub/test-issues"
@@ -196,6 +199,7 @@ class MissionUXService:
             try:
                 self._persist_entities()
             except Exception:  # pragma: no cover — jangan blokir jalur lama
+                _metrics.inc("sam_persistence_error")
                 pass
         if self._state is None:
             return
@@ -315,6 +319,7 @@ class MissionUXService:
         # M12-005: Fail-closed produksi — bila persistence PG tidak siap,
         # tolak mission baru (0 operasi, 0 side effect).
         if self._production_blocked:
+            _metrics.inc("sam_mission_blocked")
             st = self._state if (self._state and self._state.status == str(UxStateStatus.BLOCKED)) \
                 else _blocked_state("Fail-closed: persistence produksi tidak siap")
             self._state = st
@@ -328,9 +333,13 @@ class MissionUXService:
             if existing is not None and self._state is not None:
                 # Pastikan teks yang dipakai sama utk menghindari misuse key.
                 if existing.get("text") == text:
+                    _metrics.inc("sam_idempotency_replay")
                     return self._state
+                _metrics.inc("sam_idempotency_conflict")
             # Key baru (atau teks berbeda) -> catat key utk operasi ini.
             self._idem[idempotency_key] = {"request_id": "", "text": text}
+
+        _metrics.inc("sam_mission_received")
 
         # Pahami request terlebih dahulu (SAM memahami sebelum menyimpan).
         operation, target, understood, planned, action_summary, approval_reason = (
@@ -472,10 +481,13 @@ class MissionUXService:
                 "detail": "Approval ditolak user — tanpa eksekusi (0 mutation)",
                 "approver": _approver,
             })
+            _metrics.inc("sam_mission_rejected")
             self._persist()
             return state
 
         # outcome == APPROVED -> jalankan mission nyata via jalur canonical.
+        _metrics.inc("sam_mission_approved")
+        _metrics.inc("sam_execution_started")
         state.approval_status = UxStateStatus.APPROVED
         state.approval_decision = outcome.as_dict()
         state.status = UxStateStatus.RUNNING
@@ -550,6 +562,11 @@ class MissionUXService:
             if verdict["status"] == "blocked"
             else UxStateStatus.FAILED
         )
+        # M12-008: telemetri hasil eksekusi.
+        if state.status == UxStateStatus.COMPLETED:
+            _metrics.inc("sam_execution_completed")
+        elif state.status == UxStateStatus.FAILED:
+            _metrics.inc("sam_execution_failed")
         state.failure_kind = verdict["failure_kind"] or UxFailureKind.NONE
         state.failure_message = (
             "" if verdict["status"] == "completed" else verdict["message"]
