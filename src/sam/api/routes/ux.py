@@ -20,7 +20,7 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Cookie, Header, HTTPException, Response
 from pydantic import BaseModel
 
 from sam.application.ux.approval import ApprovalDecisionIntent
@@ -70,7 +70,23 @@ class UxRoutes:
         """AUTH aktif bila env SAM_ENABLE_AUTH=1. Dinamis agar test bisa set per-case."""
         return os.environ.get("SAM_ENABLE_AUTH") == "1"
 
-    def _require_auth(self, authorization: Optional[str]) -> dict:
+    @staticmethod
+    def _extract_token(
+        authorization: Optional[str], cookie: Optional[str] = None
+    ) -> Optional[str]:
+        """Ambil token dari header Bearer (prioritas) ATAU cookie httpOnly.
+
+        M11-005: browser mengirim token via cookie httpOnly (tanpa localStorage),
+        sehingga token tidak pernah tersentuh JS. Header Bearer tetap didukung
+        utk kompatibilitas API/test langsung.
+        """
+        if authorization and authorization.lower().startswith("bearer "):
+            return authorization[7:].strip()
+        return (cookie or "").strip() or None
+
+    def _require_auth(
+        self, authorization: Optional[str], cookie: Optional[str] = None
+    ) -> dict:
         """Wajibkan identitas terverifikasi (M11-004).
 
         Mengembalikan dict {'username','role'} bila token valid & role berwenang,
@@ -78,9 +94,7 @@ class UxRoutes:
         """
         if not self.auth_enabled:
             return {"username": "user", "role": "operator"}
-        token = None
-        if authorization and authorization.lower().startswith("bearer "):
-            token = authorization[7:].strip()
+        token = self._extract_token(authorization, cookie)
         identity = self.sessions.authenticate(token)
         if not identity:
             raise HTTPException(
@@ -93,6 +107,10 @@ class UxRoutes:
             )
         return identity
 
+
+# Cookie httpOnly pembawa token sesi (M11-005). Browser mengirimnya otomatis;
+# token TIDAK pernah disimpan di JS (tanpa localStorage) — memenuhi hardening M9-008.
+SESSION_COOKIE = "sam_session"
 
 _routes = UxRoutes()
 router = APIRouter(tags=["ux"])
@@ -120,7 +138,11 @@ async def ux_state():
 
 
 @router.post("/decide")
-async def ux_decide(request: DecideRequest, authorization: Optional[str] = Header(None)):
+async def ux_decide(
+    request: DecideRequest,
+    authorization: Optional[str] = Header(None),
+    sam_session: Optional[str] = Cookie(None),
+):
     """Terapkan keputusan approval user (approve/reject).
 
     Adapter murni: meneruskan intent ke MissionUXService.decide, yang
@@ -138,7 +160,7 @@ async def ux_decide(request: DecideRequest, authorization: Optional[str] = Heade
 
     # M11-004: identitas terverifikasi dari sesi (bila auth aktif). Dalam mode
     # non-auth (default), `approver` body tetap dipakai utk kompatibilitas regresi.
-    identity = _routes._require_auth(authorization)
+    identity = _routes._require_auth(authorization, sam_session)
     approver = (
         identity.get("username", "user")
         if _routes.auth_enabled
@@ -150,41 +172,53 @@ async def ux_decide(request: DecideRequest, authorization: Optional[str] = Heade
 
 
 @router.post("/login")
-async def ux_login(request: LoginRequest):
-    """Login -> kembalikan token Bearer + identitas user (M11-004).
+async def ux_login(request: LoginRequest, response: Response):
+    """Login -> set cookie httpOnly + kembalikan identitas user (M11-004/M11-005).
 
     Verifikasi credential terhadap UserStore (users.json di luar project).
-    Berhasil -> buat sesi, kembali {token, user:{username, role}}. Password
-    TIDAK pernah dikembalikan/dilog.
+    Berhasil -> buat sesi, set cookie httpOnly `sam_session`, kembali
+    {token, user:{username, role}}. Password TIDAK pernah dikembalikan/dilog.
+    `token` di body tetap dikembalikan utk kompatibilitas API/test langsung.
     """
     identity = _routes.users.verify(request.username, request.password)
     if not identity:
         raise HTTPException(status_code=401, detail="username atau password salah")
     token = _routes.sessions.login(identity)
+    response.set_cookie(
+        key=SESSION_COOKIE,
+        value=token,
+        httponly=True,
+        samesite="lax",
+        path="/",
+    )
     return {"token": token, "user": identity}
 
 
 @router.post("/logout")
-async def ux_logout(authorization: Optional[str] = Header(None)):
-    """Logout — hapus sesi token (M11-004)."""
-    token = None
-    if authorization and authorization.lower().startswith("bearer "):
-        token = authorization[7:].strip()
+async def ux_logout(
+    response: Response,
+    authorization: Optional[str] = Header(None),
+    sam_session: Optional[str] = Cookie(None),
+):
+    """Logout — hapus sesi token + cookie httpOnly (M11-004/M11-005)."""
+    token = _routes._extract_token(authorization, sam_session)
     if _routes.sessions.logout(token):
+        response.delete_cookie(key=SESSION_COOKIE, path="/")
         return {"ok": True, "message": "logged out"}
     return {"ok": False, "message": "sudah tidak ada sesi / token tidak valid"}
 
 
 @router.get("/me")
-async def ux_me(authorization: Optional[str] = Header(None)):
+async def ux_me(
+    authorization: Optional[str] = Header(None),
+    sam_session: Optional[str] = Cookie(None),
+):
     """Identitas user yang sedang login (M11-004). Bila auth nonaktif, kembali
     identitas default 'user' utk kebutuhan UI."""
     if not _routes.auth_enabled:
         return {"authenticated": False, "user": {"username": "user", "role": "operator"}}
     identity = _routes.sessions.authenticate(
-        authorization[7:].strip()
-        if authorization and authorization.lower().startswith("bearer ")
-        else None
+        _routes._extract_token(authorization, sam_session)
     )
     if not identity:
         raise HTTPException(status_code=401, detail="belum login")

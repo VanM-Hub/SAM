@@ -6,891 +6,569 @@
 <title>SAM — Mission Workspace</title>
 <style>
 :root{
- --bg:#080c12;--surface:#101620;--surface2:#151d29;--line:#263243;
- --text:#edf2f8;--muted:#7f8da1;--soft:#b8c4d4;--blue:#728cff;
- --green:#64d49a;--yellow:#e2c16c;--red:#e77d84;
+  --bg:#0b1020; --bg2:#0e1526; --panel:#121a2e; --panel2:#17203a;
+  --border:#1e2a47; --border2:#2b3c66;
+  --txt:#e9eefb; --muted:#93a3c8; --dim:#5d6c93;
+  --blue:#4f7cff; --indigo:#6d5ef0; --violet:#a78bfa;
+  --cyan:#22d3ee; --green:#34d399; --amber:#fbbf24; --red:#f87171;
+  --mono:Consolas,Menlo,'SFMono-Regular',monospace;
 }
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);
-font:13px/1.45 Inter,Segoe UI,system-ui,sans-serif}
-button,input{font:inherit}button{cursor:pointer}
-.app{min-height:100vh;display:flex}
-aside{width:72px;border-right:1px solid var(--line);background:#0b1017;padding:15px 10px;
-display:flex;flex-direction:column;align-items:center}
-.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#6047dd,#628dff);
-display:grid;place-items:center;font-weight:800;font-size:18px;margin-bottom:25px}
-.nav{display:grid;gap:8px}.nav button{width:42px;height:40px;border:1px solid transparent;border-radius:10px;
-background:transparent;color:#68778b;font-size:17px}.nav button.active,.nav button:hover{background:#172234;border-color:#30425b;color:#fff}
-aside .bottom{margin-top:auto;color:#617087;font-size:15px}
-main{flex:1;min-width:0}.topbar{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;
-justify-content:space-between;padding:0 25px;background:#090e15}
-.brand{font-weight:650;font-size:14px}.brand small{color:#6d7c90;font-weight:400;margin-left:7px}
-.top-actions{display:flex;align-items:center;gap:9px}.pill{font-size:9px;padding:5px 9px;border:1px solid #294938;
-color:var(--green);background:#0d1913;border-radius:20px}.pill.off{border-color:#4a3538;color:var(--red);background:#1a1213}
-.avatar{width:29px;height:29px;border-radius:50%;background:#94755e;display:grid;place-items:center;font-size:10px}
-.content{max-width:1180px;margin:auto;padding:25px}
-.view{display:none}.view.active{display:block}
-.eyebrow{text-transform:uppercase;letter-spacing:.15em;font-size:8px;color:#65748a}
-h1{font-size:25px;letter-spacing:-.6px;margin:5px 0}h2{font-size:17px;margin:0}h3{font-size:11px;margin:0}
-.sub{color:var(--muted);font-size:11px}.row{display:flex;align-items:center;justify-content:space-between;gap:15px}
-.btn{border:1px solid #304159;background:#111a27;color:#b9c5d5;border-radius:8px;height:31px;padding:0 12px;font-size:10px}
-.btn:hover{border-color:#4b6282}.primary{background:#5068df;border-color:#6d82ed;color:white}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:radial-gradient(1100px 500px at 75% -10%,#16224a 0%,var(--bg) 55%);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;
+  height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.mono{font-family:var(--mono)} .dim{color:var(--dim);font-size:11px;font-family:var(--mono)}
+.hl{color:var(--amber);font-weight:700}
+a{color:var(--blue);cursor:pointer;text-decoration:none}
+a:hover{text-decoration:underline}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;
+  border-bottom:1px solid var(--border);background:rgba(11,16,32,.75);flex-shrink:0}
+.brand{display:flex;gap:11px;align-items:center}
+.logo{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;
+  background:linear-gradient(135deg,var(--indigo),var(--blue));border:1px solid var(--blue);box-shadow:0 0 16px rgba(79,124,255,.4)}
+.brand h1{font-size:15px}.brand small{color:var(--muted);font-size:11px;display:block}
+.head-r{display:flex;align-items:center;gap:12px}
+.pill{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--border2);background:var(--panel)}
+.pill .dot{width:7px;height:7px;border-radius:50%}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);display:grid;place-items:center;font-weight:700;font-size:11px;color:#fff;cursor:pointer;border:1px solid var(--border2)}
+.avatar:hover{border-color:var(--blue)}
+
+.shell{flex:1;min-height:0;display:flex}
+aside{width:215px;border-right:1px solid var(--border);padding:12px 10px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;overflow-y:auto;scrollbar-width:none}
+aside::-webkit-scrollbar{display:none}
+.nav-lbl{font-size:9.5px;letter-spacing:1.2px;color:var(--dim);padding:8px 12px 3px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:9px;color:var(--muted);cursor:pointer;font-size:13px;border:1px solid transparent;user-select:none}
+.nav-item:hover{background:var(--panel);color:var(--txt)}
+.nav-item.active{background:linear-gradient(90deg,rgba(109,94,240,.18),rgba(79,124,255,.12));color:var(--violet);border-color:var(--border2)}
+.nav-badge{margin-left:auto;background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px}
+.aside-foot{margin-top:auto;padding:10px;font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border)}
+
+main{flex:1;min-width:0;padding:16px 20px;overflow:hidden}
+.page{height:100%;overflow-y:auto;scrollbar-width:thin;-ms-overflow-style:none}
+.page::-webkit-scrollbar{width:8px}
+.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px}
+.page.active{display:block}
+.page:not(.active){display:none}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:13px;margin-bottom:13px;overflow:hidden}
+.card-head{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border)}
+.card-head h3{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--txt)}
+.card-head .cnt{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.pad{padding:16px}
+.rule{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:9px}
+.rule b{color:var(--txt)}
+.ok{color:var(--green)}.wr{color:var(--amber)}.bd{color:var(--red)}.cy{color:var(--cyan)}.vi{color:var(--violet)}
+.grid-home{display:grid;grid-template-columns:1.6fr 1fr;gap:13px;align-items:start}
+.cols2{display:grid;grid-template-columns:1.5fr 1fr;gap:13px;align-items:start}
+
+/* hero */
+.hero{display:flex;gap:14px;align-items:center;background:linear-gradient(120deg,#141d3a,#101a33 60%,#0f2030);padding:14px 16px}
+.bot{width:46px;height:46px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:21px;
+  background:radial-gradient(circle at 35% 30%,#27407c,#101a33);border:1px solid var(--blue);box-shadow:0 0 18px rgba(79,124,255,.35)}
+.hero-t{flex:1}
+.hero-t h3{font-size:15px;margin-bottom:3px}
+.hero-t p{color:var(--muted);font-size:12.5px}
+
+/* understanding + plan */
+.understand{padding:16px}
+.understand .say{font-size:15px;line-height:1.5;margin-bottom:8px}
+.understand .sub{color:var(--muted);line-height:1.5;margin-bottom:12px;font-size:13px}
+.planbox{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.35);border-radius:11px;padding:12px 14px;margin-bottom:12px}
+.planbox h4{font-size:12px;margin-bottom:7px;color:var(--green)}
+.planbox li{list-style:none;color:var(--muted);font-size:13px;padding:3px 0}
+.planbox li::before{content:'•';color:var(--green);font-weight:700;margin-right:8px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:6px 10px;font-size:13px;padding:4px 0}
+.kv .k{color:var(--dim)}
+.kv .v{color:var(--txt);word-break:break-word}
+
+/* approval */
+.ask{display:flex;gap:9px;align-items:center;font-size:14px;font-weight:600;margin-bottom:11px}
+.ask .q{color:var(--green)}
+.dec-actions{display:flex;gap:9px;flex-wrap:wrap}
+.btn{padding:9px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--panel2);color:var(--txt);transition:.15s}
+.btn:hover{transform:translateY(-1px);border-color:var(--blue)}
 .btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
-.card{border:1px solid var(--line);border-radius:11px;background:linear-gradient(180deg,#111923,#0d141d)}
-.card-head{height:42px;border-bottom:1px solid var(--line);padding:0 14px;display:flex;align-items:center;justify-content:space-between}
-.card-head span{font-size:8px;color:#69788d}
+.btn-yes{background:linear-gradient(135deg,#15803d,#16a34a);border-color:#22c55e;color:#fff}
+.btn-yes:hover{box-shadow:0 0 14px rgba(34,197,94,.45)}
+.btn-no{background:transparent;border-color:var(--red);color:var(--red)}
+.result{margin-top:11px;font-size:13px;font-weight:600}
+details.tech summary{cursor:pointer;color:var(--blue);font-size:12px;margin-top:10px}
+details.tech .mono-box{margin-top:8px;background:#070b16;border:1px solid var(--border);border-radius:9px;padding:11px;font-family:var(--mono);font-size:11.5px;line-height:1.8;color:var(--muted);white-space:pre-wrap;word-break:break-word}
 
-/* HOME */
-.home{max-width:920px;margin:9vh auto}.hero{text-align:center}.hero h1{font-size:30px;margin-bottom:8px}
-.hero p{font-size:12px;color:var(--muted);margin-bottom:24px}.ask{height:53px;border:1px solid #344b6a;
-border-radius:12px;background:#101925;display:flex;align-items:center;padding:0 8px 0 15px;box-shadow:0 15px 50px rgba(0,0,0,.2)}
-.ask input{flex:1;background:none;border:0;outline:0;color:white;font-size:12px}.ask button{width:37px;height:37px;border:0;border-radius:9px;background:#566ee9;color:white}
-.shortcuts{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:11px 0}.shortcuts button{border:1px solid #29384d;
-background:#101823;color:#8d9caf;border-radius:20px;padding:6px 10px;font-size:9px}
-.recent{margin-top:30px}.recent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:9px}
-.recent-item{padding:11px;border:1px solid #243349;border-radius:8px;background:#0e1620;cursor:pointer}.recent-item:hover{border-color:#455e81}
-.recent-item small{font-size:8px;color:#64748a}.recent-item b{display:block;font-size:10px;margin:5px 0 8px}.bar{height:3px;background:#1d2938;border-radius:4px}.bar i{display:block;height:100%;background:#718aff;border-radius:4px}
-.recent-item footer{display:flex;justify-content:space-between;margin-top:7px;font-size:8px;color:#68788e}
+/* submit */
+.inputrow{display:flex;gap:9px;margin-top:4px}
+.inputrow textarea{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;color:var(--txt);font-size:13px;outline:none;resize:vertical;min-height:60px;font-family:inherit}
+.inputrow textarea:focus{border-color:var(--blue)}
+.send{align-self:flex-end;border-radius:10px;border:none;background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff;font-size:14px;cursor:pointer;padding:11px 20px;font-weight:600}
+.send:hover{box-shadow:0 0 16px rgba(109,94,240,.5)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin:11px 0}
+.chip{padding:6px 13px;border-radius:999px;border:1px solid var(--border2);background:var(--panel);color:var(--muted);font-size:12px;cursor:pointer}
+.chip:hover{color:var(--txt);border-color:var(--blue)}
 
-/* MISSION */
-.mission-head{margin-bottom:16px}.mission-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:10px}
-.objective{padding:16px}.objective p{margin:5px 0 0;color:#78879a;font-size:10px}.progress{height:4px;background:#1c2939;margin-top:14px;border-radius:5px}.progress i{display:block;height:100%;width:65%;background:linear-gradient(90deg,#6889ff,#8977ff);border-radius:5px}
-.canvas{height:355px;position:relative;overflow:hidden}.canvas:before{content:"";position:absolute;inset:0;
-background-image:radial-gradient(#29394f 1px,transparent 1px);background-size:22px 22px;opacity:.18}
-.edge{position:absolute;height:1px;background:#304159;transform-origin:left center}.e1{left:24%;top:31%;width:180px;transform:rotate(13deg)}
-.e2{left:50%;top:28%;width:110px;transform:rotate(90deg)}.e3{left:55%;top:31%;width:170px;transform:rotate(-13deg)}
-.e4{left:26%;top:55%;width:175px;transform:rotate(-10deg)}.e5{left:53%;top:55%;width:175px;transform:rotate(10deg)}
-.e6{left:45%;top:61%;width:90px;transform:rotate(90deg)}
-.node{position:absolute;width:88px;text-align:center;z-index:2;cursor:pointer}.orb{width:50px;height:50px;margin:auto;border-radius:50%;
-display:grid;place-items:center;background:#111a26;border:1px solid #34475f;color:#8c9db2;font-size:17px;transition:.15s}
-.node:hover .orb{transform:scale(1.06);border-color:#6b82e5}.node b{display:block;font-size:9px;margin-top:6px}
-.node small{display:block;font-size:7px;color:#66768c;margin-top:1px}
-.active .orb{border-color:#55c78e;color:#73dfa6;box-shadow:0 0 24px rgba(85,199,142,.12)}.direct .orb{border-color:#718aff;color:#9babff}
-.center{left:50%;top:50%;transform:translate(-50%,-50%)}.n1{left:12%;top:10%}.n2{left:42%;top:5%}.n3{right:11%;top:11%}.n4{left:11%;bottom:9%}.n5{right:11%;bottom:9%}.n6{left:42%;bottom:5%}
-.canvas-note{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:8px;color:#607087;white-space:nowrap}
-.under-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.context,.next,.activity{padding:11px 13px}.context p{margin:0;font-size:9px;line-height:1.65;color:#b5c1d0}.context strong{color:#e2e8f0}
-.next strong{font-size:10px}.next p{font-size:8px;color:#738298;margin:4px 0 9px}
-.side-card{margin-bottom:10px}.side-list{padding:7px 13px}.side-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1c2838;font-size:8px}.side-row:last-child{border:0}.side-row span{color:#718096}.green{color:var(--green)}.yellow{color:var(--yellow)}.red{color:var(--red)}
-.event{display:grid;grid-template-columns:7px 1fr auto;gap:8px;padding:8px 0;border-bottom:1px solid #1b2736}.event:last-child{border:0}.dot{width:6px;height:6px;border-radius:50%;background:#718aff;margin-top:4px}.event b{font-size:8px}.event small{display:block;color:#65748a;font-size:7px}.event time{font-size:7px;color:#59687c}
+/* mini status */
+.mini{padding:11px 16px;border-bottom:1px solid var(--border)}
+.mini:last-child{border-bottom:none}
+.mini .row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px}
+.mini .row .v{color:var(--muted)}
+.mini h4{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:flex;justify-content:space-between}
+.mini h4 a{font-weight:400;text-transform:none;letter-spacing:0}
 
-/* ACTION PANEL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;z-index:10}.overlay.open{display:block}
-.panel{position:fixed;right:0;top:0;height:100vh;width:360px;background:#0d1621;border-left:1px solid #344760;
-z-index:11;transform:translateX(100%);transition:.22s;padding:22px;overflow:auto}.panel.open{transform:translateX(0)}
-.panel .close{position:absolute;right:18px;top:18px;width:27px;height:27px;border-radius:7px;border:1px solid #304159;background:#111b28;color:#a9b6c7}
-.panel h2{font-size:19px;margin:6px 0}.panel .lead{font-size:10px;color:#8290a4;line-height:1.55}
-.panel .action-title{font-size:9px;color:#64748a;text-transform:uppercase;letter-spacing:.13em;margin-top:22px}
-.actionbox{margin-top:7px;border:1px solid #2b3d55;border-radius:9px;background:#111a27;padding:12px}
-.actionbox input{width:100%;height:35px;border:1px solid #30435b;border-radius:7px;background:#0c141f;color:white;padding:0 9px;outline:0;font-size:9px}
-.actionbox button{margin-top:7px}.choice{display:grid;gap:6px;margin-top:7px}.choice button{text-align:left;padding:9px;border:1px solid #293b53;background:#101a27;color:#aebbc9;border-radius:7px;font-size:9px}
-.choice button:hover{border-color:#50678b}.confidence{display:flex;align-items:center;gap:8px;font-size:8px;color:#75859a}.confidence i{height:4px;flex:1;background:#263449;border-radius:4px}.confidence i:after{content:"";display:block;width:92%;height:100%;background:#718aff;border-radius:4px}
+/* timeline */
+.journey{padding:4px 16px}
+.j-step{display:flex;gap:12px;padding:9px 0;position:relative}
+.j-step::before{content:'';position:absolute;left:10px;top:32px;bottom:-2px;width:2px;background:var(--border)}
+.j-step:last-child::before{display:none}
+.j-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:10px;font-weight:700;border:2px solid var(--border2);background:var(--panel2);color:var(--dim);z-index:1}
+.j-step.done .j-dot{border-color:var(--green);color:var(--green);background:rgba(52,211,153,.1)}
+.j-step.now .j-dot{border-color:var(--cyan);color:var(--cyan);background:rgba(34,211,238,.12);box-shadow:0 0 10px rgba(34,211,238,.4)}
+.j-step.fail .j-dot{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.12)}
+.j-body b{font-size:13px;display:block}
+.j-body p{color:var(--dim);font-size:11.5px;margin-top:2px}
+.j-time{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--dim)}
 
-/* SMART WARNING */
-.warning{border:1px solid #4c4226;background:#19170f;border-radius:9px;padding:10px 12px;margin-bottom:10px;display:none}.warning.show{display:block}.warning b{font-size:9px;color:var(--yellow)}.warning p{font-size:8px;color:#aeb6c1;margin:3px 0 8px}
+/* audit table */
+.tw{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 16px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+td{padding:10px 16px;border-bottom:1px solid var(--border)}
+tr:hover td{background:rgba(255,255,255,.02)}
 
-/* ACC (Integration Boundary) */
-.acc-grid{display:grid;grid-template-columns:230px 1fr;gap:10px}.agent-row{display:flex;gap:9px;padding:10px 13px;border-bottom:1px solid #1b2736}.agent-row:last-child{border:0}.agent-avatar{width:31px;height:31px;border-radius:8px;background:#30459a;display:grid;place-items:center;font-size:9px;font-weight:700}.agent-row b{font-size:9px}.agent-row small{display:block;color:#6d7c90;font-size:7px}.chat{height:470px;display:flex;flex-direction:column}.messages{flex:1;padding:12px}.bubble{display:inline-block;max-width:82%;padding:9px 11px;border:1px solid #2b3d55;background:#111a27;border-radius:9px;font-size:9px;line-height:1.5;margin-bottom:8px}.composer{padding:8px;border-top:1px solid var(--line);display:flex;gap:6px}.composer input{flex:1;background:#0d1620;border:1px solid #293b52;color:white;border-radius:7px;padding:0 9px;height:32px;outline:0}
+/* badges */
+.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;letter-spacing:.4px;display:inline-block}
+.b-low{background:rgba(52,211,153,.12);color:var(--green);border:1px solid var(--green)}
+.b-med{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid var(--amber)}
+.b-high{background:rgba(248,113,113,.12);color:var(--red);border:1px solid var(--red)}
+.b-info{background:rgba(79,124,255,.12);color:var(--blue);border:1px solid var(--blue)}
+.b-cy{background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid var(--cyan)}
 
-/* ADVANCED */
-.advanced-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.approval{padding:9px 13px}.approval-item{padding:9px 0;border-bottom:1px solid #1b2736}.approval-item:last-child{border:0}.approval-item b{display:block;font-size:9px;margin:3px 0}.approval-item small{font-size:8px;color:#6e7e92}
+footer{border-top:1px solid var(--border);padding:8px 20px;display:flex;gap:22px;flex-wrap:wrap;align-items:center;color:var(--dim);font-size:11px;font-family:var(--mono);flex-shrink:0}
+footer .ok,footer .cy{font-weight:700}
 
-/* UNAVAILABLE status */
-.unavailable{border-color:#4a3b26!important;color:#c9a552!important}.unavailable .orb{border-color:#5a4a2a!important;color:#b99e4f!important}
-.tag-unav{display:inline-block;font-size:7px;padding:2px 6px;border:1px solid #4a3b26;color:#c9a552;border-radius:10px;margin-top:4px}
-.tag-ro{display:inline-block;font-size:7px;padding:2px 6px;border:1px solid #294976;color:#85a6d6;border-radius:10px;margin-top:4px}
-.tag-live{display:inline-block;font-size:7px;padding:2px 6px;border:1px solid #294938;color:var(--green);border-radius:10px;margin-top:4px}
+/* login overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.login-box{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:26px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-box h2{font-size:16px;margin-bottom:4px}
+.login-box p{color:var(--muted);font-size:12.5px;margin-bottom:16px}
+.login-box label{display:block;font-size:11px;color:var(--muted);margin:10px 0 4px}
+.login-box input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:10px 12px;color:var(--txt);font-size:13px;outline:none}
+.login-box input:focus{border-color:var(--blue)}
+.login-box .err{color:var(--red);font-size:12px;margin-top:10px;display:none}
+.login-box .btn{width:100%;margin-top:16px}
+.login-box .btn-yes{background:linear-gradient(135deg,var(--indigo),var(--blue));border-color:var(--blue)}
 
-/* M11-004: login overlay */
-.auth-overlay{display:none;position:fixed;inset:0;background:rgba(4,10,18,.82);z-index:50;align-items:center;justify-content:center}
-.auth-card{width:320px;background:#0d1621;border:1px solid #2b3d55;border-radius:16px;padding:28px;box-shadow:0 18px 60px rgba(0,0,0,.5)}
-.auth-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#3BA7FF,#718aff);display:grid;place-items:center;color:#06101c;font-weight:800;font-size:20px;margin-bottom:14px}
-.auth-card h2{font-size:20px;margin:0 0 4px}
-.auth-sub{font-size:10px;color:#8290a4;line-height:1.55;margin:0 0 18px}
-.auth-card input{width:100%;box-sizing:border-box;padding:12px;margin-bottom:10px;border-radius:10px;border:1px solid #2b3d55;background:#0a1420;color:#e7eef6;font-size:14px;outline:none}
-.auth-card input:focus{border-color:#3BA7FF}
-.auth-card .btn{width:100%;padding:13px;font-size:14px}
-.auth-err{color:#e77d84;font-size:11px;min-height:15px;margin:2px 0 8px}
-.auth-hint{font-size:9px;color:#5c6a7d;margin-top:12px;text-align:center}
-.auth-overlay .close-logout{align-self:flex-end}
+#toasts{position:fixed;bottom:50px;right:20px;display:flex;flex-direction:column;gap:9px;z-index:300}
+.toast{background:var(--panel2);border:1px solid var(--border2);border-left:4px solid var(--cyan);padding:12px 16px;border-radius:9px;font-size:13px;min-width:250px;max-width:380px;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:si .3s ease}
+.toast.ok{border-left-color:var(--green)}.toast.bad{border-left-color:var(--red)}.toast.warn{border-left-color:var(--amber)}
+@keyframes si{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
 
-/* RESPONSIVE */
-@media(max-width:850px){.mission-layout{grid-template-columns:1fr}.under-grid,.advanced-grid{grid-template-columns:1fr}.recent-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){aside{display:none}.content{padding:16px}.recent-grid{grid-template-columns:1fr}.home{margin-top:4vh}.panel{width:92vw}.topbar{padding:0 15px}}
+.empty{color:var(--dim);font-size:13px;padding:16px;text-align:center}
+@media(max-width:1100px){.grid-home,.cols2{grid-template-columns:1fr}aside{display:none}body{overflow:auto}}
 </style>
 </head>
 <body>
-<div class="app">
-<aside>
-  <div class="logo">S</div>
-  <div class="nav">
-    <button class="active" data-view="home" title="Home">&#8998;</button>
-    <button data-view="missions" title="Missions">&#9678;</button>
-    <button data-view="knowledge" title="Knowledge">&#9636;</button>
-    <button data-view="agents" title="Agents">&#8660;</button>
-    <button data-view="advanced" title="Advanced">&#9671;</button>
+
+<header>
+  <div class="brand">
+    <div class="logo">SAM</div>
+    <div><h1>SAM</h1><small>Mission Workspace · Production</small></div>
   </div>
-  <div class="bottom" id="asideDot">&#9679;</div>
+  <div class="head-r">
+    <div class="pill" id="healthPill"><span class="dot" style="background:var(--dim)"></span><span id="healthTxt">memeriksa…</span></div>
+    <div class="pill" id="authPill" style="display:none"><span class="dot" style="background:var(--amber)"></span><span id="authTxt">Login</span></div>
+    <div class="avatar" id="avatarBtn" title="Akun">?</div>
+  </div>
+</header>
+
+<div class="shell">
+<aside>
+  <div class="nav-lbl">Menu</div>
+  <div class="nav-item active" data-page="mission">🎯 Misi</div>
+  <div class="nav-item" data-page="evidence">🧾 Bukti</div>
+  <div class="nav-item" data-page="audit">📋 Audit Trail</div>
+  <div class="aside-foot">Recommendation ≠ Authority.<br>Preview ≠ Execution.<br><br>Semua data di halaman ini berasal langsung dari backend SAM (bukan contoh).</div>
 </aside>
 
 <main>
-<header class="topbar">
-  <div class="brand">SAM <small>Mission Workspace</small></div>
-  <div class="top-actions"><span id="rtPill" class="pill">checking...</span><span class="avatar" id="avatarBtn" title="Klik utk logout" onclick="doLogout()">U</span></div>
-</header>
 
-<div class="content">
-
-<section id="home" class="view active">
-  <div class="home">
-    <div class="hero">
-      <div class="eyebrow">SAM Mission Workspace</div>
-      <h1>Apa yang ingin kita selesaikan?</h1>
-      <p>Tulis tujuan. SAM menjalankan Mission melalui <code>POST /mission/{id}</code> &mdash; Mission Cognitive Runtime (MCR) dengan MissionBuilder & governance.</p>
-      <div class="ask" id="askBar"><input id="goal" placeholder="Saya ingin..." onkeydown="if(event.key==='Enter')startMission()"><button onclick="startMission()">&gt;</button></div>
-      <div class="shortcuts">
-        <button onclick="fill('Analisis arsitektur provider execution')">Analisis arsitektur</button>
-        <button onclick="fill('Audit governance boundary')">Audit governance</button>
-        <button onclick="fill('Review mission cycle')">Review cycle</button>
-        <button onclick="fill('Periksa status runtime')">Status runtime</button>
-        <button onclick="fill('Rencanakan integrasi')">Rencanakan integrasi</button>
-      </div>
-    </div>
-    <div class="recent card">
-      <div class="card-head"><h3>Mission terakhir</h3><span id="recentTag">session-scoped</span></div>
-      <div class="recent-grid" id="recentGrid"></div>
-    </div>
-  </div>
-</section>
-
-<section id="missions" class="view">
-  <div class="mission-head">
-    <div class="row"><div><div class="eyebrow" id="mEyebrow">Mission</div><h1 id="missionTitle">Belum ada mission</h1><div class="sub" id="mSub">Klik "Continue" untuk menjalankan. Semua aksi melalui jalur MCR production.</div></div>
-    <div><button class="btn" id="pauseBtn" onclick="rejectMission()" disabled>Tolak</button> <button class="btn primary" id="continueBtn" onclick="runMission()">Continue</button></div></div>
-  </div>
-
-  <div class="mission-layout">
+<!-- ============ MISI ============ -->
+<section class="page active" id="page-mission">
+  <div class="grid-home">
     <div>
-      <div class="card objective"><div class="row"><div><div class="eyebrow">Current objective</div><h2 id="objTitle">mission belum dijalankan</h2><p id="objDesc">Klik Continue untuk menjalankan Mission Cognitive Runtime cycle.</p></div><strong style="font-size:20px;color:#718aff" id="objProgress">--</strong></div><div class="progress" id="progBar"><i style="width:0%"></i></div></div>
-
-      <div class="card" style="margin-top:10px">
-        <div class="card-head"><h3>MCR Internal Phases</h3><span>klik untuk lihat status</span></div>
-        <div class="canvas">
-          <div class="edge e1"></div><div class="edge e2"></div><div class="edge e3"></div><div class="edge e4"></div><div class="edge e5"></div><div class="edge e6"></div>
-
-          <div class="node n1" onclick="inspectPhase('remember')"><div class="orb">&#9635;</div><b>Remember</b><small id="phRemember">fase internal</small></div>
-          <div class="node n2" onclick="inspectPhase('investigate')"><div class="orb">&#9672;</div><b>Investigate</b><small id="phInvestigate">fase internal</small></div>
-          <div class="node n3" onclick="inspectPhase('observe')"><div class="orb">&#9676;</div><b>Observe</b><small id="phObserve">fase internal</small></div>
-          <div class="node n4" onclick="inspectPhase('understand')"><div class="orb">&#9636;</div><b>Understand</b><small id="phUnderstand">/knowledge/</small></div>
-          <div class="node direct n5" onclick="inspectPhase('act')"><div class="orb">&#9654;</div><b>Act</b><small id="phAct">governed</small></div>
-          <div class="node n6" onclick="inspectPhase('verify')"><div class="orb">&#9671;</div><b>Verify</b><small id="phVerify">fase internal</small></div>
-          <div class="node center"><div class="orb">&#9678;</div><b>Mission</b><small>POST /mission</small></div>
-          <div class="canvas-note">Ini adalah visualisasi fase internal MCR &mdash; bukan aksi mandiri.</div>
+      <div class="card"><div class="card-head"><h3>🦋 Misi Berjalan</h3><span class="cnt" id="reqId">—</span></div>
+        <div class="understand" id="missionCard">
+          <div class="empty">Belum ada misi. Ketik permintaan di bawah untuk memulai.</div>
         </div>
       </div>
 
-      <div class="under-grid">
-        <div class="card"><div class="card-head"><h3>Hasil Cycle Terakhir</h3><span id="cycleTime">--</span></div><div class="context" id="cycleResult"><p><strong>Belum ada cycle.</strong> Jalankan mission untuk melihat hasil.</p></div></div>
-        <div class="card"><div class="card-head"><h3>Route Status</h3><span>live probe</span></div><div class="next" id="routeProbe"><p>Memeriksa...</p></div></div>
+      <div class="card"><div class="card-head"><h3>✍️ Mulai Misi Baru</h3></div>
+        <div class="pad">
+          <div class="chips">
+            <div class="chip" onclick="fillAsk('Periksa status runtime')">Periksa status runtime</div>
+            <div class="chip" onclick="fillAsk('Buka halaman example.com')">Buka halaman example.com</div>
+            <div class="chip" onclick="fillAsk('Kirim data ke JSONPlaceholder')">Kirim data ke JSONPlaceholder</div>
+          </div>
+          <div class="inputrow">
+            <textarea id="ask" placeholder="Tulis permintaan untuk SAM…"></textarea>
+            <button class="send" id="submitBtn" onclick="submitMission()">➤ Kirim</button>
+          </div>
+          <div class="dim" style="margin-top:8px">Setelah dikirim, SAM akan memahami permintaan, menyusun rencana, lalu menunggu persetujuan kamu sebelum eksekusi nyata.</div>
+        </div>
       </div>
     </div>
 
     <div>
-      <div class="card side-card"><div class="card-head"><h3>Mission state</h3><span>dari /ux/state</span></div><div class="side-list" id="missionState">
-        <div class="side-row"><span>Menunggu</span><b>belum ada mission</b></div></div></div>
-      <div class="card side-card"><div class="card-head"><h3>Last Activity</h3><span></span></div><div class="activity" id="lastActivity">
-        <div class="event"><i class="dot"></i><div><b>Menunggu</b><small>Belum ada cycle dijalankan</small></div><time>--</time></div>
-      </div></div>
-      <div class="card side-card"><div class="card-head"><h3>Panduan</h3><span></span></div><div class="next"><p>Semua aksi melalui jalur MCR production (<code>POST /mission</code>). Fase Remember/Investigate/Observe/Verify adalah langkah internal MCR dalam satu cycle &mdash; bukan aksi mandiri. Klik node untuk melihat status capability yang tersedia.</p></div></div>
+      <div class="card"><div class="card-head"><h3>🔎 Pemahaman SAM</h3></div>
+        <div class="pad" id="understandSide">
+          <div class="empty">Belum ada misi.</div>
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><h3>📦 Status Eksekusi</h3></div>
+        <div class="pad" id="execSide">
+          <div class="empty">Belum ada misi.</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="knowledge" class="view">
- <div class="row" style="margin-bottom:15px"><div><div class="eyebrow">Workspace</div><h1>Knowledge</h1><div class="sub">Sumber knowledge dari <code>GET /knowledge/</code> (read-only).</div></div><button class="btn primary" disabled title="Write endpoint belum tersedia (G4)">Add source (UNAVAILABLE)</button></div>
- <div class="card"><div class="card-head"><h3>Available sources</h3><span id="knowCount">loading...</span></div><div class="side-list" id="knowList"><div class="side-row"><span>Status</span><b>Memeriksa...</b></div></div></div>
+<!-- ============ BUKTI ============ -->
+<section class="page" id="page-evidence">
+  <div class="card"><div class="card-head"><h3>🧾 Evidence Chain</h3><span class="cnt" id="evCnt">0 item</span></div>
+    <div id="evidenceList"><div class="empty">Belum ada bukti.</div></div>
+  </div>
 </section>
 
-<section id="agents" class="view">
- <div class="row" style="margin-bottom:15px"><div><div class="eyebrow">Agents</div><h1>Collaboration</h1><div class="sub">ACC adalah integration boundary (pending). Agent registry dari <code>GET /mission/</code>.</div></div><button class="btn primary" disabled title="ACC belum diimplementasikan (G5)">Open ACC (UNAVAILABLE)</button></div>
- <div class="acc-grid"><div class="card"><div class="card-head"><h3>Registered agents</h3><span id="agentCount">loading...</span></div>
-  <div id="agentList"></div>
- </div>
- <div class="card chat"><div class="card-head"><h3>ACC &mdash; Integration Boundary</h3><span>pending</span></div><div class="messages"><div class="bubble">ACC (Agent Collaboration Center) belum diimplementasikan. Ini adalah integration boundary yang belum tersedia di production (G5).</div><br><div class="bubble">Untuk saat ini, semua agent coordination terjadi melalui Mission Cognitive Runtime (MCR) sebagai satu-satunya cognitive owner.</div></div><div class="composer"><input placeholder="ACC unavailable..." disabled><button class="btn primary" disabled>&gt;</button></div></div></div>
+<!-- ============ AUDIT ============ -->
+<section class="page" id="page-audit">
+  <div class="card"><div class="card-head"><h3>📋 Audit Trail</h3><span class="cnt" id="audCnt">0 item</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>Tahap</th><th>Status</th><th>Detail</th></tr></thead>
+      <tbody id="auditBody"></tbody>
+    </table></div>
+  </div>
 </section>
 
-<section id="advanced" class="view">
- <div style="margin-bottom:15px"><div class="eyebrow">Advanced</div><h1>Control Plane</h1><div class="sub">Visibilitas runtime &mdash; audit, policy, workflow, approval read-only.</div></div>
- <div class="advanced-grid">
-  <div class="card"><div class="card-head"><h3>Approvals</h3><span id="approvalTag">read-only</span></div><div class="approval" id="approvalList">
-   <div class="approval-item"><b>Route: GET /approval/{id}</b><small>Read-only inspection. Decision endpoint tidak tersedia (G6).</small></div>
-  </div></div>
-  <div class="card"><div class="card-head"><h3>Audit</h3><span>GET /audit/</span></div><div class="activity" id="auditList">
-   <div class="event"><i class="dot" style="background:var(--green)"></i><div><b>Route aktif</b><small>GET /audit/ tersedia</small></div><time id="auditTime">--</time></div>
-  </div></div>
- </div>
- <div class="advanced-grid" style="margin-top:10px">
-  <div class="card"><div class="card-head"><h3>Policy</h3><span>GET /policy/</span></div><div class="side-list" id="policyList"><div class="side-row"><span>Status</span><b>Memeriksa...</b></span></div></div></div>
-  <div class="card"><div class="card-head"><h3>Workflow</h3><span>GET /workflow/</span></div><div class="side-list" id="workflowList"><div class="side-row"><span>Status</span><b>Memeriksa...</b></span></div></div></div>
- </div>
-</section>
-
-</div>
 </main>
 </div>
 
-<div class="overlay" id="overlay" onclick="closePanel()"></div>
-<aside class="panel" id="panel">
- <button class="close" onclick="closePanel()">x</button>
- <div class="eyebrow">Node Detail</div>
- <h2 id="panelTitle">--</h2>
- <p class="lead" id="panelLead">Memuat...</p>
- <div class="action-title">Status</div>
- <div class="actionbox" id="panelBody"></div>
- <div class="action-title">Route / Kontrak</div>
- <div class="actionbox"><p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55" id="panelRoute">--</p></div>
-</aside>
+<footer>
+  <span>Status <span id="footHealth" class="wr">…</span></span>
+  <span>Service <span id="footVersion" class="cy">…</span></span>
+  <span id="footUser" class="dim">belum login</span>
+  <span style="margin-left:auto" id="clock">--:-- WITA</span>
+</footer>
 
-<!-- M11-004: login overlay (production identity) -->
-<div class="overlay auth-overlay" id="authOverlay" style="display:none">
-  <div class="auth-card">
-    <div class="auth-logo">S</div>
-    <h2>Masuk ke SAM</h2>
-    <p class="auth-sub">Produksi memerlukan autentikasi operator sebelum menyetujui misi.</p>
-    <input id="authUser" autocomplete="username" placeholder="Username">
-    <input id="authPass" type="password" autocomplete="current-password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
-    <div class="auth-err" id="authErr"></div>
-    <button class="btn primary " onclick="doLogin()">Login</button>
-    <div class="auth-hint" id="authUserLabel"></div>
+<!-- login overlay -->
+<div class="overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>🔐 Masuk ke SAM</h2>
+    <p>Keputusan approval membutuhkan identitas terverifikasi.</p>
+    <label>Username</label>
+    <input id="loginUser" placeholder="username">
+    <label>Password</label>
+    <input id="loginPass" type="password" placeholder="password">
+    <div class="err" id="loginErr"></div>
+    <button class="btn btn-yes" onclick="doLogin()">Masuk</button>
+    <button class="btn" style="margin-top:8px;width:100%" onclick="closeLogin()">Batal</button>
   </div>
 </div>
 
+<div id="toasts"></div>
+
 <script>
-// ===== THIN CLIENT: semua interaksi fetch ke route SAM production =====
+// ===== state =====
+// Token sesi dibawa via cookie httpOnly (server), TIDAK disimpan di JS.
+let currentUser = null;
 
-var _state = {
-  runtimeOnline: false,
-  runtimeVersion: '--',
-  running: false,
-  lastResult: null,
-  missionGoal: '',
-  cycleTime: '--'
-};
+// ===== helpers =====
+function toast(m,t='ok'){const e=document.createElement('div');e.className='toast '+t;e.textContent=m;
+  document.getElementById('toasts').appendChild(e);setTimeout(()=>{e.style.opacity=0;e.style.transition='.4s';setTimeout(()=>e.remove(),400)},4200);}
 
-function _(id){ return document.getElementById(id); }
-
-// ----- HTTP helpers (M11-004: sertakan Bearer token bila ada) -----
-var _authToken = localStorage.getItem('sam_auth_token') || null;
-function authHeaders() {
-  return _authToken ? { 'Authorization': 'Bearer ' + _authToken } : {};
-}
-
-async function api(method, url, body) {
-  try {
-    var init = { method: method, headers: Object.assign({ 'Accept': 'application/json' }, authHeaders()) };
-    if (body !== undefined) { init.headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(body); }
-    var r = await fetch(url, init);
-    var txt = await r.text();
-    try { return { ok: r.ok, status: r.status, data: JSON.parse(txt), raw: txt }; }
-    catch(e) { return { ok: r.ok, status: r.status, data: null, raw: txt }; }
-  } catch(e) {
-    return { ok: false, status: 0, data: null, raw: String(e) };
+async function api(path, opts={}){
+  const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  const res = await fetch(path, Object.assign({}, opts, {headers, credentials:'same-origin'}));
+  if(res.status===401 && !path.endsWith('/login') && !path.endsWith('/me')){
+    // belum login / sesi habis
+    showLogin();
+    throw new Error('unauthorized');
   }
+  const data = await res.json().catch(()=>({}));
+  return {status:res.status, data};
 }
 
-function apiGet(url){ return api('GET', url); }
-function apiPost(url, body){ return api('POST', url, body); }
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-// ----- M11-004: production identity (login/logout/check) -----
-function doLogin() {
-  var u = _('authUser').value.trim();
-  var p = _('authPass').value;
-  _('authErr').textContent = '';
-  if (!u || !p) { _('authErr').textContent = 'Isi username dan password.'; return; }
-  apiPost('/ux/login', { username: u, password: p }).then(function(res){
-    if (res.ok && res.data && res.data.token) {
-      _authToken = res.data.token;
-      localStorage.setItem('sam_auth_token', _authToken);
-      _('authOverlay').style.display = 'none';
-      _('authPass').value = '';
-      renderAuthUser(res.data.user);
-    } else {
-      _('authErr').textContent = 'Login gagal: ' + (res.data && res.data.detail ? res.data.detail : 'periksa username/password');
-    }
-  });
+// ===== navigation =====
+document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>showPage(n.dataset.page)));
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id==='page-'+p));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x.dataset.page===p));
 }
 
-function doLogout() {
-  apiPost('/ux/logout', {}).then(function(){
-    _authToken = null;
-    localStorage.removeItem('sam_auth_token');
-    showLoginIfNeeded();
-    renderAuthUser(null);
-  });
+// ===== auth =====
+function showLogin(){
+  document.getElementById('loginOverlay').classList.add('open');
+  document.getElementById('loginErr').style.display='none';
 }
-
-function renderAuthUser(user) {
-  var av = document.querySelector('.avatar');
-  if (user) { if (av) av.textContent = (user.username || 'U').charAt(0).toUpperCase(); }
-  else if (av) { av.textContent = 'U'; }
-}
-
-// Cek status auth: bila server mewajibkan login (auth aktif) dan belum ada
-// token valid -> tampilkan overlay login.
-async function showLoginIfNeeded() {
-  var me = await apiGet('/ux/me');
-  if (me.status === 401) {
-    _('authOverlay').style.display = 'flex';
-    return;
-  }
-  if (me.ok && me.data && me.data.user) renderAuthUser(me.data.user);
-}
-
-// ----- Runtime status probe -----
-async function probeRuntime() {
-  var h = await apiGet('/health');
-  var rt = await apiGet('/runtime');
-  var rdy = await apiGet('/health/ready');
-
-  _state.runtimeOnline = h.ok && rdy.ok;
-  _state.runtimeVersion = (rt.ok && rt.data && rt.data.version) ? rt.data.version : '--';
-
-  var pill = _('rtPill');
-  var dot = _('asideDot');
-  if (_state.runtimeOnline) {
-    pill.className = 'pill';
-    pill.textContent = 'Runtime online v' + _state.runtimeVersion;
-    dot.style.color = '#64d49a';
+function closeLogin(){document.getElementById('loginOverlay').classList.remove('open');}
+async function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(!u||!p){document.getElementById('loginErr').textContent='Isi username dan password.';document.getElementById('loginErr').style.display='block';return;}
+  const r = await api('/ux/login',{method:'POST',body:JSON.stringify({username:u,password:p})});
+  if(r.status===200 && r.data.user){
+    currentUser = r.data.user;
+    document.getElementById('loginOverlay').classList.remove('open');
+    document.getElementById('loginPass').value='';
+    updateAuthUI();
+    toast('Berhasil masuk sebagai '+r.data.user.username+'.','ok');
+    refreshAll();
   } else {
-    pill.className = 'pill off';
-    pill.textContent = 'Runtime offline';
-    dot.style.color = '#e77d84';
-  }
-
-  // probe route panel di mission view
-  var routes = [
-    ['/health', 'GET', '/health', !!h.ok],
-    ['/runtime', 'GET', '/runtime', !!rt.ok],
-    ['/health/ready', 'GET', '/health/ready', !!rdy.ok]
-  ];
-  var probeDiv = _('routeProbe');
-  if (probeDiv) {
-    var lines = routes.map(function(r){ return '<p style="font-size:9px;margin:3px 0"><span style="color:'+(r[3]?'var(--green)':'var(--red)')+'">'+(r[3]?'OK':'ERR')+'</span> '+r[0]+' ('+r[1]+')</p>'; }).join('');
-    probeDiv.innerHTML = '<strong>'+(_state.runtimeOnline ? 'All routes connected' : 'Some routes failed')+'</strong>'+lines;
+    document.getElementById('loginErr').textContent = r.data.detail || 'Login gagal.';
+    document.getElementById('loginErr').style.display='block';
   }
 }
-
-// ----- Navigation -----
-var _navMap = { home:'home', missions:'missions', knowledge:'knowledge', agents:'agents', advanced:'advanced' };
-function showView(v) {
-  document.querySelectorAll('.view').forEach(function(x){ x.classList.remove('active'); });
-  var el = _(v);
-  if (el) el.classList.add('active');
-  document.querySelectorAll('.nav button').forEach(function(b){ b.classList.toggle('active', b.dataset.view === v); });
-  // Priority #7: state nyata, bukan toast/prototype.
-  if (v === 'missions') refreshMissionState();
-  if (v === 'knowledge') probeKnowledge();
-  if (v === 'agents') probeAgents();
-  if (v === 'advanced') probeAdvanced();
+async function doLogout(){
+  await api('/ux/logout',{method:'POST'});
+  currentUser=null;
+  updateAuthUI();
+  toast('Keluar.','warn');
 }
-
-document.querySelectorAll('.nav button').forEach(function(b){
-  b.onclick = function(){ showView(b.dataset.view); };
+function updateAuthUI(){
+  const av=document.getElementById('avatarBtn');
+  const pill=document.getElementById('authPill');
+  const foot=document.getElementById('footUser');
+  if(currentUser){
+    av.textContent=(currentUser.username||'?')[0].toUpperCase();
+    av.title=currentUser.username+' ('+currentUser.role+')';
+    pill.style.display='flex';
+    document.getElementById('authTxt').textContent=currentUser.username;
+    foot.textContent='login: '+currentUser.username+' ('+currentUser.role+')';
+  } else {
+    av.textContent='?';
+    av.title='Masuk';
+    pill.style.display='none';
+    foot.textContent='belum login';
+  }
+}
+document.getElementById('avatarBtn').addEventListener('click',()=>{
+  if(currentUser){ if(confirm('Logout?')) doLogout(); }
+  else showLogin();
 });
 
-// ----- Home: start mission -----
-function fill(t){ _('goal').value = t; _('goal').focus(); }
-
-async function startMission() {
-  var g = _('goal').value.trim();
-  if (!g) return;
-
-  _state.missionGoal = g;
-  _state.running = true;
-  _state.lastResult = null;
-
-  // update UI ke mission view
-  _('missionTitle').textContent = g;
-  _('mEyebrow').textContent = 'Misi';
-  _('mSub').textContent = 'SAM sedang memahami permintaan Anda...';
-  _('continueBtn').disabled = true;
-  _('continueBtn').textContent = 'Running...';
-  _('pauseBtn').disabled = true;
-  _('objTitle').textContent = g;
-  _('objDesc').textContent = 'Menyusun rencana...';
-
-  showView('missions');
-
-  // Jalur UX nyata (M9): UI -> MissionUXService -> canonical runtime.
-  // TIDAK bypass ke GitHub/adapter lain. Browser hanya fetch ke /ux.
-  var res = await apiPost('/ux/submit', { text: g });
-
-  _state.running = false;
-  if (!res.ok) {
-    _('mSub').textContent = 'Server error: ' + res.status + ' -- ' + (res.raw||'').substring(0,120);
-    _('objDesc').textContent = 'server returned: ' + res.status;
-    _('continueBtn').disabled = true;
-    _('objProgress').textContent = 'ERR';
-    return;
+// ===== health =====
+async function refreshHealth(){
+  try{
+    const r = await fetch('/health/ready');
+    const d = await r.json();
+    const ok = d.state==='healthy' || d.status==='ready';
+    const dot=document.getElementById('healthPill').querySelector('.dot');
+    dot.style.background = ok?'var(--green)':'var(--red)';
+    dot.style.boxShadow = ok?'0 0 8px var(--green)':'0 0 8px var(--red)';
+    document.getElementById('healthTxt').textContent = ok?'SAM sehat':'SAM bermasalah';
+    document.getElementById('footHealth').textContent = ok?'HEALTHY':'UNHEALTHY';
+    document.getElementById('footHealth').className = ok?'ok':'bd';
+  }catch(e){
+    document.getElementById('healthTxt').textContent='tidak terhubung';
+    document.getElementById('footHealth').textContent='OFFLINE';
+    document.getElementById('footHealth').className='bd';
   }
-
-  var d = res.data;
-  _state.lastResult = d;
-
-  // render rencana (bahasa manusia dari viewmodel)
-  _('objTitle').textContent = d.understanding.what_sam_understood || g;
-  var steps = (d.plan && d.plan.planned_steps) || [];
-  _('objDesc').textContent = d.plan && d.plan.action_summary ? d.plan.action_summary : 'SAM menyusun rencana.';
-  _('objProgress').textContent = steps.length + ' steps';
-  _('progBar').innerHTML = '<i style="width:15%"></i>';
-
-  // tampilkan langkah + approval di cycle result
-  var stepHtml = steps.map(function(s,i){ return (i+1) + '. ' + esc(s); }).join('<br>');
-  _('cycleResult').innerHTML =
-    '<p><strong>Yang SAM pahami</strong><br>' + esc(d.understanding.what_sam_understood||'') +
-    '<br><br><strong>Rencana SAM</strong><br>' + stepHtml +
-    '<br><br><strong>Perlu persetujuan?</strong> ' + (d.plan.approval_required ? 'Ya' : 'Tidak') + '</p>';
-  _('cycleTime').textContent = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-
-  // tombol approval nyata (gate)
-  _('continueBtn').disabled = false;
-  _('continueBtn').textContent = 'Approve & Jalankan';
-  _('continueBtn').onclick = function(){ approveMission(); };
-  _('pauseBtn').disabled = false;
-  _('pauseBtn').textContent = 'Tolak';
-  _('pauseBtn').onclick = function(){ rejectMission(); };
-  _('pauseBtn').title = 'Tolak mission (tidak ada eksekusi)';
-
-  refreshMissionState();
-  addRecent(g, false);
+}
+async function refreshRuntime(){
+  try{
+    const r = await fetch('/runtime');
+    const d = await r.json();
+    document.getElementById('footVersion').textContent = d.version||'?';
+  }catch(e){document.getElementById('footVersion').textContent='?';}
 }
 
-// Approve: real execution gate -> canonical runtime -> real external effect.
-async function approveMission() {
-  if (!_state.missionGoal) { return; }
-  _('continueBtn').disabled = true;
-  _('continueBtn').textContent = 'Menjalankan...';
-  _('pauseBtn').disabled = true;
-  _('objDesc').textContent = 'Approval diterima. SAM menjalankan eksekusi nyata...';
-  _('objProgress').textContent = 'RUN';
-  _('progBar').innerHTML = '<i style="width:60%"></i>';
-
-  // M11-004: approver TIDAK dikirim dari client — identitas diambil server
-  // dari sesi login (Authorization).
-  var res = await apiPost('/ux/decide', { intent: 'approve' });
-  renderOutcome(res);
-}
-
-// Reject: no execution.
-async function rejectMission() {
-  if (!_state.missionGoal) { return; }
-  _('continueBtn').disabled = true;
-  _('pauseBtn').disabled = true;
-  _('objDesc').textContent = 'Mission ditolak.';
-  var res = await apiPost('/ux/decide', { intent: 'reject' });
-  renderOutcome(res);
-}
-
-// M9-008.3: evidence-first result. Setelah mission selesai user melihat:
-//   What SAM did / What changed externally / How SAM verified it /
-//   Evidence / Artifact / Audit — bukan sekadar "Mission completed ✓".
-// Render dari STATE SERVER (source of truth), bukan dari JS memory.
-// M9-008.4: evidence & audit diambil eksplisit dari /ux/evidence + /ux/audit
-// (runtime source), bukan hanya dari state embedding.
-async function renderOutcomeFromState(d) {
-  if (!d) return;
-  _state.lastResult = d;
-  var ex = d.execution || {};
-  var st = ex.status;
-  var appr = (d.approval && d.approval.status) || '';
-
-  // failure / blocked / rejected / completed semantics (M9-008.5):
-  // nilai dari runtime state, bukan hardcoded UI.
-  if (st === 'completed') {
-    _('objProgress').textContent = 'OK';
-    _('progBar').innerHTML = '<i style="width:100%"></i>';
-    _('mSub').textContent = 'Eksekusi nyata selesai.';
-  } else if (st === 'blocked') {
-    _('objProgress').textContent = 'BLOCKED';
-    _('progBar').innerHTML = '<i style="width:40%;background:var(--amber, #f0b429)"></i>';
-    _('mSub').textContent = 'BLOCKED: ' + (ex.failure_message||'');
-  } else if (st === 'rejected' || appr === 'rejected') {
-    _('objProgress').textContent = 'REJECTED';
-    _('progBar').innerHTML = '<i style="width:20%;background:#e77d84"></i>';
-    _('mSub').textContent = 'Mission ditolak pengguna. Tidak ada eksekusi.';
+// ===== auth me check =====
+async function refreshMe(){
+  const r = await api('/ux/me');
+  if(r.status===200 && r.data.authenticated){
+    currentUser = r.data.user;
   } else {
-    _('objProgress').textContent = st ? st.toUpperCase() : 'FAILED';
-    _('progBar').innerHTML = '<i style="width:50%;background:#e77d84"></i>';
-    _('mSub').textContent = (st ? st.toUpperCase() + ': ' : 'FAILED: ') + (ex.failure_message||'eksekusi gagal');
+    currentUser = null;
   }
-  _('objDesc').textContent = ex.result_summary || '';
-
-  // ----- Evidence-first blocks (M9-008.3) -----
-  var understanding = (d.understanding && d.understanding.what_sam_understood) || '--';
-  var steps = (d.plan && d.plan.planned_steps) || [];
-  var stepHtml = steps.map(function(s,i){ return (i+1) + '. ' + esc(s); }).join('<br>') || '--';
-
-  // M9-008.4: tarik evidence & audit penuh dari endpoint runtime (bukan hanya
-  // dari state embedding). Kalau request refresh cukup cepat dan route belum
-  // siap, fallback ke nilai yang sudah ada di state.
-  var evList = [];
-  var audList = [];
-  try {
-    var evRes = await apiGet('/ux/evidence');
-    if (evRes.ok && evRes.data && Array.isArray(evRes.data.evidence)) evList = evRes.data.evidence;
-    var auRes = await apiGet('/ux/audit');
-    if (auRes.ok && auRes.data && Array.isArray(auRes.data.audit)) audList = auRes.data.audit;
-  } catch (e) { /* fallback di bawah */ }
-  if (evList.length === 0) evList = d.evidence || [];
-  if (audList.length === 0) audList = d.timeline || [];
-
-  var ev = evList.length
-    ? evList.map(function(e){ return '&#9679; ' + esc(e.kind||e.stage||'') + ': ' + esc(e.url || e.detail || ''); }).join('<br>')
-    : 'Tidak ada evidence eksternal.';
-  var art = d.artifact_ref ? esc(d.artifact_ref) : '--';
-  var aud = audList.length
-    ? audList.map(function(t){ return '&middot; ' + esc(t.stage||'') + ': ' + (t.ok ? 'ok' : (t.blocked ? 'blocked' : 'err')) + (t.detail ? ' — ' + esc(t.detail) : ''); }).join('<br>')
-    : (d.audit_ref ? esc(d.audit_ref) : '--');
-  // opsional: timeline yang sudah di-scrub (what actually happened, verified)
-  var tl = (d.timeline || []).map(function(t){
-    return esc(t.stage||'') + ': ' + (t.ok ? 'ok' : (t.blocked ? 'blocked' : 'err'))
-      + (t.detail ? ' — ' + esc(t.detail) : '');
-  }).join('<br>');
-
-  _('objTitle').textContent = understanding;
-  _('cycleResult').innerHTML =
-    '<p><strong>Status</strong>: ' + esc(st) +
-    (ex.failure_kind ? ' <span style="color:#e77d84">(' + esc(ex.failure_kind) + ')</span>' : '') +
-    '<br><br><strong>Yang SAM lakukan (rencana)</strong><br>' + stepHtml +
-    '<br><br><strong>Perubahan eksternal &amp; verifikasi</strong><br>' +
-      (ev === 'Tidak ada evidence eksternal.' ? ev : ev) +
-    '<br><br><strong>Artifact yang dihasilkan</strong>: ' + art +
-    '<br><strong>Audit trail</strong>: ' + aud +
-    (tl ? '<br><br><strong>Timeline (sanitized)</strong><br>' + tl : '') + '</p>';
-  _('cycleTime').textContent = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-
-  _('continueBtn').textContent = 'Mission Baru';
-  _('continueBtn').disabled = false;
-  _('continueBtn').onclick = function(){ startMissionForce(_state.missionGoal); };
-  _('pauseBtn').style.display = 'none';
-
-  refreshMissionState();
+  updateAuthUI();
 }
 
-// Render hasil nyata (success/failure semantics) dari /ux.
-// Delegasi ke renderOutcomeFromState — UI selalu menampilkan state server.
-async function renderOutcome(res) {
-  if (!res.ok) {
-    _('objProgress').textContent = 'ERR';
-    _('cycleResult').innerHTML = '<p><strong>Server error</strong> ' + res.status + ': ' + esc(res.raw||'').substring(0,200) + '</p>';
+// ===== mission state =====
+function renderOutcomeFromState(s){
+  const el = document.getElementById('missionCard');
+  const sid = document.getElementById('understandSide');
+  const execEl = document.getElementById('execSide');
+  document.getElementById('reqId').textContent = s.request_id || '—';
+
+  if(!s.request_id){
+    el.innerHTML='<div class="empty">Belum ada misi. Ketik permintaan di bawah untuk memulai.</div>';
+    sid.innerHTML='<div class="empty">Belum ada misi.</div>';
+    execEl.innerHTML='<div class="empty">Belum ada misi.</div>';
     return;
   }
-  await renderOutcomeFromState(res.data);
+
+  // main card: request + plan + approval
+  const u = s.understanding||{};
+  const p = s.plan||{};
+  const ap = s.approval||{};
+  const ex = s.execution||{};
+  const apStatus = ap.status||'none';
+  const exStatus = ex.status||'none';
+
+  let html = '';
+  html += '<div class="say">"'+esc(s.request||'')+'"</div>';
+  html += '<div class="sub">'+esc(u.what_sam_understood||'')+'</div>';
+
+  // plan
+  if(p.planned_steps && p.planned_steps.length){
+    html += '<div class="planbox"><h4>Rencana SAM</h4>';
+    p.planned_steps.forEach(st=>{ html += '<li>'+esc(st)+'</li>'; });
+    html += '</div>';
+  }
+  html += '<div class="kv"><span class="k">Operasi</span><span class="v mono">'+esc(u.operation||'-')+'</span></div>';
+  html += '<div class="kv"><span class="k">Target</span><span class="v mono">'+esc(u.target||'-')+'</span></div>';
+
+  // approval area — tombol hanya saat benar-benar menunggu keputusan
+  if(apStatus==='waiting_approval'){
+    html += '<div style="margin-top:12px"><div class="ask"><span class="q">❓</span> Apakah kamu setujui SAM menjalankan ini?</div>';
+    html += '<div class="dec-actions">';
+    html += '<button class="btn btn-yes" id="btnApprove" onclick="decide(\'approve\')">✔ Setujui</button>';
+    html += '<button class="btn btn-no" id="pauseBtn" onclick="decide(\'reject\')">✖ Tolak</button>';
+    html += '</div></div>';
+  }
+
+  if(apStatus==='approved'){
+    html += '<div class="result ok">✔ DISETUJUI'+(ap.decision&&ap.decision.approver?' oleh '+esc(ap.decision.approver):'')+' — diteruskan ke eksekusi.</div>';
+  } else if(apStatus==='rejected'){
+    html += '<div class="result bd">✖ DITOLAK — 0 side-effect.</div>';
+  }
+
+  // execution result
+  if(exStatus==='completed'){
+    html += '<div class="result ok">✔ Selesai: '+esc(ex.result_summary||'')+'</div>';
+  } else if(exStatus==='blocked' || exStatus==='failed'){
+    html += '<div class="result wr">⚠ '+(ex.failure_kind==='blocked'?'DIBLOKIR':'GAGAL')+': '+esc(ex.failure_message||'')+'</div>';
+  } else if(exStatus==='running'){
+    html += '<div class="result cy">▶ Sedang berjalan…</div>';
+  }
+
+  el.innerHTML = html;
+
+  // side: understanding
+  sid.innerHTML = '<div class="kv"><span class="k">Dipahami</span><span class="v">'+esc(u.what_sam_understood||'-')+'</span></div>'
+    +'<div class="kv"><span class="k">Operasi</span><span class="v mono">'+esc(u.operation||'-')+'</span></div>'
+    +'<div class="kv"><span class="k">Target</span><span class="v mono">'+esc(u.target||'-')+'</span></div>';
+
+  // side: execution status
+  const statusBadge = {
+    'none':['b-info','NONE'],'received':['b-info','DITERIMA'],'understood':['b-info','DIPAHAMI'],
+    'waiting_approval':['b-info','MENUNGGU'],'approved':['b-low','DISETUJUI'],
+    'rejected':['b-high','DITOLAK'],'running':['b-cy','BERJALAN'],'completed':['b-low','SELESAI'],
+    'blocked':['b-med','DIBLOKIR'],'failed':['b-high','GAGAL'],'retryable':['b-med','BISA COBA LAGI']
+  }[exStatus] || ['b-info', (exStatus||'?').toUpperCase()];
+  execEl.innerHTML = '<div class="kv"><span class="k">Status</span><span class="v"><span class="badge '+statusBadge[0]+'">'+statusBadge[1]+'</span></span></div>'
+    +(ex.failure_kind&&ex.failure_kind!=='none'?'<div class="kv"><span class="k">Jenis</span><span class="v mono">'+esc(ex.failure_kind)+'</span></div>':'')
+    +(ex.result_summary?'<div class="kv"><span class="k">Hasil</span><span class="v">'+esc(ex.result_summary)+'</span></div>':'')
+    +'<div class="kv"><span class="k">Diperbarui</span><span class="v mono dim">'+esc((s.updated_at||'').replace('T',' ').slice(0,19))+'</span></div>';
 }
 
-async function startMissionForce(g) {
-  var gi = _('goal');
-  if (gi) gi.value = g;
-  await startMission();
+async function hydrateFromServer(){
+  const r = await api('/ux/state');
+  if(r.status===200){ renderOutcomeFromState(r.data); }
 }
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function runMission() {
-  if (!_state.missionGoal) { _('missionTitle').textContent = 'Tulis tujuan di Home dulu'; return; }
-  if (_state.running) return;
-  startMissionForce(_state.missionGoal);
+async function submitMission(){
+  const v=document.getElementById('ask').value.trim();
+  if(!v){toast('Tulis permintaan dulu.','warn');return;}
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='…';
+  try{
+    const r = await api('/ux/submit',{method:'POST',body:JSON.stringify({text:v})});
+    if(r.status===200){
+      document.getElementById('ask').value='';
+      renderOutcomeFromState(r.data);
+      refreshEvidence();
+      toast('Misi dipahami SAM. Menunggu persetujuan kamu.','ok');
+    } else {
+      toast('Gagal mengirim: '+(r.data.error||r.data.detail||r.status),'bad');
+    }
+  }catch(e){ toast('Gagal mengirim.','bad'); }
+  finally{ btn.disabled=false; btn.textContent='➤ Kirim'; }
 }
 
-// Priority #2: UI -> /ux/state -> actual runtime state (bukan state hardcoded).
-async function refreshMissionState() {
-  var res = await apiGet('/ux/state');
-  var el = _('missionState');
-  var act = _('lastActivity');
-  if (!res.ok || !res.data || res.data.request_id == null) {
-    var empty = '<div class="side-row"><span>Final State</span><b>--</b></div>'+
-      '<div class="side-row"><span>Approval</span><b>--</b></div>'+
-      '<div class="side-row"><span>Execution</span><b>--</b></div>';
-    if (el) el.innerHTML = empty;
-    if (act) act.innerHTML = '<div class="event"><i class="dot"></i><div><b>Menunggu</b><small>Belum ada mission</small></div><time>--</time></div>';
+function fillAsk(t){document.getElementById('ask').value=t;}
+
+async function decide(intent){
+  // M11-004: bila auth aktif, butuh login
+  const me = await api('/ux/me');
+  if(me.status===401){
+    showLogin();
+    toast('Login dulu untuk menyetujui misi.','warn');
     return;
   }
-  var d = res.data;
-  var appr = (d.approval && d.approval.status) || '--';
-  var ex = (d.execution && d.execution.status) || '--';
-  var fs = (d.execution && d.execution.final_state) || ex || '--';
-  var apprColor = appr === 'approved' ? 'var(--green)' : (appr === 'rejected' ? 'var(--red)' : 'var(--yellow)');
-  if (el) el.innerHTML =
-    '<div class="side-row"><span>Request ID</span><b>' + esc(d.request_id) + '</b></div>'+
-    '<div class="side-row"><span>Status</span><b>' + esc(d.mission_status || '--') + '</b></div>'+
-    '<div class="side-row"><span>Approval</span><b style="color:' + apprColor + '">' + esc(appr) + '</b></div>'+
-    '<div class="side-row"><span>Execution</span><b>' + esc(fs) + '</b></div>'+
-    '<div class="side-row"><span>Kenapa</span><b>' + esc((d.approval && d.approval.reason) || '--') + '</b></div>';
-  if (act) act.innerHTML =
-    '<div class="event"><i class="dot" style="background:' + apprColor + '"></i><div><b>' + esc(appr) + '</b><small>' + esc((d.understanding && d.understanding.what_sam_understood) || 'terima mission') + '</small></div><time>' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) + '</time></div>';
-}
-
-// Priority #2: Last activity dari /ux/state (actual). updateLastActivity tidak dipakai lagi
-function updateLastActivity(d) { refreshMissionState(); }
-
-// ----- Recent missions (session-scoped) -----
-var _recent = [];
-function addRecent(g, ok) {
-  _recent.unshift({ goal: g, ok: ok, time: new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) });
-  if (_recent.length > 6) _recent.length = 6;
-  renderRecent();
-}
-
-function renderRecent() {
-  var grid = _('recentGrid');
-  if (_recent.length === 0) {
-    grid.innerHTML = '<div class="recent-item" style="text-align:center;padding:18px"><small>Session-scoped</small><b>Belum ada mission</b><footer><span>mission hilang saat sesi/server berhenti (G1)</span></footer></div>';
-    _('recentTag').textContent = 'session-scoped';
-    return;
+  const r = await api('/ux/decide',{method:'POST',body:JSON.stringify({intent:intent, approver: currentUser?currentUser.username:'user'})});
+  if(r.status===200 && !r.data.error){
+    renderOutcomeFromState(r.data);
+    refreshEvidence();
+    toast(intent==='approve'?'Misi disetujui — eksekusi canonical berjalan.':'Misi ditolak — 0 side-effect.', intent==='approve'?'ok':'warn');
+  } else {
+    toast('Gagal: '+(r.data.error||r.data.detail||r.status),'bad');
   }
-  _('recentTag').textContent = _recent.length + ' item (session-scoped)';
-  grid.innerHTML = _recent.map(function(r,i){
-    return '<div class="recent-item" onclick="openRecent('+i+')"><small>Mission #'+(i+1)+'</small><b>'+esc(r.goal.substring(0,48))+'</b><div class="bar"><i style="width:'+(r.ok?100:50)+'%"></i></div><footer><span>'+(r.ok?'OK':'Done')+'</span><span class="'+(r.ok?'green':'yellow')+'">'+r.time+'</span></footer></div>';
+}
+
+// ===== evidence =====
+async function refreshEvidence(){
+  const r = await api('/ux/evidence');
+  const list = (r.data.evidence||[]);
+  const el = document.getElementById('evidenceList');
+  document.getElementById('evCnt').textContent = list.length+' item';
+  if(!list.length){el.innerHTML='<div class="empty">Belum ada bukti.</div>';return;}
+  el.innerHTML = list.map((e,i)=>{
+    const j = JSON.stringify(e);
+    return '<div class="mini"><div class="row"><span class="mono">#'+i+'</span><span class="v mono dim">'+esc(j).slice(0,80)+'</span></div></div>';
   }).join('');
 }
 
-function openRecent(i) {
-  var r = _recent[i];
-  if (!r) return;
-  _state.missionGoal = r.goal;
-  _('missionTitle').textContent = r.goal;
-  _('mEyebrow').textContent = 'Mission (recent)';
-  _('mSub').textContent = 'Klik Run Again untuk menjalankan ulang cycle.';
-  _('continueBtn').disabled = false;
-  _('continueBtn').textContent = 'Run Again';
-  _('objTitle').textContent = r.goal;
-  _('objDesc').textContent = 'Cycle sebelumnya: ' + (r.ok?'OK':'Done') + ' (' + r.time + ')';
-  _('objProgress').textContent = '--';
-  _('progBar').innerHTML = '<i style="width:0%"></i>';
-  showView('missions');
+// ===== audit =====
+async function refreshAudit(){
+  const r = await api('/ux/audit');
+  const list = (r.data.audit||[]);
+  document.getElementById('audCnt').textContent = list.length+' item';
+  const body = document.getElementById('auditBody');
+  if(!list.length){body.innerHTML='<tr><td colspan="3" class="empty">Belum ada audit.</td></tr>';return;}
+  body.innerHTML = list.map(a=>{
+    const ok = a.ok===true;
+    const blocked = a.blocked===true;
+    const stage = esc(a.stage||a.event||'-');
+    const detail = esc(a.detail||'');
+    let badge;
+    if(blocked) badge='<span class="badge b-med">BLOCKED</span>';
+    else if(ok) badge='<span class="badge b-low">OK</span>';
+    else badge='<span class="badge b-high">FAIL</span>';
+    return '<tr><td class="mono">'+stage+'</td><td>'+badge+'</td><td class="dim">'+detail+'</td></tr>';
+  }).join('');
 }
 
-// ----- Node inspection (semua fase = visualisasi, bukan aksi mandiri) -----
-var _phaseInfo = {
-  remember: {
-    title: 'Remember (fase internal MCR)',
-    lead: 'MCR mencari pengalaman/kasus sebelumnya sebagai bagian dari satu cycle Mission. Ini adalah langkah internal &mdash; bukan aksi mandiri.',
-    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Remember adalah fase awal MCR dalam satu cycle <code>POST /mission</code>. Tidak ada endpoint mandiri untuk Remember. Evidence dari memory dikumpulkan otomatis saat MCR membangun plan melalui MissionBuilder.</p>',
-    route: 'Internal MCR &mdash; tidak ada route mandiri. Hasil dari fase ini tercermin dalam <code>AgentRunResult</code> dari <code>POST /mission/{id}</code>.',
-    tag: 'UNAVAILABLE (mandiri)'
-  },
-  investigate: {
-    title: 'Investigate (fase internal MCR)',
-    lead: 'MCR menganalisis evidence dan membangun reasoning sebagai bagian dari satu cycle. Ini adalah langkah internal &mdash; bukan aksi mandiri.',
-    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Investigate adalah reasoning engine MCR yang berjalan otomatis dalam setiap cycle <code>POST /mission</code>. Tidak ada endpoint mandiri. Confidence & reasoning adalah output internal MCR, bukan aksi user.</p>'+
-      '<div style="margin-top:10px"><span class="tag-unav">FASE INTERNAL</span> <span style="font-size:8px;color:#798aa0;margin-left:6px">bukan aksi mandiri</span></div>',
-    route: 'Internal MCR &mdash; reasoning dijalankan otomatis setiap cycle. Lihat <code>detail</code> di <code>AgentRunResult</code> dari <code>POST /mission/{id}</code>.',
-    tag: 'UNAVAILABLE (mandiri)'
-  },
-  observe: {
-    title: 'Observe (fase internal MCR, best-effort)',
-    lead: 'MCR mengumpulkan observasi runtime sebagai bagian dari cycle. Observasi bersifat best-effort &mdash; cycle tetap berlanjut meskipun observasi tidak tersedia.',
-    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Observation dikumpulkan otomatis oleh MCR. Saat probe terakhir: <strong>observation unavailable (best-effort, cycle proceeds)</strong>. Ini adalah perilaku runtime yang sebenarnya — bukan simulasi. Tidak ada endpoint mandiri untuk observation.</p>'+
-      '<div style="margin-top:10px"><span class="tag-ro">BEST-EFFORT</span> <span style="font-size:8px;color:#798aa0;margin-left:6px">tidak menghalangi cycle</span></div>',
-    route: 'Internal MCR &mdash; observasi otomatis. Tidak ada route mandiri.',
-    tag: 'READ-ONLY (internal)'
-  },
-  understand: {
-    title: 'Understand (Knowledge)',
-    lead: 'Lihat knowledge yang tersedia untuk Mission. Route: <code>GET /knowledge/</code> (read-only).',
-    body: '<div id="understandBody"><p style="font-size:9px;color:#aeb9c8;margin:0">Memuat...</p></div>',
-    route: 'GET /knowledge/ &rarr; read-only. Add source mutation <strong>tidak tersedia</strong> (G4).',
-    tag: 'READ-ONLY',
-    probe: true
-  },
-  act: {
-    title: 'Act (Execution) — real jalur canonical (M9)',
-    lead: 'Eksekusi hanya terjadi melalui jalur canonical: <code>MissionUXService → ApprovalGate → mission canonical</code>. Tidak ada tombol eksekusi mandiri dan tidak ada executor kedua.',
-    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Setelah user memberi persetujuan (<code>POST /ux/decide approve</code>), SAM menjalankan eksekusi NYATA via mission canonical (mis. GitHub create issue di repo test) dengan verifikasi independen GET. Tanpa approval → WAITING_APPROVAL; tanpa kredensial → BLOCKED (bukan fake success).</p>'+
-      '<div style="margin-top:10px"><span class="tag-live">GOVERNED</span> <span style="font-size:8px;color:#798aa0;margin-left:6px">/ux/decide → canonical</span></div>',
-    route: 'MissionUXService → ApprovalGate canonical → mission canonical (m8_002) → GitHub connector; verify GET independen.',
-    tag: 'CONNECTED (via canonical)'
-  },
-  verify: {
-    title: 'Verify (fase internal MCR)',
-    lead: 'MCR melakukan verifikasi hasil sebagai bagian dari satu cycle. ReflectionManager mencatat reflection setiap cycle. Ini adalah langkah internal.',
-    body: '<p style="font-size:9px;color:#aeb9c8;margin:0;line-height:1.55">Verify adalah fase akhir MCR. ReflectionManager mencatat reflection setiap cycle (confidence, success). Tidak ada endpoint mandiri. Hasil verifikasi tercermin dalam <code>AgentRunResult.ok</code> dan <code>final_state</code>.</p>',
-    route: 'Internal MCR &mdash; ReflectionManager. Tidak ada route mandiri.',
-    tag: 'UNAVAILABLE (mandiri)'
-  }
-};
-
-function inspectPhase(name) {
-  var info = _phaseInfo[name] || _phaseInfo.remember;
-  _('panelTitle').textContent = info.title;
-  _('panelLead').innerHTML = info.lead;
-  _('panelBody').innerHTML = info.body;
-  _('panelRoute').textContent = info.route || '--';
-
-  var tagEl = _('panelBody').querySelector('.tag-unav, .tag-ro, .tag-live');
-  // already in body HTML
-
-  _('panel').classList.add('open');
-  _('overlay').classList.add('open');
-
-  // probe knowledge jika node Understand
-  if (info.probe) {
-    probeUnderstandNode();
-  }
+// ===== clock =====
+function clock(){
+  document.getElementById('clock').textContent = new Date().toTimeString().slice(0,5)+' WITA';
 }
 
-async function probeUnderstandNode() {
-  var res = await apiGet('/knowledge/');
-  var div = document.getElementById('understandBody');
-  if (!div) return;
-  if (!res.ok) {
-    div.innerHTML = '<p style="font-size:9px;color:var(--red)">Gagal memuat: HTTP '+res.status+'</p>';
-    return;
-  }
-  var ids = (res.data && res.data.knowledge_ids) ? res.data.knowledge_ids : [];
-  if (ids.length === 0) {
-    div.innerHTML = '<p style="font-size:9px;color:#aeb9c8;margin:0">Tidak ada knowledge terdaftar. Registry kosong. Ini jujur &mdash; bukan error.</p>'+
-      '<div style="margin-top:10px"><span class="tag-ro">READ-ONLY</span> <span style="font-size:8px;color:#798aa0;margin-left:6px">knowledge_ids: []</span></div>';
-  } else {
-    div.innerHTML = '<p style="font-size:9px;color:#aeb9c8;margin:0"><strong>'+ids.length+' knowledge terdaftar:</strong></p>'+
-      ids.map(function(id){ return '<p style="font-size:8px;color:var(--green);margin:2px 0">'+esc(String(id))+'</p>'; }).join('');
-  }
+// ===== refresh all =====
+function refreshAll(){ refreshHealth(); refreshRuntime(); refreshMe(); hydrateFromServer(); refreshEvidence(); refreshAudit(); }
+
+// ===== boot =====
+async function boot(){
+  updateAuthUI();
+  await refreshMe();
+  refreshAll();
+  setInterval(clock,1000);
+  setInterval(()=>{hydrateFromServer();refreshHealth();},15000);
 }
-
-function closePanel() {
-  _('panel').classList.remove('open');
-  _('overlay').classList.remove('open');
-}
-
-// ----- Knowledge view probe -----
-async function probeKnowledge() {
-  var res = await apiGet('/knowledge/');
-  var count = _('knowCount');
-  var list = _('knowList');
-  if (!res.ok) {
-    count.textContent = 'error';
-    list.innerHTML = '<div class="side-row"><span>Error</span><b class="red">HTTP '+res.status+'</b></div>';
-    return;
-  }
-  var ids = (res.data && res.data.knowledge_ids) ? res.data.knowledge_ids : [];
-  count.textContent = ids.length + ' terdaftar';
-  if (ids.length === 0) {
-    list.innerHTML = '<div class="side-row"><span>Registry</span><b>Kosong</b></div><div class="side-row"><span>Write</span><b class="yellow">UNAVAILABLE (G4)</b></div>';
-  } else {
-    list.innerHTML = ids.map(function(id){ return '<div class="side-row"><span>Knowledge ID</span><b>'+esc(String(id))+'</b></div>'; }).join('');
-  }
-}
-
-// ----- Agents view probe -----
-async function probeAgents() {
-  var res = await apiGet('/mission/');
-  var count = _('agentCount');
-  var list = _('agentList');
-  if (!res.ok) {
-    count.textContent = 'error';
-    list.innerHTML = '<div class="agent-row"><div class="agent-avatar">!</div><div><b>Error</b><small>HTTP '+res.status+'</small></div></div>';
-    return;
-  }
-  var agents = (res.data && res.data.agents) ? res.data.agents : [];
-  count.textContent = agents.length + ' online';
-  if (agents.length === 0) {
-    list.innerHTML = '<div class="agent-row"><div class="agent-avatar" style="background:#284a62">M</div><div><b>Tidak ada agent</b><small>Registry kosong &mdash; <code>GET /mission/</code></small></div></div>';
-  } else {
-    list.innerHTML = agents.map(function(a){
-      return '<div class="agent-row"><div class="agent-avatar">'+esc(String(a).charAt(0).toUpperCase())+'</div><div><b>'+esc(String(a))+'</b><small>Registered via MISSIONS_API</small></div></div>';
-    }).join('');
-  }
-}
-
-// ----- Advanced view probe -----
-async function probeAdvanced() {
-  var pol = await apiGet('/policy/');
-  var wf = await apiGet('/workflow/');
-  var aud = await apiGet('/audit/');
-
-  _('policyList').innerHTML = pol.ok
-    ? '<div class="side-row"><span>policy_ids</span><b>'+(pol.data&&pol.data.policy_ids?pol.data.policy_ids.length:0)+'</b></div>'
-    : '<div class="side-row"><span>Error</span><b class="red">'+pol.status+'</b></div>';
-
-  _('workflowList').innerHTML = wf.ok
-    ? '<div class="side-row"><span>workflow_ids</span><b>'+(wf.data&&wf.data.workflow_ids?wf.data.workflow_ids.length:0)+'</b></div>'
-    : '<div class="side-row"><span>Error</span><b class="red">'+wf.status+'</b></div>';
-
-  _('auditTime').textContent = aud.ok ? 'live' : 'err';
-  _('auditList').innerHTML = aud.ok
-    ? '<div class="event"><i class="dot" style="background:var(--green)"></i><div><b>Route audit aktif</b><small>audit_ids: '+(aud.data&&aud.data.audit_ids?aud.data.audit_ids.length:0)+'</small></div><time>live</time></div>'
-    : '<div class="event"><i class="dot" style="background:var(--red)"></i><div><b>Error</b><small>HTTP '+aud.status+'</small></div><time>--</time></div>';
-
-  _('approvalTag').textContent = 'read-only';
-  _('approvalList').innerHTML = '<div class="approval-item"><b>GET /approval/{id}</b><small>Read-only inspection. Decision endpoint tidak tersedia (G6).</small></div>'+
-    '<div class="approval-item"><small style="color:var(--yellow)">Tidak ada endpoint list approval. Setiap approval diakses via <code>GET /approval/{id}</code> (read-only).</small></div>';
-}
-
-// ----- Init -----
-function init() {
-  probeRuntime();
-  renderRecent();
-  // M11-004: cek auth session (login overlay bila produksi mewajibkan).
-  showLoginIfNeeded();
-  // M9-008.4: refresh/reload resilience — pulihkan state mission DARI SERVER
-  // (source of truth), bukan dari JS memory/session. Setelah browser refresh,
-  // mission yang sudah di-submit tetap tampil (WAITING_APPROVAL/COMPLETED/...)
-  // beserta evidence/audit, selama server masih menyimpan request.
-  hydrateFromServer();
-  // periodic runtime check
-  setInterval(probeRuntime, 30000);
-}
-
-// M9-008.2 + M9-008.4: pull state canonical dari /ux/state dan render ulang UI.
-// UI TIDAK menciptakan state sendiri — apapun yang tampil berasal dari server.
-async function hydrateFromServer() {
-  var res = await apiGet('/ux/state');
-  var d = res.ok && res.data ? res.data : null;
-  if (!d || !d.request_id) { return; } // tidak ada mission aktif di server
-
-  // Restore konteks mission.
-  _state.missionGoal = d.request || _state.missionGoal;
-  _('missionTitle').textContent = d.request || 'Mission';
-  _('mEyebrow').textContent = 'Misi';
-  _('mSub').textContent = 'Dipulihkan dari server (source of truth).';
-  _('objTitle').textContent = (d.understanding && d.understanding.what_sam_understood) || d.request;
-  var steps = (d.plan && d.plan.planned_steps) || [];
-  _('objDesc').textContent = (d.plan && d.plan.action_summary) || 'SAM menyusun rencana.';
-  _('objProgress').textContent = steps.length + ' steps';
-  var stepHtml = steps.map(function(s,i){ return (i+1) + '. ' + esc(s); }).join('<br>');
-  _('cycleResult').innerHTML = '<p><strong>Yang SAM pahami</strong><br>' + esc(d.understanding && d.understanding.what_sam_understood || '') +
-    '<br><br><strong>Rencana SAM</strong><br>' + stepHtml + '</p>';
-
-  // Status approval di server menentukan tombol (bukan JS).
-  var appr = (d.approval && d.approval.status) || '';
-  var ex = (d.execution && d.execution.status) || '';
-  if (appr === 'waiting_approval') {
-    // belum diputuskan — tampilkan gate approval canonical.
-    _('continueBtn').disabled = false;
-    _('continueBtn').textContent = 'Approve & Jalankan';
-    _('continueBtn').onclick = function(){ approveMission(); };
-    _('pauseBtn').disabled = false;
-    _('pauseBtn').textContent = 'Tolak';
-    _('pauseBtn').onclick = function(){ rejectMission(); };
-    _('pauseBtn').style.display = '';
-    _('objProgress').textContent = 'Menunggu persetujuan';
-    _('mSub').textContent = 'Menunggu persetujuan Anda untuk eksekusi nyata.';
-  } else if (ex === 'completed' || ex === 'blocked' || ex === 'failed' || ex === 'rejected' || appr === 'rejected') {
-    // sudah selesai/ditolak — render hasil evidence-first dari server state.
-    await renderOutcomeFromState(d);
-  } else {
-    // approved/running/executing — sedang jalan.
-    _('continueBtn').disabled = true;
-    _('continueBtn').textContent = 'Sedang berjalan...';
-    _('pauseBtn').disabled = true;
-    _('pauseBtn').style.display = '';
-    _('objProgress').textContent = 'MENGEKSEKUSI';
-    _('mSub').textContent = 'Eksekusi sedang berjalan di runtime canonical.';
-  }
-  refreshMissionState();
-  showView('missions');
-}
-
-document.addEventListener('DOMContentLoaded', init);
+boot();
 </script>
 </body>
 </html>
