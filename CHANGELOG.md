@@ -29,7 +29,7 @@ SAM “tahan banting” untuk operasi produksi nyata: durable state, idempotency
 
 ### M12 Deploy Produksi (2026-08-13, Van: "pasang")
 - Service SAM -> **SERVICE_AUTO_START**; env produksi `SAM_ENV=production` + `SAM_PG_DSN` + `SAM_ENABLE_PG_SECRETS=1`; `/health/ready` 200 `persistence=ready`. Task `SAM-Watchdog` tiap 5 menit -> live `code=0 OK`.
-- **HTTPS (secure cookie produksi) masih PENDING** (butuh reverse proxy/self-signed cert; belum terpasang).
+- **HTTPS lokal SELESAI (2026-08-13, self-signed, tanpa domain)**: Caddy v2.11.4 (binary di PC, LUAR repo, folder tools Zara) sebagai reverse proxy `tls internal` `https://localhost:8443 -> 127.0.0.1:8080`. **Secure cookie M12-011 TERBUKTI end-to-end**: login produksi via HTTPS => `Set-Cookie: sam_session=...; HttpOnly; Path=/; SameSite=lax; Secure` (flag `Secure` aktif karena `SAM_ENV=production` + koneksi HTTPS). `/health/ready` via HTTPS 8443 = 200 `persistence:ready`. **Caddy tidak menjadi dependency SAM** — HTTPS = lapisan opsional reverse-proxy per-deploy; SAM tetap HTTP di 8080 & portable. **Autostart Caddy (service/task) PENDING** — butuh admin (UAC) yang belum tersedia di sesi ini; untuk sekarang jalan manual via `_start_caddy.bat`.
 
 ### M12 P3 (M12-013..017) - Backup / Restore / Failure Injection / 24h / Certification
 - **M12-013 Backup** - `tools/sam_backup.py`: archive terenkripsi Fernet (PG dump semua tabel + identity users.json), retention (N terakhir), integrity check (sha256 + decrypt + zip + truth). **Terbukti real vs PG produksi: `code=0 BACKUP OK integrity OK`.** Commit `1752a3f`.
