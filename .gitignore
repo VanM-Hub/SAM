@@ -121,6 +121,7 @@ docs/engineering/templates/*
 !docs/engineering/reports/PhaseV2_Completion_Audit.md
 !docs/engineering/reports/PhaseV3_Provider_Vocabulary.md
 !docs/engineering/reports/PhaseV4_Capability_Vocabulary.md
+!docs/engineering/reports/PhaseV5_Mission_Vocabulary.md
 
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md
