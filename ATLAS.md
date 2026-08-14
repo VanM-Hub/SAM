@@ -35,6 +35,39 @@
 
 ---
 
+## 0.5 — SEMANTIC MAP (governance identity)
+
+```
+SUBJECT
+├── CITIZEN — entitas di DALAM governance domain SAM
+│     Provider · Runtime · Workflow · Mission · Policy · Capability · Service · Extension
+└── WARD — entitas EKSTERNAL yang dipercayakan kpd SAM (observe/protect/govern)
+
+IMPLEMENTATION
+├── CORE / PLATFORM — mesin governance SAM
+├── CITIZEN IMPLEMENTATION — implementasi Citizen
+├── WARD IMPLEMENTATION — adapter/connector/integration
+└── MODULE — packaging/operational layer (BUKAN Citizen, BUKAN Ward)
+```
+
+> **Folder ≠ Semantic Identity.** Repository structure does not define governance identity.
+> A folder/package/module/adapter/provider implementation is not itself a Citizen or Ward.
+> Classification follows the authoritative domain model and contracts.
+
+Contoh canonical: Provider = **Citizen** · OpenClaw instance = **Ward** · `src/sam/openclaw/` = implementation boundary (bukan otomatis Ward) · GitHub repo instance = **Ward** · GitHub connector = adapter · SAM GitHub capability = **Capability Citizen**.
+
+**When in doubt → inspect repository** (jangan berasumsi; jangan jawab dari nama folder/ingatan):
+```
+ARCHITECTURAL QUESTION → definisi eksplisit di authoritative docs?
+   ├─ YES → ikuti definition
+   └─ NO  → inspect repo: source · tests · contracts · decisions · actual state
+```
+
+> Peta struktur folder (rumpun, BUKAN daftar 98) + peta ownership 13 kategori →
+> `docs/architecture/REPOSITORY_STRUCTURE.md` → `docs/engineering/reports/Semantic_Repository_Map.md`.
+
+---
+
 ## 1. DOCUMENTS — RUMPUN
 
 ```
@@ -267,6 +300,9 @@
 
 ## 9. REPOSITORY MAP (perintah "klik")
 
+> Peta struktur folder rumpun + peta ownership 13 kategori → `docs/architecture/REPOSITORY_STRUCTURE.md`
+> (BUKAN daftar 98 folder di ATLAS; ATLAS hanya menunjuk, repo tetap ground truth.)
+
 ```
  ROOT
    ├── Identity      (MISSION, VISION, CHARTER, PRINCIPLES, GOVERNANCE)
@@ -288,6 +324,7 @@
 ```
  • code tidak ubah Mission/Constitution/Architecture
  • engineering tidak ubah Architecture; ubah = Architecture Session
+ • Folder ≠ Semantic Identity (repository structure ≠ governance identity; klasifikasi ikut domain model + kontrak)
  • history bukan authority (read-only)
  • dokumen ber-status Draft/Deprecated (mis. konsep arsitektur eksploratif) = IDE, bukan status SAM saat ini
  • ADR = keputusan; specification = kontrak — beda

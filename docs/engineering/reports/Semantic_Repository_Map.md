@@ -43,6 +43,7 @@ service extension
 - **Hanya node di bawah Citizen yang memakai CitizenKind.** Ward punya vocabulary sendiri.
 - **Provider tetap Citizen** — yang menentukan relasi governance, bukan lokasi fisik. Jangan ubah provider → Ward.
 - **OpenClaw = Ward** (instance yang dititipkan user). **OpenClawProvider = Citizen** (saat SAM memakainya sebagai provider). Dua relasi tak boleh dicampur.
+- **Folder ≠ Semantic Identity.** Repository structure does not define governance identity. Folder/paket/modul/adapter bukan Citizen/Ward; klasifikasi mengikuti domain model + kontrak authoritative. `src/sam/openclaw/` = implementation boundary (bukan otomatis Ward).
 - **Module** = lapisan packaging/platform/documentation — bukan Citizen, bukan Ward. `modules/` berada di sini.
 
 ---
@@ -57,7 +58,7 @@ Kategori: **1** CITIZEN DOMAIN · **2** WARD DOMAIN · **3** CORE GOVERNANCE · 
 |---|---|---|---|
 | `providers` | 1 Citizen | Registry provider (anthropic, deepseek, gemini, ollama, openai, docker, filesystem, shell, sqlite...) | canonical |
 | `ward` | 2 Ward | Tata kelola Ward (identity/entrustment/governance/registry/capability/adapters) | canonical |
-| `openclaw` | 2+1 Ward/Citizen | Koneksi/health/log OpenClaw; berpotensi Provider bila dipakai SAM | canonical (dual) |
+| `openclaw` | 2+1 Ward/Citizen | Koneksi/health/log OpenClaw; berpotensi Provider bila dipakai SAM | canonical (dual) — folder = implementation boundary, BUKAN Ward entity |
 | `runtime` | 10 Runtime-subsystem | RuntimeState, Coordinator, Bootstrap, workflow, recovery | canonical |
 | `runtime_kernel` | 10 Runtime-subsystem | Kernel runtime (226 ref): conversation_*, health_*, scheduler, event_bus, security, telemetry | canonical |
 | `runtime_root` | 3 Core/assembly | Composition Root (RuntimeBuilder→RuntimeRoot); 26 ref | canonical |
