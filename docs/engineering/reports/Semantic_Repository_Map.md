@@ -105,7 +105,7 @@ Kategori: **1** CITIZEN DOMAIN · **2** WARD DOMAIN · **3** CORE GOVERNANCE · 
 | `cluster`, `federation`, `collaboration` | 3 Core | Federasi/kolaborasi | canonical |
 | `events`, `telemetry`, `reporting`, `render` | 6 Infrastructure | Infrastruktur | canonical |
 | `iam` | 3 Core | Identity/access | canonical |
-| `dos` | 3 Core? | (perlu cek isi) | UNKNOWN |
+| `dos` | 6 Infrastructure | Desired Operational State (DOSModel + DOSLoader baca `desired-state.yaml`); 8 ref | canonical |
 | `web` | 6 Infrastructure | static/templates | canonical |
 | `hosting` | 6 Infrastructure | hosting | canonical |
 | `confidence` | 7 Model | confidence assessment | canonical |
@@ -116,10 +116,12 @@ Kategori: **1** CITIZEN DOMAIN · **2** WARD DOMAIN · **3** CORE GOVERNANCE · 
 | `strategy` | 3 Core | strategy | canonical |
 | `evolution` | 3 Core | evolution | canonical |
 | `integration` | 8 Adapter | integration | canonical |
-| `plugin` vs `plugins` | 12 LEGACY/DUPLICATE? | Dua nama mirip — **perlu verifikasi isi**; kandidat konsolidasi | **VERIFIKASI** |
-| `knowledge` | 7+10 | (6 py) — perlu cek hubungan dgn knowledge_runtime | VERIFIKASI |
+| `plugin` | 8 Adapter (framework) | PluginManifest/PluginPermission/PluginStatus + loader/registry/lifecycle/health/discovery/version/validator/repository; **hanya 3 ref (semua `test_legacy_failure_injection.py`)** | canonical framework, **pemakaian tipis** |
+| `plugins` | 8 Adapter (runtime) | plugin_protocol/registry/loader/policy/runtime + conversation/dashboard/integration_plugin; 9 ref (test_sprint41) | canonical runtime |
+| `knowledge` | 9 Repository | KnowledgeDocument/Relationship/Fact/History (pydantic BaseModel) + Store/Loader/Importer/Graph; 9 ref | canonical storage |
+| `knowledge_runtime` | 10 Runtime-subsystem | KnowledgeFact/Relation (frozen dataclass) + pipeline preview; 85 ref | canonical preview |
 
-> ⚠️ **Baris yang ditandai VERIFIKASI** belum ditentukan statusnya; perlu investigasi isi sebelum diklasifikasi final (sesuai prinsip "jangan paksa rapi").
+> ⚠️ **Temuan tumpang tindih nama kelas (bukan folder):** `KnowledgeFact` ada di **dua tempat dengan dua model berbeda** — `knowledge/models.py` (pydantic `BaseModel`, storage system) vs `knowledge_runtime/model/knowledge_fact.py` (frozen `dataclass`, preview runtime). Serta `KnowledgeRelationship` (BaseModel) vs `KnowledgeRelation` (dataclass). **Ini indikasi dua vocabulary/layer bersaing untuk konsep yang sama**, persis yang diperingatkan Aster. BUKAN duplikat folder — tetapi **ownership nama konsep perlu diperjelas** (mana canonical untuk "KnowledgeFact" di storage vs preview).
 
 ---
 
@@ -131,16 +133,19 @@ Temuan yang benar dari audit (mendukung Aster):
 2. **Repository structure belum konsisten secara semantic mapping** — bukan karena "98 folder vs 8 CitizenKind", melainkan karena **ada beberapa vocabulary/layer runtime yang tampak sama-sama canonical** dan ownership-nya belum didokumentasikan eksplisit per folder.
 3. **Belum ada canonical ownership yang tegas** untuk tiap domain, sehingga bernama-mirip sulit dibedakan canonical vs duplicate.
 4. `modules/` = Module layer (bukan Citizen/Ward) — sudah tepat.
-5. `plugin` vs `plugins`, `knowledge` vs `knowledge_runtime` — **kandidat yang perlu diverifikasi** (bukan dihapus dulu).
+5. **Hasil verifikasi kandidat (final):**
+   - `plugin` vs `plugins` — **BUKAN duplikat**: `plugin` = framework (PluginManifest/loader/registry; pemakaian tipis, 3 ref legacy), `plugins` = runtime implementation (protocol/registry/loader/policy/runtime). Dua layer berbeda.
+   - `knowledge` vs `knowledge_runtime` — **BUKAN duplikat folder**: `knowledge` = storage (pydantic, Store/Loader/Importer/Graph), `knowledge_runtime` = preview (frozen dataclass, pipeline). **TAPI ada tumpang tindih NAMA KELAS** `KnowledgeFact` (BaseModel vs dataclass) yang perlu diperjelas ownership-nya.
+   - `dos` = Desired Operational State loader (Infrastructure) — **bukan UNKNOWN lagi**.
 
 ---
 
 ## 5. Rekomendasi (sebelum konsolidasi)
 
 1. **Lengkapi Semantic Repository Map ini** — untuk tiap folder pastikan kolom: Apa ini? / Siapa pemilik authority? / Layer? / Citizen|Ward|Core|Infrastructure? / Canonical atau duplicate? / Dipakai siapa? / Boleh dihapus?
-2. **Verifikasi kandidat overlap** (`plugin` vs `plugins`, `knowledge` vs `knowledge_runtime`) berdasar isi + referensi, sebelum memutuskan canonical/deprecated.
+2. **Selesaikan tumpang tindih nama konsep** — tetapkan canonical owner untuk `KnowledgeFact` (storage vs preview) & kelas serupa, supaya tidak ada dua definisi kelas yang bersaing.
 3. **JANGAN langsung hapus** folder mana pun. Konsolidasi hanya setelah peta selesai & ownership ditetapkan.
-4. **Dokumentasikan canonical authority** per domain runtime agar vocabulary idak tampak "bersaing".
+4. **Dokumentasikan canonical authority** per domain runtime agar vocabulary tidak tampak "bersaing".
 5. **Samakan dengan Clean Architecture labels** (canonical / historical / deprecated / delete) setelah audit isi selesai.
 
 ---
@@ -153,9 +158,11 @@ Temuan yang benar dari audit (mendukung Aster):
 | 2 WARD DOMAIN | ward, openclaw (dual), guardian |
 | 3+5 CORE/EXECUTION | approval, autonomy, delegated_authority, compliance, governance_* |
 | 4 APPLICATION | application, api, presentation, cli, sdk, launcher |
-| 6 INFRASTRUCTURE | events, telemetry, hosting, web |
-| 10 RUNTIME SUBSYSTEM | runtime*, execution_runtime, cognitive_runtime, intelligence_runtime |
-| 12 LEGACY/DUPLICATE | `plugin`/`plugins` (VERIFIKASI), `knowledge` (VERIFIKASI) |
-| 13 UNKNOWN | `dos` (perlu cek) |
+| 6 INFRASTRUCTURE | events, telemetry, hosting, web, dos |
+| 8 ADAPTER | plugin (framework), plugins (runtime), integration |
+| 9 REPOSITORY | knowledge (storage), persistence, storage |
+| 10 RUNTIME SUBSYSTEM | runtime*, execution_runtime, cognitive_runtime, intelligence_runtime, knowledge_runtime |
+| 12 LEGACY/DUPLICATE | (tidak ada yang murni duplikat — semua folder punya peran beda) |
+| 13 UNKNOWN | (kosong — `dos` sudah terklasifikasi) |
 
-> Status ini **bukan final** untuk baris VERIFIKASI — menunggu investigasi isi.
+> **Status final:** tidak ada folder yang murni "duplikat" atau "belum terdefinisi" setelah verifikasi isi + referensi. Yang tersisa = **tumpang tindih nama kelas** (`KnowledgeFact` dll) yang perlu penetapan ownership, bukan penghapusan folder.
