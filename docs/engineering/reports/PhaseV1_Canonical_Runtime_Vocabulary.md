@@ -1,7 +1,8 @@
 # PHASE V1 — Canonical Runtime Vocabulary (RuntimeState + EvidenceType)
 
 **Tanggal:** 2026-08-14
-**Jenis:** Audit consumer + rencana canonical owner (BUKAN eksekusi rename — sesuai aturan V1 "jangan langsung rename").
+**Jenis:** Audit consumer + rencana canonical owner.
+**Status:** ✅ **V1-EXEC-001 & V1-EXEC-002 DIEKSEKUSI** (commit `7d62a37`). Migration plan di bawah telah dijalankan.
 **Cakupan:** `RuntimeState` dan `EvidenceType`.
 
 ---
@@ -73,12 +74,16 @@ Seluruh konsumen enum 12 nilai memakai **R2 (`runtime/state.py`)**:
 
 R3–R6 **bukan** bagian dari keputusan ini — mereka bounded context berbeda dan tetap hidup.
 
-### 1.8 Migration plan (TIDAK dieksekusi)
+### 1.8 Migration plan — ✅ DIEKSEKUSI (commit `7d62a37`)
 
-1. Hapus `contracts/runtime.py` (R1), atau biarkan sebagai alias `from sam.runtime.state import RuntimeState` untuk backward-compat.
-2. Perbarui `contracts/__init__.py` → import dari `sam.runtime.state` (bukan `.runtime`).
-3. Verifikasi tidak ada `from sam.contracts import RuntimeState` tersisa (sudah terkonfirmasi 0).
-4. Run `tests/unit/test_contracts.py` + suite runtime untuk pastikan no regression.
+1. `contracts/runtime.py` diubah menjadi **compatibility shim** (re-export `from sam.runtime.state import RuntimeState`), bukan definisi kedua — `sam.contracts.RuntimeState` tetap valid.
+2. `contracts/__init__.py` tetap `from .runtime import RuntimeState` (menunjuk ke shim).
+3. Verifikasi 0 consumer `from sam.contracts import RuntimeState` (statis + dinamis) — terkonfirmasi. Tidak ada import dinamis (getattr/importlib) yang relevan.
+4. Regression unit+runtime: **lulus.**
+
+Hasil verifikasi:
+- `RuntimeState is sam.contracts.RuntimeState` → **True** (satu definisi).
+- `sam.runtime.state.RuntimeState` = satusatunya canonical.
 
 > **Catatan arsitektural:** R1 hidup di `contracts/` (layer authority), R2 di `runtime/` (layer implementasi). Secara semantik, "RuntimeState 12 fase" adalah **kontrak runtime**, bukan kontrak antar-boundary seperti Mission/DOS. Maka home-nya adalah `runtime/state.py`. Ini selaras aturan baru "Folder ≠ Semantic Identity" — yang menentukan owner = semantic ownership, bukan nama folder `contracts`.
 
@@ -139,12 +144,18 @@ R3–R6 **bukan** bagian dari keputusan ini — mereka bounded context berbeda d
 
 E3 (`evidence/models.py`) = bounded context berbeda (operational evidence, 15 nilai lowercase) — **jangan disatukan**.
 
-### 2.8 Migration plan (TIDAK dieksekusi)
+### 2.8 Migration plan — ✅ DIEKSEKUSI (commit `7d62a37`)
 
-1. Arahkan `compliance/manifest/loader.py` untuk import `EvidenceType` dari `sam.compliance.models.evidence_type` (E2), bukan dari `..catalog.models`.
-2. Hapus `EvidenceType` dari `catalog/models.py` (E1) — biarkan `CheckMetadata`/`CheckerClass`/`CheckAuthority` di catalog (itu domain catalog yang sah).
-3. Verifikasi `from_str()` helper tersedia di semua jalur yang butuh parsing string (E2 sudah menyediakan).
-4. Run suite compliance (`tests/compliance/checks/`) untuk pastikan no regression.
+1. `compliance/manifest/loader.py` diarahkan import `EvidenceType` dari `sam.compliance.models.evidence_type` (E2); `CheckerClass` tetap dari `..catalog.models`.
+2. `catalog/models.py` tidak lagi mendefinisikan `EvidenceType` sendiri — import dari canonical (`from ..models.evidence_type import EvidenceType`) untuk field `CheckMetadata.evidence_type`. `CheckMetadata`/`CheckerClass`/`CheckAuthority` tetap di catalog (domain catalog yang sah).
+3. Verifikasi `from_str()` helper tersedia (E2 sudah menyediakan).
+4. Run suite compliance — **lulus** (masuk 4417 passed).
+
+Verifikasi:
+- `catalog.models.EvidenceType is models.evidence_type.EvidenceType` → **True**.
+- Tidak ada consumer yang import `EvidenceType` dari `catalog.models` tersisa.
+
+Catatan lint: `auto`/`Optional` yang sudah tidak terpakai di `catalog/models.py` ikut dibersihkan (pre-existing unused).
 
 ---
 
@@ -155,4 +166,13 @@ E3 (`evidence/models.py`) = bounded context berbeda (operational evidence, 15 ni
 | `RuntimeState` | `runtime/state.py` (R2) | `contracts/runtime.py` (R1, dead) | lifecycle/kernel/observation/guardian (R3–R6) |
 | `EvidenceType` | `compliance/models/evidence_type.py` (E2) | `catalog/models.py` EvidenceType (E1) | `evidence/models.py` operational (E3) |
 
-**Belum dieksekusi** — menunggu keputusan Van untuk jalankan migration plan.
+**Status:** ✅ **V1-EXEC-001 & V1-EXEC-002 selesai** (commit `7d62a37`).
+
+**Acceptance criteria V1 — TERPENUHI:**
+- `RuntimeState` → 1 canonical (`runtime/state.py`), 0 duplicate (contracts jadi shim; identity verified).
+- Compliance `EvidenceType` → 1 canonical (`models/evidence_type.py`), semua consumer pakai canonical (identity verified).
+- Operational `EvidenceType` (`evidence/models.py`, 15 nilai) → tetap terisolasi, tidak dipaksa.
+- Bounded `RuntimeState` (lifecycle/kernel/observation/guardian) → tetap terisolasi, tidak dipaksa.
+- Regression `unit`+`runtime`+`compliance`: **4417 passed, 1 skipped**. Ruff clean.
+
+**Prinsip dipertahankan:** 5113 classes & 526 collisions tidak dipangkas semua — hanya menghilangkan semantic ambiguity yang terbukti nyata (2 duplicate sejati). Folder ≠ Semantic Identity = aturan tetap.
