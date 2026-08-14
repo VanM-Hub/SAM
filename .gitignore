@@ -113,6 +113,7 @@ docs/engineering/templates/*
 !docs/engineering/reports/M14_Engineering_Report.md
 !docs/engineering/reports/Daftar_Citizen_dan_Peta_Defisiensi_Struktur.md
 !docs/engineering/reports/Semantic_Repository_Map.md
+!docs/engineering/reports/Architecture_Vocabulary_Hardening_Audit.md
 
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md
