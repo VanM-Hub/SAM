@@ -104,7 +104,8 @@ class ProviderRecoveryResult:
             "failed_reason": self.failed_reason,
             "switched_to": self.switched_to,
             "probes": [p.as_dict() for p in self.probes],
-            "approval": self.approval.as_dict() if self.approval else None,
+            "approval": (self.approval.as_dict() if hasattr(self.approval, "as_dict")
+                           else self.approval),
             "outcome": self.outcome.as_dict() if self.outcome else None,
         }
 
