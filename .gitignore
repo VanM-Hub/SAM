@@ -111,6 +111,7 @@ docs/engineering/templates/*
 !docs/engineering/reports/M12_Certification_Report.md
 !docs/engineering/reports/M13_Architecture_Certification.md
 !docs/engineering/reports/M14_Engineering_Report.md
+!docs/engineering/reports/Daftar_Citizen_dan_Peta_Defisiensi_Struktur.md
 
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md
