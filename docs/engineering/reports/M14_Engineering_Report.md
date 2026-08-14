@@ -3,7 +3,7 @@
 **Milestone:** M14 Build (delegated authority / SAM becomes useful) + re-architecture environment-adaptive
 **Rilis:** SAM 5.2.0
 **Tanggal:** 2026-08-14
-**Status:** Implementasi selesai, real E2E parsial PROVEN + rombak environment-adaptive selesai + M14-CLOSE bukti autonomy (autonomous mutation & governed recovery)
+**Status:** Implementasi selesai, real E2E parsial PROVEN + rombak environment-adaptive selesai + M14-CLOSE bukti autonomy (autonomous mutation, governed recovery, guardian environment-adaptive & kontinu)
 **Verdict resmi:** Belum dikeluarkan (menunggu acceptance M14-CLOSE penuh)
 
 ---
@@ -89,12 +89,13 @@ Ward spesifik dirombak menjadi **instance `CapabilityProvider`** pada mesin gene
 | `m14_close_002_autonomous_mutation_real_e2e.py` | **Real Autonomous Mutation**: provider `nvidia` unhealthy → `DelegationGrant` owner AUTONOMOUS bounded (`requires_human_approval=False`, `allowed_mutations=("protect")`, `blast_radius=PROVIDER_CONNECTION`) → `auto_approve` (source `delegated`, approver `delegated:nvidia`) → switch nyata ke `ollama` → verifikasi ok. Skenario fail-closed (grant OBSERVE) → `escalate`, TIDAK switch. Fase penuh observe→investigate→diagnose→plan→authority→execute→verify. Mutation terjadi TANPA campur tangan user. | **REAL PROVEN** |
 | `m14_close_003_failure_recovery_real_e2e.py` | **Governed Recovery / ESCALATE**: A) tanpa alternatif sehat → FAILED, `switched_to=None`, `loops_attempted=1` (tidak retry tak terbatas); B) switch B sukses tapi verification gagal → `escalated` utk review (`esc_...`), bounded attempt, bukan automated action. | **REAL PROVEN** |
 | `m14_close_006_tahan_banting_degradation_e2e.py` | **Tahan banting**: observer A/B/C sengaja dirusak (throw) → partial evidence → confidence dihitung ulang jujur → verdict `escalate` (tidak eksekusi saat evidence tak cukup); credential unavailable → boundary MISSING/BLOCKED; no `evidence_missing→assume→execute`. Temuan jujur: `ConfidenceAssessor` menghitung evidence failed (0.0) sbg lemah (bias permisif) — SAM tetap aman. | **REAL PROVEN** |
+| `m14_close_004_005_guardian_real_e2e.py` | **Environment-Adaptive + Continuous Guardian**: 004 — instruksi "jaga subject" tanpa tahu aplikasi → discover → pilih subject dari graph (bukan nama aplikasi) → baseline → deteksi DELTA kesehatan tanpa hardcode; degradasi → `no_assume_execute`. 005 — GUARD kontinu stateful: cycle 0 baseline, cycle lanjutan mendeteksi perubahan "3 jam kemudian" TANPA perintah "Scan lagi"; grant default OBSERVE → escalate fail-closed (tidak auto-mutasi); grant owner AUTONOMOUS bounded → `auto_approve` (source delegated) → repair real (`execute_fn` dipanggil) → verify → `completed`. | **REAL PROVEN** |
 
 > Seluruh bukti menggunakan provider nyata (NVIDIA token dari env, Ollama lokal); token tidak di-commit, tidak bocor ke output (no_leak), evidence eksternal.
 
 ### Status BLOCKED (jujur)
 - **OpenClaw Ward real E2E** — jembatan `health.json` ke runtime belum tersambung penuh.
-- **M14-CLOSE-004/005** (Guardian environment-adaptive + continuous guard) — belum dieksekusi sebagai bukti nyata (menunggu jadwal).
+- M14-CLOSE-004/005 kini PROVEN (Guardian environment-adaptive + continuous guard).
 
 ---
 
@@ -136,6 +137,7 @@ Rombak B TIDAK merusak M13/M14.
 | M14-008 real E2E: Credential Remediation PROVEN | `934d64e` |
 | Update laporan M14 (M14-008 PROVEN) | `71312c7` |
 | M14-CLOSE-002/003/006: autonomous mutation + governed recovery + tahan banting | `7bd84b2` |
+| M14-CLOSE-004/005: Environment-Adaptive + Continuous Guardian | `1790293` |
 
 Semua commit ter-push ke `main`.
 
