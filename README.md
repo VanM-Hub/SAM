@@ -8,7 +8,7 @@ Sejak v4.1.0, SAM memperluas platform melalui **Universal Governance (SAM 5.x)**
 
 **M9 Productization (2026-08-12):** SAM kini punya *real user-facing operational path* via `src/sam/application/ux/` (`MissionUXService`). UI (browser) memanggil `/ux` endpoint → Application Service → ApprovalGate canonical → mission canonical → real external effect (GitHub, dst), tanpa executor kedua. Lihat `CHANGELOG.md` untuk detail M9.
 
-**M12 Self-Preservation (2026-08-13):** SAM "tahan banting" untuk operasi produksi - durable state + idempotency + restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix (crash/PG-down/secret-down/corrupt/disk/duplicate). HTTPS lokal via Caddy self-signed (`https://localhost:8443`) - secure cookie TERBUKTI (`Set-Cookie ... Secure`). Milestone M12-016 (12h test) berjalan otomatis via Task Scheduler (verify 14 Agu 10:23 WITA); detail di `CHANGELOG.md`.
+**M12 Self-Preservation (2026-08-13):** SAM "tahan banting" untuk operasi produksi - durable state + idempotency + restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix (crash/PG-down/secret-down/corrupt/disk/duplicate). HTTPS lokal via Caddy self-signed (`https://localhost:8443`) - secure cookie TERBUKTI (`Set-Cookie ... Secure`). **Milestone M12-016 (12h test) ✅ PASS (2026-08-14, elapsed 14.5h, semua invariant OK)** - detail di `CHANGELOG.md`.
 
 ---
 
