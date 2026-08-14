@@ -114,6 +114,7 @@ docs/engineering/templates/*
 !docs/engineering/reports/Daftar_Citizen_dan_Peta_Defisiensi_Struktur.md
 !docs/engineering/reports/Semantic_Repository_Map.md
 !docs/engineering/reports/Architecture_Vocabulary_Hardening_Audit.md
+!docs/engineering/reports/PhaseV1_Canonical_Runtime_Vocabulary.md
 
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md
