@@ -4,6 +4,27 @@
 > **SAM 4.0.0 (2026-08-10) adalah rilis Federated Governance Platform terakhir yang Architecture Accepted**
 > (MISSION-4.1..4.6 COMPLETE).
 
+## SAM 5.2.0 (2026-08-14) - M13 Universal Governance of External Wards
+
+SAM memperluas `Universal` dari sekadar banyak connector menjadi **satu governance model untuk berbagai subject** (`Citizen | Ward`). Kemampuan internal yang sudah terbukti (observe/investigate/diagnose/recover/learn/verify) **digeneralisasi** agar menerima subjek internal (Citizen) maupun eksternal yang dipercayakan (Ward) — BUKAN dibuat ulang. (M13-001..015 CERTIFIED, order resmi Van.)
+
+### M13 P0 (M13-001..015) - Foundation + First Real External Ward
+- **M13-001 Ward Foundation** - domain `ward/`: `WardIdentity` (immutable/deterministic), `WardType`, `WardOwner`, `WardAccess`, `WardStatus`, `WardMetadata`; jenis awal: application, service, repository, container, database, host, filesystem, external_api. Citizen tidak diubah. **PROVEN (21 test).**
+- **M13-002 Ward Registry** - `WardRepository` (Repository Pattern) register/get/list/update_metadata/revoke; HANYA identity/metadata, TIDAK execute/observe/restart/delete/mutate; identity immutable. **PROVEN.**
+- **M13-003 Entrustment / Consent** - `Owner → Entrustment → Ward`; allowed_capabilities, access_scope, approval_policy, created_at, revoked_at. **Registered ≠ permission to mutate.** **PROVEN.**
+- **M13-004..007 Generalize Contracts** - `ObservationTarget`/`InvestigationTarget`/`Diagnosis`/`Recovery` realizable sebagai Citizen|Ward; satu engine internal dipakai ulang, tanpa `External*Engine` terpisah. **PROVEN.**
+- **M13-008 Ward Learning** - Experience punya `subject_id`+`subject_type`; pengalaman NVIDIA/GitHub/OpenClaw tidak tercampur. **PROVEN.**
+- **M13-009 Ward Mission** - Mission = objective+subject+observation+reasoning+approval+execution+verification+evidence+outcome. **PROVEN.**
+- **M13-010 Ward Governance Boundary** - gate keamanan: revoked → observation+blocked+both mutation+blocked; connector tidak menyimpan authority. **PROVEN.**
+- **M13-011/012 First Real GitHub Ward + External Investigation** - WWARD #1 `VanM-Hub/SAM` observe/investigate real via adapter HTTP canonical, tanpa mutation. **PROVEN (REAL).**
+- **M13-013 First External Protection** - `VanM-Hub/test-issues` (private): register→observe→investigate→recommend(approval)→approve→canonical execute (m8_002 PROVEN)→verify eksternal→learn. **PROVEN (REAL): create issue nyata, read-back independen state=open, token masked len=40 leak_free.**
+- **M13-014 Multi-Ward Generalization** - satu `WardGovernor` menangani repository/external_api/process/database/container; revoke terisolasi, failure tidak domino; adapter beda, domain capability sama. **PROVEN (5 test).**
+- **M13-015 Architecture Certification** - **17/17 checklist resmi PASS** (Citizen internal, Ward external tanpa authority, consent, reuse capability, no executor kedua, no duplicate, connector adapter, audit+evidence simpan Ward identity, revoke langsung blok). Laporan `docs/engineering/reports/M13_Architecture_Certification.md`. **CERTIFIED.**
+
+> **CATATAN JUJUR:** M13-016/017 belum dirinci oleh Van (order eksekusi Zara berakhir di M13-015). Mutation M13-013 memakai repo **private** `VanM-Hub/test-issues` (milik Van, bukan produksi). Satu regression test `test_ux_runner_connectors::test_http_endpoint_routes_to_http_readonly` merah karena **httpbin.org sedang HTTP 503** (server eksternal; perilaku harness benar honest-fail, bukan regresi M13).
+
+---
+
 ## SAM 5.1.0 (2026-08-13) - M12 Self-Preservation (Production-Operational Ready)
 
 SAM "tahan banting" untuk operasi produksi nyata: durable state, idempotency, restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix. (M12-016 12h test berjalan otomatis via Task Scheduler; certified setelah verify 14 Agu 10:23 WITA.)
