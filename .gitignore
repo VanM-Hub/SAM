@@ -119,6 +119,7 @@ docs/engineering/templates/*
 !docs/engineering/reports/PhaseV2_Evidence_Representation.md
 !docs/engineering/reports/PhaseV2_Mission_Representation.md
 !docs/engineering/reports/PhaseV2_Completion_Audit.md
+!docs/engineering/reports/PhaseV3_Provider_Vocabulary.md
 
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md
