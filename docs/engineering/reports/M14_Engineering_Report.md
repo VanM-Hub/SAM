@@ -3,8 +3,8 @@
 **Milestone:** M14 Build (delegated authority / SAM becomes useful) + re-architecture environment-adaptive
 **Rilis:** SAM 5.2.0
 **Tanggal:** 2026-08-14
-**Status:** Implementasi selesai, real E2E parsial PROVEN, rombak environment-adaptive selesai
-**Verdict resmi:** Belum dikeluarkan
+**Status:** Implementasi selesai, real E2E parsial PROVEN + rombak environment-adaptive selesai + M14-CLOSE bukti autonomy (autonomous mutation & governed recovery)
+**Verdict resmi:** Belum dikeluarkan (menunggu acceptance M14-CLOSE penuh)
 
 ---
 
@@ -83,9 +83,18 @@ Ward spesifik dirombak menjadi **instance `CapabilityProvider`** pada mesin gene
 | `m14_provider_recovery_real_e2e.py` | Probe health provider + alur delegated (observasi/failover fail-closed) | REAL PROVEN (parsial) |
 | `m14_008_credential_remediation_real_e2e.py` | Remediasi kredensial NYATA via `CredentialBoundary` (NVIDIA provider): deteksi key valid AVAILABLE, env kosong MISSING/BLOCKED, remediasi MISSING→AVAILABLE (owner-supplied, SAM tidak menebak secret), fail-closed tanpa otorisasi→ESCALATED, no self-grant, raw token tidak bocor ke output, audit boundary 6 entries | **REAL PROVEN** |
 
+### M14-CLOSE — bukti autonomy (gap kritis yang ditutup)
+| Tool | Bukti | Status |
+|---|---|---|
+| `m14_close_002_autonomous_mutation_real_e2e.py` | **Real Autonomous Mutation**: provider `nvidia` unhealthy → `DelegationGrant` owner AUTONOMOUS bounded (`requires_human_approval=False`, `allowed_mutations=("protect")`, `blast_radius=PROVIDER_CONNECTION`) → `auto_approve` (source `delegated`, approver `delegated:nvidia`) → switch nyata ke `ollama` → verifikasi ok. Skenario fail-closed (grant OBSERVE) → `escalate`, TIDAK switch. Fase penuh observe→investigate→diagnose→plan→authority→execute→verify. Mutation terjadi TANPA campur tangan user. | **REAL PROVEN** |
+| `m14_close_003_failure_recovery_real_e2e.py` | **Governed Recovery / ESCALATE**: A) tanpa alternatif sehat → FAILED, `switched_to=None`, `loops_attempted=1` (tidak retry tak terbatas); B) switch B sukses tapi verification gagal → `escalated` utk review (`esc_...`), bounded attempt, bukan automated action. | **REAL PROVEN** |
+| `m14_close_006_tahan_banting_degradation_e2e.py` | **Tahan banting**: observer A/B/C sengaja dirusak (throw) → partial evidence → confidence dihitung ulang jujur → verdict `escalate` (tidak eksekusi saat evidence tak cukup); credential unavailable → boundary MISSING/BLOCKED; no `evidence_missing→assume→execute`. Temuan jujur: `ConfidenceAssessor` menghitung evidence failed (0.0) sbg lemah (bias permisif) — SAM tetap aman. | **REAL PROVEN** |
+
+> Seluruh bukti menggunakan provider nyata (NVIDIA token dari env, Ollama lokal); token tidak di-commit, tidak bocor ke output (no_leak), evidence eksternal.
+
 ### Status BLOCKED (jujur)
-- **Auto-failover eksekusi penuh** — menunggu grant owner `AUTONOMOUS` dengan `requires_human_approval=False` (keputusan owner, bukan SAM).
 - **OpenClaw Ward real E2E** — jembatan `health.json` ke runtime belum tersambung penuh.
+- **M14-CLOSE-004/005** (Guardian environment-adaptive + continuous guard) — belum dieksekusi sebagai bukti nyata (menunggu jadwal).
 
 ---
 
@@ -126,6 +135,7 @@ Rombak B TIDAK merusak M13/M14.
 | Docs README/CHANGELOG/ATLAS (opsi B) | `3994130` |
 | M14-008 real E2E: Credential Remediation PROVEN | `934d64e` |
 | Update laporan M14 (M14-008 PROVEN) | `71312c7` |
+| M14-CLOSE-002/003/006: autonomous mutation + governed recovery + tahan banting | `7bd84b2` |
 
 Semua commit ter-push ke `main`.
 
@@ -144,3 +154,4 @@ Semua commit ter-push ke `main`.
 
 - Error collection pada suite penuh `tests/` (`import file mismatch` pada `test_wp*`) berasal dari **duplikasi nama file** pada folder test — kondisi pre-existing, bukan dari rombak environment.
 - Satu regression network test (`test_m6browser_fetch_real`) rentan flaky akibat timeout koneksi eksternal — perilaku harness `honest-fail`, bukan regresi.
+- **Temuan M14-CLOSE-006:** `ConfidenceAssessor` menghitung evidence *source failed* (strength 0.0) sebagai evidence lemah sehingga beberapa evidence gagal bisa menghasilkan confidence MEDIUM (bias permisif). SAM tetap aman (verdict `escalate`, tidak mengeksekusi), tapi assessor layak diperbaiki agar evidence gagal dihitung sebagai pengurang, bukan penambah. Direkomendasikan utk iterasi berikutnya.
