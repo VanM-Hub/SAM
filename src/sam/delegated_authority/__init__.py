@@ -64,6 +64,14 @@ from .real_pdf_investigation import (
     PDFPerformanceInvestigator,
     PDFPerformanceInvestigation,
 )
+from .real_project_guardian import (
+    ProjectGuardian,
+    ProjectGuardianResult,
+    ProjectProbe,
+    GitHubProbe,
+    LocalProjectProbe,
+    ProjectKind,
+)
 
 __all__ = [
     "AutonomousAuthority",
@@ -92,4 +100,10 @@ __all__ = [
     "WordInvestigation",
     "PDFPerformanceInvestigator",
     "PDFPerformanceInvestigation",
+    "ProjectGuardian",
+    "ProjectGuardianResult",
+    "ProjectProbe",
+    "GitHubProbe",
+    "LocalProjectProbe",
+    "ProjectKind",
 ]
