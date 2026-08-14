@@ -184,6 +184,20 @@ def main(argv=None) -> int:
     evidence["audit"].append({"step": "learn", "verdict": "OK", "subject_type": "ward"})
     print("[OK] LEARN -> subject_type=ward, action=protect/create_issue")
 
+    # Item 14 & 15 M13-015: Audit & Evidence WAJIB menyimpan Ward identity agar
+    # dapat ditelusuri ke Ward. Normalisasi: tambahkan subject Ward identity ke
+    # setlap record audit yang belum punya, dan isi evidence.subject top-level.
+    evidence["subject"] = ident.as_dict()
+    for _rec in evidence.get("audit", []):
+        if isinstance(_rec, dict) and not _rec.get("subject"):
+            _rec["subject"] = ident.as_dict()
+    evidence["steps"].append({
+        "step": "CERTIFY_SUBJECT",
+        "note": "audit & evidence diikat ke Ward identity (M13-015 #14/#15)",
+        "ward_id": ident.ward_id,
+        "ward_type": ident.ward_type,
+    })
+
     evidence["finished_at"] = _now()
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:

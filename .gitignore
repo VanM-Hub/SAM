@@ -109,6 +109,7 @@ docs/engineering/templates/*
 !docs/engineering/reports/P11_*.md
 !docs/engineering/reports/M10_Production_Operational_Readiness_Report.md
 !docs/engineering/reports/M12_Certification_Report.md
+!docs/engineering/reports/M13_Architecture_Certification.md
 
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md
