@@ -125,6 +125,7 @@ Rombak B TIDAK merusak M13/M14.
 | **Rombak B: CapabilityProvider registry** | `eba15bd` |
 | Docs README/CHANGELOG/ATLAS (opsi B) | `3994130` |
 | M14-008 real E2E: Credential Remediation PROVEN | `934d64e` |
+| Update laporan M14 (M14-008 PROVEN) | `71312c7` |
 
 Semua commit ter-push ke `main`.
 
