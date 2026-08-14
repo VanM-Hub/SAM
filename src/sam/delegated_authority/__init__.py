@@ -45,6 +45,17 @@ from .real_credential_remediation import (
     CredentialRemediationResult,
     RealCredentialRemediation,
 )
+from .real_openclaw_ward import (
+    OpenClawWard,
+    OpenClawWardResult,
+    OpenClawDiagnosis,
+)
+from .real_windows_pc_ward import (
+    WindowsPCWard,
+    PCWardResult,
+    PCDiagnosis,
+    FileProbe,
+)
 
 __all__ = [
     "AutonomousAuthority",
@@ -62,4 +73,11 @@ __all__ = [
     "ProviderRecoveryResult",
     "CredentialRemediationResult",
     "RealCredentialRemediation",
+    "OpenClawWard",
+    "OpenClawWardResult",
+    "OpenClawDiagnosis",
+    "WindowsPCWard",
+    "PCWardResult",
+    "PCDiagnosis",
+    "FileProbe",
 ]
