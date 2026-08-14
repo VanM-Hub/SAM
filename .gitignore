@@ -118,6 +118,7 @@ docs/engineering/templates/*
 !docs/engineering/reports/PhaseV2_Representation_Naming_Knowledge.md
 !docs/engineering/reports/PhaseV2_Evidence_Representation.md
 !docs/engineering/reports/PhaseV2_Mission_Representation.md
+!docs/engineering/reports/PhaseV2_Completion_Audit.md
 
 docs/engineering/decisions/*
 !docs/engineering/decisions/ARCHITECTURE ORDER.md
