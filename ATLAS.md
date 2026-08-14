@@ -121,6 +121,11 @@
    │                                 AutonomousRecoveryLoop + real targets (provider recovery, credential
    │                                 remediation, OpenClaw Ward, Windows PC Ward, Word/PDF investigation,
    │                                 Project Guardian) + safety & operational certification
+   │     environment              ← M14 environment-adaptive (Opsi B rombak habis): mesin generic
+   │                                 DISCOVERY→IDENTIFICATION→OBSERVATION→INVESTIGATION→DIAGNOSIS→
+   │                                 AUTHORITY→EXECUTION→VERIFICATION; CapabilityProvider/ProviderRegistry
+   │                                 jadikan ward spesifik (Word/PDF/OpenClaw/GitHub/Provider) sebaga
+   │                                 instance terdaftar, BUKAN katalog aplikasi yang SAM andalkan
    │
    ├── legacy (HISTORIS — jangan tambah dependency baru)
    │     operations / execution / runtime / reasoning

@@ -29,6 +29,16 @@ SAM memperluas `Universal` dari sekadar banyak connector menjadi **satu governan
 
 M14 menghubungkan fondasi yang sudah ada (AutonomyLevel, AutonomyController, Guardrails, Approval Policy, ApprovalGate, Ward, canonical execution, verification, audit, learning) menjadi **delegated authority bridge**: approval bisa diberikan secara OTOMATIS HANYA bila delegated authority owner mengizinkan - tetap SATU ApprovalGate, SATU canonical execution, tanpa executor kedua, tanpa self-grant. Target M14: **user tidak perlu memikirkan SAM** - user menitipkan "jaga PC saya / project saya / OpenClaw saya", SAM melakukan sisanya dalam authority yang didelegasikan. UI diabaikan. (Belum verdict resmi Van; status implementasi + sertifikasi keselamatan/operasional di `docs/engineering/reports/`.)
 
+### Re-architecture environment-adaptive (Opsi B — rombak habis) 2026-08-14
+
+Ward spesifik (Word/PDF/OpenClaw/GitHub/Provider) dirombak menjadi **instance `CapabilityProvider`** pada mesin generic — BUKAN hardcoded application catalogue. Mesin generic `src/sam/environment/` memahami environment TANPA daftar nama aplikasi; provider hanya menambah source observasi bila DIDAFTARKAN (registry default kosong → mesin tetap jalan penuh).
+- **`environment/providers.py`** — `CapabilityProvider` + `ProviderRegistry` + `ProviderObservation`; 3 fungsi optional (observe/diagnose/remediate), remediate HANYA menandai avail, tidak mengeksekusi (eksekusi tetap canonical).
+- **`environment/capabilities.py`** — factory bungkus investigator ward lama (word/pdf/openclaw/project/provider) jadi provider instance + `register_default_instances`; reuse, bukan duplikat.
+- **`environment/pipeline.py`** — wire `register_provider`; observasi provider masuk evidence/verdicts HANYA bila terdaftar.
+- **Test** — `tests/environment/test_capabilities_rombak.py` 5 test (0-provider jalan penuh, register→pipeline pakai evidence, provider tak eksekusi, word/pdf tetap berfungsi, factory register). Total `tests/environment/` = **17 passed**.
+- **Regression** — environment + delegated_authority (M14) + ward (M13) = **131 passed**; platform 141; execution_runtime 359 (1 flaky network browser pre-existing); application 124. Rombak B **tidak merusak M13/M14**.
+- Commit `eba15bd` (pushed).
+
 ### Bounded context baru: `src/sam/delegated_authority/`
 Jembatan authority M14 (OBSERVE/RECOMMEND/ASSIST/SUPERVISE/AUTONOMOUS dipakai ulang dari `autonomy/`) - 67 test di `tests/delegated_authority/`.
 
