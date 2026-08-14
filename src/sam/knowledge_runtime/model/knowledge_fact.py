@@ -9,8 +9,8 @@ from typing import Optional
 
 
 @dataclass(frozen=True)
-class KnowledgeFact:
-    """Fakta knowledge (immutable)."""
+class KnowledgeFactPreview:
+    """Fakta knowledge (immutable, preview/read-only DTO)."""
     fact_id: str
     subject: str = ""
     predicate: str = "is"

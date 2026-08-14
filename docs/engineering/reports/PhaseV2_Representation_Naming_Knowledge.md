@@ -2,7 +2,7 @@
 
 **Tanggal:** 2026-08-14
 **Jenis:** Analisis kontrak + consumer untuk memberi **nama representasi** yang jelas (BUKAN hapus, BUKAN merge).
-**Status:** ⏳ Draft rekomendasi — **TIDAK mengubah kode**; menunggu keputusan Van untuk eksekusi penamaan.
+**Status:** ✅ **V2-EXEC-001 DIEKSEKUSI (Opsi B, direstui Van).** Storage: `KnowledgeFact`/`KnowledgeRelationship` tetap. Preview di-rename: `KnowledgeFactPreview`/`KnowledgeRelationPreview`. (details di bawah)
 **Cakupan:** `KnowledgeFact`, `KnowledgeRelation`/`KnowledgeRelationship` (storage vs preview).
 
 ---
@@ -159,3 +159,58 @@ Rasional: paling deskriptif, tapi paling invasif (ubah kedua-duanya).
 Detail impact per opsi akan diukur ulang saat keputusan Van turun (scan consumer penuh → regression).
 
 **Belum dieksekusi.** Menunggu keputusan Van: pilih opsi penamaan (A / B / C) — lalu aku jalankan rename + leaf check + regression sesuai pola V1-EXEC.
+
+---
+
+## 6. V2-EXEC-001 — EKSEKUSI (Opsi B, APPROVED Van 2026-08-14)
+
+**Keputusan Van:** Opsi B. Storage tidak diubah namanya; preview di-rename dengan sufiks `*Preview`. `Stored*` ditolak (mengikatkan mekanisme persistence ke nama model → melanggar implementation independence). `KnowledgeRelationship → KnowledgeRelation` rename tambahan ditolak.
+
+### Perubahan final
+
+| Konsep | Storage (tetap) | Preview (rename) |
+|---|---|---|
+| Fact | `sam.knowledge.KnowledgeFact` | `sam.knowledge_runtime.KnowledgeFact` → **`KnowledgeFactPreview`** |
+| Relation | `sam.knowledge.KnowledgeRelationship` | `sam.knowledge_runtime.KnowledgeRelation` → **`KnowledgeRelationPreview`** |
+
+### File yang diubah
+- `knowledge_runtime/model/knowledge_fact.py` — `class KnowledgeFactPreview`
+- `knowledge_runtime/model/knowledge_relation.py` — `class KnowledgeRelationPreview`
+- `knowledge_runtime/model/__init__.py` — re-export `KnowledgeFactPreview`/`KnowledgeRelationPreview`
+- `knowledge_runtime/model/knowledge_validator.py` — tipe hint → `*Preview`
+- `knowledge_runtime/builder/fact_builder.py` — import/return → `KnowledgeFactPreview`
+- `knowledge_runtime/builder/relation_builder.py` — import/return → `KnowledgeRelationPreview`
+- `knowledge_runtime/__init__.py` — public surface re-export `*Preview`
+- `tests/unit/test_sprint181.py` — import/instansiasi → `*Preview`
+- `tests/knowledge_runtime/test_knowledge_runtime_contract_suite.py` — import/instansiasi → `*Preview`
+
+### Yang TIDAK diubah (sesuai aturan Van)
+- `sam.knowledge` (storage) — tidak disentuh: `KnowledgeFact`, `KnowledgeRelationship`, `KnowledgeDocument`, `KnowledgeHistory`, store/graph/loader/patterns/persistence.
+- `evidence/models.py` — tidak disentuh.
+- Struktur bounded context / lokasi package — tidak berubah.
+- Behaviour / schema / field — tidak berubah (hanya rename identifier).
+- Tidak ada merge storage + preview.
+- Tidak ada compatibility alias (public surface `sam.knowledge_runtime` sekarang `*Preview`; tidak ada consumer eksternal terverifikasi yang perlu alias).
+
+### Verifikasi
+- Smoke import: `KnowledgeFactPreview`/`KnowledgeRelationPreview` resolve dari `sam.knowledge_runtime` konsisten (identity `is` True).
+- Skim: 0 referensi nama lama `KnowledgeFact`/`KnowledgeRelation` (tanpa sufiks) tersisa di seluruh `knowledge_runtime`; 0 import nama lama dari jalur `knowledge_runtime`.
+- **Ruff clean** (exit 0).
+- **Regression:** `tests/knowledge_runtime/` + `tests/unit/test_sprint181.py` + `test_sprint182.py` = **75 passed**. Full `tests/unit/` = **2941 passed, 1 skipped**.
+
+### Acceptance criteria (dedicated)
+
+| Criterion | Hasil |
+|---|---|
+| no ambiguous KnowledgeFact definitions in same semantic vocabulary | ✅ `KnowledgeFact` hanya di `sam.knowledge` (storage); `KnowledgeFactPreview` di `knowledge_runtime` |
+| no ambiguous KnowledgeRelation definitions | ✅ `KnowledgeRelationship` di storage; `KnowledgeRelationPreview` di preview |
+| storage consumers resolve to storage models | ✅ store/graph/patterns/persistence tak berubah |
+| preview consumers resolve to preview models | ✅ builder/validator/pipeline/test → `*Preview` |
+| no runtime behavior change | ✅ rename-only; 2941+75 passed hijau |
+| no new architectural boundary | ✅ |
+| no authority/responsibility leakage | ✅ |
+| leak check = 0 | ✅ |
+| ruff = clean | ✅ |
+| targeted regression = green | ✅ |
+
+**V2-EXEC-001 SELESAI.** Sisa V2: Evidence representation + Mission representation (belum dieksekusi, menunggu Van).

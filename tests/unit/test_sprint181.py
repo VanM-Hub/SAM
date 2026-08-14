@@ -3,8 +3,8 @@ import pytest
 from dataclasses import FrozenInstanceError
 
 from sam.knowledge_runtime.model.knowledge_record import KnowledgeRecord
-from sam.knowledge_runtime.model.knowledge_fact import KnowledgeFact
-from sam.knowledge_runtime.model.knowledge_relation import KnowledgeRelation
+from sam.knowledge_runtime.model.knowledge_fact import KnowledgeFactPreview
+from sam.knowledge_runtime.model.knowledge_relation import KnowledgeRelationPreview
 from sam.knowledge_runtime.model.knowledge_context import KnowledgeContext
 from sam.knowledge_runtime.model.knowledge_tag import KnowledgeTag
 from sam.knowledge_runtime.model.knowledge_validator import (
@@ -35,29 +35,29 @@ class TestKnowledgeRecord:
 
 class TestKnowledgeFact:
     def test_default(self):
-        f = KnowledgeFact("f1", "Water", "is", "H2O")
+        f = KnowledgeFactPreview("f1", "Water", "is", "H2O")
         assert f.predicate == "is"
         assert f.preview_only is True
 
     def test_is_valid(self):
-        assert KnowledgeFact("f1", "Water").is_valid() is True
-        assert KnowledgeFact("", "").is_valid() is False
+        assert KnowledgeFactPreview("f1", "Water").is_valid() is True
+        assert KnowledgeFactPreview("", "").is_valid() is False
 
     def test_immutable(self):
-        f = KnowledgeFact("f1", "Water")
+        f = KnowledgeFactPreview("f1", "Water")
         with pytest.raises(FrozenInstanceError):
             f.obj = "x"
 
 
 class TestKnowledgeRelation:
     def test_default(self):
-        r = KnowledgeRelation("rel1", "a", "b")
+        r = KnowledgeRelationPreview("rel1", "a", "b")
         assert r.rel_type == "relates_to"
         assert r.is_valid() is True
-        assert KnowledgeRelation("", "", "").is_valid() is False
+        assert KnowledgeRelationPreview("", "", "").is_valid() is False
 
     def test_immutable(self):
-        r = KnowledgeRelation("rel1", "a", "b")
+        r = KnowledgeRelationPreview("rel1", "a", "b")
         with pytest.raises(FrozenInstanceError):
             r.rel_type = "x"
 
@@ -94,16 +94,16 @@ class TestKnowledgeValidator:
         assert v.valid is False
 
     def test_validate_fact(self):
-        v = KnowledgeValidator().validate_fact(KnowledgeFact("f1", "Water"))
+        v = KnowledgeValidator().validate_fact(KnowledgeFactPreview("f1", "Water"))
         assert v.valid is True
-        v2 = KnowledgeValidator().validate_fact(KnowledgeFact("", ""))
+        v2 = KnowledgeValidator().validate_fact(KnowledgeFactPreview("", ""))
         assert v2.valid is False
 
     def test_validate_relation(self):
         v = KnowledgeValidator().validate_relation(
-            KnowledgeRelation("r1", "a", "b"))
+            KnowledgeRelationPreview("r1", "a", "b"))
         assert v.valid is True
-        v2 = KnowledgeValidator().validate_relation(KnowledgeRelation("", "", ""))
+        v2 = KnowledgeValidator().validate_relation(KnowledgeRelationPreview("", "", ""))
         assert v2.valid is False
 
     def test_validate_context(self):
@@ -149,7 +149,7 @@ class TestDashboardModelBridge:
 
 class TestModelImmutability:
     DTO_CLASSES = [
-        KnowledgeRecord, KnowledgeFact, KnowledgeRelation,
+        KnowledgeRecord, KnowledgeFactPreview, KnowledgeRelationPreview,
         KnowledgeContext, KnowledgeTag, KnowledgeValidation,
     ]
 

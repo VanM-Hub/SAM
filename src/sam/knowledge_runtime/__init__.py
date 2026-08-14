@@ -17,8 +17,8 @@ from .foundation import (
 from .dashboard import ExecutionCard
 from .model import (
     KnowledgeRecord,
-    KnowledgeFact,
-    KnowledgeRelation,
+    KnowledgeFactPreview,
+    KnowledgeRelationPreview,
     KnowledgeContext,
     KnowledgeTag,
     KnowledgeValidator,
@@ -123,8 +123,8 @@ __all__ = [
     "DashboardKnowledgeBridge",
     "ExecutionCard",
     "KnowledgeRecord",
-    "KnowledgeFact",
-    "KnowledgeRelation",
+    "KnowledgeFactPreview",
+    "KnowledgeRelationPreview",
     "KnowledgeContext",
     "KnowledgeTag",
     "KnowledgeValidator",

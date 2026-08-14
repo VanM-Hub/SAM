@@ -8,8 +8,8 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class KnowledgeRelation:
-    """Relasi knowledge (immutable)."""
+class KnowledgeRelationPreview:
+    """Relasi knowledge (immutable, preview/read-only DTO)."""
     relation_id: str
     source_id: str = ""
     target_id: str = ""

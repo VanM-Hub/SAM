@@ -14,9 +14,9 @@ from sam.knowledge_runtime.foundation.knowledge_registry import KnowledgeRegistr
 from sam.knowledge_runtime.runtime.knowledge_runtime import KnowledgeRuntime
 from sam.knowledge_runtime.runtime.knowledge_summary import KnowledgeSummarizer
 from sam.knowledge_runtime.builder.knowledge_builder import KnowledgeBuilder
-from sam.knowledge_runtime.model.knowledge_fact import KnowledgeFact
+from sam.knowledge_runtime.model.knowledge_fact import KnowledgeFactPreview
 from sam.knowledge_runtime.model.knowledge_record import KnowledgeRecord
-from sam.knowledge_runtime.model.knowledge_relation import KnowledgeRelation
+from sam.knowledge_runtime.model.knowledge_relation import KnowledgeRelationPreview
 
 
 def _registry():
@@ -82,13 +82,13 @@ class TestModelContract:
         assert rec.preview_only is True
 
     def test_fact(self):
-        f = KnowledgeFact("f1", subject="SAM", predicate="is", obj="arch")
+        f = KnowledgeFactPreview("f1", subject="SAM", predicate="is", obj="arch")
         assert f.fact_id == "f1"
         assert f.obj == "arch"
         assert f.is_valid() is True
         assert f.preview_only is True
 
     def test_relation(self):
-        rel = KnowledgeRelation("r1", source_id="kn1", target_id="kn2", rel_type="linked")
+        rel = KnowledgeRelationPreview("r1", source_id="kn1", target_id="kn2", rel_type="linked")
         assert rel.rel_type == "linked"
         assert rel.is_valid() is True

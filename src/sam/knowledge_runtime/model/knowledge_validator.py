@@ -8,8 +8,8 @@ from dataclasses import dataclass, field
 from typing import List
 
 from .knowledge_record import KnowledgeRecord
-from .knowledge_fact import KnowledgeFact
-from .knowledge_relation import KnowledgeRelation
+from .knowledge_fact import KnowledgeFactPreview
+from .knowledge_relation import KnowledgeRelationPreview
 from .knowledge_context import KnowledgeContext
 
 
@@ -31,7 +31,7 @@ class KnowledgeValidator:
             issues.append("knowledge_id required")
         return KnowledgeValidation(valid=not issues, issues=issues)
 
-    def validate_fact(self, fact: KnowledgeFact) -> KnowledgeValidation:
+    def validate_fact(self, fact: KnowledgeFactPreview) -> KnowledgeValidation:
         issues = []
         if not fact.fact_id:
             issues.append("fact_id required")
@@ -39,7 +39,7 @@ class KnowledgeValidator:
             issues.append("subject required")
         return KnowledgeValidation(valid=not issues, issues=issues)
 
-    def validate_relation(self, relation: KnowledgeRelation) -> KnowledgeValidation:
+    def validate_relation(self, relation: KnowledgeRelationPreview) -> KnowledgeValidation:
         issues = []
         if not relation.relation_id:
             issues.append("relation_id required")
