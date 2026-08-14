@@ -56,6 +56,14 @@ from .real_windows_pc_ward import (
     PCDiagnosis,
     FileProbe,
 )
+from .real_word_investigation import (
+    WordInvestigator,
+    WordInvestigation,
+)
+from .real_pdf_investigation import (
+    PDFPerformanceInvestigator,
+    PDFPerformanceInvestigation,
+)
 
 __all__ = [
     "AutonomousAuthority",
@@ -80,4 +88,8 @@ __all__ = [
     "PCWardResult",
     "PCDiagnosis",
     "FileProbe",
+    "WordInvestigator",
+    "WordInvestigation",
+    "PDFPerformanceInvestigator",
+    "PDFPerformanceInvestigation",
 ]
