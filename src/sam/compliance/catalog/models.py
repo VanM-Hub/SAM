@@ -7,8 +7,10 @@ Python 3.8 compatible — frozen dataclass with Dict from typing.
 """
 
 from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import Dict, Any, Optional, List
+from enum import Enum
+from typing import Dict, Any, List
+
+from ..models.evidence_type import EvidenceType  # canonical evidence type
 
 
 class CheckLevel(Enum):
@@ -40,20 +42,6 @@ class CheckSeverity(Enum):
     MAJOR = "MAJOR"
     MINOR = "MINOR"
     INFO = "INFO"
-
-
-class EvidenceType(Enum):
-    """Evidence types from P1-001 §4.1."""
-    FILE_EXISTS = "FILE_EXISTS"
-    FILE_ABSENT = "FILE_ABSENT"
-    SOURCE_CONTAINS = "SOURCE_CONTAINS"
-    SOURCE_ABSENT = "SOURCE_ABSENT"
-    TEST_PASS = "TEST_PASS"
-    TEST_COUNT = "TEST_COUNT"
-    IMPORT_LEGAL = "IMPORT_LEGAL"
-    IMPORT_ILLEGAL = "IMPORT_ILLEGAL"
-    LIFECYCLE_VALID = "LIFECYCLE_VALID"
-    TRACE_CHAIN = "TRACE_CHAIN"
 
 
 class CheckAuthority(Enum):

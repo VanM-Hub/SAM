@@ -1,20 +1,11 @@
 """
-Runtime State Enum — 12 State Phase 0
+Runtime State Enum — compatibility shim.
+
+Canonical definition lives in ``sam.runtime.state``.
+This module re-exports it so that ``from sam.contracts import RuntimeState``
+remains a valid compatibility surface without introducing a second definition.
 """
 
-from enum import Enum
+from sam.runtime.state import RuntimeState
 
-
-class RuntimeState(str, Enum):
-    INITIALIZING = "initializing"
-    BOOTSTRAPPING = "bootstrapping"
-    RECOVERING = "recovering"
-    READY = "ready"
-    RUNNING = "running"
-    DEGRADED = "degraded"
-    PAUSED = "paused"
-    UPDATING = "updating"
-    STOPPING = "stopping"
-    SHUTDOWN = "shutdown"
-    CRASHED = "crashed"
-    SAFE_MODE = "safe_mode"
+__all__ = ["RuntimeState"]

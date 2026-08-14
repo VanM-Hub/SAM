@@ -18,7 +18,8 @@ execution graph acyclic by construction.
 from typing import List, Optional
 
 from ..catalog.catalog import ComplianceCheckCatalog
-from ..catalog.models import CheckerClass, EvidenceType
+from ..catalog.models import CheckerClass
+from ..models.evidence_type import EvidenceType
 from .entry import ManifestEntry
 from .manifest import ComplianceManifest
 
