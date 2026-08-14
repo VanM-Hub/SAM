@@ -72,6 +72,16 @@ from .real_project_guardian import (
     LocalProjectProbe,
     ProjectKind,
 )
+from .safety_certification import (
+    AutonomousSafetyCertifier,
+    SafetyCertification,
+    SafetyCheck,
+)
+from .operational_certification import (
+    OperationalCertifier,
+    OperationalCertification,
+    CapabilityStatus,
+)
 
 __all__ = [
     "AutonomousAuthority",
@@ -106,4 +116,10 @@ __all__ = [
     "GitHubProbe",
     "LocalProjectProbe",
     "ProjectKind",
+    "AutonomousSafetyCertifier",
+    "SafetyCertification",
+    "SafetyCheck",
+    "OperationalCertifier",
+    "OperationalCertification",
+    "CapabilityStatus",
 ]
