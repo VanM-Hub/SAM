@@ -81,10 +81,10 @@ Ward spesifik dirombak menjadi **instance `CapabilityProvider`** pada mesin gene
 | `m14_pc_word_pdf_real_e2e.py` | Investigasi Word/PDF pada file nyata | REAL PROVEN (parsial) |
 | `m14_project_guardian_real_e2e.py` | `ProjectGuardian` detect pada target GitHub/Lokal nyata | REAL PROVEN |
 | `m14_provider_recovery_real_e2e.py` | Probe health provider + alur delegated (observasi/failover fail-closed) | REAL PROVEN (parsial) |
+| `m14_008_credential_remediation_real_e2e.py` | Remediasi kredensial NYATA via `CredentialBoundary` (NVIDIA provider): deteksi key valid AVAILABLE, env kosong MISSING/BLOCKED, remediasi MISSING→AVAILABLE (owner-supplied, SAM tidak menebak secret), fail-closed tanpa otorisasi→ESCALATED, no self-grant, raw token tidak bocor ke output, audit boundary 6 entries | **REAL PROVEN** |
 
 ### Status BLOCKED (jujur)
 - **Auto-failover eksekusi penuh** — menunggu grant owner `AUTONOMOUS` dengan `requires_human_approval=False` (keputusan owner, bukan SAM).
-- **M14-008 Credential Remediation real E2E** — menunggu provider eksternal ber-key yang tersedia.
 - **OpenClaw Ward real E2E** — jembatan `health.json` ke runtime belum tersambung penuh.
 
 ---
@@ -124,6 +124,7 @@ Rombak B TIDAK merusak M13/M14.
 | M14 real E2E (PC/Guardian/Provider) | `1072235` |
 | **Rombak B: CapabilityProvider registry** | `eba15bd` |
 | Docs README/CHANGELOG/ATLAS (opsi B) | `3994130` |
+| M14-008 real E2E: Credential Remediation PROVEN | `934d64e` |
 
 Semua commit ter-push ke `main`.
 
@@ -134,6 +135,7 @@ Semua commit ter-push ke `main`.
 - M13 Universal Governance of External Wards — CERTIFIED (17/17).
 - M12 Self-Preservation — CERTIFIED (M12-001..017 PASS).
 - Environment-adaptive menambah folder `src/sam/environment/` (ATLAS & README telah diperbarui).
+- M14-008 (Credential Remediation) kini REAL PROVEN via provider NVIDIA nyata (token dari env, tidak di-commit; evidence eksternal).
 
 ---
 
