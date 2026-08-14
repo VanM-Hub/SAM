@@ -79,14 +79,28 @@ class HttpObservationAdapter(ObservationTarget):
         return self._base_url
 
     def _resolve_headers(self, runtime_env: Optional[Dict[str, str]]) -> Optional[Dict[str, str]]:
-        """Baca header dari env runtime (bukan hardcode). Contoh: token read-only."""
+        """Baca header dari env runtime (bukan hardcode). Contoh: token read-only.
+
+        Bila `runtime_env` tidak diberikan, jatuh ke env proses (os.environ) -
+        konsisten dengan connector canonical lain yang membaca env. Adapter
+        NEVER hardcode secret; header diisi oleh wiring composition root.
+        """
         if not self._headers_env:
             return None
-        env = runtime_env or {}
+        env = runtime_env
+        if env is None:
+            try:
+                import os
+                env = os.environ
+            except Exception:
+                env = {}
+        env = env or {}
         resolved = {}
         for header_name, env_key in self._headers_env.items():
             val = env.get(env_key)
             if val:
+                # jangan pernah rekam secret utuh ke payload/evidence - hanya
+                # flag kehadiran
                 resolved[header_name] = val
         return resolved or None
 
