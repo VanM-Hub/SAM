@@ -35,6 +35,16 @@ from .provider import DelegatedApprovalProvider
 from .scope import ScopedAutonomy
 from .escalation import AutomaticEscalation
 from .recovery import AutonomousRecoveryLoop
+from .real_provider_recovery import (
+    ProviderProbe,
+    ProviderHealthProbe,
+    ProviderRecovery,
+    ProviderRecoveryResult,
+)
+from .real_credential_remediation import (
+    CredentialRemediationResult,
+    RealCredentialRemediation,
+)
 
 __all__ = [
     "AutonomousAuthority",
@@ -46,4 +56,10 @@ __all__ = [
     "ScopedAutonomy",
     "AutomaticEscalation",
     "AutonomousRecoveryLoop",
+    "ProviderProbe",
+    "ProviderHealthProbe",
+    "ProviderRecovery",
+    "ProviderRecoveryResult",
+    "CredentialRemediationResult",
+    "RealCredentialRemediation",
 ]

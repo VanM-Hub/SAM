@@ -104,7 +104,8 @@ class DelegatedApprovalProvider:
         # Ambil ward_id dari konteks / request (payload memuat subject).
         ward_id = str(action_context.get("ward_id", "") if action_context else "") \
                   or request.payload.get("ward_id", "")
-        capability = request.operation
+        capability = (action_context.get("capability", "") if action_context else "") \
+                     or request.operation
 
         authority = await self._evaluation.evaluate(
             ward_id=ward_id,

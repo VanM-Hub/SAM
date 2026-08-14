@@ -104,6 +104,7 @@ class AutonomousRecoveryLoop:
         *,
         request: Any,                 # ExecutionRequest
         grant,                        # DelegationGrant (proyeksi Entrustment)
+        capability: Optional[str] = None,   # authority capability (default=request.operation)
         risk: float = 0.0,
         risk_label: str = "low",
         plan: Optional[Dict[str, Any]] = None,
@@ -123,6 +124,7 @@ class AutonomousRecoveryLoop:
         """
         recovery_id = f"rec_{uuid4().hex[:12]}"
         ward_id = str(request.payload.get("ward_id", "")) or str(getattr(request, "operation", ""))
+        authority_capability = capability or request.operation
         steps: List[RecoveryStep] = []
 
         # --- Observe --- (read-only)
@@ -155,7 +157,8 @@ class AutonomousRecoveryLoop:
         outcome = await self._provider.approve_for(
             request, grant=grant, risk=risk, risk_label=risk_label,
             evidence_refs=evidence_refs,
-            action_context={"ward_id": ward_id, "plan": plan},
+            action_context={"ward_id": ward_id, "plan": plan,
+                            "capability": authority_capability},
         )
         steps.append(RecoveryStep(
             RecoveryPhase.AUTHORITY, outcome.approved, outcome.as_dict(),
@@ -169,7 +172,7 @@ class AutonomousRecoveryLoop:
         ):
             esc = await self._escalation.escalate_for(
                 ward_id=ward_id,
-                capability=request.operation,
+                capability=authority_capability,
                 reason=outcome.reason,
                 verdict=AuthorityVerdict(outcome.verdict),
                 context={"recovery_id": recovery_id, "authority": outcome.as_dict()},
