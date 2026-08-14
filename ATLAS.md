@@ -115,6 +115,13 @@
    │     enterprise_governance    ← Org/tenant/policy/audit boundary (5.5)
    │     adaptive_governance      ← Learning/simulation/impact/recommendation (5.6, authority di manusia)
    │
+   ├── M14 (M14 Build - SAM becomes useful, delegated authority)
+   │     delegated_authority      ← jembatan authority M14: AutonomousAuthority / DelegatedApprovalProvider /
+   │                                 AuthorityEvaluation / ScopedAutonomy / AutomaticEscalation /
+   │                                 AutonomousRecoveryLoop + real targets (provider recovery, credential
+   │                                 remediation, OpenClaw Ward, Windows PC Ward, Word/PDF investigation,
+   │                                 Project Guardian) + safety & operational certification
+   │
    ├── legacy (HISTORIS — jangan tambah dependency baru)
    │     operations / execution / runtime / reasoning
    │

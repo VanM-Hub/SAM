@@ -25,6 +25,38 @@ SAM memperluas `Universal` dari sekadar banyak connector menjadi **satu governan
 
 ---
 
+## SAM 5.2.0 (2026-08-14) - M14 Build SELESAI (001-015): SAM becomes useful
+
+M14 menghubungkan fondasi yang sudah ada (AutonomyLevel, AutonomyController, Guardrails, Approval Policy, ApprovalGate, Ward, canonical execution, verification, audit, learning) menjadi **delegated authority bridge**: approval bisa diberikan secara OTOMATIS HANYA bila delegated authority owner mengizinkan - tetap SATU ApprovalGate, SATU canonical execution, tanpa executor kedua, tanpa self-grant. Target M14: **user tidak perlu memikirkan SAM** - user menitipkan "jaga PC saya / project saya / OpenClaw saya", SAM melakukan sisanya dalam authority yang didelegasikan. UI diabaikan. (Belum verdict resmi Van; status implementasi + sertifikasi keselamatan/operasional di `docs/engineering/reports/`.)
+
+### Bounded context baru: `src/sam/delegated_authority/`
+Jembatan authority M14 (OBSERVE/RECOMMEND/ASSIST/SUPERVISE/AUTONOMOUS dipakai ulang dari `autonomy/`) - 67 test di `tests/delegated_authority/`.
+
+### M14-001..006 Foundation - delegated authority bridge
+- **M14-001 AutonomousAuthority** - `DelegationGrant` (proyeksi Entrustment owner: autonomy level + allowed_mutations + requires_human_approval) + `AutonomousAuthority` (source/verdict immutable). Fail-closed: tanpa grant -> NO_AUTHORITY.
+- **M14-002 DelegatedApprovalProvider** - menentukan apakah delegated authority mengizinkan AUTO-APPROVE utk ExecutionRequest; verifikasi ulang via ApprovalGate canonical (defense in depth). TIDAK mengeksekusi.
+- **M14-003 AuthorityEvaluation** - Guardrails + SelfAssessment + Entrustment deterministik; tanpa grant -> NO_AUTHORITY, evidence/assessment tak cukup -> ESCALATE, guardrail -> BLOCKED. Assessment TIDAK menaikkan authority.
+- **M14-004 ScopedAutonomy** - batas atas otonomi per (ward,capability) dari OWNER; HANYA penurunan (degrade), TIDAK pernah menaik (self-grant dilarang).
+- **M14-005 AutomaticEscalation** - membungkus EscalationManager: escalate saat authority/evidence/verification tak cukup.
+- **M14-006 AutonomousRecoveryLoop** - orkestrator observe->investigate->diagnose->plan->authority->execute->verify->learn; execute_fn/verify_fn DIINJEKSIKAN canonical; tanpa injeksi -> FAILED (no fake success); success hanya bila independent verification lulus.
+
+### M14-007..013 Real targets (harness + logic teruji; real E2E jujur)
+- **M14-007 Real Provider Recovery** - auto-failover provider: probe health nyata + `AutonomousRecoveryLoop`; execute=ProviderExecutor+ApprovalGate; primary sehat -> no failover; gagal+alternatif+grant auto -> switch; human-required -> escalate; tanpa alternatif -> FAILED honest.
+- **M14-008 Real Credential Remediation** - deteksi MISSING/INVALID via CredentialBoundary (M8-005); remediasi HANYA bila otoritas setuju + replacement VALID; SAM tidak pernah menebak/self-create; nilai raw selalu di-mask.
+- **M14-009 Real OpenClaw Ward** - observe (OpenClawHealthCollector) + log (OpenClawLogAnalyzer) + diagnose + recover via loop; execute/verify diinjeksi.
+- **M14-010 Real Windows PC Ward** - observe (disk free + scan .docx/.pdf) + diagnose (metadata+signature, TANPA isi dokumen -> privasi) + recover delegated.
+- **M14-011 Word Investigation** - struktur .docx read-only (props, jumlah paragraf/heading/tabel/gambar); TIDAK mengekspos isi teks.
+- **M14-012 PDF Performance Investigation** - metrik performa PDF read-only (obj/stream/kompresi/pages, performance_level).
+- **M14-013 Project Guardian** - detect+repair project GitHub/local; repair HANYA bila authorized (execute_fn canonical); probe GitHub read-only tanpa simpan token.
+
+### M14-014..015 Certification
+- **M14-014 Autonomous Safety Certification** - `AutonomousSafetyCertifier`: 8 larangan keras (S1-S8: approval utuh, no self-grant, no escalation, credential via boundary, no direct connector, no second executor, ward-scoped, no fake success). FAIL mana pun -> all_pass=False.
+- **M14-015 Real Operational Certification** - `OperationalCertifier`: status bukti jujur (unverified/unit/integration/real/blocked); operational_ready hanya bila >=1 real & tanpa unverified. TIDAK mengklaim PROVEN tanpa real E2E.
+
+> **CATATAN JUJUR:** Seluruh capability M14 saat ini **UNIT-verified** (logic deterministik + boundary + fail-closed teruji 67 test). **Real E2E** (OpenClaw live, PC produksi, provider online, GitHub mutation) masih menunggu env/credential/runtime - tidak diklaim PROVEN. Ini konsisten aturan Van: jangan klaim PROVEN sebelum real E2E.
+
+---
+
 ## SAM 5.1.0 (2026-08-13) - M12 Self-Preservation (Production-Operational Ready)
 
 SAM "tahan banting" untuk operasi produksi nyata: durable state, idempotency, restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix. (M12-016 12h test berjalan otomatis via Task Scheduler; certified setelah verify 14 Agu 10:23 WITA.)

@@ -2,7 +2,7 @@
 
 The **Deterministic Operational Intelligence Platform** that governs intelligent systems.
 
-**Versi:** SAM 5.2 - Universal Governance Platform (5.2.0) - M13 Universal Governance of External Wards
+**Versi:** SAM 5.2 - Universal Governance Platform (5.2.0) - M13 Universal Governance of External Wards · M14 Build (delegated authority / SAM becomes useful)
 
 Sejak v4.1.0, SAM memperluas platform melalui **Universal Governance (SAM 5.x)**: AI, Tool, Agent, dan Workflow diperlakukan sebagai **Citizen** yang di-govern via kontrak seragam, ditambah Enterprise Governance boundary dan Adaptive Governance (learning/simulation/impact/recommendation) di atasnya. Authority tetap di manusia.
 
@@ -11,6 +11,8 @@ Sejak v4.1.0, SAM memperluas platform melalui **Universal Governance (SAM 5.x)**
 **M12 Self-Preservation (2026-08-13):** SAM "tahan banting" untuk operasi produksi - durable state + idempotency + restart safety, PostgreSQL persistent, secret manager terenkripsi, identity+auth, multi-mission isolation, NSSM service supervision + external watchdog, backup/restore terenkripsi, dan failure-injection matrix (crash/PG-down/secret-down/corrupt/disk/duplicate). HTTPS lokal via Caddy self-signed (`https://localhost:8443`) - secure cookie TERBUKTI (`Set-Cookie ... Secure`). **Milestone M12-016 (12h test) ✅ PASS (2026-08-14, elapsed 14.5h, semua invariant OK)** - detail di `CHANGELOG.md`.
 
 **M13 Universal Governance of External Wards (2026-08-14):** SAM memperluas makna "Universal" — bukan soal punya banyak connector, melainkan **satu governance model untuk berbagai subject** (`Citizen | Ward`). Kemampuan internal yang sudah terbukti (observe/investigate/diagnose/recover/learn/verify) **digeneralisasi** agar menerima subjek internal maupun eksternal yang dipercayakan (Ward), **tanpa engine baru, tanpa executor kedua, tanpa duplikasi capability**. Ward #1 nyata = GitHub Repository (`VanM-Hub/SAM` observe/investigate; `VanM-Hub/test-issues` protect: create issue nyata terverifikasi eksternal). Arsitektur: `SAM → Wards → External World`. **M13-015 Architecture Certification 17/17 PASS.** Detail di `CHANGELOG.md` + `docs/engineering/reports/M13_Architecture_Certification.md`.
+
+**M14 Build — SAM becomes useful (2026-08-14, 001-015):** M14 membangun **jembatan delegated authority** (`src/sam/delegated_authority/`) di atas fondasi yang sudah ada (AutonomyLevel, Guardrails, ApprovalGate, Ward, canonical execution, verification, audit, learning). Hakikatnya: **approval bisa diberikan OTOMATIS HANYA bila delegated authority owner mengizinkan** — tetap SATU ApprovalGate, SATU canonical execution, **tanpa executor kedua, tanpa self-grant, tanpa menaikkan authority lewat learning**. Target M14: user menitipkan "jaga PC saya / project saya / OpenClaw saya", SAM melakukan sisanya dalam authority yang didelegasikan. Termasuk real targets: provider recovery, credential remediation, OpenClaw Ward, Windows PC Ward (Word/PDF), Word/PDF investigation, Project Guardian, ditutup Autonomous Safety Certification (8 larangan keras) + Real Operational Certification (jujur, tanpa klaim PROVEN tanpa real E2E). UI diabaikan. Detail `CHANGELOG.md`.
 
 ---
 
