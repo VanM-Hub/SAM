@@ -76,12 +76,16 @@ class TestNoPrototypeSemantics(unittest.TestCase):
             assert not re.search(pat, ui), f"unsur fake/simulasi: {pat}"
 
     def test_state_source_is_server_not_localstorage(self):
-        """Source of truth = server. localStorage/sessionStorage TIDAK jadi state."""
+        """Source of truth = server. localStorage/sessionStorage TIDAK jadi state.
+        S2-5: jalur kirim = /ux/conversation/message (canonical conversation),
+        bukan lagi /ux/submit (legacy). Semua interaksi misi lewat /ux (server),
+        bukan DOM-append mandiri."""
         ui = _served_ui()
         assert "localStorage" not in ui, "localStorage tidak boleh source of truth"
         assert "sessionStorage" not in ui, "sessionStorage tidak boleh source of truth"
-        # Semua interaksi misi lewat /ux (server), bukan DOM-append mandiri.
-        assert "/ux/submit" in ui and "/ux/decide" in ui
+        # Semua interaksi misi lewat /ux (server): kirim via conversation boundary,
+        # keputusan via /ux/decide, state via /ux/state.
+        assert "/ux/conversation/message" in ui and "/ux/decide" in ui and "/ux/state" in ui
 
 
 class TestStateMachineUX(unittest.TestCase):
