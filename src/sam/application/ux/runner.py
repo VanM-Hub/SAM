@@ -108,6 +108,55 @@ def run_http_mission(
     }
 
 
+def run_environment_observation_mission(subject_id: str = "local-machine"):
+    """Jalankan observasi environment via EnvironmentObservationAdapter (read-only).
+
+    Memakai EnvironmentDiscovery (mesin real M14) melalui kontrak
+    ObservationTarget/Adapter — bukan executor kedua, bukan import harness.
+    EnvironmentDiscovery adalah implementation yang DIAMATI, bukan Ward/Citizen
+    baru (semantic boundary dikunci Van R1-002).
+
+    Mengembalikan dict bentuk timeline yg dipahami service/UI:
+      {ok, operation, target, timeline:[{stage: environment.observe,...}],
+       detail, evidence}
+    """
+    from sam.ward.capability.contracts import SubjectRef
+    from sam.ward.adapters.environment_observation import EnvironmentObservationAdapter
+
+    subject = SubjectRef(subject_id=subject_id, subject_type="citizen",
+                         kind="environment", name="local-machine")
+    adapter = EnvironmentObservationAdapter(subject=subject)
+    obs = adapter.observe(capability="observe")
+
+    ev = (obs.evidence if hasattr(obs, "evidence") else {}) or {}
+    failures = ev.get("failures") or []
+    sources = ev.get("sources") or []
+    ok = bool(obs.successful)
+    stage_detail = (
+        "Menemukan {} entitas environment nyata dari sumber: {}. Probe gagal: {}."
+        .format(ev.get("entity_count", 0), ", ".join(sources) or "-",
+                ", ".join(f.get("source", "") for f in failures) or "-")
+        if ok
+        else "environment discovery tidak menghasilkan entitas (probe kosong/gagal)"
+    )
+    return {
+        "ok": ok,
+        "operation": "environment.observe",
+        "target": subject_id,
+        "timeline": [{
+            "stage": "environment.observe",
+            "ok": ok,
+            "blocked": None if ok else True,
+            "detail": stage_detail,
+            "evidence": ev,
+            "scrubbed": {"ok": ok, "entity_count": ev.get("entity_count", 0),
+                          "sources": sources, "failures": failures},
+        }],
+        "detail": stage_detail,
+        "evidence": ev,
+    }
+
+
 def run_mission(
     operation: str,
     target: Optional[str] = None,
@@ -133,6 +182,11 @@ def run_mission(
     if op.startswith("github."):
         REPO = repo or target or DEFAULT_TEST_REPO
         return run_github_real_mission(repo=REPO, audit=audit, artifact_dir=artifact_dir)
+    if op.startswith("environment."):
+        # R1-002: read-only observasi environment nyata (periksa komputer).
+        # target = identitas subjek (default local-machine).
+        subject_id = (target or "").strip() or "local-machine"
+        return run_environment_observation_mission(subject_id=subject_id)
     if op.startswith("web."):
         url = (target or "").strip()
         if not url:
@@ -174,7 +228,8 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
     # Deteksi connector utama dari stage eksekusi pada timeline (B).
     _exec_stage = next(
         (t for t in timeline
-         if t.get("stage") in ("github_api", "web.fetch", "http.get", "execute", "act")
+         if t.get("stage") in ("github_api", "web.fetch", "http.get",
+                                "environment.observe", "execute", "act")
          and (t.get("ok") is not None or t.get("blocked") is not None)),
         None,
     )
@@ -195,12 +250,14 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         "github_api": "GitHub",
         "web.fetch": "membaca halaman web",
         "http.get": "panggilan HTTP",
+        "environment.observe": "observasi environment",
     }.get(conn, "eksekusi")
     _blocked_msg = {
         "github_api": ("GitHub tidak dapat digunakan karena GITHUB_TOKEN tidak "
                         "tersedia atau GITHUB_TEST_REPO kosong."),
         "web.fetch": "Membaca halaman web terblokir (network/driver tidak tersedia).",
         "http.get": "Panggilan HTTP terblokir (endpoint/kredensial).",
+        "environment.observe": "Observasi environment terblokir (probe tidak menghasilkan entitas).",
     }.get(conn, "Eksekusi terblokir (0 side effect).")
 
     if _exec_stage.get("blocked"):

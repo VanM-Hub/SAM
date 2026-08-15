@@ -610,7 +610,24 @@ class MissionUXService:
             None,
         )
         scrubbed = (gh or {}).get("scrubbed") or {}
-        if scrubbed.get("ok"):
+        # R1-002: evidence environment nyata (dari timeline environment.observe).
+        env_t = next(
+            (t for t in timeline if t.get("stage") == "environment.observe"),
+            None,
+        )
+        env_ev = (env_t or {}).get("evidence") or {}
+        if env_t is not None:
+            env_scrubbed = (env_t or {}).get("scrubbed") or {}
+            state.evidence = [{
+                "kind": "environment_observation",
+                "entity_count": env_ev.get("entity_count", 0),
+                "sources": env_ev.get("sources", []),
+                "failures": env_ev.get("failures", []),
+                "entities": env_ev.get("entities", []),
+                "detail": (env_t or {}).get("detail", ""),
+                "ok": bool(env_scrubbed.get("ok")),
+            }]
+        elif scrubbed.get("ok"):
             state.evidence = [{
                 "kind": "external_github_issue",
                 "url": scrubbed.get("issue_url", ""),
@@ -670,6 +687,14 @@ class MissionUXService:
         """
         t = (text or "").strip()
         low = t.lower()
+
+        # 0) Determistik (SEBELUM AI): "periksa komputer saya"-sekelas.
+        #    Ini perintah eksplisit yg TIDAK boleh bergantung pada routing AI
+        #    lokal yang flaky/MAP (pelajaran S2-4: jangan percaya target dari
+        #    AI utk operasi jitu). Bila cocok -> langsung environment.observe.
+        env_match = MissionUXService._interpret_environment_observe(low)
+        if env_match:
+            return env_match
 
         # 1) Coba pemahaman cerdas via AI lokal (Gemma3:1b via Ollama).
         #    Menutup kesenjangan "SAM hanya kenal pola kata" -> SAM bisa
@@ -754,6 +779,51 @@ class MissionUXService:
             "",
         )
 
+    @staticmethod
+    def _interpret_environment_observe(low: str):
+        """Deteksi deterministik instruksi observasi environment (R1-002).
+
+        Dicocokkan SEBELUM AI agar perintah eksplisit seperti "periksa komputer
+        saya" tidak bergantung pada routing Gemma yang flaky. Mengembalikan
+        tuple _interpret bila cocok, atau None.
+
+        Read-only: menemukan entitas nyata (process/port/file/env) TANPA
+        katalog aplikasi. Bukan katalog Word/PDF/OpenClaw.
+        """
+        is_env_observe = bool(re.search(
+            r"(periksa|cek|scan|inspect|monitor|amati|obs\.?erv|lihat)\s*.{0,40}"
+            r"(komputer|pc|mesin|sistem|environment|lokal|host)",
+            low,
+        )) or bool(re.search(
+            r"(komputer|pc|mesin|sistem|environment|host)\s*.{0,40}"
+            r"(periksa|cek|scan|inspect|monitor|amati|sehat|kesehatan|status)",
+            low,
+        ))
+        is_env_show = bool(re.search(
+            r"(ada apa|tunjukkan|daftar|list|apa saja)", low)) and bool(
+            re.search(r"(komputer|pc|mesin|sistem|environment|lokal|host)", low))
+        if not (is_env_observe or is_env_show):
+            return None
+        return (
+            "environment.observe",
+            "local-machine",
+            "SAM memahami: mengobservasi environment komputer ini (process, "
+            "port, file, variabel lingkungan) secara read-only, tanpa katalog "
+            "aplikasi spesifik.",
+            [
+                "enumerasi process nyata dari environment",
+                "enumerasi port listening nyata",
+                "enumerasi file dan variabel lingkungan",
+                "bangun entity graph + confidence per sumber",
+                "laporkan evidence (provenance-aware; probe gagal tetap tercatat)",
+            ],
+            "SAM akan mengobservasi dan melaporkan environment komputer ini "
+            "(read-only, tanpa mengubah apapun).",
+            "Operasi ini read-only (mengobservasi environment lokal) - tidak "
+            "mengubah state eksternal, namun tetap disediakan persetujuan Anda "
+            "untuk transparansi.",
+        )
+
     # ------------------------------------------------------------------
     # pemahaman cerdas via AI lokal (Gemma3:1b / Ollama) — tanpa internet
     # ------------------------------------------------------------------
@@ -765,7 +835,8 @@ class MissionUXService:
         "[http.call] panggil API/HTTP eksternal; "
         "[ai.think] minta AI berpikir/menjawab; "
         "[db.query] baca/tulis database; "
-        "[process.run] jalankan perintah/command lokal."
+        "[process.run] jalankan perintah/command lokal; "
+        "[environment.observe] periksa/observasi komputer/environment lokal (read-only)."
     )
 
     @staticmethod
