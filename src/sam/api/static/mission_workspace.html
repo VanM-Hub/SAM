@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SAM â€” Mission OS v18</title>
+<title>SAM — Mission OS v18</title>
 <style>
 :root{--bg:#f3f5f3;--panel:#fff;--soft:#f8faf8;--line:#d9dfda;--text:#18201b;--muted:#707a74;--green:#2f6f5e;--gs:#e6f0eb;--amber:#a66b18;--as:#fff1da;--blue:#3d6f9c;--bs:#e9f0f7;--shadow:0 4px 16px #17351d0a}
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:13px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}
@@ -34,24 +34,24 @@
 <div class="brand"><div class="mark">S</div><span>SAM</span></div>
 <div class="navlabel">Workspace</div>
 <nav class="nav">
-<button class="active" data-page="home"><span class="ico">âŒ‚</span><span>Home</span></button>
-<button data-page="mission"><span class="ico">â—ˆ</span><span>Mission Control</span><b class="count" id="navMissionCount"></b></button>
-<button data-page="wards"><span class="ico">â—‡</span><span>Wards</span><b class="count" id="navWardCount" style="display:none"></b></button>
-<button data-page="guardian"><span class="ico">â—Œ</span><span>Guardian</span></button>
+<button class="active" data-page="home"><span class="ico">⌂</span><span>Home</span></button>
+<button data-page="mission"><span class="ico">■</span><span>Mission Control</span><b class="count" id="navMissionCount"></b></button>
+<button data-page="wards"><span class="ico">◇</span><span>Wards</span><b class="count" id="navWardCount" style="display:none"></b></button>
+<button data-page="guardian"><span class="ico">○</span><span>Guardian</span></button>
 </nav>
 <div class="navlabel">System</div>
-<nav class="nav"><button data-page="control"><span class="ico">âš™</span><span>Control Panel</span></button></nav>
-<div class="sidefoot"><b>Four modes Â· one SAM</b><br>Control Panel = Runtime Â· Governance Â· Records</div>
+<nav class="nav"><button data-page="control"><span class="ico">⚠</span><span>Control Panel</span></button></nav>
+<div class="sidefoot"><b>Four modes · one SAM</b><br>Control Panel = Runtime · Governance · Records</div>
 </aside>
 
 <main class="main">
 <header class="top">
 <div class="statuses">
-<div class="status"><div class="lbl">SAM</div><div class="val ok">â— Operational Â· actively observing</div></div>
-<div class="status"><div class="lbl">Wards</div><div class="val" id="stWards">â€”</div></div>
-<div class="status"><div class="lbl">Attention</div><div class="val warn" id="stAttention">â€”</div></div>
-<div class="status"><div class="lbl">Missions</div><div class="val" id="stMissions">â€”</div></div>
-<div class="status"><div class="lbl">Last activity</div><div class="val" id="last">â€”</div></div>
+<div class="status"><div class="lbl">SAM</div><div class="val ok">● Operational · actively observing</div></div>
+<div class="status"><div class="lbl">Wards</div><div class="val" id="stWards">—</div></div>
+<div class="status"><div class="lbl">Attention</div><div class="val warn" id="stAttention">—</div></div>
+<div class="status"><div class="lbl">Missions</div><div class="val" id="stMissions">—</div></div>
+<div class="status"><div class="lbl">Last activity</div><div class="val" id="last">—</div></div>
 </div>
 <div class="spacer"></div><div class="rt"><i></i>Runtime online</div><div class="avatar">VM</div>
 </header>
@@ -63,16 +63,16 @@
 <div class="alert" id="homeAlert" style="display:none"><div class="alerticon">!</div><div class="alertmain"><b id="homeAlertTitle">Perhatian</b><span id="homeAlertMsg"></span></div><div class="actions"><button class="btn primary" onclick="go('mission')">Lihat mission</button><button class="btn" onclick="this.closest('.alert').remove()">Abaikan</button></div></div>
 <div class="grid2">
 <div class="stack">
-<section class="card"><div class="head"><h2>Mission berjalan</h2><button class="link" onclick="go('mission')">Mission Control â†’</button></div>
+<section class="card"><div class="head"><h2>Mission berjalan</h2><button class="link" onclick="go('mission')">Mission Control →</button></div>
 <div id="homeMissions"></div>
 </section>
 <section class="card fill"><div class="head"><h2>Kejadian terkini</h2><span>today</span></div><div class="scroll" id="eventList"></div></section>
 </div>
 <div class="stack">
-<section class="card"><div class="head"><h2>Ward List</h2><button class="link" onclick="go('wards')">Buka Wards â†’</button></div>
-<div id="homeWards"><div class="ward"><div class="icon">â€“</div><div><b>Ward list belum tersedia</b><div class="meta">canonical Ward source belum di-wire (Phase 2). Ini bukan data palsu.</div></div></div></div>
+<section class="card"><div class="head"><h2>Ward List</h2><button class="link" onclick="go('wards')">Buka Wards →</button></div>
+<div id="homeWards"><div class="ward"><div class="icon">–</div><div><b>Ward list belum tersedia</b><div class="meta">canonical Ward source belum di-wire (Phase 2). Ini bukan data palsu.</div></div></div></div>
 </section>
-<section class="card"><div class="head"><h2>Keputusan yang membutuhkan saya</h2><span class="badge warning">1</span></div><div id="homeDecision"><div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Belum ada keputusan</b><div class="meta">Menunggu state approval dari runtime.</div></div><button class="link" onclick="go('mission')">Review â†’</button></div></div></section>
+<section class="card"><div class="head"><h2>Keputusan yang membutuhkan saya</h2><span class="badge warning">1</span></div><div id="homeDecision"><div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Belum ada keputusan</b><div class="meta">Menunggu state approval dari runtime.</div></div><button class="link" onclick="go('mission')">Review →</button></div></div></section>
 </div>
 </div>
 </section>
@@ -80,11 +80,11 @@
 <section class="page" id="mission">
 <div class="pagehead"><h1>Mission Control</h1><span>apa yang sedang kita kerjakan bersama</span></div>
 <div class="mc">
-<section class="card mcbox"><div class="head"><h2>Chat dengan SAM</h2><span>OpenClaw-014</span></div><div class="messages" id="messages"><div class="msg sammsg"><div class="who">SAM</div>Belum ada conversation. Kirim pesan untuk memulai mission.</div></div><div class="chatform"><input id="chat" placeholder="Tanya SAMâ€¦" onkeydown="if(event.key==='Enter')send()"><button class="send" onclick="send()">Kirim</button></div></section>
+<section class="card mcbox"><div class="head"><h2>Chat dengan SAM</h2><span>OpenClaw-014</span></div><div class="messages" id="messages"><div class="msg sammsg"><div class="who">SAM</div>Belum ada conversation. Kirim pesan untuk memulai mission.</div></div><div class="chatform"><input id="chat" placeholder="Tanya SAM…" onkeydown="if(event.key==='Enter')send()"><button class="send" onclick="send()">Kirim</button></div></section>
 <section class="card mcbox"><div class="head"><h2>Mission</h2><span>select</span></div><div class="body">
 <div id="missionList"></div>
 </div></section>
-<section class="card mcbox workspace"><div class="workspacehead"><div class="eyebrow">MISSION Â· menunggu state runtime</div><h1>Belum ada mission</h1><div class="stages"><span class="stage">Observe</span><span class="stage">Investigate</span><span class="stage">Recommend</span><span class="stage">Decision</span><span class="stage">Execute</span><span class="stage">Verify</span></div></div><div class="workspacebody"><div class="insight"><h3>Menunggu data dari runtime</h3><p>State mission di-render dari /ux/state (jujur, bukan data palsu).</p></div></div></section>
+<section class="card mcbox workspace"><div class="workspacehead"><div class="eyebrow">MISSION · menunggu state runtime</div><h1>Belum ada mission</h1><div class="stages"><span class="stage">Observe</span><span class="stage">Investigate</span><span class="stage">Recommend</span><span class="stage">Decision</span><span class="stage">Execute</span><span class="stage">Verify</span></div></div><div class="workspacebody"><div class="insight"><h3>Menunggu data dari runtime</h3><p>State mission di-render dari /ux/state (jujur, bukan data palsu).</p></div></div></section>
 </div>
 </section>
 
@@ -92,50 +92,50 @@
 <div class="pagehead"><h1>Wards</h1><span>apa yang dipercayakan kepada SAM</span><button class="btn primary headbtn" onclick="openModal('wardModal')">+ Add Ward</button></div>
 <div class="wardpage">
 <section class="card wardlist"><div class="head"><h2>Ward List</h2><span>Phase 2</span></div><div class="wardrows">
-<div class="wardrow"><div class="icon">â€“</div><div><div class="wardname">Ward list belum tersedia</div><div class="wardtype">canonical Ward source belum di-wire (Phase 2/3). Bukan data palsu.</div></div></div>
+<div class="wardrow"><div class="icon">–</div><div><div class="wardname">Ward list belum tersedia</div><div class="wardtype">canonical Ward source belum di-wire (Phase 2/3). Bukan data palsu.</div></div></div>
 </div></section>
-<section class="card warddetail"><div class="head"><h2>Ward Detail</h2><span class="statusword">Phase 2</span></div><div class="detailbody"><div class="hero"><div class="icon">â€“</div><div><h2>Belum tersedia</h2><p>Canonical Ward source belum di-wire. Detail Ward itu projection runtime, bukan data palsu.</p></div></div><div class="boundary"><b>Boundary:</b> discovery â‰  entrustment Â· observation â‰  authority Â· action flows through canonical runtime Â· verification requires evidence.</div></div></section>
+<section class="card warddetail"><div class="head"><h2>Ward Detail</h2><span class="statusword">Phase 2</span></div><div class="detailbody"><div class="hero"><div class="icon">–</div><div><h2>Belum tersedia</h2><p>Canonical Ward source belum di-wire. Detail Ward itu projection runtime, bukan data palsu.</p></div></div><div class="boundary"><b>Boundary:</b> discovery ≠ entrustment · observation ≠ authority · action flows through canonical runtime · verification requires evidence.</div></div></section>
 </div>
 </section>
 
 <section class="page" id="guardian">
 <div class="pagehead"><h1>Guardian</h1><span>bagaimana SAM menjaga Wards</span></div>
 <div class="guardpage">
-<section class="card guardcard"><div class="guardhero"><div class="orb">â—Œ</div><div><b>Guardian belum di-wire</b><span>Canonical Guardian/observation source berada di Phase 4. Bukan status palsu.</span></div><span class="badge" style="background:#eee;color:#707a74">PHASE 4</span></div><div class="head"><h2>Guardian State</h2><span>current</span></div><div class="guardbody">
+<section class="card guardcard"><div class="guardhero"><div class="orb">○</div><div><b>Guardian belum di-wire</b><span>Canonical Guardian/observation source berada di Phase 4. Bukan status palsu.</span></div><span class="badge" style="background:#eee;color:#707a74">PHASE 4</span></div><div class="head"><h2>Guardian State</h2><span>current</span></div><div class="guardbody">
 <div class="guarditem"><div class="guardtop"><div class="guardtitle">Guardian state belum tersedia</div><span class="badge" style="background:#eee;color:#707a74">PHASE 4</span></div><div class="guardmeta">Canonical Guardian/observation source belum di-wire. Bukan status palsu.</div></div>
 </div></section>
-<section class="card guardcard"><div class="head"><h2>Guardian Activity</h2><span>observe â†’ investigate â†’ verify</span></div><div class="guardbody">
-<div class="event"><span class="dot"></span><div><b>Guardian Activity belum tersedia</b><span>Phase 4 Â· hubungkan ke canonical observation source.</span></div></div>
+<section class="card guardcard"><div class="head"><h2>Guardian Activity</h2><span>observe → investigate → verify</span></div><div class="guardbody">
+<div class="event"><span class="dot"></span><div><b>Guardian Activity belum tersedia</b><span>Phase 4 · hubungkan ke canonical observation source.</span></div></div>
 </div></section>
 </div>
 </section>
 
 <section class="page" id="control">
-<div class="pagehead"><h1>Control Panel</h1><span>Runtime Â· Governance Â· Records</span></div>
-<div class="cpintro"><div class="cpintroicon">âš™</div><div><b>System Control</b><span>Tempat mengatur konfigurasi sistem, memahami authority, dan menelusuri record. Bukan tempat menjalankan Mission.</span></div></div>
+<div class="pagehead"><h1>Control Panel</h1><span>Runtime · Governance · Records</span></div>
+<div class="cpintro"><div class="cpintroicon">⚠</div><div><b>System Control</b><span>Tempat mengatur konfigurasi sistem, memahami authority, dan menelusuri record. Bukan tempat menjalankan Mission.</span></div></div>
 <div class="cpgrid">
 <section class="card cpbox"><div class="head"><h2>Runtime</h2><span class="badge" id="runtimeBadge" style="background:#eee;color:#707a74">?</span></div><div class="cpbody">
-<div class="cpstate"><div class="cpstateicon">âŒ</div><div><b>Canonical Runtime</b><span>Operational Â· heartbeat <span id="beat">â€¦</span></span></div></div>
-<div class="cpaction" onclick="openModal('providerModal')"><div class="cpactiontop"><div><b>Providers</b><p>Provider yang dipakai SAM per capability.</p></div><strong>â†’</strong></div><small>Belum tersedia Â· Phase 5 (Provider configuration boundary)</small></div>
-<div class="cpaction" onclick="openModal('credentialModal')"><div class="cpactiontop"><div><b>Credentials</b><p>Secure credentials untuk provider dan connector.</p></div><strong>â†’</strong></div><small>Belum tersedia Â· Phase 6 (Credential boundary)</small></div>
-<div class="cpaction" onclick="refresh()"><div class="cpactiontop"><div><b>Runtime Health</b><p>Service health, execution state, heartbeat, diagnostics.</p></div><strong>â†»</strong></div><small id="health">Memeriksaâ€¦</small></div>
+<div class="cpstate"><div class="cpstateicon">⌁</div><div><b>Canonical Runtime</b><span>Operational · heartbeat <span id="beat">…</span></span></div></div>
+<div class="cpaction" onclick="openModal('providerModal')"><div class="cpactiontop"><div><b>Providers</b><p>Provider yang dipakai SAM per capability.</p></div><strong>→</strong></div><small>Belum tersedia · Phase 5 (Provider configuration boundary)</small></div>
+<div class="cpaction" onclick="openModal('credentialModal')"><div class="cpactiontop"><div><b>Credentials</b><p>Secure credentials untuk provider dan connector.</p></div><strong>→</strong></div><small>Belum tersedia · Phase 6 (Credential boundary)</small></div>
+<div class="cpaction" onclick="refresh()"><div class="cpactiontop"><div><b>Runtime Health</b><p>Service health, execution state, heartbeat, diagnostics.</p></div><strong>↻</strong></div><small id="health">Memeriksa…</small></div>
 </div></section>
 
 <section class="card cpbox"><div class="head"><h2>Governance</h2><span>authority & policy</span></div><div class="cpbody">
-<div class="cpstate"><div class="cpstateicon">âš–</div><div><b>Authority Boundary</b><span>Human decision remains authoritative.</span></div></div>
-<div class="cpaction" onclick="toast('Authority review opened')"><div class="cpactiontop"><div><b>Authority</b><p>Siapa yang berwenang mengambil keputusan.</p></div><strong>â†’</strong></div><small>Human decision remains authoritative (Konsep).</small></div>
-<div class="cpaction" onclick="toast('Policy review opened')"><div class="cpactiontop"><div><b>Policy</b><p>Capability boundaries dan execution constraints.</p></div><strong>â†’</strong></div><small>Phase 7 Â· hubungkan ke canonical governance contract.</small></div>
-<div class="cpaction" onclick="toast('Verification policy opened')"><div class="cpactiontop"><div><b>Verification</b><p>Bagaimana hasil execution dibuktikan.</p></div><strong>â†’</strong></div><small>ADR-007 Â· Recorded â†’ Verified â†’ Archived.</small></div>
+<div class="cpstate"><div class="cpstateicon">⚖</div><div><b>Authority Boundary</b><span>Human decision remains authoritative.</span></div></div>
+<div class="cpaction" onclick="toast('Authority review opened')"><div class="cpactiontop"><div><b>Authority</b><p>Siapa yang berwenang mengambil keputusan.</p></div><strong>→</strong></div><small>Human decision remains authoritative (Konsep).</small></div>
+<div class="cpaction" onclick="toast('Policy review opened')"><div class="cpactiontop"><div><b>Policy</b><p>Capability boundaries dan execution constraints.</p></div><strong>→</strong></div><small>Phase 7 · hubungkan ke canonical governance contract.</small></div>
+<div class="cpaction" onclick="toast('Verification policy opened')"><div class="cpactiontop"><div><b>Verification</b><p>Bagaimana hasil execution dibuktikan.</p></div><strong>→</strong></div><small>ADR-007 · Recorded → Verified → Archived.</small></div>
 </div></section>
 
 <section class="card cpbox cprecords"><div class="head"><h2>Records</h2><span>traceability</span></div><div class="cpbody">
 <div class="recordtiles">
-<div class="recordtile" onclick="showRecords('Evidence')"><b>Evidence</b><span>Bukti observation, decision, execution dan verification.</span><strong>Open â†’</strong></div>
-<div class="recordtile" onclick="showRecords('Activity')"><b>Activity</b><span>Timeline aktivitas dan perubahan yang terjadi.</span><strong>Open â†’</strong></div>
-<div class="recordtile" onclick="showRecords('Audit')"><b>Audit</b><span>Jejak keputusan, authority dan tindakan.</span><strong>Open â†’</strong></div>
+<div class="recordtile" onclick="showRecords('Evidence')"><b>Evidence</b><span>Bukti observation, decision, execution dan verification.</span><strong>Open →</strong></div>
+<div class="recordtile" onclick="showRecords('Activity')"><b>Activity</b><span>Timeline aktivitas dan perubahan yang terjadi.</span><strong>Open →</strong></div>
+<div class="recordtile" onclick="showRecords('Audit')"><b>Audit</b><span>Jejak keputusan, authority dan tindakan.</span><strong>Open →</strong></div>
 </div>
 <div class="recent"><div class="recenthead"><b>Recent records</b><button class="link" onclick="showRecords('All Records')">View all</button></div>
-<div class="recordline"><span><b>Records belum tersedia</b> Â· Phase 8 Â· hubungkan ke canonical Evidence/Activity/Audit source.</span></div>
+<div class="recordline"><span><b>Records belum tersedia</b> · Phase 8 · hubungkan ke canonical Evidence/Activity/Audit source.</span></div>
 </div>
 </div></section>
 </div>
@@ -146,7 +146,7 @@
 </div>
 
 <!-- Add Ward -->
-<div class="modalback" id="wardModal" onclick="backdrop(event,'wardModal')"><div class="modal"><div class="modalhead"><h2>Add Ward</h2><button onclick="closeModal('wardModal')">Ã—</button></div><div class="modalbody">
+<div class="modalback" id="wardModal" onclick="backdrop(event,'wardModal')"><div class="modal"><div class="modalhead"><h2>Add Ward</h2><button onclick="closeModal('wardModal')">×</button></div><div class="modalbody">
 <div class="field"><label>Ward type</label><select><option>GitHub Repository</option><option>OpenClaw</option><option>PC / Host</option><option>Backup Target</option></select></div>
 <div class="field"><label>Resource</label><input value="VanM-Hub/SAM"><div class="hint">Discovery menemukan candidate. Tombol Entrust Ward adalah keputusan eksplisit user.</div></div>
 <div class="field"><label>Purpose</label><input value="Observe and investigate"></div>
@@ -154,7 +154,7 @@
 </div><div class="modalfoot"><button class="btn" onclick="closeModal('wardModal')">Cancel</button><button class="btn primary" onclick="submit('Ward')">Entrust Ward</button></div></div></div>
 
 <!-- Provider -->
-<div class="modalback" id="providerModal" onclick="backdrop(event,'providerModal')"><div class="modal"><div class="modalhead"><h2>Configure Provider</h2><button onclick="closeModal('providerModal')">Ã—</button></div><div class="modalbody">
+<div class="modalback" id="providerModal" onclick="backdrop(event,'providerModal')"><div class="modal"><div class="modalhead"><h2>Configure Provider</h2><button onclick="closeModal('providerModal')">×</button></div><div class="modalbody">
 <div class="field"><label>Capability</label><select><option>Reasoning</option><option>Planning</option></select></div>
 <div class="field"><label>Provider</label><select><option>NVIDIA</option><option>OpenAI</option><option>Anthropic</option></select></div>
 <div class="field"><label>Credential</label><select><option>Pilih credential (belum tersedia Phase 6)</option></select></div>
@@ -162,7 +162,7 @@
 </div><div class="modalfoot"><button class="btn" onclick="closeModal('providerModal')">Cancel</button><button class="btn primary" onclick="submit('Provider')">Save Provider</button></div></div></div>
 
 <!-- Credential -->
-<div class="modalback" id="credentialModal" onclick="backdrop(event,'credentialModal')"><div class="modal"><div class="modalhead"><h2>Secure Credential</h2><button onclick="closeModal('credentialModal')">Ã—</button></div><div class="modalbody">
+<div class="modalback" id="credentialModal" onclick="backdrop(event,'credentialModal')"><div class="modal"><div class="modalhead"><h2>Secure Credential</h2><button onclick="closeModal('credentialModal')">×</button></div><div class="modalbody">
 <div class="field"><label>Provider</label><select><option>OpenAI</option><option>NVIDIA</option><option>Anthropic</option></select></div>
 <div class="field"><label>Credential name</label><input value="OpenAI Production"></div>
 <div class="field"><label>API Key</label><input type="password" placeholder="Enter secret securely"></div>
@@ -172,12 +172,12 @@
 <div class="toast" id="toast"></div>
 <script>
 /* ============================================================
-   SAM UI v18 â€” wired ke runtime nyata (Phase 1: Home + Mission Control)
-   Sesuai: "SAM UI Functional & Semantic Specification" Â§62 (Phase 1)
+   SAM UI v18 — wired ke runtime nyata (Phase 1: Home + Mission Control)
+   Sesuai: "SAM UI Functional & Semantic Specification" §62 (Phase 1)
    Prinsip: UI = presentation only. Server = source of truth.
-   Rehydrate rule (Â§55): POST -> GET state/evidence/audit -> render.
-   Failure (Â§56): runtime gagal -> UNAVAILABLE (bukan Healthy).
-   Jangan pakai storage klien sbg state authoritative. (Â§3).
+   Rehydrate rule (§55): POST -> GET state/evidence/audit -> render.
+   Failure (§56): runtime gagal -> UNAVAILABLE (bukan Healthy).
+   Jangan pakai storage klien sbg state authoritative. (§3).
    ============================================================ */
 const pages=['home','mission','wards','guardian','control'];
 
@@ -236,7 +236,7 @@ function showLogin(force){
 async function refreshAuth(){
   try{ const me=await api('/ux/me'); const a=document.querySelector('.avatar');
     if(me&&me.user) a.textContent=(me.user.slice(0,2).toUpperCase());
-  }catch(e){ const a=document.querySelector('.avatar'); if(a) a.textContent='Â·'; }
+  }catch(e){ const a=document.querySelector('.avatar'); if(a) a.textContent='·'; }
 }
 
 /* ---------- phase 1: Home + Mission Control ---------- */
@@ -248,7 +248,7 @@ async function loadState(){
 function safeHTML(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
 function esc(s){return safeHTML(s);}
 
-/* Status efektif dari schema asli /ux/state (Â§48): status TIDAK di top-level.
+/* Status efektif dari schema asli /ux/state (§48): status TIDAK di top-level.
    approval.status & execution.status paling atas oleh runtime. */
 function effStatus(state){
   if(!state) return '';
@@ -269,12 +269,12 @@ function renderWorkspace(state){
   const idx=stages.findIndex(x=>status.toLowerCase().includes(x));
   st.querySelectorAll('.stage').forEach((el,i)=>{el.className='stage'+(idx>i?' done':idx===i?' current':'');});
   if(head && state&&state.request) head.textContent=String(state.request);
-  if(eyebrow && state) eyebrow.textContent='MISSION Â· '+(state.request_id||'â€”')+(status?' Â· '+status:'');
+  if(eyebrow && state) eyebrow.textContent='MISSION · '+(state.request_id||'—')+(status?' · '+status:'');
   if(!body) return;
   let html='';
   if(state&&state.understanding&&state.understanding.what_sam_understood){
     html+='<div class="insight"><div class="eyebrow">Apa yang dipahami SAM</div><h3>'+esc(state.understanding.what_sam_understood)+'</h3>'
-      +'<p>'+(state.understanding.operation?('Operation: '+esc(state.understanding.operation)):'')+(state.understanding.target?(' Â· Target: '+esc(state.understanding.target)):'')+'</p></div>';
+      +'<p>'+(state.understanding.operation?('Operation: '+esc(state.understanding.operation)):'')+(state.understanding.target?(' · Target: '+esc(state.understanding.target)):'')+'</p></div>';
   }
   if(state&&state.plan&&state.plan.planned_steps&&state.plan.planned_steps.length){
     html+='<div class="insight"><div class="eyebrow">Rencana</div><ul style="margin:4px 0 0;padding-left:16px;font-size:8.2px;color:#707a74">';
@@ -291,18 +291,18 @@ function renderWorkspace(state){
     st+='</div>';
     html+=st;
   }
-  // tombol decision HANYA saat menunggu approval (intent -> canonical ApprovalGate Â§20/Â§47)
+  // tombol decision HANYA saat menunggu approval (intent -> canonical ApprovalGate §20/§47)
   if(needsApproval){
-    html+='<div class="recommend"><h3>Menunggu keputusan Anda</h3><p>Keputusan dikirim ke canonical ApprovalGate. Approval â‰  Execution.</p>'
+    html+='<div class="recommend"><h3>Menunggu keputusan Anda</h3><p>Keputusan dikirim ke canonical ApprovalGate. Approval ≠ Execution.</p>'
       +'<div class="twobutton"><button class="btn primary" onclick="decide(\'approve\')">Setujui & lanjutkan</button>'
       +'<button class="btn" onclick="decide(\'reject\')">Jangan lakukan</button></div></div>';
   }
   if(!html){ html='<div class="insight"><h3>Belum ada mission aktif</h3><p>State kosong dari runtime (jujur, bukan data palsu).</p></div>'; }
   body.innerHTML=html;
-  renderEvidenceAudit(body);   // async append sesudah render (Â§62 evidence/audit read)
+  renderEvidenceAudit(body);   // async append sesudah render (§62 evidence/audit read)
 }
 
-/* Evidence & Audit â€” proven Phase 1 read surface (Â§62): /ux/evidence, /ux/audit */
+/* Evidence & Audit — proven Phase 1 read surface (§62): /ux/evidence, /ux/audit */
 async function renderEvidenceAudit(body){
   try{
     const ev = await api('/ux/evidence');
@@ -311,8 +311,8 @@ async function renderEvidenceAudit(body){
     const auList = (au && au.audit) ? (Array.isArray(au.audit)?au.audit:(au.audit.items||[])) : [];
     if(evList.length||auList.length){
       let h='';
-      if(evList.length) h+='<div class="insight"><div class="eyebrow">Evidence (canonical)</div>'+evList.slice(0,3).map(x=>'<div style="font-size:8px;color:#707a74;margin-top:3px">â€¢ '+esc(x.event_name||x.type||x.id||x)+'</div>').join('')+'</div>';
-      if(auList.length) h+='<div class="insight"><div class="eyebrow">Audit (canonical)</div>'+auList.slice(0,3).map(x=>'<div style="font-size:8px;color:#707a74;margin-top:3px">â€¢ '+esc(x.event_name||x.action||x.type||x.id||x)+'</div>').join('')+'</div>';
+      if(evList.length) h+='<div class="insight"><div class="eyebrow">Evidence (canonical)</div>'+evList.slice(0,3).map(x=>'<div style="font-size:8px;color:#707a74;margin-top:3px">• '+esc(x.event_name||x.type||x.id||x)+'</div>').join('')+'</div>';
+      if(auList.length) h+='<div class="insight"><div class="eyebrow">Audit (canonical)</div>'+auList.slice(0,3).map(x=>'<div style="font-size:8px;color:#707a74;margin-top:3px">• '+esc(x.event_name||x.action||x.type||x.id||x)+'</div>').join('')+'</div>';
       if(h && body.querySelector('.recommend')) body.insertAdjacentHTML('beforeend',h);
     }
   }catch(e){ /* evidence/audit read gagal -> diam, state tetap rehydrate */ }
@@ -325,20 +325,20 @@ async function renderChatAndState(){  try{
     renderMissionList(state);
     // status bar SAM
     const sts=effStatus(state);
-    document.querySelector('.status .val') && (document.querySelector('.status .val').textContent='â— '+(sts||'idle'));
-    document.querySelector('#last') && (document.querySelector('#last').textContent=(state.updated_at||'â€”').toString().slice(11,16));
+    document.querySelector('.status .val') && (document.querySelector('.status .val').textContent='● '+(sts||'idle'));
+    document.querySelector('#last') && (document.querySelector('#last').textContent=(state.updated_at||'—').toString().slice(11,16));
     // counter jujur (bukan angka fabrikasi)
     const hasActive = !!(state && state.request && sts && !/^REJECTED|^COMPLETED|^FAILED|^BLOCKED/i.test(sts));
     const mEl=document.getElementById('stMissions'); if(mEl) mEl.textContent=hasActive?1:0;
     const am=document.getElementById('navMissionCount'); if(am){ am.textContent=hasActive?1:''; am.style.display=hasActive?'':'none'; }
-    const wEl=document.getElementById('stWards'); if(wEl) wEl.textContent='â€” (Phase 2)';
-    const at=document.getElementById('stAttention'); if(at) at.textContent='â€” (Phase 2)';
+    const wEl=document.getElementById('stWards'); if(wEl) wEl.textContent='— (Phase 2)';
+    const at=document.getElementById('stAttention'); if(at) at.textContent='— (Phase 2)';
   }catch(e){
     toast('Gagal baca state runtime: '+e.message, true);
   }
 }
 
-/* Home hooks: alert, mission aktif, decision â€” semua dari runtime (Â§55) */
+/* Home hooks: alert, mission aktif, decision — semua dari runtime (§55) */
 function renderHome(state){
   const sts=effStatus(state);
   const needsApproval = state && state.approval && /waiting_approval|pending|awaiting/i.test(state.approval.status||'');
@@ -346,29 +346,29 @@ function renderHome(state){
   const al=document.getElementById('homeAlert');
   if(al){ const needs = sts && /BLOCKED|FAILED|ERROR/i.test(sts);
     al.style.display = needs ? 'flex' : 'none';
-    if(needs){ document.getElementById('homeAlertTitle').textContent='Perhatian â€” '+sts;
+    if(needs){ document.getElementById('homeAlertTitle').textContent='Perhatian — '+sts;
       document.getElementById('homeAlertMsg').textContent=(state.request||'')+' belum selesai. Lihat Mission Control.'; } }
   const hm=document.getElementById('homeMissions');
   if(hm){ hm.innerHTML = (state && state.request && sts && !/^REJECTED|^COMPLETED|^FAILED|^BLOCKED/i.test(sts))
-    ? '<div class="mission" onclick="go(\'mission\')"><div class="mtop"><span class="badge running">Berjalan</span></div><div class="mtitle">'+esc(state.request)+'</div><div class="meta">'+esc(sts)+' Â· '+(state.request_id||'')+'</div><div class="bar"><span></span></div></div>'
+    ? '<div class="mission" onclick="go(\'mission\')"><div class="mtop"><span class="badge running">Berjalan</span></div><div class="mtitle">'+esc(state.request)+'</div><div class="meta">'+esc(sts)+' · '+(state.request_id||'')+'</div><div class="bar"><span></span></div></div>'
     : '<div class="insight" style="padding:10px;font-size:8.2px;color:#707a74">Belum ada mission aktif dari runtime.</div>'; }
   const hd=document.getElementById('homeDecision');
   if(hd){ const need=needsApproval || (sts && /APPROVAL|DECISION/i.test(sts));
     hd.innerHTML = need
-      ? '<div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Menunggu keputusan</b><div class="meta">'+esc(state.request||'')+' Â· '+esc(sts||'')+'</div></div><button class="link" onclick="go(\'mission\')">Review â†’</button></div>'
-      : '<div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Belum ada keputusan</b><div class="meta">Menunggu state approval dari runtime.</div></div><button class="link" onclick="go(\'mission\')">Review â†’</button></div>'; }
+      ? '<div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Menunggu keputusan</b><div class="meta">'+esc(state.request||'')+' · '+esc(sts||'')+'</div></div><button class="link" onclick="go(\'mission\')">Review →</button></div>'
+      : '<div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Belum ada keputusan</b><div class="meta">Menunggu state approval dari runtime.</div></div><button class="link" onclick="go(\'mission\')">Review →</button></div>'; }
 }
 
-/* Mission list â€” satu mission aktif (phase 1: state tunggal dari /ux/state) */
+/* Mission list — satu mission aktif (phase 1: state tunggal dari /ux/state) */
 function renderMissionList(state){
   const ml=document.getElementById('missionList'); if(!ml) return;
   const sts=effStatus(state);
   ml.innerHTML = (state && state.request)
-    ? '<div class="mission selected"><span class="badge running">Berjalan</span><div class="mtitle">'+esc(state.request)+'</div><div class="meta">'+esc(sts||'')+' Â· '+esc(state.request_id||'')+'</div></div>'
+    ? '<div class="mission selected"><span class="badge running">Berjalan</span><div class="mtitle">'+esc(state.request)+'</div><div class="meta">'+esc(sts||'')+' · '+esc(state.request_id||'')+'</div></div>'
     : '<div class="mission"><div class="mtitle">Belum ada mission</div><div class="meta">State kosong dari runtime.</div></div>';
 }
 
-/* send chat -> POST /ux/submit, lalu rehydrate (Â§48, Â§55) */
+/* send chat -> POST /ux/submit, lalu rehydrate (§48, §55) */
 async function send(){
   const i=document.getElementById('chat'), v=i.value.trim();
   if(!v) return;
@@ -378,21 +378,21 @@ async function send(){
   box.appendChild(el); i.value=''; box.scrollTop=box.scrollHeight;
   try{
     const data=await api('/ux/submit',{method:'POST',body:JSON.stringify({text:v})});
-    await renderChatAndState();   // rehydrate (Â§55)
+    await renderChatAndState();   // rehydrate (§55)
   }catch(e){
     const s=document.createElement('div'); s.className='msg sammsg';
-    s.innerHTML='<div class="who">SAM</div>Submission gagal: '+esc(e.message)+' Â· state dibaca ulang dari runtime.';
+    s.innerHTML='<div class="who">SAM</div>Submission gagal: '+esc(e.message)+' · state dibaca ulang dari runtime.';
     box.appendChild(s); box.scrollTop=box.scrollHeight;
   }
 }
 
-/* decision -> POST /ux/decide (Â§20/Â§21/Â§47) HANYA intent, bukan eksekusi.
-   Contract asli (/ux/decide): {intent:'approve'|'reject'} â€” tidak ada request_id
-   (state = current service state). Jangan mengarang field (Â§48). */
+/* decision -> POST /ux/decide (§20/§21/§47) HANYA intent, bukan eksekusi.
+   Contract asli (/ux/decide): {intent:'approve'|'reject'} — tidak ada request_id
+   (state = current service state). Jangan mengarang field (§48). */
 async function decide(decision){
   try{
     await api('/ux/decide',{method:'POST',body:JSON.stringify({intent:decision})});
-    toast(decision==='approve'?'Keputusan approve dikirim Â· eksekusi lewat canonical runtime':'Keputusan reject dikirim Â· 0 mutation');
+    toast(decision==='approve'?'Keputusan approve dikirim · eksekusi lewat canonical runtime':'Keputusan reject dikirim · 0 mutation');
     await renderChatAndState();
   }catch(e){ if(e.status===401){ /* login overlay sudah dimunculkan by api() */ }
     else toast('Gagal kirim keputusan: '+e.message, true); }
@@ -402,9 +402,9 @@ async function decide(decision){
 async function loadHealth(){
   const checks=[];
   try{ const h=await api('/health/ready'); checks.push({name:'Ready',ok:h&&h.status==='ready',val:(h&&h.status)||'?'}); }catch(e){ checks.push({name:'Ready',ok:false,val:'UNAVAILABLE'}); }
-  try{ const r=await api('/runtime'); checks.push({name:'Runtime',ok:!!(r&&r.healthy),val:r?'v'+(r.version||'?')+' Â· '+((r.services&&r.services['execution.preview'])||'preview'):'UNAVAILABLE'}); }catch(e){ checks.push({name:'Runtime',ok:false,val:'UNAVAILABLE'}); }
+  try{ const r=await api('/runtime'); checks.push({name:'Runtime',ok:!!(r&&r.healthy),val:r?'v'+(r.version||'?')+' · '+((r.services&&r.services['execution.preview'])||'preview'):'UNAVAILABLE'}); }catch(e){ checks.push({name:'Runtime',ok:false,val:'UNAVAILABLE'}); }
   const h=document.getElementById('health');
-  if(h){ const bad=checks.some(c=>!c.ok); h.textContent=(bad?'UNAVAILABLE Â· ':'Healthy Â· ')+checks.map(c=>c.name+'='+c.val).join(' Â· '); }
+  if(h){ const bad=checks.some(c=>!c.ok); h.textContent=(bad?'UNAVAILABLE · ':'Healthy · ')+checks.map(c=>c.name+'='+c.val).join(' · '); }
   const rb=document.getElementById('runtimeBadge');
   if(rb){ const bad=checks.some(c=>!c.ok); rb.textContent=bad?'UNAVAILABLE':'ONLINE'; rb.style.background=bad?'#f3d9d9':'#e6f0eb'; rb.style.color=bad?'#8a2f2f':'#2f6f5e'; rb.className='badge'; }
   const rt=document.querySelector('.rt');
@@ -416,16 +416,16 @@ async function loadEvents(){
     const ev=await api('/events?limit=8');
     const list=(ev&&ev.events)||[];
     e.innerHTML=list.length?list.map(x=>
-      '<div class="event'+(x.severity==='error'||x.severity==='warning'?' warning':'')+'"><time>'+esc((x.timestamp||'').toString().slice(11,16))+'</time><span class="dot"></span><div><b>'+esc(x.event_name||x.component)+'</b><span>'+esc(x.component)+' Â· '+esc(x.severity)+'</span></div></div>'
+      '<div class="event'+(x.severity==='error'||x.severity==='warning'?' warning':'')+'"><time>'+esc((x.timestamp||'').toString().slice(11,16))+'</time><span class="dot"></span><div><b>'+esc(x.event_name||x.component)+'</b><span>'+esc(x.component)+' · '+esc(x.severity)+'</span></div></div>'
     ).join(''):'<div class="event"><span class="dot"></span><div><b>Belum ada event</b><span>Telemetry kosong (jujur).</span></div></div>';
   }catch(err){ e.innerHTML='<div class="event"><span class="dot"></span><div><b>Event UNAVAILABLE</b><span>'+esc(err.message)+'</span></div></div>'; }
 }
 
-/* smooth rehydration setelah mutasi (Â§55) */
+/* smooth rehydration setelah mutasi (§55) */
 async function refreshAll(){ await Promise.all([renderChatAndState(),loadHealth(),loadEvents(),refreshAuth()]); }
 function refresh(){ refreshAll(); }
 
-/* ---------- element tanpa backend (Phase 2-6) -> honest "belum tersedia" (Â§50/Â§63) ---------- */
+/* ---------- element tanpa backend (Phase 2-6) -> honest "belum tersedia" (§50/§63) ---------- */
 function submit(kind){
   const map={Ward:'Ward',Provider:'Provider',Credential:'Credential'};
   closeModal(kind==='Ward'?'wardModal':kind==='Provider'?'providerModal':'credentialModal');
