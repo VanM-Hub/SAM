@@ -64,7 +64,7 @@ ARCHITECTURAL QUESTION → definisi eksplisit di authoritative docs?
 ```
 
 > Peta struktur folder (rumpun, BUKAN daftar 98) + peta ownership 13 kategori →
-> `docs/architecture/REPOSITORY_STRUCTURE.md` → `docs/engineering/reports/Semantic_Repository_Map.md`.
+> `docs/architecture/REPOSITORY_STRUCTURE.md` → `docs/architecture/Semantic_Repository_Map.md`.
 
 ---
 

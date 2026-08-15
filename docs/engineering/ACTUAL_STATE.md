@@ -10,7 +10,7 @@
 
 > Klaim lama "capability berfungsi" diganti status berbasis bukti (source + real external effect).
 > **Aturan:** IMPLEMENTED ≠ OPERATIONAL. Mock/preview/unit-test/HTTP-construction/success=True TIDAK menaikkan ke PROVEN.
-> Ledger detail: `docs/engineering/reports/CAPABILITY_TRUTH_MATRIX.md`.
+> Ledger detail: `docs/architecture/CAPABILITY_TRUTH_MATRIX.md`.
 
 **Dua belas capability real execution kini PROVEN** (real external effect + verification + audit + repeatable):
 

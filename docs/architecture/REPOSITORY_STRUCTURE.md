@@ -74,7 +74,7 @@ src/sam/
 Untuk **klasifikasi semantic ownership per-folder** (98 folder → 13 kategori, UNKNOWN diizinkan),
 lihat dokumen authority-nya:
 
-→ **`docs/engineering/reports/Semantic_Repository_Map.md`**
+→ **`docs/architecture/Semantic_Repository_Map.md`**
 
 ATLAS tidak menyalin daftar itu; ATLAS hanya menunjuk ke sini, dan dokumen ini menunjuk ke peta ownership.
 
