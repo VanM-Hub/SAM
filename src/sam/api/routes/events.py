@@ -36,15 +36,15 @@ async def get_events(
         "total": len(events),
         "events": [
             {
-                "event_id": e.event_id,
-                "event_name": e.event_name,
+                "event_id": e.id,
+                "event_name": e.message,
                 "timestamp": e.timestamp.isoformat(),
                 "severity": e.severity.value,
-                "component": e.component,
-                "runtime_state": e.runtime_state,
+                "component": e.component.value,
+                "category": e.category.value,
                 "correlation_id": e.correlation_id,
                 "session_id": e.session_id,
-                "payload": e.payload,
+                "payload": e.metadata,
             }
             for e in events
         ],

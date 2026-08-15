@@ -68,6 +68,17 @@ class TelemetryService:
         """Get recent events."""
         return self._buffer.get_recent(limit)
 
+    def get_events(self, limit: int = 100, severity: Optional[EventSeverity] = None) -> List[TelemetryEvent]:
+        """Ambil event dari ring buffer, opsional filter severity.
+
+        Digunakan oleh route /events (J-telemetry). Mengembalikan event paling
+        baru dulu (urutan buffer), dibatasi `limit` (default 100, max 1000).
+        """
+        events = self._buffer.get_all()
+        if severity is not None:
+            events = [e for e in events if e.severity == severity]
+        return list(events)[:limit]
+
     async def follow(self) -> AsyncGenerator[TelemetryEvent, None]:
         """Stream events in real-time (for SSE)."""
         while not self._closed:
