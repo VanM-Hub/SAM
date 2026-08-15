@@ -67,16 +67,9 @@ for _router in rest_app.routers:
 
 @app.get("/ui", response_class=HTMLResponse)
 async def mission_workspace_ui():
-    """SAM Mission Workspace --- thin client UI ke SAM production capability."""
+    """SAM Mission Workspace --- thin client UI ke SAM production capability.
+    File baseline = v18 (Phase 1 wired ke /ux/*). UI lama dihapus."""
     ui_file = Path(__file__).resolve().parent / "static" / "mission_workspace.html"
-    return FileResponse(ui_file, media_type="text/html")
-
-
-@app.get("/ui/v18", response_class=HTMLResponse)
-async def mission_workspace_ui_v18():
-    """SAM UI v18 --- Phase 1 (Home + Mission Control) wired ke /ux/*.
-    Baseline Qwen tetap di /ui; v18 serve file terpisah (workstream UI)."""
-    ui_file = Path(__file__).resolve().parent / "static" / "mission_workspace_v18.html"
     return FileResponse(ui_file, media_type="text/html")
 
 

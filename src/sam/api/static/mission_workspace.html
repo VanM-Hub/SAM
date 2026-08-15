@@ -1,574 +1,443 @@
-<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAM — Mission Workspace</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAM â€” Mission OS v18</title>
 <style>
-:root{
-  --bg:#0b1020; --bg2:#0e1526; --panel:#121a2e; --panel2:#17203a;
-  --border:#1e2a47; --border2:#2b3c66;
-  --txt:#e9eefb; --muted:#93a3c8; --dim:#5d6c93;
-  --blue:#4f7cff; --indigo:#6d5ef0; --violet:#a78bfa;
-  --cyan:#22d3ee; --green:#34d399; --amber:#fbbf24; --red:#f87171;
-  --mono:Consolas,Menlo,'SFMono-Regular',monospace;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
-body{background:radial-gradient(1100px 500px at 75% -10%,#16224a 0%,var(--bg) 55%);color:var(--txt);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;
-  height:100vh;overflow:hidden;display:flex;flex-direction:column}
-.mono{font-family:var(--mono)} .dim{color:var(--dim);font-size:11px;font-family:var(--mono)}
-.hl{color:var(--amber);font-weight:700}
-a{color:var(--blue);cursor:pointer;text-decoration:none}
-a:hover{text-decoration:underline}
+:root{--bg:#f3f5f3;--panel:#fff;--soft:#f8faf8;--line:#d9dfda;--text:#18201b;--muted:#707a74;--green:#2f6f5e;--gs:#e6f0eb;--amber:#a66b18;--as:#fff1da;--blue:#3d6f9c;--bs:#e9f0f7;--shadow:0 4px 16px #17351d0a}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:13px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}
+.app{height:100vh;display:grid;grid-template-columns:198px 1fr}.side{background:#fbfcfb;border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:8px;padding:4px 8px 20px;font-size:17px;font-weight:800}.mark{width:28px;height:28px;border-radius:8px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:12px}.navlabel{font-size:9px;color:#9aa39d;text-transform:uppercase;letter-spacing:.09em;padding:8px}.nav{display:grid;gap:3px}.nav button{position:relative;border:0;background:transparent;color:var(--muted);text-align:left;padding:9px;border-radius:8px;font-size:12px}.nav button.active{background:var(--gs);color:var(--green);font-weight:800}.nav button.active:before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:3px;background:var(--green)}.ico{display:inline-block;width:22px;text-align:center}.count{float:right;background:var(--amber);color:#fff;border-radius:10px;padding:1px 5px;font-size:8px}.sidefoot{margin-top:auto;border-top:1px solid var(--line);padding:10px 8px 2px;color:#9aa39d;font-size:8px;line-height:1.6}.sidefoot b{color:var(--muted)}
+.main{min-width:0;display:flex;flex-direction:column}.top{height:68px;flex:none;background:#ffffffee;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:7px}.statuses{display:flex;gap:6px}.status{height:44px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;min-width:102px}.status:first-child{min-width:188px;background:#f8fcfa;border-color:#cbdcd4}.lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}.val{font-size:10px;font-weight:750;margin-top:3px}.ok{color:var(--green)}.warn{color:var(--amber)}.spacer{flex:1}.rt{font-size:9px;color:var(--muted)}.rt i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#36a56d;margin-right:5px}.avatar{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:#e0ebe4;color:var(--green);font-size:9px;font-weight:800}
+.content{height:calc(100vh - 68px);padding:14px 18px 16px;min-height:0}.page{display:none;height:100%;min-height:0}.page.active{display:flex;flex-direction:column}.pagehead{height:30px;flex:none;display:flex;align-items:center;gap:9px;margin-bottom:8px}.pagehead h1{font-size:18px;letter-spacing:-.03em;margin:0}.pagehead span{font-size:9px;color:var(--muted)}.headbtn{margin-left:auto}.card{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}.head{height:38px;padding:0 11px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.head h2{font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin:0}.head span{font-size:8.5px;color:var(--muted)}.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 9px;font-size:9px;font-weight:750}.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.link{border:0;background:none;color:var(--green);font-size:9px;font-weight:800}.badge{font-size:7.5px;font-weight:800;padding:2px 6px;border-radius:20px}.good{background:var(--gs);color:var(--green)}.warning{background:var(--as);color:var(--amber)}.running{background:var(--bs);color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1.55fr 1fr;gap:10px;flex:1;min-height:0}.stack{display:flex;flex-direction:column;gap:10px;min-height:0}.fill{min-height:0;display:flex;flex-direction:column}.scroll{min-height:0;overflow:auto}.alert{display:flex;align-items:center;gap:9px;padding:10px;margin-bottom:9px;border:1px solid #e7d2ab;border-radius:9px;background:#fffaf0}.alerticon{width:27px;height:27px;border-radius:7px;background:var(--as);color:var(--amber);display:grid;place-items:center;font-weight:900}.alertmain{flex:1}.alertmain b{display:block;font-size:11px}.alertmain span{display:block;font-size:8.5px;color:var(--muted)}.actions{display:flex;gap:5px}
+.mission{padding:9px 11px;border-bottom:1px solid var(--line);cursor:pointer}.mission:hover{background:#fbfcfb}.mission.selected{background:var(--gs);border-left:3px solid var(--green);padding-left:8px}.mtop{display:flex;gap:6px;align-items:center}.mtitle{font-size:9.5px;font-weight:750;margin-top:4px}.meta{font-size:8px;color:var(--muted)}.bar{height:3px;background:#edf0ed;border-radius:5px;margin-top:6px}.bar span{display:block;height:100%;width:68%;background:var(--green);border-radius:5px}.ward{display:grid;grid-template-columns:27px 1fr auto;gap:8px;align-items:center;padding:8px 11px;border-bottom:1px solid var(--line)}.icon{width:27px;height:27px;border-radius:7px;background:#eef1ee;color:var(--green);display:grid;place-items:center;font-size:8px;font-weight:850}.ward b{font-size:9.5px}.ward .meta{margin-top:1px}.statusword{font-size:8px;color:var(--green);font-weight:800}.statusword.warning{color:var(--amber)}.event{display:grid;grid-template-columns:37px 7px 1fr;gap:7px;padding:7px 11px;border-bottom:1px solid var(--line)}.event time{font-size:8px;color:#9aa39d}.dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin-top:5px}.event.warning .dot{background:var(--amber)}.event b{font-size:8.8px}.event span{display:block;font-size:8px;color:var(--muted)}.decision{padding:9px 11px;display:flex;align-items:center;gap:8px}.q{width:26px;height:26px;border-radius:7px;background:var(--as);color:var(--amber);display:grid;place-items:center;font-weight:900}.decisionmain{flex:1}
 
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;
-  border-bottom:1px solid var(--border);background:rgba(11,16,32,.75);flex-shrink:0}
-.brand{display:flex;gap:11px;align-items:center}
-.logo{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;
-  background:linear-gradient(135deg,var(--indigo),var(--blue));border:1px solid var(--blue);box-shadow:0 0 16px rgba(79,124,255,.4)}
-.brand h1{font-size:15px}.brand small{color:var(--muted);font-size:11px;display:block}
-.head-r{display:flex;align-items:center;gap:12px}
-.pill{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--border2);background:var(--panel)}
-.pill .dot{width:7px;height:7px;border-radius:50%}
-.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);display:grid;place-items:center;font-weight:700;font-size:11px;color:#fff;cursor:pointer;border:1px solid var(--border2)}
-.avatar:hover{border-color:var(--blue)}
+.mc{display:grid;grid-template-columns:1fr 1fr 2fr;gap:10px;flex:1;min-height:0}.mcbox{min-height:0;display:flex;flex-direction:column}.body{min-height:0;overflow:auto}.messages{flex:1;min-height:0;overflow:auto;padding:9px;background:var(--soft);display:flex;flex-direction:column;gap:7px}.msg{max-width:92%;font-size:8.8px;padding:7px 8px;border-radius:8px}.sammsg{background:#fff;border:1px solid var(--line);align-self:flex-start}.usermsg{background:var(--gs);align-self:flex-end}.who{font-size:7px;font-weight:800;color:var(--muted);margin-bottom:2px}.chatform{display:flex;gap:5px;padding:7px;border-top:1px solid var(--line)}.chatform input{flex:1;border:1px solid var(--line);border-radius:6px;padding:6px;font-size:8.5px}.send{border:0;background:var(--green);color:#fff;border-radius:6px;padding:0 9px;font-size:8.5px;font-weight:800}.workspacehead{padding:11px;border-bottom:1px solid var(--line)}.eyebrow{font-size:7.5px;color:var(--muted);letter-spacing:.06em}.workspacehead h1{font-size:14px;margin:3px 0}.stages{display:flex;gap:3px}.stage{flex:1;background:#eef0ee;color:var(--muted);padding:4px 1px;border-radius:5px;text-align:center;font-size:7px;font-weight:800}.stage.done{background:var(--gs);color:var(--green)}.stage.current{background:var(--bs);color:var(--blue)}.workspacebody{padding:10px;overflow:auto}.insight{border:1px solid var(--line);background:#fafcfb;border-radius:8px;padding:9px}.insight h3{font-size:10.5px;margin:3px 0}.insight p{font-size:8.2px;color:var(--muted);margin:0}.evidence{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:7px}.ev{border:1px solid var(--line);border-radius:6px;padding:6px}.ev b{display:block;font-size:7.8px}.ev span{display:block;font-size:7.5px;color:var(--muted);margin-top:2px}.recommend{margin-top:7px;border:1px solid #c9d8d0;background:#f8fcfa;border-radius:8px;padding:9px}.recommend h3{font-size:10.5px;margin:0}.recommend p{font-size:8px;color:var(--muted);margin:3px 0 7px}.twobutton{display:flex;gap:5px}.twobutton .btn{flex:1}
 
-.shell{flex:1;min-height:0;display:flex}
-aside{width:215px;border-right:1px solid var(--border);padding:12px 10px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;overflow-y:auto;scrollbar-width:none}
-aside::-webkit-scrollbar{display:none}
-.nav-lbl{font-size:9.5px;letter-spacing:1.2px;color:var(--dim);padding:8px 12px 3px;text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:9px;color:var(--muted);cursor:pointer;font-size:13px;border:1px solid transparent;user-select:none}
-.nav-item:hover{background:var(--panel);color:var(--txt)}
-.nav-item.active{background:linear-gradient(90deg,rgba(109,94,240,.18),rgba(79,124,255,.12));color:var(--violet);border-color:var(--border2)}
-.nav-badge{margin-left:auto;background:var(--amber);color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px}
-.aside-foot{margin-top:auto;padding:10px;font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border)}
+.wardpage{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;flex:1;min-height:0}.wardlist,.warddetail{min-height:0;display:flex;flex-direction:column}.wardrows{overflow:auto;min-height:0}.wardrow{display:grid;grid-template-columns:29px 1fr auto;gap:8px;align-items:center;padding:10px 11px;border-bottom:1px solid var(--line);cursor:pointer}.wardrow:hover{background:#fbfcfb}.wardrow.selected{background:var(--gs);border-left:3px solid var(--green);padding-left:8px}.wardname{font-size:9.5px;font-weight:800}.wardtype{font-size:8px;color:var(--muted)}.detailbody{padding:10px;overflow:auto}.hero{display:flex;gap:9px;align-items:center;padding:10px;background:var(--soft);border:1px solid var(--line);border-radius:8px}.hero h2{font-size:12px;margin:0}.hero p{font-size:8px;color:var(--muted);margin:2px 0}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:7px}.metric{border:1px solid var(--line);border-radius:6px;padding:6px}.metric label{display:block;font-size:7px;color:var(--muted);text-transform:uppercase}.metric b{display:block;font-size:8.5px;margin-top:2px}.sectionbox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:7px}.sectiontitle{padding:7px 8px;border-bottom:1px solid var(--line);font-size:8px;font-weight:850;text-transform:uppercase}.lineitem{padding:7px 8px;border-bottom:1px solid var(--line);font-size:8px}.lineitem:last-child{border:0}.lineitem span{color:var(--muted)}.boundary{padding:8px;margin-top:7px;background:#fafcfb;border:1px dashed #cdd8d1;border-radius:7px;font-size:7.8px;color:var(--muted)}
 
-main{flex:1;min-width:0;padding:16px 20px;overflow:hidden}
-.page{height:100%;overflow-y:auto;scrollbar-width:thin;-ms-overflow-style:none}
-.page::-webkit-scrollbar{width:8px}
-.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px}
-.page.active{display:block}
-.page:not(.active){display:none}
+.guardpage{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0}.guardcard{min-height:0;display:flex;flex-direction:column}.guardhero{padding:11px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px}.orb{width:34px;height:34px;border-radius:9px;background:var(--gs);color:var(--green);display:grid;place-items:center;font-weight:900}.guardhero b{font-size:11px}.guardhero span{display:block;font-size:8px;color:var(--muted)}.guardbody{padding:9px;overflow:auto}.guarditem{border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:6px}.guardtop{display:flex;justify-content:space-between}.guardtitle{font-size:8.8px;font-weight:800}.guardmeta{font-size:8px;color:var(--muted);margin-top:2px}
 
-.card{background:var(--panel);border:1px solid var(--border);border-radius:13px;margin-bottom:13px;overflow:hidden}
-.card-head{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border)}
-.card-head h3{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--txt)}
-.card-head .cnt{font-family:var(--mono);font-size:11px;color:var(--muted)}
-.pad{padding:16px}
-.rule{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:9px}
-.rule b{color:var(--txt)}
-.ok{color:var(--green)}.wr{color:var(--amber)}.bd{color:var(--red)}.cy{color:var(--cyan)}.vi{color:var(--violet)}
-.grid-home{display:grid;grid-template-columns:1.6fr 1fr;gap:13px;align-items:start}
-.cols2{display:grid;grid-template-columns:1.5fr 1fr;gap:13px;align-items:start}
+.cpintro{flex:none;display:flex;align-items:center;gap:9px;padding:8px 10px;margin-bottom:9px;border:1px solid #cbdcd4;border-radius:9px;background:#f8fcfa}.cpintroicon{width:28px;height:28px;border-radius:7px;background:var(--gs);color:var(--green);display:grid;place-items:center;font-weight:900}.cpintro b{display:block;font-size:9.5px}.cpintro span{display:block;font-size:8px;color:var(--muted);margin-top:1px}
+.cpgrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:10px;flex:1;min-height:0}.cpbox{min-width:0;min-height:0;display:flex;flex-direction:column}.cpbody{padding:9px;display:flex;flex-direction:column;gap:7px;overflow:auto;min-height:0}.cpstate{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);background:var(--soft);border-radius:8px}.cpstateicon{width:29px;height:29px;border-radius:7px;background:var(--gs);color:var(--green);display:grid;place-items:center;font-weight:900}.cpstate b{display:block;font-size:9px}.cpstate span{display:block;font-size:7.8px;color:var(--muted);margin-top:1px}.cpaction{border:1px solid var(--line);border-radius:8px;padding:8px;cursor:pointer;background:#fff}.cpaction:hover{background:#fafcfb;border-color:#c5d5cd}.cpactiontop{display:flex;justify-content:space-between;gap:8px}.cpaction b{font-size:8.8px}.cpaction p{font-size:7.8px;color:var(--muted);margin:2px 0 0}.cpaction strong{color:var(--green)}.cpaction small{display:block;font-size:7.3px;color:var(--muted);margin-top:5px}.cprecords{grid-column:1/-1}.recordtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.recordtile{border:1px solid var(--line);border-radius:8px;padding:8px;cursor:pointer}.recordtile:hover{background:#fafcfb}.recordtile b{font-size:8.8px}.recordtile span{display:block;font-size:7.8px;color:var(--muted);margin:3px 0 6px}.recordtile strong{font-size:7.5px;color:var(--green)}.recent{border-top:1px solid var(--line);margin-top:8px;padding-top:7px}.recenthead{display:flex;justify-content:space-between;font-size:8.5px;margin-bottom:3px}.recordline{display:grid;grid-template-columns:36px 1fr;gap:6px;padding:5px 0;border-bottom:1px solid var(--line);font-size:7.8px}.recordline time{color:#9aa39d}.recordline span{color:var(--muted)}.recordline b{color:var(--text)}
 
-/* hero */
-.hero{display:flex;gap:14px;align-items:center;background:linear-gradient(120deg,#141d3a,#101a33 60%,#0f2030);padding:14px 16px}
-.bot{width:46px;height:46px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:21px;
-  background:radial-gradient(circle at 35% 30%,#27407c,#101a33);border:1px solid var(--blue);box-shadow:0 0 18px rgba(79,124,255,.35)}
-.hero-t{flex:1}
-.hero-t h3{font-size:15px;margin-bottom:3px}
-.hero-t p{color:var(--muted);font-size:12.5px}
-
-/* understanding + plan */
-.understand{padding:16px}
-.understand .say{font-size:15px;line-height:1.5;margin-bottom:8px}
-.understand .sub{color:var(--muted);line-height:1.5;margin-bottom:12px;font-size:13px}
-.planbox{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.35);border-radius:11px;padding:12px 14px;margin-bottom:12px}
-.planbox h4{font-size:12px;margin-bottom:7px;color:var(--green)}
-.planbox li{list-style:none;color:var(--muted);font-size:13px;padding:3px 0}
-.planbox li::before{content:'•';color:var(--green);font-weight:700;margin-right:8px}
-.kv{display:grid;grid-template-columns:130px 1fr;gap:6px 10px;font-size:13px;padding:4px 0}
-.kv .k{color:var(--dim)}
-.kv .v{color:var(--txt);word-break:break-word}
-
-/* approval */
-.ask{display:flex;gap:9px;align-items:center;font-size:14px;font-weight:600;margin-bottom:11px}
-.ask .q{color:var(--green)}
-.dec-actions{display:flex;gap:9px;flex-wrap:wrap}
-.btn{padding:9px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--panel2);color:var(--txt);transition:.15s}
-.btn:hover{transform:translateY(-1px);border-color:var(--blue)}
-.btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
-.btn-yes{background:linear-gradient(135deg,#15803d,#16a34a);border-color:#22c55e;color:#fff}
-.btn-yes:hover{box-shadow:0 0 14px rgba(34,197,94,.45)}
-.btn-no{background:transparent;border-color:var(--red);color:var(--red)}
-.result{margin-top:11px;font-size:13px;font-weight:600}
-details.tech summary{cursor:pointer;color:var(--blue);font-size:12px;margin-top:10px}
-details.tech .mono-box{margin-top:8px;background:#070b16;border:1px solid var(--border);border-radius:9px;padding:11px;font-family:var(--mono);font-size:11.5px;line-height:1.8;color:var(--muted);white-space:pre-wrap;word-break:break-word}
-
-/* submit */
-.inputrow{display:flex;gap:9px;margin-top:4px}
-.inputrow textarea{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;color:var(--txt);font-size:13px;outline:none;resize:vertical;min-height:60px;font-family:inherit}
-.inputrow textarea:focus{border-color:var(--blue)}
-.send{align-self:flex-end;border-radius:10px;border:none;background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff;font-size:14px;cursor:pointer;padding:11px 20px;font-weight:600}
-.send:hover{box-shadow:0 0 16px rgba(109,94,240,.5)}
-.chips{display:flex;gap:7px;flex-wrap:wrap;margin:11px 0}
-.chip{padding:6px 13px;border-radius:999px;border:1px solid var(--border2);background:var(--panel);color:var(--muted);font-size:12px;cursor:pointer}
-.chip:hover{color:var(--txt);border-color:var(--blue)}
-
-/* mini status */
-.mini{padding:11px 16px;border-bottom:1px solid var(--border)}
-.mini:last-child{border-bottom:none}
-.mini .row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px}
-.mini .row .v{color:var(--muted)}
-.mini h4{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:flex;justify-content:space-between}
-.mini h4 a{font-weight:400;text-transform:none;letter-spacing:0}
-
-/* timeline */
-.journey{padding:4px 16px}
-.j-step{display:flex;gap:12px;padding:9px 0;position:relative}
-.j-step::before{content:'';position:absolute;left:10px;top:32px;bottom:-2px;width:2px;background:var(--border)}
-.j-step:last-child::before{display:none}
-.j-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:10px;font-weight:700;border:2px solid var(--border2);background:var(--panel2);color:var(--dim);z-index:1}
-.j-step.done .j-dot{border-color:var(--green);color:var(--green);background:rgba(52,211,153,.1)}
-.j-step.now .j-dot{border-color:var(--cyan);color:var(--cyan);background:rgba(34,211,238,.12);box-shadow:0 0 10px rgba(34,211,238,.4)}
-.j-step.fail .j-dot{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.12)}
-.j-body b{font-size:13px;display:block}
-.j-body p{color:var(--dim);font-size:11.5px;margin-top:2px}
-.j-time{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--dim)}
-
-/* audit table */
-.tw{overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:10px 16px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
-td{padding:10px 16px;border-bottom:1px solid var(--border)}
-tr:hover td{background:rgba(255,255,255,.02)}
-
-/* badges */
-.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;letter-spacing:.4px;display:inline-block}
-.b-low{background:rgba(52,211,153,.12);color:var(--green);border:1px solid var(--green)}
-.b-med{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid var(--amber)}
-.b-high{background:rgba(248,113,113,.12);color:var(--red);border:1px solid var(--red)}
-.b-info{background:rgba(79,124,255,.12);color:var(--blue);border:1px solid var(--blue)}
-.b-cy{background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid var(--cyan)}
-
-footer{border-top:1px solid var(--border);padding:8px 20px;display:flex;gap:22px;flex-wrap:wrap;align-items:center;color:var(--dim);font-size:11px;font-family:var(--mono);flex-shrink:0}
-footer .ok,footer .cy{font-weight:700}
-
-/* login overlay */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:100;align-items:center;justify-content:center}
-.overlay.open{display:flex}
-.login-box{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:26px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.login-box h2{font-size:16px;margin-bottom:4px}
-.login-box p{color:var(--muted);font-size:12.5px;margin-bottom:16px}
-.login-box label{display:block;font-size:11px;color:var(--muted);margin:10px 0 4px}
-.login-box input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:10px 12px;color:var(--txt);font-size:13px;outline:none}
-.login-box input:focus{border-color:var(--blue)}
-.login-box .err{color:var(--red);font-size:12px;margin-top:10px;display:none}
-.login-box .btn{width:100%;margin-top:16px}
-.login-box .btn-yes{background:linear-gradient(135deg,var(--indigo),var(--blue));border-color:var(--blue)}
-
-#toasts{position:fixed;bottom:50px;right:20px;display:flex;flex-direction:column;gap:9px;z-index:300}
-.toast{background:var(--panel2);border:1px solid var(--border2);border-left:4px solid var(--cyan);padding:12px 16px;border-radius:9px;font-size:13px;min-width:250px;max-width:380px;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:si .3s ease}
-.toast.ok{border-left-color:var(--green)}.toast.bad{border-left-color:var(--red)}.toast.warn{border-left-color:var(--amber)}
-@keyframes si{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
-
-.empty{color:var(--dim);font-size:13px;padding:16px;text-align:center}
-@media(max-width:1100px){.grid-home,.cols2{grid-template-columns:1fr}aside{display:none}body{overflow:auto}}
+.modalback{position:fixed;inset:0;background:#12201747;display:none;align-items:center;justify-content:center;z-index:100}.modalback.open{display:flex}.modal{width:min(440px,calc(100vw - 30px));background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 20px 60px #0002;overflow:hidden}.modalhead{padding:11px 13px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.modalhead h2{font-size:11px;margin:0}.modalhead button{border:0;background:none;font-size:15px;color:var(--muted)}.modalbody{padding:12px;display:flex;flex-direction:column;gap:8px}.field label{display:block;font-size:7.8px;font-weight:850;margin-bottom:3px}.field input,.field select{width:100%;border:1px solid #ccd6d0;border-radius:6px;padding:7px;font-size:8.5px;background:#fff}.hint{font-size:7.3px;color:var(--muted);margin-top:3px}.modalfoot{padding:9px 12px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:5px}.secure{padding:7px;background:#fafcfb;border:1px dashed #cdd8d1;border-radius:7px;font-size:7.5px;color:var(--muted)}
+.toast{position:fixed;right:18px;bottom:18px;background:#202a24;color:#fff;padding:8px 11px;border-radius:7px;font-size:8.5px;opacity:0;transform:translateY(5px);transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:none}
+@media(max-width:1000px){.app{grid-template-columns:58px 1fr}.brand span,.navlabel,.nav button span,.sidefoot{display:none}.brand .mark{margin:auto}.nav button{text-align:center;font-size:16px;padding:9px 0}.ico{width:auto}.statuses .status:nth-child(n+4){display:none}.mc{grid-template-columns:1fr 1fr}.mcbox.workspace{grid-column:1/-1;height:450px}.guardpage,.wardpage{grid-template-columns:1fr}.cpgrid{grid-template-columns:1fr}.cprecords{grid-column:auto}}
+@media(max-width:650px){html,body{overflow:auto}.app{display:block;height:auto;min-height:100vh}.side{display:none}.top{height:auto;padding:7px 10px}.statuses{display:grid;grid-template-columns:1fr 1fr;width:100%}.statuses .status:first-child{grid-column:1/-1}.spacer,.rt,.avatar{display:none}.content{height:auto;min-height:calc(100vh - 70px);padding:11px}.page{height:auto;min-height:calc(100vh - 90px)}.grid2,.mc,.guardpage,.wardpage,.cpgrid{grid-template-columns:1fr}.mcbox.workspace{grid-column:auto;height:500px}.chat,.missionbox{height:360px}.recordtiles{grid-template-columns:1fr}.cprecords{grid-column:auto}.metrics,.evidence{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="brand">
-    <div class="logo">SAM</div>
-    <div><h1>SAM</h1><small>Mission Workspace · Production</small></div>
-  </div>
-  <div class="head-r">
-    <div class="pill" id="healthPill"><span class="dot" style="background:var(--dim)"></span><span id="healthTxt">memeriksa…</span></div>
-    <div class="pill" id="authPill" style="display:none"><span class="dot" style="background:var(--amber)"></span><span id="authTxt">Login</span></div>
-    <div class="avatar" id="avatarBtn" title="Akun">?</div>
-  </div>
-</header>
-
-<div class="shell">
-<aside>
-  <div class="nav-lbl">Menu</div>
-  <div class="nav-item active" data-page="mission">🎯 Misi</div>
-  <div class="nav-item" data-page="evidence">🧾 Bukti</div>
-  <div class="nav-item" data-page="audit">📋 Audit Trail</div>
-  <div class="aside-foot">Recommendation ≠ Authority.<br>Preview ≠ Execution.<br><br>Semua data di halaman ini berasal langsung dari backend SAM (bukan contoh).</div>
+<div class="app">
+<aside class="side">
+<div class="brand"><div class="mark">S</div><span>SAM</span></div>
+<div class="navlabel">Workspace</div>
+<nav class="nav">
+<button class="active" data-page="home"><span class="ico">âŒ‚</span><span>Home</span></button>
+<button data-page="mission"><span class="ico">â—ˆ</span><span>Mission Control</span><b class="count" id="navMissionCount"></b></button>
+<button data-page="wards"><span class="ico">â—‡</span><span>Wards</span><b class="count" id="navWardCount" style="display:none"></b></button>
+<button data-page="guardian"><span class="ico">â—Œ</span><span>Guardian</span></button>
+</nav>
+<div class="navlabel">System</div>
+<nav class="nav"><button data-page="control"><span class="ico">âš™</span><span>Control Panel</span></button></nav>
+<div class="sidefoot"><b>Four modes Â· one SAM</b><br>Control Panel = Runtime Â· Governance Â· Records</div>
 </aside>
 
-<main>
+<main class="main">
+<header class="top">
+<div class="statuses">
+<div class="status"><div class="lbl">SAM</div><div class="val ok">â— Operational Â· actively observing</div></div>
+<div class="status"><div class="lbl">Wards</div><div class="val" id="stWards">â€”</div></div>
+<div class="status"><div class="lbl">Attention</div><div class="val warn" id="stAttention">â€”</div></div>
+<div class="status"><div class="lbl">Missions</div><div class="val" id="stMissions">â€”</div></div>
+<div class="status"><div class="lbl">Last activity</div><div class="val" id="last">â€”</div></div>
+</div>
+<div class="spacer"></div><div class="rt"><i></i>Runtime online</div><div class="avatar">VM</div>
+</header>
 
-<!-- ============ MISI ============ -->
-<section class="page active" id="page-mission">
-  <div class="grid-home">
-    <div>
-      <div class="card"><div class="card-head"><h3>🦋 Misi Berjalan</h3><span class="cnt" id="reqId">—</span></div>
-        <div class="understand" id="missionCard">
-          <div class="empty">Belum ada misi. Ketik permintaan di bawah untuk memulai.</div>
-        </div>
-      </div>
+<div class="content">
 
-      <div class="card"><div class="card-head"><h3>✍️ Mulai Misi Baru</h3></div>
-        <div class="pad">
-          <div class="chips">
-            <div class="chip" onclick="fillAsk('Periksa status runtime')">Periksa status runtime</div>
-            <div class="chip" onclick="fillAsk('Buka halaman example.com')">Buka halaman example.com</div>
-            <div class="chip" onclick="fillAsk('Kirim data ke JSONPlaceholder')">Kirim data ke JSONPlaceholder</div>
-          </div>
-          <div class="inputrow">
-            <textarea id="ask" placeholder="Tulis permintaan untuk SAM…"></textarea>
-            <button class="send" id="submitBtn" onclick="submitMission()">➤ Kirim</button>
-          </div>
-          <div class="dim" style="margin-top:8px">Setelah dikirim, SAM akan memahami permintaan, menyusun rencana, lalu menunggu persetujuan kamu sebelum eksekusi nyata.</div>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="card"><div class="card-head"><h3>🔎 Pemahaman SAM</h3></div>
-        <div class="pad" id="understandSide">
-          <div class="empty">Belum ada misi.</div>
-        </div>
-      </div>
-      <div class="card"><div class="card-head"><h3>📦 Status Eksekusi</h3></div>
-        <div class="pad" id="execSide">
-          <div class="empty">Belum ada misi.</div>
-        </div>
-      </div>
-    </div>
-  </div>
+<section class="page active" id="home">
+<div class="pagehead"><h1>Home</h1><span>apa yang sedang terjadi</span></div>
+<div class="alert" id="homeAlert" style="display:none"><div class="alerticon">!</div><div class="alertmain"><b id="homeAlertTitle">Perhatian</b><span id="homeAlertMsg"></span></div><div class="actions"><button class="btn primary" onclick="go('mission')">Lihat mission</button><button class="btn" onclick="this.closest('.alert').remove()">Abaikan</button></div></div>
+<div class="grid2">
+<div class="stack">
+<section class="card"><div class="head"><h2>Mission berjalan</h2><button class="link" onclick="go('mission')">Mission Control â†’</button></div>
+<div id="homeMissions"></div>
+</section>
+<section class="card fill"><div class="head"><h2>Kejadian terkini</h2><span>today</span></div><div class="scroll" id="eventList"></div></section>
+</div>
+<div class="stack">
+<section class="card"><div class="head"><h2>Ward List</h2><button class="link" onclick="go('wards')">Buka Wards â†’</button></div>
+<div id="homeWards"><div class="ward"><div class="icon">â€“</div><div><b>Ward list belum tersedia</b><div class="meta">canonical Ward source belum di-wire (Phase 2). Ini bukan data palsu.</div></div></div></div>
+</section>
+<section class="card"><div class="head"><h2>Keputusan yang membutuhkan saya</h2><span class="badge warning">1</span></div><div id="homeDecision"><div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Belum ada keputusan</b><div class="meta">Menunggu state approval dari runtime.</div></div><button class="link" onclick="go('mission')">Review â†’</button></div></div></section>
+</div>
+</div>
 </section>
 
-<!-- ============ BUKTI ============ -->
-<section class="page" id="page-evidence">
-  <div class="card"><div class="card-head"><h3>🧾 Evidence Chain</h3><span class="cnt" id="evCnt">0 item</span></div>
-    <div id="evidenceList"><div class="empty">Belum ada bukti.</div></div>
-  </div>
+<section class="page" id="mission">
+<div class="pagehead"><h1>Mission Control</h1><span>apa yang sedang kita kerjakan bersama</span></div>
+<div class="mc">
+<section class="card mcbox"><div class="head"><h2>Chat dengan SAM</h2><span>OpenClaw-014</span></div><div class="messages" id="messages"><div class="msg sammsg"><div class="who">SAM</div>Belum ada conversation. Kirim pesan untuk memulai mission.</div></div><div class="chatform"><input id="chat" placeholder="Tanya SAMâ€¦" onkeydown="if(event.key==='Enter')send()"><button class="send" onclick="send()">Kirim</button></div></section>
+<section class="card mcbox"><div class="head"><h2>Mission</h2><span>select</span></div><div class="body">
+<div id="missionList"></div>
+</div></section>
+<section class="card mcbox workspace"><div class="workspacehead"><div class="eyebrow">MISSION Â· menunggu state runtime</div><h1>Belum ada mission</h1><div class="stages"><span class="stage">Observe</span><span class="stage">Investigate</span><span class="stage">Recommend</span><span class="stage">Decision</span><span class="stage">Execute</span><span class="stage">Verify</span></div></div><div class="workspacebody"><div class="insight"><h3>Menunggu data dari runtime</h3><p>State mission di-render dari /ux/state (jujur, bukan data palsu).</p></div></div></section>
+</div>
 </section>
 
-<!-- ============ AUDIT ============ -->
-<section class="page" id="page-audit">
-  <div class="card"><div class="card-head"><h3>📋 Audit Trail</h3><span class="cnt" id="audCnt">0 item</span></div>
-    <div class="tw"><table>
-      <thead><tr><th>Tahap</th><th>Status</th><th>Detail</th></tr></thead>
-      <tbody id="auditBody"></tbody>
-    </table></div>
-  </div>
+<section class="page" id="wards">
+<div class="pagehead"><h1>Wards</h1><span>apa yang dipercayakan kepada SAM</span><button class="btn primary headbtn" onclick="openModal('wardModal')">+ Add Ward</button></div>
+<div class="wardpage">
+<section class="card wardlist"><div class="head"><h2>Ward List</h2><span>Phase 2</span></div><div class="wardrows">
+<div class="wardrow"><div class="icon">â€“</div><div><div class="wardname">Ward list belum tersedia</div><div class="wardtype">canonical Ward source belum di-wire (Phase 2/3). Bukan data palsu.</div></div></div>
+</div></section>
+<section class="card warddetail"><div class="head"><h2>Ward Detail</h2><span class="statusword">Phase 2</span></div><div class="detailbody"><div class="hero"><div class="icon">â€“</div><div><h2>Belum tersedia</h2><p>Canonical Ward source belum di-wire. Detail Ward itu projection runtime, bukan data palsu.</p></div></div><div class="boundary"><b>Boundary:</b> discovery â‰  entrustment Â· observation â‰  authority Â· action flows through canonical runtime Â· verification requires evidence.</div></div></section>
+</div>
 </section>
 
+<section class="page" id="guardian">
+<div class="pagehead"><h1>Guardian</h1><span>bagaimana SAM menjaga Wards</span></div>
+<div class="guardpage">
+<section class="card guardcard"><div class="guardhero"><div class="orb">â—Œ</div><div><b>Guardian belum di-wire</b><span>Canonical Guardian/observation source berada di Phase 4. Bukan status palsu.</span></div><span class="badge" style="background:#eee;color:#707a74">PHASE 4</span></div><div class="head"><h2>Guardian State</h2><span>current</span></div><div class="guardbody">
+<div class="guarditem"><div class="guardtop"><div class="guardtitle">Guardian state belum tersedia</div><span class="badge" style="background:#eee;color:#707a74">PHASE 4</span></div><div class="guardmeta">Canonical Guardian/observation source belum di-wire. Bukan status palsu.</div></div>
+</div></section>
+<section class="card guardcard"><div class="head"><h2>Guardian Activity</h2><span>observe â†’ investigate â†’ verify</span></div><div class="guardbody">
+<div class="event"><span class="dot"></span><div><b>Guardian Activity belum tersedia</b><span>Phase 4 Â· hubungkan ke canonical observation source.</span></div></div>
+</div></section>
+</div>
+</section>
+
+<section class="page" id="control">
+<div class="pagehead"><h1>Control Panel</h1><span>Runtime Â· Governance Â· Records</span></div>
+<div class="cpintro"><div class="cpintroicon">âš™</div><div><b>System Control</b><span>Tempat mengatur konfigurasi sistem, memahami authority, dan menelusuri record. Bukan tempat menjalankan Mission.</span></div></div>
+<div class="cpgrid">
+<section class="card cpbox"><div class="head"><h2>Runtime</h2><span class="badge" id="runtimeBadge" style="background:#eee;color:#707a74">?</span></div><div class="cpbody">
+<div class="cpstate"><div class="cpstateicon">âŒ</div><div><b>Canonical Runtime</b><span>Operational Â· heartbeat <span id="beat">â€¦</span></span></div></div>
+<div class="cpaction" onclick="openModal('providerModal')"><div class="cpactiontop"><div><b>Providers</b><p>Provider yang dipakai SAM per capability.</p></div><strong>â†’</strong></div><small>Belum tersedia Â· Phase 5 (Provider configuration boundary)</small></div>
+<div class="cpaction" onclick="openModal('credentialModal')"><div class="cpactiontop"><div><b>Credentials</b><p>Secure credentials untuk provider dan connector.</p></div><strong>â†’</strong></div><small>Belum tersedia Â· Phase 6 (Credential boundary)</small></div>
+<div class="cpaction" onclick="refresh()"><div class="cpactiontop"><div><b>Runtime Health</b><p>Service health, execution state, heartbeat, diagnostics.</p></div><strong>â†»</strong></div><small id="health">Memeriksaâ€¦</small></div>
+</div></section>
+
+<section class="card cpbox"><div class="head"><h2>Governance</h2><span>authority & policy</span></div><div class="cpbody">
+<div class="cpstate"><div class="cpstateicon">âš–</div><div><b>Authority Boundary</b><span>Human decision remains authoritative.</span></div></div>
+<div class="cpaction" onclick="toast('Authority review opened')"><div class="cpactiontop"><div><b>Authority</b><p>Siapa yang berwenang mengambil keputusan.</p></div><strong>â†’</strong></div><small>Human decision remains authoritative (Konsep).</small></div>
+<div class="cpaction" onclick="toast('Policy review opened')"><div class="cpactiontop"><div><b>Policy</b><p>Capability boundaries dan execution constraints.</p></div><strong>â†’</strong></div><small>Phase 7 Â· hubungkan ke canonical governance contract.</small></div>
+<div class="cpaction" onclick="toast('Verification policy opened')"><div class="cpactiontop"><div><b>Verification</b><p>Bagaimana hasil execution dibuktikan.</p></div><strong>â†’</strong></div><small>ADR-007 Â· Recorded â†’ Verified â†’ Archived.</small></div>
+</div></section>
+
+<section class="card cpbox cprecords"><div class="head"><h2>Records</h2><span>traceability</span></div><div class="cpbody">
+<div class="recordtiles">
+<div class="recordtile" onclick="showRecords('Evidence')"><b>Evidence</b><span>Bukti observation, decision, execution dan verification.</span><strong>Open â†’</strong></div>
+<div class="recordtile" onclick="showRecords('Activity')"><b>Activity</b><span>Timeline aktivitas dan perubahan yang terjadi.</span><strong>Open â†’</strong></div>
+<div class="recordtile" onclick="showRecords('Audit')"><b>Audit</b><span>Jejak keputusan, authority dan tindakan.</span><strong>Open â†’</strong></div>
+</div>
+<div class="recent"><div class="recenthead"><b>Recent records</b><button class="link" onclick="showRecords('All Records')">View all</button></div>
+<div class="recordline"><span><b>Records belum tersedia</b> Â· Phase 8 Â· hubungkan ke canonical Evidence/Activity/Audit source.</span></div>
+</div>
+</div></section>
+</div>
+</section>
+
+</div>
 </main>
 </div>
 
-<footer>
-  <span>Status <span id="footHealth" class="wr">…</span></span>
-  <span>Service <span id="footVersion" class="cy">…</span></span>
-  <span id="footUser" class="dim">belum login</span>
-  <span style="margin-left:auto" id="clock">--:-- WITA</span>
-</footer>
+<!-- Add Ward -->
+<div class="modalback" id="wardModal" onclick="backdrop(event,'wardModal')"><div class="modal"><div class="modalhead"><h2>Add Ward</h2><button onclick="closeModal('wardModal')">Ã—</button></div><div class="modalbody">
+<div class="field"><label>Ward type</label><select><option>GitHub Repository</option><option>OpenClaw</option><option>PC / Host</option><option>Backup Target</option></select></div>
+<div class="field"><label>Resource</label><input value="VanM-Hub/SAM"><div class="hint">Discovery menemukan candidate. Tombol Entrust Ward adalah keputusan eksplisit user.</div></div>
+<div class="field"><label>Purpose</label><input value="Observe and investigate"></div>
+<div class="field"><label>Execution</label><select><option>Governed</option><option>Observation only</option></select></div>
+</div><div class="modalfoot"><button class="btn" onclick="closeModal('wardModal')">Cancel</button><button class="btn primary" onclick="submit('Ward')">Entrust Ward</button></div></div></div>
 
-<!-- login overlay -->
-<div class="overlay" id="loginOverlay">
-  <div class="login-box">
-    <h2>🔐 Masuk ke SAM</h2>
-    <p>Keputusan approval membutuhkan identitas terverifikasi.</p>
-    <label>Username</label>
-    <input id="loginUser" placeholder="username">
-    <label>Password</label>
-    <input id="loginPass" type="password" placeholder="password">
-    <div class="err" id="loginErr"></div>
-    <button class="btn btn-yes" onclick="doLogin()">Masuk</button>
-    <button class="btn" style="margin-top:8px;width:100%" onclick="closeLogin()">Batal</button>
-  </div>
-</div>
+<!-- Provider -->
+<div class="modalback" id="providerModal" onclick="backdrop(event,'providerModal')"><div class="modal"><div class="modalhead"><h2>Configure Provider</h2><button onclick="closeModal('providerModal')">Ã—</button></div><div class="modalbody">
+<div class="field"><label>Capability</label><select><option>Reasoning</option><option>Planning</option></select></div>
+<div class="field"><label>Provider</label><select><option>NVIDIA</option><option>OpenAI</option><option>Anthropic</option></select></div>
+<div class="field"><label>Credential</label><select><option>Pilih credential (belum tersedia Phase 6)</option></select></div>
+<div class="secure">Changing Provider changes runtime configuration, not Ward ownership. Activation is performed through the canonical runtime boundary.</div>
+</div><div class="modalfoot"><button class="btn" onclick="closeModal('providerModal')">Cancel</button><button class="btn primary" onclick="submit('Provider')">Save Provider</button></div></div></div>
 
-<div id="toasts"></div>
+<!-- Credential -->
+<div class="modalback" id="credentialModal" onclick="backdrop(event,'credentialModal')"><div class="modal"><div class="modalhead"><h2>Secure Credential</h2><button onclick="closeModal('credentialModal')">Ã—</button></div><div class="modalbody">
+<div class="field"><label>Provider</label><select><option>OpenAI</option><option>NVIDIA</option><option>Anthropic</option></select></div>
+<div class="field"><label>Credential name</label><input value="OpenAI Production"></div>
+<div class="field"><label>API Key</label><input type="password" placeholder="Enter secret securely"></div>
+<div class="secure">Raw secret tidak ditampilkan kembali dan tidak boleh masuk Chat, Mission, Evidence, Activity, atau Audit.</div>
+</div><div class="modalfoot"><button class="btn" onclick="closeModal('credentialModal')">Cancel</button><button class="btn primary" onclick="submit('Credential')">Save Securely</button></div></div></div>
 
+<div class="toast" id="toast"></div>
 <script>
-// ===== state =====
-// Token sesi dibawa via cookie httpOnly (server), TIDAK disimpan di JS.
-let currentUser = null;
+/* ============================================================
+   SAM UI v18 â€” wired ke runtime nyata (Phase 1: Home + Mission Control)
+   Sesuai: "SAM UI Functional & Semantic Specification" Â§62 (Phase 1)
+   Prinsip: UI = presentation only. Server = source of truth.
+   Rehydrate rule (Â§55): POST -> GET state/evidence/audit -> render.
+   Failure (Â§56): runtime gagal -> UNAVAILABLE (bukan Healthy).
+   Jangan pakai storage klien sbg state authoritative. (Â§3).
+   ============================================================ */
+const pages=['home','mission','wards','guardian','control'];
 
-// ===== helpers =====
-function toast(m,t='ok'){const e=document.createElement('div');e.className='toast '+t;e.textContent=m;
-  document.getElementById('toasts').appendChild(e);setTimeout(()=>{e.style.opacity=0;e.style.transition='.4s';setTimeout(()=>e.remove(),400)},4200);}
+/* ---------- navigation ---------- */
+document.querySelectorAll('.nav button[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+function go(id){
+  pages.forEach(p=>document.getElementById(p).classList.toggle('active',p===id));
+  document.querySelectorAll('.nav button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+}
 
-async function api(path, opts={}){
-  const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
-  const res = await fetch(path, Object.assign({}, opts, {headers, credentials:'same-origin'}));
-  if(res.status===401 && !path.endsWith('/login') && !path.endsWith('/me')){
-    // belum login / sesi habis
-    showLogin();
-    throw new Error('unauthorized');
+/* ---------- toast ---------- */
+function toast(s,err){
+  const t=document.getElementById('toast');
+  t.textContent=s;
+  t.style.background=err?'#8a2f2f':'#202a24';
+  t.classList.add('show'); clearTimeout(window.tt);
+  window.tt=setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+/* ---------- api helper ---------- */
+async function api(path,opts={}){
+  const res=await fetch(path,Object.assign({headers:{'Content-Type':'application/json'}},opts));
+  if(res.status===401) { showLogin(true); throw new Error('unauthorized'); }
+  let data=null; try{data=await res.json();}catch(e){}
+  if(!res.ok){
+    const err=new Error((data&&data.detail)||('HTTP '+res.status));
+    err.status=res.status; err.data=data; throw err;
   }
-  const data = await res.json().catch(()=>({}));
-  return {status:res.status, data};
+  return data;
 }
 
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-
-// ===== navigation =====
-document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>showPage(n.dataset.page)));
-function showPage(p){
-  document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id==='page-'+p));
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x.dataset.page===p));
-}
-
-// ===== auth =====
-function showLogin(){
-  document.getElementById('loginOverlay').classList.add('open');
-  document.getElementById('loginErr').style.display='none';
-}
-function closeLogin(){document.getElementById('loginOverlay').classList.remove('open');}
-async function doLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value;
-  if(!u||!p){document.getElementById('loginErr').textContent='Isi username dan password.';document.getElementById('loginErr').style.display='block';return;}
-  const r = await api('/ux/login',{method:'POST',body:JSON.stringify({username:u,password:p})});
-  if(r.status===200 && r.data.user){
-    currentUser = r.data.user;
-    document.getElementById('loginOverlay').classList.remove('open');
-    document.getElementById('loginPass').value='';
-    updateAuthUI();
-    toast('Berhasil masuk sebagai '+r.data.user.username+'.','ok');
-    refreshAll();
-  } else {
-    document.getElementById('loginErr').textContent = r.data.detail || 'Login gagal.';
-    document.getElementById('loginErr').style.display='block';
+/* ---------- login ---------- */
+function showLogin(force){
+  let ov=document.getElementById('loginOverlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='loginOverlay';
+    ov.style.cssText='position:fixed;inset:0;background:#122017b8;z-index:200;display:flex;align-items:center;justify-content:center';
+    ov.innerHTML='<div style="background:#fff;border:1px solid #d9dfda;border-radius:12px;padding:22px 26px;width:min(340px,86vw);box-shadow:0 20px 60px #0003">'
+      +'<h2 style="margin:0 0 4px;font-size:15px">Login SAM</h2>'
+      +'<div style="font-size:11px;color:#707a74;margin-bottom:14px">Identitas operator dibutuhkan untuk keputusan.</div>'
+      +'<div class="field" style="margin-bottom:9px"><label>Username</label><input id="lgUser" autocomplete="username"></div>'
+      +'<div class="field" style="margin-bottom:13px"><label>Password</label><input id="lgPass" type="password" autocomplete="current-password"></div>'
+      +'<div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn" id="lgCancel">Batal</button><button class="btn primary" id="lgGo">Masuk</button></div>'
+      +'<div id="lgErr" style="color:#8a2f2f;font-size:10px;margin-top:9px"></div></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#lgCancel').onclick=()=>{ov.style.display='none'};
+    ov.querySelector('#lgGo').onclick=async()=>{
+      const u=ov.querySelector('#lgUser').value.trim(), p=ov.querySelector('#lgPass').value;
+      try{ await api('/ux/login',{method:'POST',body:JSON.stringify({username:u,password:p})}); ov.style.display='none'; refreshAll(); }
+      catch(e){ ov.querySelector('#lgErr').textContent='Login gagal: '+e.message; }
+    };
   }
+  ov.style.display='flex';
 }
-async function doLogout(){
-  await api('/ux/logout',{method:'POST'});
-  currentUser=null;
-  updateAuthUI();
-  toast('Keluar.','warn');
+async function refreshAuth(){
+  try{ const me=await api('/ux/me'); const a=document.querySelector('.avatar');
+    if(me&&me.user) a.textContent=(me.user.slice(0,2).toUpperCase());
+  }catch(e){ const a=document.querySelector('.avatar'); if(a) a.textContent='Â·'; }
 }
-function updateAuthUI(){
-  const av=document.getElementById('avatarBtn');
-  const pill=document.getElementById('authPill');
-  const foot=document.getElementById('footUser');
-  if(currentUser){
-    av.textContent=(currentUser.username||'?')[0].toUpperCase();
-    av.title=currentUser.username+' ('+currentUser.role+')';
-    pill.style.display='flex';
-    document.getElementById('authTxt').textContent=currentUser.username;
-    foot.textContent='login: '+currentUser.username+' ('+currentUser.role+')';
-  } else {
-    av.textContent='?';
-    av.title='Masuk';
-    pill.style.display='none';
-    foot.textContent='belum login';
-  }
-}
-document.getElementById('avatarBtn').addEventListener('click',()=>{
-  if(currentUser){ if(confirm('Logout?')) doLogout(); }
-  else showLogin();
-});
 
-// ===== health =====
-async function refreshHealth(){
+/* ---------- phase 1: Home + Mission Control ---------- */
+async function loadState(){
+  const state=await api('/ux/state');
+  return state||{};
+}
+
+function safeHTML(s){return String(s==null?'':s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+function esc(s){return safeHTML(s);}
+
+/* Status efektif dari schema asli /ux/state (Â§48): status TIDAK di top-level.
+   approval.status & execution.status paling atas oleh runtime. */
+function effStatus(state){
+  if(!state) return '';
+  const a=(state.approval&&state.approval.status)||'';
+  const x=(state.execution&&state.execution.status)||'';
+  return (x||a||(state.observability&&state.observability.status)||'').toUpperCase();
+}
+
+/* render mission workspace stages (Observe..Verify) dari state runtime */
+function renderWorkspace(state){
+  const stages=['observe','investigate','recommend','decision','execute','verify'];
+  const st=document.querySelector('.stages');
+  const head=document.querySelector('.workspacehead h1');
+  const eyebrow=document.querySelector('.workspacehead .eyebrow');
+  const body=document.querySelector('.workspacebody');
+  const status=effStatus(state);
+  if(!st) return;
+  const idx=stages.findIndex(x=>status.toLowerCase().includes(x));
+  st.querySelectorAll('.stage').forEach((el,i)=>{el.className='stage'+(idx>i?' done':idx===i?' current':'');});
+  if(head && state&&state.request) head.textContent=String(state.request);
+  if(eyebrow && state) eyebrow.textContent='MISSION Â· '+(state.request_id||'â€”')+(status?' Â· '+status:'');
+  if(!body) return;
+  let html='';
+  if(state&&state.understanding&&state.understanding.what_sam_understood){
+    html+='<div class="insight"><div class="eyebrow">Apa yang dipahami SAM</div><h3>'+esc(state.understanding.what_sam_understood)+'</h3>'
+      +'<p>'+(state.understanding.operation?('Operation: '+esc(state.understanding.operation)):'')+(state.understanding.target?(' Â· Target: '+esc(state.understanding.target)):'')+'</p></div>';
+  }
+  if(state&&state.plan&&state.plan.planned_steps&&state.plan.planned_steps.length){
+    html+='<div class="insight"><div class="eyebrow">Rencana</div><ul style="margin:4px 0 0;padding-left:16px;font-size:8.2px;color:#707a74">';
+    state.plan.planned_steps.forEach(s2=>{html+='<li>'+esc(s2)+'</li>';});
+    html+='</ul></div>';
+  }
+  const needsApproval = state&&state.approval&&/waiting_approval|pending|awaiting/i.test(state.approval.status||'');
+  // render failure semantics dari runtime (M9-008.5): ex.failure_message read dari /ux/state
+  const fm = state&&state.execution&&state.execution.failure_message ? String(state.execution.failure_message) : '';
+  const isTerminal = /BLOCKED|FAILED|REJECTED|COMPLETED|ERROR/.test(status);
+  if(status){
+    let st='<div class="recommend"><h3>Status</h3><p>'+esc(status)+'</p>';
+    if(fm){ st+='<p style="color:#b04a3a;font-size:8.2px;margin-top:4px">'+esc(fm)+'</p>'; }
+    st+='</div>';
+    html+=st;
+  }
+  // tombol decision HANYA saat menunggu approval (intent -> canonical ApprovalGate Â§20/Â§47)
+  if(needsApproval){
+    html+='<div class="recommend"><h3>Menunggu keputusan Anda</h3><p>Keputusan dikirim ke canonical ApprovalGate. Approval â‰  Execution.</p>'
+      +'<div class="twobutton"><button class="btn primary" onclick="decide(\'approve\')">Setujui & lanjutkan</button>'
+      +'<button class="btn" onclick="decide(\'reject\')">Jangan lakukan</button></div></div>';
+  }
+  if(!html){ html='<div class="insight"><h3>Belum ada mission aktif</h3><p>State kosong dari runtime (jujur, bukan data palsu).</p></div>'; }
+  body.innerHTML=html;
+  renderEvidenceAudit(body);   // async append sesudah render (Â§62 evidence/audit read)
+}
+
+/* Evidence & Audit â€” proven Phase 1 read surface (Â§62): /ux/evidence, /ux/audit */
+async function renderEvidenceAudit(body){
   try{
-    const r = await fetch('/health/ready');
-    const d = await r.json();
-    const ok = d.state==='healthy' || d.status==='ready';
-    const dot=document.getElementById('healthPill').querySelector('.dot');
-    dot.style.background = ok?'var(--green)':'var(--red)';
-    dot.style.boxShadow = ok?'0 0 8px var(--green)':'0 0 8px var(--red)';
-    document.getElementById('healthTxt').textContent = ok?'SAM sehat':'SAM bermasalah';
-    document.getElementById('footHealth').textContent = ok?'HEALTHY':'UNHEALTHY';
-    document.getElementById('footHealth').className = ok?'ok':'bd';
-  }catch(e){
-    document.getElementById('healthTxt').textContent='tidak terhubung';
-    document.getElementById('footHealth').textContent='OFFLINE';
-    document.getElementById('footHealth').className='bd';
-  }
-}
-async function refreshRuntime(){
-  try{
-    const r = await fetch('/runtime');
-    const d = await r.json();
-    document.getElementById('footVersion').textContent = d.version||'?';
-  }catch(e){document.getElementById('footVersion').textContent='?';}
-}
-
-// ===== auth me check =====
-async function refreshMe(){
-  const r = await api('/ux/me');
-  if(r.status===200 && r.data.authenticated){
-    currentUser = r.data.user;
-  } else {
-    currentUser = null;
-  }
-  updateAuthUI();
-}
-
-// ===== mission state =====
-function renderOutcomeFromState(s){
-  const el = document.getElementById('missionCard');
-  const sid = document.getElementById('understandSide');
-  const execEl = document.getElementById('execSide');
-  document.getElementById('reqId').textContent = s.request_id || '—';
-
-  if(!s.request_id){
-    el.innerHTML='<div class="empty">Belum ada misi. Ketik permintaan di bawah untuk memulai.</div>';
-    sid.innerHTML='<div class="empty">Belum ada misi.</div>';
-    execEl.innerHTML='<div class="empty">Belum ada misi.</div>';
-    return;
-  }
-
-  // main card: request + plan + approval
-  const u = s.understanding||{};
-  const p = s.plan||{};
-  const ap = s.approval||{};
-  const ex = s.execution||{};
-  const apStatus = ap.status||'none';
-  const exStatus = ex.status||'none';
-
-  let html = '';
-  html += '<div class="say">"'+esc(s.request||'')+'"</div>';
-  html += '<div class="sub">'+esc(u.what_sam_understood||'')+'</div>';
-
-  // plan
-  if(p.planned_steps && p.planned_steps.length){
-    html += '<div class="planbox"><h4>Rencana SAM</h4>';
-    p.planned_steps.forEach(st=>{ html += '<li>'+esc(st)+'</li>'; });
-    html += '</div>';
-  }
-  html += '<div class="kv"><span class="k">Operasi</span><span class="v mono">'+esc(u.operation||'-')+'</span></div>';
-  html += '<div class="kv"><span class="k">Target</span><span class="v mono">'+esc(u.target||'-')+'</span></div>';
-
-  // approval area — tombol hanya saat benar-benar menunggu keputusan
-  if(apStatus==='waiting_approval'){
-    html += '<div style="margin-top:12px"><div class="ask"><span class="q">❓</span> Apakah kamu setujui SAM menjalankan ini?</div>';
-    html += '<div class="dec-actions">';
-    html += '<button class="btn btn-yes" id="btnApprove" onclick="decide(\'approve\')">✔ Setujui</button>';
-    html += '<button class="btn btn-no" id="pauseBtn" onclick="decide(\'reject\')">✖ Tolak</button>';
-    html += '</div></div>';
-  }
-
-  if(apStatus==='approved'){
-    html += '<div class="result ok">✔ DISETUJUI'+(ap.decision&&ap.decision.approver?' oleh '+esc(ap.decision.approver):'')+' — diteruskan ke eksekusi.</div>';
-  } else if(apStatus==='rejected'){
-    html += '<div class="result bd">✖ DITOLAK — 0 side-effect.</div>';
-  }
-
-  // execution result
-  if(exStatus==='completed'){
-    html += '<div class="result ok">✔ Selesai: '+esc(ex.result_summary||'')+'</div>';
-  } else if(exStatus==='blocked' || exStatus==='failed'){
-    html += '<div class="result wr">⚠ '+(ex.failure_kind==='blocked'?'DIBLOKIR':'GAGAL')+': '+esc(ex.failure_message||'')+'</div>';
-  } else if(exStatus==='running'){
-    html += '<div class="result cy">▶ Sedang berjalan…</div>';
-  }
-
-  el.innerHTML = html;
-
-  // side: understanding
-  sid.innerHTML = '<div class="kv"><span class="k">Dipahami</span><span class="v">'+esc(u.what_sam_understood||'-')+'</span></div>'
-    +'<div class="kv"><span class="k">Operasi</span><span class="v mono">'+esc(u.operation||'-')+'</span></div>'
-    +'<div class="kv"><span class="k">Target</span><span class="v mono">'+esc(u.target||'-')+'</span></div>';
-
-  // side: execution status
-  const statusBadge = {
-    'none':['b-info','NONE'],'received':['b-info','DITERIMA'],'understood':['b-info','DIPAHAMI'],
-    'waiting_approval':['b-info','MENUNGGU'],'approved':['b-low','DISETUJUI'],
-    'rejected':['b-high','DITOLAK'],'running':['b-cy','BERJALAN'],'completed':['b-low','SELESAI'],
-    'blocked':['b-med','DIBLOKIR'],'failed':['b-high','GAGAL'],'retryable':['b-med','BISA COBA LAGI']
-  }[exStatus] || ['b-info', (exStatus||'?').toUpperCase()];
-  execEl.innerHTML = '<div class="kv"><span class="k">Status</span><span class="v"><span class="badge '+statusBadge[0]+'">'+statusBadge[1]+'</span></span></div>'
-    +(ex.failure_kind&&ex.failure_kind!=='none'?'<div class="kv"><span class="k">Jenis</span><span class="v mono">'+esc(ex.failure_kind)+'</span></div>':'')
-    +(ex.result_summary?'<div class="kv"><span class="k">Hasil</span><span class="v">'+esc(ex.result_summary)+'</span></div>':'')
-    +'<div class="kv"><span class="k">Diperbarui</span><span class="v mono dim">'+esc((s.updated_at||'').replace('T',' ').slice(0,19))+'</span></div>';
-}
-
-async function hydrateFromServer(){
-  const r = await api('/ux/state');
-  if(r.status===200){ renderOutcomeFromState(r.data); }
-}
-
-async function submitMission(){
-  const v=document.getElementById('ask').value.trim();
-  if(!v){toast('Tulis permintaan dulu.','warn');return;}
-  const btn=document.getElementById('submitBtn');
-  btn.disabled=true; btn.textContent='…';
-  try{
-    const r = await api('/ux/submit',{method:'POST',body:JSON.stringify({text:v})});
-    if(r.status===200){
-      document.getElementById('ask').value='';
-      renderOutcomeFromState(r.data);
-      refreshEvidence();
-      toast('Misi dipahami SAM. Menunggu persetujuan kamu.','ok');
-    } else {
-      toast('Gagal mengirim: '+(r.data.error||r.data.detail||r.status),'bad');
+    const ev = await api('/ux/evidence');
+    const au = await api('/ux/audit');
+    const evList = (ev && ev.evidence) ? (Array.isArray(ev.evidence)?ev.evidence:(ev.evidence.items||[])) : [];
+    const auList = (au && au.audit) ? (Array.isArray(au.audit)?au.audit:(au.audit.items||[])) : [];
+    if(evList.length||auList.length){
+      let h='';
+      if(evList.length) h+='<div class="insight"><div class="eyebrow">Evidence (canonical)</div>'+evList.slice(0,3).map(x=>'<div style="font-size:8px;color:#707a74;margin-top:3px">â€¢ '+esc(x.event_name||x.type||x.id||x)+'</div>').join('')+'</div>';
+      if(auList.length) h+='<div class="insight"><div class="eyebrow">Audit (canonical)</div>'+auList.slice(0,3).map(x=>'<div style="font-size:8px;color:#707a74;margin-top:3px">â€¢ '+esc(x.event_name||x.action||x.type||x.id||x)+'</div>').join('')+'</div>';
+      if(h && body.querySelector('.recommend')) body.insertAdjacentHTML('beforeend',h);
     }
-  }catch(e){ toast('Gagal mengirim.','bad'); }
-  finally{ btn.disabled=false; btn.textContent='➤ Kirim'; }
+  }catch(e){ /* evidence/audit read gagal -> diam, state tetap rehydrate */ }
 }
 
-function fillAsk(t){document.getElementById('ask').value=t;}
-
-async function decide(intent){
-  // M11-004: bila auth aktif, butuh login
-  const me = await api('/ux/me');
-  if(me.status===401){
-    showLogin();
-    toast('Login dulu untuk menyetujui misi.','warn');
-    return;
+async function renderChatAndState(){  try{
+    const state=await loadState();
+    renderWorkspace(state);
+    renderHome(state);
+    renderMissionList(state);
+    // status bar SAM
+    const sts=effStatus(state);
+    document.querySelector('.status .val') && (document.querySelector('.status .val').textContent='â— '+(sts||'idle'));
+    document.querySelector('#last') && (document.querySelector('#last').textContent=(state.updated_at||'â€”').toString().slice(11,16));
+    // counter jujur (bukan angka fabrikasi)
+    const hasActive = !!(state && state.request && sts && !/^REJECTED|^COMPLETED|^FAILED|^BLOCKED/i.test(sts));
+    const mEl=document.getElementById('stMissions'); if(mEl) mEl.textContent=hasActive?1:0;
+    const am=document.getElementById('navMissionCount'); if(am){ am.textContent=hasActive?1:''; am.style.display=hasActive?'':'none'; }
+    const wEl=document.getElementById('stWards'); if(wEl) wEl.textContent='â€” (Phase 2)';
+    const at=document.getElementById('stAttention'); if(at) at.textContent='â€” (Phase 2)';
+  }catch(e){
+    toast('Gagal baca state runtime: '+e.message, true);
   }
-  const r = await api('/ux/decide',{method:'POST',body:JSON.stringify({intent:intent, approver: currentUser?currentUser.username:'user'})});
-  if(r.status===200 && !r.data.error){
-    renderOutcomeFromState(r.data);
-    refreshEvidence();
-    toast(intent==='approve'?'Misi disetujui — eksekusi canonical berjalan.':'Misi ditolak — 0 side-effect.', intent==='approve'?'ok':'warn');
-  } else {
-    toast('Gagal: '+(r.data.error||r.data.detail||r.status),'bad');
+}
+
+/* Home hooks: alert, mission aktif, decision â€” semua dari runtime (Â§55) */
+function renderHome(state){
+  const sts=effStatus(state);
+  const needsApproval = state && state.approval && /waiting_approval|pending|awaiting/i.test(state.approval.status||'');
+  // alert: tampil hanya bila runtime menandakan masalah (jujur, bukan fabricasi)
+  const al=document.getElementById('homeAlert');
+  if(al){ const needs = sts && /BLOCKED|FAILED|ERROR/i.test(sts);
+    al.style.display = needs ? 'flex' : 'none';
+    if(needs){ document.getElementById('homeAlertTitle').textContent='Perhatian â€” '+sts;
+      document.getElementById('homeAlertMsg').textContent=(state.request||'')+' belum selesai. Lihat Mission Control.'; } }
+  const hm=document.getElementById('homeMissions');
+  if(hm){ hm.innerHTML = (state && state.request && sts && !/^REJECTED|^COMPLETED|^FAILED|^BLOCKED/i.test(sts))
+    ? '<div class="mission" onclick="go(\'mission\')"><div class="mtop"><span class="badge running">Berjalan</span></div><div class="mtitle">'+esc(state.request)+'</div><div class="meta">'+esc(sts)+' Â· '+(state.request_id||'')+'</div><div class="bar"><span></span></div></div>'
+    : '<div class="insight" style="padding:10px;font-size:8.2px;color:#707a74">Belum ada mission aktif dari runtime.</div>'; }
+  const hd=document.getElementById('homeDecision');
+  if(hd){ const need=needsApproval || (sts && /APPROVAL|DECISION/i.test(sts));
+    hd.innerHTML = need
+      ? '<div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Menunggu keputusan</b><div class="meta">'+esc(state.request||'')+' Â· '+esc(sts||'')+'</div></div><button class="link" onclick="go(\'mission\')">Review â†’</button></div>'
+      : '<div class="decision"><div class="q">?</div><div class="decisionmain"><b style="font-size:9px">Belum ada keputusan</b><div class="meta">Menunggu state approval dari runtime.</div></div><button class="link" onclick="go(\'mission\')">Review â†’</button></div>'; }
+}
+
+/* Mission list â€” satu mission aktif (phase 1: state tunggal dari /ux/state) */
+function renderMissionList(state){
+  const ml=document.getElementById('missionList'); if(!ml) return;
+  const sts=effStatus(state);
+  ml.innerHTML = (state && state.request)
+    ? '<div class="mission selected"><span class="badge running">Berjalan</span><div class="mtitle">'+esc(state.request)+'</div><div class="meta">'+esc(sts||'')+' Â· '+esc(state.request_id||'')+'</div></div>'
+    : '<div class="mission"><div class="mtitle">Belum ada mission</div><div class="meta">State kosong dari runtime.</div></div>';
+}
+
+/* send chat -> POST /ux/submit, lalu rehydrate (Â§48, Â§55) */
+async function send(){
+  const i=document.getElementById('chat'), v=i.value.trim();
+  if(!v) return;
+  const box=document.getElementById('messages');
+  const el=document.createElement('div'); el.className='msg usermsg';
+  el.innerHTML='<div class="who">Anda</div>'+esc(v);
+  box.appendChild(el); i.value=''; box.scrollTop=box.scrollHeight;
+  try{
+    const data=await api('/ux/submit',{method:'POST',body:JSON.stringify({text:v})});
+    await renderChatAndState();   // rehydrate (Â§55)
+  }catch(e){
+    const s=document.createElement('div'); s.className='msg sammsg';
+    s.innerHTML='<div class="who">SAM</div>Submission gagal: '+esc(e.message)+' Â· state dibaca ulang dari runtime.';
+    box.appendChild(s); box.scrollTop=box.scrollHeight;
   }
 }
 
-// ===== evidence =====
-async function refreshEvidence(){
-  const r = await api('/ux/evidence');
-  const list = (r.data.evidence||[]);
-  const el = document.getElementById('evidenceList');
-  document.getElementById('evCnt').textContent = list.length+' item';
-  if(!list.length){el.innerHTML='<div class="empty">Belum ada bukti.</div>';return;}
-  el.innerHTML = list.map((e,i)=>{
-    const j = JSON.stringify(e);
-    return '<div class="mini"><div class="row"><span class="mono">#'+i+'</span><span class="v mono dim">'+esc(j).slice(0,80)+'</span></div></div>';
-  }).join('');
+/* decision -> POST /ux/decide (Â§20/Â§21/Â§47) HANYA intent, bukan eksekusi.
+   Contract asli (/ux/decide): {intent:'approve'|'reject'} â€” tidak ada request_id
+   (state = current service state). Jangan mengarang field (Â§48). */
+async function decide(decision){
+  try{
+    await api('/ux/decide',{method:'POST',body:JSON.stringify({intent:decision})});
+    toast(decision==='approve'?'Keputusan approve dikirim Â· eksekusi lewat canonical runtime':'Keputusan reject dikirim Â· 0 mutation');
+    await renderChatAndState();
+  }catch(e){ if(e.status===401){ /* login overlay sudah dimunculkan by api() */ }
+    else toast('Gagal kirim keputusan: '+e.message, true); }
 }
 
-// ===== audit =====
-async function refreshAudit(){
-  const r = await api('/ux/audit');
-  const list = (r.data.audit||[]);
-  document.getElementById('audCnt').textContent = list.length+' item';
-  const body = document.getElementById('auditBody');
-  if(!list.length){body.innerHTML='<tr><td colspan="3" class="empty">Belum ada audit.</td></tr>';return;}
-  body.innerHTML = list.map(a=>{
-    const ok = a.ok===true;
-    const blocked = a.blocked===true;
-    const stage = esc(a.stage||a.event||'-');
-    const detail = esc(a.detail||'');
-    let badge;
-    if(blocked) badge='<span class="badge b-med">BLOCKED</span>';
-    else if(ok) badge='<span class="badge b-low">OK</span>';
-    else badge='<span class="badge b-high">FAIL</span>';
-    return '<tr><td class="mono">'+stage+'</td><td>'+badge+'</td><td class="dim">'+detail+'</td></tr>';
-  }).join('');
+/* ---------- runtime health (Control Panel Phase 1 safe area) ---------- */
+async function loadHealth(){
+  const checks=[];
+  try{ const h=await api('/health/ready'); checks.push({name:'Ready',ok:h&&h.status==='ready',val:(h&&h.status)||'?'}); }catch(e){ checks.push({name:'Ready',ok:false,val:'UNAVAILABLE'}); }
+  try{ const r=await api('/runtime'); checks.push({name:'Runtime',ok:!!(r&&r.healthy),val:r?'v'+(r.version||'?')+' Â· '+((r.services&&r.services['execution.preview'])||'preview'):'UNAVAILABLE'}); }catch(e){ checks.push({name:'Runtime',ok:false,val:'UNAVAILABLE'}); }
+  const h=document.getElementById('health');
+  if(h){ const bad=checks.some(c=>!c.ok); h.textContent=(bad?'UNAVAILABLE Â· ':'Healthy Â· ')+checks.map(c=>c.name+'='+c.val).join(' Â· '); }
+  const rb=document.getElementById('runtimeBadge');
+  if(rb){ const bad=checks.some(c=>!c.ok); rb.textContent=bad?'UNAVAILABLE':'ONLINE'; rb.style.background=bad?'#f3d9d9':'#e6f0eb'; rb.style.color=bad?'#8a2f2f':'#2f6f5e'; rb.className='badge'; }
+  const rt=document.querySelector('.rt');
+  if(rt){ const bad=checks.some(c=>!c.ok); rt.innerHTML='<i style="background:'+(bad?'#8a2f2f':'#36a56d')+'"></i>'+(bad?'Runtime unavailable':'Runtime online'); }
+}
+async function loadEvents(){
+  const e=document.getElementById('eventList'); if(!e) return;
+  try{
+    const ev=await api('/events?limit=8');
+    const list=(ev&&ev.events)||[];
+    e.innerHTML=list.length?list.map(x=>
+      '<div class="event'+(x.severity==='error'||x.severity==='warning'?' warning':'')+'"><time>'+esc((x.timestamp||'').toString().slice(11,16))+'</time><span class="dot"></span><div><b>'+esc(x.event_name||x.component)+'</b><span>'+esc(x.component)+' Â· '+esc(x.severity)+'</span></div></div>'
+    ).join(''):'<div class="event"><span class="dot"></span><div><b>Belum ada event</b><span>Telemetry kosong (jujur).</span></div></div>';
+  }catch(err){ e.innerHTML='<div class="event"><span class="dot"></span><div><b>Event UNAVAILABLE</b><span>'+esc(err.message)+'</span></div></div>'; }
 }
 
-// ===== clock =====
-function clock(){
-  document.getElementById('clock').textContent = new Date().toTimeString().slice(0,5)+' WITA';
+/* smooth rehydration setelah mutasi (Â§55) */
+async function refreshAll(){ await Promise.all([renderChatAndState(),loadHealth(),loadEvents(),refreshAuth()]); }
+function refresh(){ refreshAll(); }
+
+/* ---------- element tanpa backend (Phase 2-6) -> honest "belum tersedia" (Â§50/Â§63) ---------- */
+function submit(kind){
+  const map={Ward:'Ward',Provider:'Provider',Credential:'Credential'};
+  closeModal(kind==='Ward'?'wardModal':kind==='Provider'?'providerModal':'credentialModal');
+  toast(map[kind]+' belum tersedia: canonical boundary belum di-wire (Phase '+(kind==='Ward'?'2/3':kind==='Provider'?'5':'6')+')', kind==='Credential');
 }
+function showRecords(kind){ toast(kind+' belum tersedia: hubungkan ke canonical record source (Phase 8). ', true); }
 
-// ===== refresh all =====
-function refreshAll(){ refreshHealth(); refreshRuntime(); refreshMe(); hydrateFromServer(); refreshEvidence(); refreshAudit(); }
-
-// ===== boot =====
-async function boot(){
-  updateAuthUI();
-  await refreshMe();
+/* inisialisasi */
+window.addEventListener('DOMContentLoaded',()=>{ 
   refreshAll();
-  setInterval(clock,1000);
-  setInterval(()=>{hydrateFromServer();refreshHealth();},15000);
-}
-boot();
+  setInterval(loadHealth,30000);
+});
 </script>
 </body>
 </html>

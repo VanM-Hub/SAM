@@ -66,9 +66,12 @@ class TestNoPrototypeSemantics(unittest.TestCase):
         assert "0 external calls" not in ui
 
     def test_no_fake_operational_controls(self):
-        """Tidak ada tombol fake ('Preview Mode', 'Pause' sebagai simulasi)."""
+        """Tidak ada tombol fake ('Preview Mode', 'Pause' sebagai simulasi).
+        Kontrol keputusan nyata: ada jalur tolak (decide reject) -> canonical."""
         ui = _served_ui()
-        assert re.search(r"pauseBtn", ui), "pauseBtn harus ada (dipakai sbg Tolak)"
+        # Tombol tolak nyata (reject intent ke canonical ApprovalGate).
+        # (HTML membawa escaping di JS string; cocokkan cukup 'reject' pada panggilan decide)
+        assert re.search(r"decide\([\\']*reject", ui), "harus ada kontrol tolak nyata (reject intent)"
         for pat in (r">Preview Mode<", r">Pause<", r">Simulasi<"):
             assert not re.search(pat, ui), f"unsur fake/simulasi: {pat}"
 
@@ -132,10 +135,12 @@ class TestRefreshResilience(unittest.TestCase):
         assert d["understanding"]["what_sam_understood"]
 
     def test_ui_hydrates_from_server(self):
-        """UI tidak hanya mengandalkan JS: ia me-rehydrate dari /ux/state di init."""
+        """UI tidak hanya mengandalkan JS: ia me-rehydrate dari /ux/state di init.
+        Implementasi v18: loadState() membaca /ux/state; renderWorkspace dari state itu."""
         ui = _served_ui()
-        assert "hydrateFromServer" in ui, "UI harus punya hydrate dari server"
+        assert "loadState" in ui, "UI harus punya loadState (rehydrate dari server)"
         assert "/ux/state" in ui
+        assert "renderWorkspace" in ui
 
     @pytest.mark.skipif(not HAVE_TOKEN, reason="butuh token utk proof evidence pasca-refresh")
     def test_evidence_audit_available_after_refresh(self):
@@ -174,11 +179,13 @@ class TestFailureRecoveryUX(unittest.TestCase):
 
     def test_html_renders_failure_semantics_from_runtime(self):
         """UI menampilkan BLOCKED/FAILED/REJECTED/COMPLETED dari runtime data,
-        bukan hardcoded — renderOutcomeFromState membaca ex.status."""
+        bukan hardcoded — renderWorkspace membaca state.execution.failure_message."""
         ui = _served_ui()
-        assert "ex.failure_message" in ui, "UI harus render failure_message dari runtime"
-        assert "renderOutcomeFromState" in ui
-        assert "'blocked'" in ui and "'rejected'" in ui
+        assert "state.execution.failure_message" in ui, "UI harus render failure_message dari runtime"
+        assert "renderWorkspace" in ui
+        assert "effStatus" in ui
+        # status terminal dipetakan dari runtime (blocked/failed/rejected/completed)
+        assert "BLOCKED" in ui and "FAILED" in ui and "REJECTED" in ui and "COMPLETED" in ui
 
 
 if __name__ == "__main__":
