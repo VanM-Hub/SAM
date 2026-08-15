@@ -2,9 +2,9 @@
 
 **Milestone:** M14 Build (delegated authority / SAM becomes useful) + re-architecture environment-adaptive
 **Rilis:** SAM 5.2.0
-**Tanggal:** 2026-08-14
-**Status:** Implementasi selesai, real E2E parsial PROVEN + rombak environment-adaptive selesai + M14-CLOSE bukti autonomy (autonomous mutation, governed recovery, guardian environment-adaptive & kontinu)
-**Verdict resmi:** Belum dikeluarkan (menunggu acceptance M14-CLOSE penuh)
+**Tanggal:** 2026-08-14 (update acceptance: 2026-08-15)
+**Status:** Implementasi selesai, real E2E PROVEN MENYELURUH + rombak environment-adaptive selesai + M14-CLOSE bukti autonomy (autonomous mutation, governed recovery, guardian environment-adaptive & kontinu) + **OpenClaw Ward real E2E DITUTUP (gateway bridge)**
+**Verdict resmi:** ACCEPTED (M14 closure penuh — seluruh gap OpenClaw Ward E2E telah ditutup via live gateway bridge, commit `1f54822`)
 
 ---
 
@@ -93,9 +93,12 @@ Ward spesifik dirombak menjadi **instance `CapabilityProvider`** pada mesin gene
 
 > Seluruh bukti menggunakan provider nyata (NVIDIA token dari env, Ollama lokal); token tidak di-commit, tidak bocor ke output (no_leak), evidence eksternal.
 
-### Status BLOCKED (jujur)
-- **OpenClaw Ward real E2E** — jembatan `health.json` ke runtime belum tersambung penuh.
+### OpenClaw Ward real E2E — GAP DITUTUP (PROVEN)
+- Sebelumnya BLOCKED: `OpenClawHealthCollector` hanya baca file `.openclaw/health.json` (tak ada di mesin) lalu fallback simulated health (bukan bukti nyata).
+- **Fix (`1f54822`):** collector mendukung `gateway_url` (opsional). Bila diset & reachable, baca live HTTP `GET <gateway>/health` dari runtime OpenClaw nyata → komponen Gateway + status dipetakan (`live`→healthy). Honest-fail: gateway tak reachable → `gateway_ok=False`, fallback sumber lain, bukan klaim. Default tak ubah perilaku (non-breaking).
+- **Bukti real E2E:** `tools/m14_openclaw_ward_real_e2e.py` vs gateway nyata `127.0.0.1:18789` → `gateway_ok=true`, runtime health `healthy`, evidence `Real_E2E_M14/openclaw_ward_gateway_e2e.json`. Diagnosis jujur: `healthy=false` karena log analyzer mendeteksi ERROR historis `watchdog.log` (2026-08-13 saat server mati) — SAM tidak memalsukan sehat.
 - M14-CLOSE-004/005 kini PROVEN (Guardian environment-adaptive + continuous guard).
+- **Status BLOCKED M14: KOSONG — seluruh closure PROVEN.**
 
 ---
 
@@ -138,6 +141,7 @@ Rombak B TIDAK merusak M13/M14.
 | Update laporan M14 (M14-008 PROVEN) | `71312c7` |
 | M14-CLOSE-002/003/006: autonomous mutation + governed recovery + tahan banting | `7bd84b2` |
 | M14-CLOSE-004/005: Environment-Adaptive + Continuous Guardian | `1790293` |
+| M14-CLOSE OpenClaw Ward real E2E: gateway bridge (live health → runtime) | `1f54822` |
 
 Semua commit ter-push ke `main`.
 
