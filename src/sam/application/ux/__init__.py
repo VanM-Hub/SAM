@@ -32,6 +32,8 @@ from sam.application.ux.state import (
 )
 from sam.application.ux.service import MissionUXService
 
+from sam.application.ux.conversation import ConversationService
+
 __all__ = [
     "MissionRequest",
     "MissionRequestStatus",
@@ -46,4 +48,5 @@ __all__ = [
     "UxFailureKind",
     "ux_state",
     "MissionUXService",
+    "ConversationService",
 ]

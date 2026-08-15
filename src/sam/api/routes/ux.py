@@ -24,8 +24,23 @@ from fastapi import APIRouter, Cookie, Header, HTTPException, Response
 from pydantic import BaseModel
 
 from sam.application.ux.approval import ApprovalDecisionIntent
+from sam.application.ux.conversation import ConversationService
 from sam.application.ux.identity import SessionStore, UserStore
 from sam.application.ux.service import MissionUXService
+from sam.application.ux.persistence import build_conversation_persistence_unit
+
+# Pengemasan pesan conversation untuk ViewModel/response (S2-3). Hanya field
+# publik non-secret; credential/token TIDAK pernah dimasukkan.
+def _message_to_viewmodel(msg) -> dict:
+    return {
+        "message_id": msg.message_id,
+        "role": str(msg.role.value if hasattr(msg.role, "value") else msg.role),
+        "content": msg.content,
+        "conversation_id": msg.conversation_id,
+        "session_id": msg.session_id,
+        "evidence_refs": list(msg.evidence_refs or []),
+        "created_at": msg.created_at,
+    }
 
 
 class SubmitRequest(BaseModel):
@@ -46,6 +61,22 @@ class DecideRequest(BaseModel):
     approver: str = "user"
 
 
+class ConversationMessageRequest(BaseModel):
+    """Body request conversation (S2-3).
+
+    conversation_id:
+      - kosong/None -> ConversationService membuat/resume conversation default
+        (ID stabil per participant, dibuat jika belum ada).
+      - diisi & dikenal -> resume conversation tsb.
+      - diisi & TIDAK dikenal -> fail-closed (HTTP 404), BUKAN dibuat diam-diam.
+    text: apa yang user kirim (bahasa alami). Harus non-kosong.
+    idempotency_key: optional (M10-005 retry-safe).
+    """
+    text: str
+    conversation_id: Optional[str] = None
+    idempotency_key: Optional[str] = None
+
+
 class LoginRequest(BaseModel):
     username: str
     password: str
@@ -64,6 +95,28 @@ class UxRoutes:
         self.service = MissionUXService()
         self.users = UserStore()
         self.sessions = SessionStore()
+        # S2-3: ConversationService (adapter HTTP conversation). Repository
+        # conversation dipilih sesuai environment: InMemory utk dev/test,
+        # PostgreSQL utk produksi (fail-closed saat PG tidak siap).
+        self._conv_blocked_reason = ""
+        from sam.application.ux.repositories import InMemoryConversationRepository
+
+        _repo = InMemoryConversationRepository()
+        try:
+            _unit, _info = build_conversation_persistence_unit()
+            if not (_info.get("production") and not _info.get("ready", True)):
+                # produksi siap ATAU bukan produksi -> pakai backend yg dipilih
+                _repo = _unit.conversations
+            else:
+                # produksi fail-closed: PG conversation tidak siap -> endpoint
+                # menolak (503); TIDAK fallback menyimpan ke in-memory.
+                self._conv_blocked_reason = _info.get("reason", "persistence unavailable")
+        except Exception:  # pragma: no cover — defensif, jangan crash server
+            _repo = InMemoryConversationRepository()
+        self.conversations = ConversationService(
+            conversation_repo=_repo,
+            mission_service=self.service,
+        )
 
     @property
     def production(self) -> bool:
@@ -200,6 +253,98 @@ async def ux_decide(
 
     state = _routes.service.decide(intent, approver=approver)
     return state.as_dict()
+
+
+@router.post("/conversation/message")
+async def ux_conversation_message(request: ConversationMessageRequest):
+    """Kirim pesan/command ke conversation (S2-3).
+
+    Adapter murni -> ConversationService (orchestrator) -> MissionUXService
+    -> canonical runtime. Response ViewModel berisi conversation + messages +
+    mission state (semua non-secret).
+
+    - conversation_id kosong -> create/resume conversation default (ID stabil).
+    - conversation_id diisi & tidak dikenal -> 404 fail-closed (BUKAN dibuat
+      diam-diam; acceptance "conversation ID tidak dikenal").
+    - text kosong -> 422 validation error (BUKAN mission execution).
+    - produksi fail-closed conversation -> 503 (PG tidak siap).
+    """
+    if _routes._conv_blocked_reason:
+        raise HTTPException(
+            status_code=503,
+            detail=f"conversation persistence tidak tersedia: {_routes._conv_blocked_reason}",
+        )
+    text = (request.text or "").strip()
+    if not text:
+        raise HTTPException(
+            status_code=422, detail="field `text` tidak boleh kosong"
+        )
+
+    # Resolve conversation: resume yang diminta (fail-closed bila tidak dikenal)
+    # ATAU create/resume default bila tidak disebutkan.
+    if request.conversation_id:
+        if not _routes.conversations.conversation_exists(request.conversation_id):
+            # fail-closed: conversation tidak dikenal -> 404, tidak membuat.
+            raise HTTPException(
+                status_code=404,
+                detail="conversation tidak dikenal — kirim tanpa conversation_id utk membuat yang baru",
+            )
+        cid = request.conversation_id
+    else:
+        convo = _routes.conversations.create_or_resume_conversation()
+        cid = convo.conversation_id
+
+    result = _routes.conversations.submit_command(
+        conversation_id=cid, text=text, idempotency_key=request.idempotency_key
+    )
+    state = result["state"]
+    messages = _routes.conversations.get_conversation(cid)
+    header = _routes.conversations.get_conversation_header(cid)
+    return {
+        "conversation_id": cid,
+        "conversation": {
+            "conversation_id": cid,
+            "title": (header.title if header else ""),
+            "status": (
+                str(header.status.value if hasattr(header.status, "value") else header.status)
+                if header else ""
+            ),
+        },
+        "messages": [_message_to_viewmodel(m) for m in messages],
+        "assistant_persisted": result["assistant_persisted"],
+        "mission_state": (state.as_dict() if state is not None else None),
+    }
+
+
+@router.get("/conversation/{conversation_id}")
+async def ux_conversation_get(conversation_id: str):
+    """Baca conversation + messages + mission state (S2-3, read-only)."""
+    if _routes._conv_blocked_reason:
+        raise HTTPException(
+            status_code=503,
+            detail=f"conversation persistence tidak tersedia: {_routes._conv_blocked_reason}",
+        )
+    if not _routes.conversations.conversation_exists(conversation_id):
+        raise HTTPException(
+            status_code=404, detail="conversation tidak dikenal"
+        )
+    messages = _routes.conversations.get_conversation(conversation_id)
+    header = _routes.conversations.get_conversation_header(conversation_id)
+    state = _routes.conversations.get_mission_state()
+    return {
+        "conversation_id": conversation_id,
+        "conversation": {
+            "conversation_id": conversation_id,
+            "title": (header.title if header else ""),
+            "participant": (header.participant if header else ""),
+            "status": (
+                str(header.status.value if hasattr(header.status, "value") else header.status)
+                if header else ""
+            ),
+        },
+        "messages": [_message_to_viewmodel(m) for m in messages],
+        "mission_state": (state.as_dict() if state is not None else None),
+    }
 
 
 @router.post("/login")
