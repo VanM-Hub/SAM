@@ -6,10 +6,12 @@ License:      Apache-2.0
 Python:       >=3.8 (tested on 3.10, 3.11, 3.12)
 Status:       Active Development
 Current:      SAM 5.x - Universal Governance Platform (versi teknis 5.2.0)
-Release:      5.2.0 dengan M14 (SAM Becomes Useful) sbg KANDIDAT release 5.3.0^
-              (M14 closure ACCEPTED level engineering 2026-08-15; bump 5.3.0 menunggu verdict Van)
+Release:      5.2.0 dengan M14 (SAM Becomes Useful) — M14 CLOSED/ACCEPTED, TIDAK bump 5.3.0^
+              (M14 closure ACCEPTED (full) 2026-08-15; verdict final Van: M14 = rilis 5.2.0,
+              __version__ 5.2.0 sync; OpenClaw Ward real E2E PROVEN via live gateway bridge)
               ^ M13-001..015 CLOSED/CERTIFIED 17/17, verst verdict Van 2026-08-14,
-              Real GitHub Ward + external protection E2E)
+              Real GitHub Ward + external protection E2E. Urutan 5.2.0 -> 5.3.0 TIDAK dieksekusi
+              (laporan M14 identifikasi rilis = 5.2.0; tidak ada release decision utk 5.3.0).
 Baseline:     SAM 1.0 Foundation (rilis pertama, 2026-08-07) -> SAM 2.0
               Operational Governance Platform (rilis kedua, 2026-08-08, Program A-F COMPLETE,
               M1-M6 ACHIEVED) -> SAM 3.6.0 Baseline Release (rilis ketiga, 2026-08-09,
