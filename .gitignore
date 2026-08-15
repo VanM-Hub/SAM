@@ -134,3 +134,12 @@ _m8_*.py
 _m9_*.py
 tests/_m9_tmp/
 
+# Proof mentah M6-M9 dipindah ke history (bukti E2E tidak ter-track; hanya file lokal)
+docs/history/reports/M6-*_E2E_Proof.json
+docs/history/reports/M7-*_E2E_Proof.json
+docs/history/reports/M7-*_report.txt
+docs/history/reports/M7-*_state_snapshot.json
+docs/history/reports/M8-*_E2E_Proof.json
+docs/history/reports/M8-*_report.txt
+docs/history/reports/M9_*_E2E_Proof.json
+
