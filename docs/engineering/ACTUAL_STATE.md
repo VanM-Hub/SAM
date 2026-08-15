@@ -33,7 +33,7 @@
 
 ## Canonical Execution Consolidation (2026-08-12)
 
-Keputusan arsitektural (Van): **Real Execution Path = CANONICAL**; `universal_*` (77 file) di-downgrade ke **LEGACY / MIGRATION SOURCE** — bukan execution authority. Migrasi bertahap, tanpa penghapusan massal, connector baru hanya di canonical.
+Keputusan arsitektural: **Real Execution Path = CANONICAL**; `universal_*` (77 file) di-downgrade ke **LEGACY / MIGRATION SOURCE** — bukan execution authority. Migrasi bertahap, tanpa penghapusan massal, connector baru hanya di canonical.
 
 Hasil M1-M5 — detail: `docs/engineering/audits/Canonical_Execution_Consolidation_Audit.md`:
 - M1 Execution Core (`RealExecutionHarness`) **sudah stabil** = single execution authority (14 gate P2-B, proven P0-P11).
