@@ -75,3 +75,45 @@ def build_persistence_unit(
     unit = repositories.InMemoryPersistenceUnit()
     return unit, {"backend": "in_memory", "production": False,
                   "ready": True, "reason": ""}
+
+
+def build_conversation_persistence_unit(
+    force: Optional[str] = None,
+) -> Tuple[object, dict]:
+    """Bangun PersistenceUnit conversation (Sprint 2, S2-1).
+
+    Memilih backend yg SAMA dgn misi (PostgreSQL produksi / InMemory dev), tapi
+    unit conversation terpisah agar tidak mengubah unit misi M12-001 yg sudah
+    terbukti. Fail-closed produksi berlaku sama (PG down -> ready=False).
+
+    Returns (unit, info):
+      unit : PostgresConversationPersistenceUnit / InMemoryConversationPersistenceUnit
+      info : dict {backend, production, ready, reason}
+    """
+    dsn = os.environ.get("SAM_PG_DSN", "").strip()
+    env = os.environ.get("SAM_ENV", "").strip()
+    if force == "pg" or env == "production":
+        if not dsn:
+            return repositories.InMemoryConversationPersistenceUnit(), {
+                "backend": "none", "production": True, "ready": False,
+                "reason": "SAM_ENV=production membutuhkan SAM_PG_DSN (PostgreSQL REQUIRED)"}
+        try:
+            unit = repositories.PostgresConversationPersistenceUnit(dsn=dsn)
+        except Exception as exc:  # pragma: no cover
+            return repositories.InMemoryConversationPersistenceUnit(), {
+                "backend": "none", "production": True, "ready": False,
+                "reason": f"Gagal inisialisasi PostgreSQL conversation: {exc}"}
+        try:
+            ok = unit.ping()
+        except Exception:  # pragma: no cover
+            ok = False
+        return unit, {"backend": "postgres", "production": True,
+                      "ready": ok,
+                      "reason": "" if ok else "PostgreSQL unreachable (fail-closed)"}
+    if is_postgres_configured():
+        unit = repositories.PostgresConversationPersistenceUnit(dsn=dsn or None)
+        return unit, {"backend": "postgres", "production": True,
+                      "ready": True, "reason": ""}
+    unit = repositories.InMemoryConversationPersistenceUnit()
+    return unit, {"backend": "in_memory", "production": False,
+                  "ready": True, "reason": ""}
