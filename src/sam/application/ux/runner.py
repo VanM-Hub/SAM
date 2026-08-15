@@ -108,6 +108,86 @@ def run_http_mission(
     }
 
 
+def run_environment_investigation_mission(
+    subject_id: str = "local-machine",
+    observation_evidence: Optional[Dict[str, Any]] = None,
+):
+    """Jalankan investigasi environment via EnvironmentInvestigationAdapter
+    (read-only, R1-003).
+
+    Reuse DiagnosisEngine.investigate() (canonical, M14-PROVEN) melalui kontrak
+    InvestigationTarget/InvestigationResult - BUKAN engine kedua. Adapter hanya
+    menerjemahkan EntityGraph (dari EnvironmentDiscovery) ke DiagnosisEngine.
+
+    Berhenti di Finding kandidat + evidence + confidence. TIDAK menyimpulkan
+    root cause (itu R1-004), TIDAK recommendation, TIDAK mutation.
+
+    Mengembalikan dict bentuk timeline yg dipahami service/UI:
+      {ok, operation, target, timeline:[{stage: environment.investigate,...}],
+       detail, evidence}
+    """
+    from sam.ward.capability.contracts import SubjectRef
+    from sam.ward.adapters.environment_investigation import (
+        EnvironmentInvestigationAdapter,
+    )
+
+    subject = SubjectRef(subject_id=subject_id, subject_type="citizen",
+                         kind="environment", name="local-machine")
+    adapter = EnvironmentInvestigationAdapter(subject=subject)
+    result = adapter.investigate(evidence=observation_evidence or {},
+                                 capability="investigate")
+
+    findings = list(result.findings or [])
+    ok = bool(result.successful)
+    if ok and not findings:
+        # Investigasi berjalan tapi evidence tidak cukup -> INSUFFICIENT jujur.
+        stage_detail = result.summary or (
+            "investigasi selesai tanpa temuan kandidat karena evidence tidak cukup")
+    else:
+        stage_detail = result.summary or (
+            "investigasi environment selesai ({} temuan kandidat)".format(len(findings)))
+
+    scrubbed = {
+        "ok": ok,
+        "finding_count": len(findings),
+        "insufficient": bool(ok) and not findings,
+        "summary": result.summary or "",
+        "evidence_ref": result.evidence_ref or "",
+        "error": result.error or "",
+    }
+    return {
+        "ok": ok,
+        "operation": "environment.investigate",
+        "target": subject_id,
+        "timeline": [{
+            "stage": "environment.investigate",
+            "ok": ok,
+            "blocked": None if ok else True,
+            "detail": stage_detail,
+            "evidence": {
+                "kind": "environment_investigation",
+                "findings": findings,
+                "finding_count": len(findings),
+                "insufficient": scrubbed["insufficient"],
+                "summary": result.summary or "",
+                "evidence_ref": result.evidence_ref or "",
+                "error": result.error or "",
+            },
+            "scrubbed": scrubbed,
+        }],
+        "detail": stage_detail,
+        "evidence": {
+            "kind": "environment_investigation",
+            "findings": findings,
+            "finding_count": len(findings),
+            "insufficient": scrubbed["insufficient"],
+            "summary": result.summary or "",
+            "evidence_ref": result.evidence_ref or "",
+            "error": result.error or "",
+        },
+    }
+
+
 def run_environment_observation_mission(subject_id: str = "local-machine"):
     """Jalankan observasi environment via EnvironmentObservationAdapter (read-only).
 
@@ -182,6 +262,11 @@ def run_mission(
     if op.startswith("github."):
         REPO = repo or target or DEFAULT_TEST_REPO
         return run_github_real_mission(repo=REPO, audit=audit, artifact_dir=artifact_dir)
+    if op == "environment.investigate" or op.startswith("environment.investigate"):
+        # R1-003: read-only investigasi environment nyata (kenapa lambat?).
+        # Berhenti di Finding kandidat + evidence + confidence; BUKAN root cause.
+        subject_id = (target or "").strip() or "local-machine"
+        return run_environment_investigation_mission(subject_id=subject_id)
     if op.startswith("environment."):
         # R1-002: read-only observasi environment nyata (periksa komputer).
         # target = identitas subjek (default local-machine).
@@ -229,7 +314,8 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
     _exec_stage = next(
         (t for t in timeline
          if t.get("stage") in ("github_api", "web.fetch", "http.get",
-                                "environment.observe", "execute", "act")
+                                "environment.observe", "environment.investigate",
+                                "execute", "act")
          and (t.get("ok") is not None or t.get("blocked") is not None)),
         None,
     )
@@ -251,6 +337,7 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         "web.fetch": "membaca halaman web",
         "http.get": "panggilan HTTP",
         "environment.observe": "observasi environment",
+        "environment.investigate": "investigasi environment",
     }.get(conn, "eksekusi")
     _blocked_msg = {
         "github_api": ("GitHub tidak dapat digunakan karena GITHUB_TOKEN tidak "
@@ -258,6 +345,7 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         "web.fetch": "Membaca halaman web terblokir (network/driver tidak tersedia).",
         "http.get": "Panggilan HTTP terblokir (endpoint/kredensial).",
         "environment.observe": "Observasi environment terblokir (probe tidak menghasilkan entitas).",
+        "environment.investigate": "Investigasi environment terblokir (probe tidak menghasilkan entitas).",
     }.get(conn, "Eksekusi terblokir (0 side effect).")
 
     if _exec_stage.get("blocked"):

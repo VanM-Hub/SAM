@@ -616,7 +616,24 @@ class MissionUXService:
             None,
         )
         env_ev = (env_t or {}).get("evidence") or {}
-        if env_t is not None:
+        # R1-003: evidence INVESTIGASI environment (dari timeline environment.investigate).
+        env_inv_t = next(
+            (t for t in timeline if t.get("stage") == "environment.investigate"),
+            None,
+        )
+        env_inv_ev = (env_inv_t or {}).get("evidence") or {}
+        if env_inv_t is not None:
+            inv_scrubbed = (env_inv_t or {}).get("scrubbed") or {}
+            state.evidence = [{
+                "kind": "environment_investigation",
+                "finding_count": env_inv_ev.get("finding_count", 0),
+                "findings": env_inv_ev.get("findings", []),
+                "insufficient": bool(env_inv_ev.get("insufficient")),
+                "summary": env_inv_ev.get("summary", ""),
+                "evidence_ref": env_inv_ev.get("evidence_ref", ""),
+                "ok": bool(inv_scrubbed.get("ok")),
+            }]
+        elif env_t is not None:
             env_scrubbed = (env_t or {}).get("scrubbed") or {}
             state.evidence = [{
                 "kind": "environment_observation",
@@ -695,6 +712,16 @@ class MissionUXService:
         env_match = MissionUXService._interpret_environment_observe(low)
         if env_match:
             return env_match
+
+        # 0b) Determistik (SEBELUM AI): "kenapa/mengapa ... lambat?"-sekelas.
+        #    R1-003 INVESTIGATION. Bedakan dari observe: observe = "periksa/
+        #    cek/lihat sehat", investigate = "kenapa/mengapa/diagnos/masalah/
+        #    selidik". Investigasi memahami permintaan mencari sebab/masalah.
+        #    Tidak pernah menyimpulkan root cause (itu R1-004); berhenti di
+        #    finding kandidat + confidence, INSUFFICIENT bila evidence tak cukup.
+        inv_match = MissionUXService._interpret_environment_investigate(low)
+        if inv_match:
+            return inv_match
 
         # 1) Coba pemahaman cerdas via AI lokal (Gemma3:1b via Ollama).
         #    Menutup kesenjangan "SAM hanya kenal pola kata" -> SAM bisa
@@ -824,6 +851,49 @@ class MissionUXService:
             "untuk transparansi.",
         )
 
+    @staticmethod
+    def _interpret_environment_investigate(low: str):
+        """Deteksi deterministik instruksi INVESTIGASI environment (R1-003).
+
+        Dicocokkan SEBELUM AI (setelah observe) agar "kenapa komputer lambat?"
+        tidak bergantung routing Gemma yang flaky. Mengembalikan tuple _interpret
+        bila cocok, atau None.
+
+        Berhenti di Finding kandidat + evidence + confidence; TIDAK menyimpulkan
+        penyebab (R1-004). INSUFFICIENT ditangani jujur di bawah (evidence tak
+        cukup -> tanpa temuan, tanpa fabrikasi).
+        """
+        # Investigasi: kata kunci tanya-sebab + konteks komputer/environment/lambat.
+        is_env_investigate = bool(re.search(
+            r"(kenapa|mengapa|apa\s*(yg|yang)|diagnos|selidik|investiga|masalah|"
+            r"trouble|sumber|penyebab)", low,
+        )) and bool(re.search(
+            r"(komputer|pc|mesin|sistem|environment|lokal|host|lambat|lelet|"
+            r"macet|hang|berat|sering)", low,
+        ))
+        if not is_env_investigate:
+            return None
+        return (
+            "environment.investigate",
+            "local-machine",
+            "SAM memahami: menginvestigasi environment komputer ini untuk mencari "
+            "temuan kandidat berdasar evidence (read-only). SAM TIDAK menyimpulkan "
+            "penyebab final; berhenti di finding kandidat + confidence, atau "
+            "INSUFFICIENT bila evidence tidak cukup.",
+            [
+                "observer/scan environment (process, port, file, env)",
+                "bangun entity graph + pilih kandidat dari fakta health",
+                "jalankan DiagnosisEngine.investigate() per kandidat",
+                "susun findings kandidat + evidence + confidence",
+                "laporkan INSUFFICIENT bila evidence tidak cukup (0 fabrikasi)",
+            ],
+            "SAM akan menginvestigasi environment ini dan melaporkan temuan "
+            "kandidat (read-only, tanpa menyimpulkan penyebab).",
+            "Operasi ini read-only (menginvestigasi environment lokal) - tidak "
+            "mengubah state eksternal, namun tetap disediakan persetujuan Anda "
+            "untuk transparansi.",
+        )
+
     # ------------------------------------------------------------------
     # pemahaman cerdas via AI lokal (Gemma3:1b / Ollama) — tanpa internet
     # ------------------------------------------------------------------
@@ -836,7 +906,9 @@ class MissionUXService:
         "[ai.think] minta AI berpikir/menjawab; "
         "[db.query] baca/tulis database; "
         "[process.run] jalankan perintah/command lokal; "
-        "[environment.observe] periksa/observasi komputer/environment lokal (read-only)."
+        "[environment.observe] periksa/observasi komputer/environment lokal (read-only); "
+        "[environment.investigate] investigasi/mencari sebab/masalah di komputer/environment "
+        "lokal (read-only, berhenti di finding kandidat)."
     )
 
     @staticmethod
