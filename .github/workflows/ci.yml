@@ -37,6 +37,7 @@ jobs:
           python scripts/validation/validate_layers.py && echo "validate_layers PASS" || echo "validate_layers: see violations above"
           python scripts/validation/validate_structure.py && echo "validate_structure PASS" || echo "validate_structure: see violations above"
           python scripts/validation/validate_docs.py && echo "validate_docs PASS" || echo "validate_docs: see violations above"
+          python scripts/validation/validate_backlog.py && echo "validate_backlog PASS" || echo "validate_backlog: backlog imports found (lihat ATLAS.md: butuh Architecture Decision)"
 
   core:
     needs: validation
