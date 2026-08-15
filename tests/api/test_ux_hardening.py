@@ -136,11 +136,11 @@ class TestRefreshResilience(unittest.TestCase):
 
     def test_ui_hydrates_from_server(self):
         """UI tidak hanya mengandalkan JS: ia me-rehydrate dari /ux/state di init.
-        Implementasi v18: loadState() membaca /ux/state; renderWorkspace dari state itu."""
+        Implementasi Sprint 1: loadState() membaca /ux/state; renderMission dari state itu."""
         ui = _served_ui()
         assert "loadState" in ui, "UI harus punya loadState (rehydrate dari server)"
         assert "/ux/state" in ui
-        assert "renderWorkspace" in ui
+        assert "renderMission" in ui
 
     @pytest.mark.skipif(not HAVE_TOKEN, reason="butuh token utk proof evidence pasca-refresh")
     def test_evidence_audit_available_after_refresh(self):
@@ -179,10 +179,10 @@ class TestFailureRecoveryUX(unittest.TestCase):
 
     def test_html_renders_failure_semantics_from_runtime(self):
         """UI menampilkan BLOCKED/FAILED/REJECTED/COMPLETED dari runtime data,
-        bukan hardcoded — renderWorkspace membaca state.execution.failure_message."""
+        bukan hardcoded — renderMission membaca state.execution.failure_message."""
         ui = _served_ui()
         assert "state.execution.failure_message" in ui, "UI harus render failure_message dari runtime"
-        assert "renderWorkspace" in ui
+        assert "renderMission" in ui
         assert "effStatus" in ui
         # status terminal dipetakan dari runtime (blocked/failed/rejected/completed)
         assert "BLOCKED" in ui and "FAILED" in ui and "REJECTED" in ui and "COMPLETED" in ui

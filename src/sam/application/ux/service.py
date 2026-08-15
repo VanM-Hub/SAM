@@ -808,8 +808,18 @@ class MissionUXService:
             operation = str(parsed.get("operation") or "")
             if not operation:
                 return None  # belum operasi yang dikenali -> biarkan fallback/tolak
-            target = str(parsed.get("target") or "") or os.environ.get(
-                "GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
+            # (S2-4) JANGAN pernah percaya target repo dari AI untuk GitHub.
+            # Gemma/Ollama sering mengembalikan target yang mengecoh (mis. mencopot
+            # hint teks jadi "[github.create_issue] S2-4") -> repo invalid -> eksekusi
+            # BLOCKED/gagal. Selalu kunci repo GitHub ke repo TEST yang aman
+            # (GITHUB_TEST_REPO / default), sesuai prinsip "repo TEST, bukan production".
+            # Begitupun web/url target: normalisasi, jangan sampai URL mentah justru
+            # membuat eksekusi salah arah.
+            target = str(parsed.get("target") or "")
+            if operation == "github.create_issue":
+                target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
+            elif not target:
+                target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
             understood = str(parsed.get("understood") or "")
             # Normalisasi: selalu awali "SAM memahami:" agar konsisten dengan
             # mode regex & harapan UI (jangan ubah kalau sudah ada).
