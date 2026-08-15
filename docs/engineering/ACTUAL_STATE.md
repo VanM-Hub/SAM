@@ -161,15 +161,16 @@ Fokus beralih dari "Can SAM do X?" ke "Can SAM operate safely and accountably?".
 
 | Item | Nilai |
 |---|---|
-| Versi (pyproject.toml) | **4.1.0** |
-| Versi (sam.__version__) | **4.1.0** |
-| Identitas rilis | **4.1.0** - SAM 5.x Universal Governance Platform (implementation WIP di atas baseline 4.0) · rilis v4.0.0 tetap baseline arsitektur Accepted |
-| CHANGELOG.md | **4.1.0** (mulai SAM 5.x) |
-| Misi selesai | MISSION-4.1 s/d 4.6 COMPLETE & ARCHITECTURE ACCEPTED (baseline 4.0) · **MISSION-5.1 s/d 5.6 IMPLEMENTATION COMPLETE (6/6)** (menunggu Architecture Review) |
-| Status saat ini | **SAM 4.0 = ARCHITECTURE ACCEPTED** (baseline resmi) · **SAM 5.x Universal Governance Platform = implementation selesai** (6 BC citizen: universal_ai/tool/agent/workflow, enterprise_governance, adaptive_governance; 158 test; authority tetap di manusia) · menunggu Architecture Review (EO-SAM5-001, review satu kali di akhir) sebelum close mission formal |
-| Branch / HEAD | `main` / `b469446` (feat 5.x: Universal Governance Platform) |
-| Verifikasi independen | **SAM 5.x: 158 test baru (6 BC) · full regression 4817 passed, 1 skipped, 2 xfailed · ruff bersih semua BC baru** · baseline 4.0 tetap Architecture Accepted tanpa regresi |
-| Tanggal update | 2026-08-10 (04:42 WITA) |
+| Versi (pyproject.toml) | **5.2.0** |
+| Versi (sam.__version__) | **5.2.0** (disync 2026-08-15; drift 5.0.0 ditutup) |
+| Identitas rilis | **5.2.0** - Universal Governance of External Wards (M13 CERTIFIED 17/17) · **M14 (SAM Becomes Useful) closure ACCEPTED** lvl engineering · **5.3.0 = KANDIDAT** (menunggu release decision Van) |
+| CHANGELOG.md | **5.2.0** (Universal Governance of External Wards) |
+| Misi selesai | MISSION-4.1..4.6 COMPLETE & ARCH ACCEPTED · MISSION-5.1..5.6 IMPLEMENTATION COMPLETE · M12 Self-Preservation CERTIFIED · M13 Universal Governance of External Wards CERTIFIED (17/17) · **M14 SAM Becomes Useful closure ACCEPTED** |
+| Status saat ini | M14 (delegated authority bridge) closure ACCEPTED 2026-08-15; seluruh gap OpenClaw Ward real E2E ditutup via gateway bridge (1f54822). Jembatan health.json→runtime kini live HTTP gateway. UI v18 baseline /ui, sesuai arsitektur (halaman DEFERRED tampil jujur capability-availability). |
+| Branch / HEAD | `main` / `f90426b` (M14 kandidat 5.3.0) |
+| Verifikasi independen | M14 suite delegated_authority 67 + integration openclaw 11 (2 baru gateway) PASS · prior 4817 green · lint ruff bersih |
+| Tanggal update | 2026-08-15 (21:30 WITA) |
+| Release candidate | **5.3.0 (M14)** — draft release note `docs/releases/release_notes/v5.3.0.md`, menunggu verdict resmi Van utk bump pyproject |
 | Berat repo | 3985 file · 765 commit · 1 author (VanM-Hub) |
 | History note | 2026-08-10: **SAM 5.x Universal Governance Platform - MISSION-5.1 s/d 5.6 IMPLEMENTATION COMPLETE** (feat 5.x, commit `b469446`; 6 BC citizen, 158 test, regression 4817 green, version 4.1.0) - implementation code+test selesai, menunggu Architecture Review sebelum close mission formal. Sebelumnya (rilis SAM 4.0): **v4.0.0** (Architecture Accepted) - release notes + manifest + version-history + tag; **verdict** di `docs/decisions/`; web UI live server (presentation layer) di `src/sam/operational_workspace/`. 2026-08-09: **rilis v3.6.0** + tag + release notes + manifest + version-history; **Close Order AO-2.0-001/AO-3.0-001** di `docs/decisions`; ADR-024/025 dikeluarkan dari seluruh git history (rewrite via git-filter-repo) |
 
