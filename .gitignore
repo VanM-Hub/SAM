@@ -143,3 +143,10 @@ docs/history/reports/M8-*_E2E_Proof.json
 docs/history/reports/M8-*_report.txt
 docs/history/reports/M9_*_E2E_Proof.json
 
+# Bukti mentah E2E M14 (OpenClaw Ward) - output lokal, tidak di-track
+Real_E2E_M14/
+Real_E2E_M14/*.json
+
+# Preview UI anti-narsis (artefak kerja, bukan dokumen publik final)
+docs/design/ui_guardian_anti_narsis_preview.html
+
