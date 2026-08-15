@@ -5,18 +5,53 @@ Membaca health OpenClaw (worker, gateway, provider, runtime).
 Integrasi dengan Telemetry Service SAM.
 """
 
+import json
 import structlog
-from typing import List, Dict, Any, Optional
+import urllib.request
+from typing import List, Optional
 from .models import OpenClawHealth, OpenClawStatus, OpenClawComponent
 
 logger = structlog.get_logger()
 
 
-class OpenClawHealthCollector:
-    """Collector health OpenClaw — membaca status komponen runtime OpenClaw."""
+def _map_gateway_status(status: Optional[str]) -> OpenClawStatus:
+    """Petakan string status nyata dari gateway OpenClaw ke status internal.
 
-    def __init__(self):
+    Data nyata gateway: {"ok": bool, "status": "live" | ...}.
+    - status == "live" dan ok: HEALTHY
+    - status tidak dikenali / field hilang: UNKNOWN (bukan asumsi sehat)
+    """
+    if not status:
+        return OpenClawStatus.UNKNOWN
+    live = str(status).strip().lower()
+    if live in ("live", "up", "healthy", "ok", "running", "ready"):
+        return OpenClawStatus.HEALTHY
+    if live in ("degraded", "degrading", "loading", "starting"):
+        return OpenClawStatus.DEGRADED
+    if live in ("down", "unhealthy", "failed", "stopped", "dead"):
+        return OpenClawStatus.UNHEALTHY
+    return OpenClawStatus.UNKNOWN
+
+
+class OpenClawHealthCollector:
+    """Collector health OpenClaw — membaca status komponen runtime OpenClaw.
+
+    Sumber (urutan prioritas, honest-fail):
+      1. gateway_url (opsional): live HTTP GET <gateway>/health dari runtime
+         OpenClaw nyata. Bila diset dan reachable -> data NYATA.
+      2. file .openclaw/health.json di workspace (file-based).
+      3. simulated fallback (Phase 1, ditandai jelas sebagai simulated).
+    """
+
+    def __init__(self, gateway_url: Optional[str] = None):
         self._last_health: Optional[OpenClawHealth] = None
+        self._gateway_url = gateway_url
+        self._gateway_ok = False  # apakah source gateway dipakai (bukti nyata)
+
+    @property
+    def gateway_ok(self) -> bool:
+        """True bila source health nyata dari gateway OpenClaw berhasil dipakai."""
+        return self._gateway_ok
 
     async def collect(self, workspace_path: str) -> OpenClawHealth:
         """Kumpulkan health OpenClaw dari workspace.
@@ -50,11 +85,18 @@ class OpenClawHealthCollector:
     async def _get_components(self, workspace_path: str) -> List[OpenClawComponent]:
         """Dapatkan daftar komponen OpenClaw beserta statusnya.
 
-        Saat ini simulated, akan diganti dengan actual health check ke OpenClaw API.
+        Prioritas sumber (honest):
+          1. gateway_url (live HTTP dari runtime OpenClaw nyata) bila diset.
+          2. file .openclaw/health.json di workspace.
+          3. simulated fallback (ditandai, bukan klaim nyata).
         """
-        # Simulasi — nanti akan baca actual health
-        # 1. Cek apakah ada file .openclaw/health.json
-        import json
+        if self._gateway_url:
+            gw = await self._get_gateway_health()
+            if gw is not None:
+                self._gateway_ok = True
+                return gw
+
+        # 2. Baca actual health dari file .openclaw/health.json
         from pathlib import Path
 
         health_file = Path(workspace_path) / ".openclaw" / "health.json"
@@ -81,7 +123,7 @@ class OpenClawHealthCollector:
             except Exception as e:
                 logger.warning("health_file_parse_failed", error=str(e))
 
-        # Fallback: simulated health
+        # 3. Fallback: simulated health (Phase 1) — bukan klaim real.
         return [
             OpenClawComponent(
                 name="Worker",
@@ -104,6 +146,43 @@ class OpenClawHealthCollector:
                 message="Runtime active",
             ),
         ]
+
+    async def _get_gateway_health(self) -> Optional[List[OpenClawComponent]]:
+        """Baca health NYATA dari runtime OpenClaw via HTTP GET <gateway>/health.
+
+        Sumber: {"ok": bool, "status": str}. Bila reachable -> komponen nyata
+        (Gateway status dari data runtime). Bila gagal / non-JSON -> None
+        (jangan asumsi sehat; caller lanjut ke sumber berikutnya).
+        """
+        base = str(self._gateway_url).rstrip("/")
+        url = f"{base}/health"
+        try:
+            with urllib.request.urlopen(url, timeout=5) as resp:  # noqa: S310 - gateway lokal/trusted
+                raw = resp.read().decode("utf-8", errors="replace")
+            data = json.loads(raw)
+            ok = bool(data.get("ok", False))
+            status = data.get("status")
+            mapped = _map_gateway_status(status)
+            if ok and mapped == OpenClawStatus.HEALTHY:
+                mapped = OpenClawStatus.HEALTHY
+            elif not ok and mapped == OpenClawStatus.HEALTHY:
+                # ok false tapi status "live" -> honest, bukan sehat penuh
+                mapped = OpenClawStatus.DEGRADED
+            logger.info(
+                "openclaw_gateway_health", url=url, ok=ok, status=status,
+                mapped=mapped.value,
+            )
+            return [
+                OpenClawComponent(
+                    name="Gateway",
+                    status=mapped,
+                    message=f"live health: status={status!r} ok={ok!r}",
+                    details={"ok": ok, "status": status, "url": url},
+                )
+            ]
+        except Exception as e:  # noqa: BLE001 - honest fail, lanjut source lain
+            logger.warning("openclaw_gateway_health_failed", url=url, error=str(e))
+            return None
 
     def _determine_runtime_status(self, components: List[OpenClawComponent]) -> OpenClawStatus:
         """Tentukan status runtime berdasarkan komponen.

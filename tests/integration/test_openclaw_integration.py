@@ -96,6 +96,59 @@ class TestOcIntegrationE2E:
         assert len(results) == 1
         assert results[0]["type"] == "info"
 
+    @pytest.mark.asyncio
+    async def test_gateway_bridge_reads_live_health(self, tmp_path, monkeypatch):
+        """Gateway bridge: baca health NYATA dari runtime OpenClaw (mocked socket).
+
+        Membuktikan collector memakai source HTTP gateway (bukan file/simulated)
+        dan memetakan {"ok":true,"status":"live"} -> HEALTHY.
+        """
+        import sam.openclaw.health as health_mod
+
+        class _FakeResp:
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+            def read(self):
+                return b'{"ok": true, "status": "live"}'
+
+        def fake_urlopen(url, timeout=5):
+            assert url.endswith("/health")
+            return _FakeResp()
+
+        monkeypatch.setattr(health_mod.urllib.request, "urlopen", fake_urlopen)
+
+        collector = OpenClawHealthCollector(gateway_url="http://127.0.0.1:18789")
+        health = await collector.collect(str(tmp_path))
+        assert collector.gateway_ok is True
+        assert any(c.name == "Gateway" for c in health.components)
+        assert health.runtime == OpenClawStatus.HEALTHY
+        # pastikan komponen dari gateway (1 komponen Gateway nyata), bukan simulated 4
+        assert len(health.components) == 1
+
+    @pytest.mark.asyncio
+    async def test_gateway_bridge_unreachable_falls_back_honest(self, tmp_path, monkeypatch):
+        """Gateway tak reachable -> jangan klaim nyata (gateway_ok False).
+
+        Perilaku honest: bila gateway source diset tapi gagal, collector fallback
+        ke sumber lain (file/simulated) dan gateway_ok tetap False (bukan bukti).
+        """
+        import sam.openclaw.health as health_mod
+
+        def fake_urlopen(url, timeout=5):
+            raise OSError("connection refused")
+
+        monkeypatch.setattr(health_mod.urllib.request, "urlopen", fake_urlopen)
+
+        collector = OpenClawHealthCollector(gateway_url="http://127.0.0.1:9")
+        health = await collector.collect(str(tmp_path))
+        assert collector.gateway_ok is False
+        assert isinstance(health, OpenClawHealth)
+        # tetap ngasih health object (bukan crash), tapi runtime dari fallback
+        assert health.runtime is not None
+
+
 
 class TestOcCLIIntegration:
     def test_cli_import(self):
