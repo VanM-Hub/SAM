@@ -10,11 +10,13 @@ di repo test, sudah PROVEN M8-002 + M8-006). Setelah rencana ditambah
 """
 from __future__ import annotations
 
-import os
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from sam.execution_runtime.m8_mission_framework import m8_002_build
 from sam.execution_runtime.real_harness import AuditTrail
+
+if TYPE_CHECKING:  # pragma: no cover - hanya utk anotasi tipe
+    from sam.ward.capability.contracts import DiagnosisResult
 
 # Repo test default utk GitHub mutation (repo TEST, bukan production).
 DEFAULT_TEST_REPO = "VanM-Hub/test-issues"
@@ -232,10 +234,12 @@ def run_environment_diagnosis_mission(
         "error": result.error or "",
         "sufficiency": verdict,  # eksplisit: verdict = diagnostic sufficiency
     }
+    _canonical = result  # objek DiagnosisResult canonical (R1-005 cache)
     return {
         "ok": ok,
         "operation": "environment.diagnose",
         "target": subject_id,
+        "_canonical_diagnosis": _canonical,
         "timeline": [{
             "stage": "environment.diagnose",
             "ok": ok,
@@ -323,6 +327,71 @@ def run_environment_observation_mission(subject_id: str = "local-machine"):
     }
 
 
+def run_environment_recommendation_mission(
+    diagnosis: Optional["DiagnosisResult"] = None,
+    subject_id: str = "local-machine",
+):
+    """Jalankan recommendation environment via EnvironmentRecommendationAdapter
+    (read-only, R1-005).
+
+    Menerima DiagnosisResult (R1-004, canonical) - BUKAN findings mentah,
+    BUKAN Dict serialized. Adapter menilai verdict dan menyusun rekomendasi
+    canonical HANYA bila ada canonical action mapping TERBUKTI; bila tidak,
+    causal -> recommendations=[] jujur (fail-closed).
+
+    Tidak import environment, connector, AI, WardGovernor, executor. Berhenti
+    di RecommendationResult (STOP). Tidak ada mutation/side effect.
+
+    Mengembalikan dict bentuk timeline yg dipahami service/UI:
+      {ok, operation, target, timeline:[{stage: environment.recommend,...}],
+       detail, evidence}
+    """
+    from sam.ward.capability.contracts import SubjectRef
+    from sam.ward.adapters.environment_recommendation import (
+        EnvironmentRecommendationAdapter,
+    )
+
+    subject = SubjectRef(subject_id=subject_id, subject_type="citizen",
+                         kind="environment", name="local-machine")
+    # BUKAN mengarang: tanpa injection canonical action mapping -> adapter
+    # fail-closed jujur (causal -> [] bila tidak ada mapping terbukti).
+    adapter = EnvironmentRecommendationAdapter(subject=subject)
+    result = adapter.recommend(diagnosis=diagnosis, capability="recommend")
+
+    recommendations = [r.as_dict() for r in result.recommendations]
+    ok = not result.error
+    stage_detail = result.summary or (
+        "recommendation selesai ({} rekomendasi)".format(len(recommendations)))
+    evidence_dict = {
+        "kind": "environment_recommendation",
+        "recommendation_count": len(recommendations),
+        "recommendations": recommendations,
+        "diagnosis_ref": result.diagnosis_ref or "",
+        "summary": result.summary or "",
+        "error": result.error or "",
+    }
+    return {
+        "ok": ok,
+        "operation": "environment.recommend",
+        "target": subject_id,
+        "timeline": [{
+            "stage": "environment.recommend",
+            "ok": ok,
+            "blocked": None if ok else True,
+            "detail": stage_detail,
+            "evidence": evidence_dict,
+            "scrubbed": {
+                "ok": ok,
+                "recommendation_count": len(recommendations),
+                "recommendations": recommendations,
+                "diagnosis_ref": result.diagnosis_ref or "",
+            },
+        }],
+        "detail": stage_detail,
+        "evidence": evidence_dict,
+    }
+
+
 def run_mission(
     operation: str,
     target: Optional[str] = None,
@@ -331,6 +400,7 @@ def run_mission(
     repo: Optional[str] = None,
     approval_reason: str = "",
     findings: Optional[List[Dict[str, Any]]] = None,
+    diagnosis: Optional["DiagnosisResult"] = None,
 ) -> Dict[str, Any]:
     """Satu dispatcher eksekusi — pilih eksekutor berdasarkan `operation`.
 
@@ -347,6 +417,8 @@ def run_mission(
       - environment.investigate -> EnvironmentInvestigationAdapter (read-only, R1-003)
       - environment.diagnose -> EnvironmentDiagnosisAdapter (read-only, R1-004);
         `findings` = cache investigasi terakhir sbg SELECTED EVIDENCE
+      - environment.recommend -> EnvironmentRecommendationAdapter (read-only,
+        R1-005); `diagnosis` = DiagnosisResult canonical (R1-004)
       - (email.send / db.write / process.run) -> BELUM dibuka -> BLOCKED
     """
     op = (operation or "").strip()
@@ -364,6 +436,13 @@ def run_mission(
         subject_id = (target or "").strip() or "local-machine"
         return run_environment_diagnosis_mission(findings=findings,
                                                  subject_id=subject_id)
+    if op == "environment.recommend" or op.startswith("environment.recommend"):
+        # R1-005: rekomendasi canonical atas DiagnosisResult R1-004.
+        # MUSTAHIL mengarang action: tanpa canonical action mapping TERBUKTI,
+        # causal -> recommendations=[] jujur (STOP sebelum approval/execution).
+        subject_id = (target or "").strip() or "local-machine"
+        return run_environment_recommendation_mission(diagnosis=diagnosis,
+                                                      subject_id=subject_id)
     if op.startswith("environment."):
         # R1-002: read-only observasi environment nyata (periksa komputer).
         # target = identitas subjek (default local-machine).
@@ -412,7 +491,8 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         (t for t in timeline
          if t.get("stage") in ("github_api", "web.fetch", "http.get",
                                 "environment.observe", "environment.investigate",
-                                "environment.diagnose", "execute", "act")
+                                "environment.diagnose", "environment.recommend",
+                                "execute", "act")
          and (t.get("ok") is not None or t.get("blocked") is not None)),
         None,
     )
@@ -436,6 +516,7 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         "environment.observe": "observasi environment",
         "environment.investigate": "investigasi environment",
         "environment.diagnose": "diagnosis environment",
+        "environment.recommend": "rekomendasi environment",
     }.get(conn, "eksekusi")
     _blocked_msg = {
         "github_api": ("GitHub tidak dapat digunakan karena GITHUB_TOKEN tidak "
@@ -445,6 +526,7 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         "environment.observe": "Observasi environment terblokir (probe tidak menghasilkan entitas).",
         "environment.investigate": "Investigasi environment terblokir (probe tidak menghasilkan entitas).",
         "environment.diagnose": "Diagnosis environment terblokir (tidak ada evidence untuk dinilai).",
+        "environment.recommend": "Rekomendasi environment terblokir (tidak ada diagnosis untuk dinilai).",
     }.get(conn, "Eksekusi terblokir (0 side effect).")
 
     if _exec_stage.get("blocked"):

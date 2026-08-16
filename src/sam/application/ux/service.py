@@ -19,7 +19,7 @@ import os
 import re
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 from sam.application.ux.approval import (
     ApprovalCoordinator,
@@ -27,6 +27,9 @@ from sam.application.ux.approval import (
     ApprovalRequest,
     ApprovalStatus,
 )
+
+if TYPE_CHECKING:  # pragma: no cover - hanya utk anotasi tipe
+    from sam.ward.capability.contracts import DiagnosisResult
 from sam.application.ux.mission_request import MissionRequest, MissionRequestStatus
 from sam.application.ux.plan import MissionPlan, MissionPlanStatus
 from sam.application.ux.runner import (
@@ -50,7 +53,6 @@ except Exception:  # pragma: no cover - psycopg2 tidak terpasang
 # tanpa persistence -> perilaku in-memory/JSON lama (regresi M10 aman).
 try:  # pragma: no cover - import opsional bila jalur repo tidak tersedia
     from sam.application.ux.persistence import build_persistence_unit
-    from sam.application.ux import repositories as _repositories
     _HAS_REPO = True
 except Exception:  # pragma: no cover
     _HAS_REPO = False
@@ -96,6 +98,12 @@ class MissionUXService:
         # R1-004 W1: cache findings investigasi terakhir (environment.investigate)
         # agar misi diagnosis terpisah dapat menilai evidence tanpa investigate ulang.
         self._last_investigation_findings: Optional[List[Dict[str, Any]]] = None
+        # R1-005: cache DiagnosisResult CANONICAL terakhir (dari environment.diagnose)
+        # agar misi recommendation berikutnya makan dari diagnosis terakhir.
+        # BUKAN Dict serialized — application boundary memegang canonical domain
+        # result (keputusan final Van rev.2). Serialization (bila dibutuhkan)
+        # dilakukan di boundary persistence, bukan di tengah application flow.
+        self._last_diagnosis_result: Optional["DiagnosisResult"] = None
         # M12-001: PersistenceUnit opsional (Repository Pattern). Bila diberikan
         # (atau env PG/produksi dikonfigurasi), state ditulis per-entity ke repo.
         # M12-004/005: produksi (SAM_ENV=production) WAJIB PG ready; bila tidak
@@ -520,6 +528,9 @@ class MissionUXService:
                 # R1-004: cache findings investigasi terakhir (W1). Hanya
                 # environment.diagnose yang membaca field ini; yang lain mengabaikan.
                 findings=self._last_investigation_findings,
+                # R1-005: cache DiagnosisResult CANONICAL terakhir. Hanya
+                # environment.recommend yang membaca field ini; yang lain mengabaikan.
+                diagnosis=self._last_diagnosis_result,
             )
         except UnsupportedOperationError as exc:
             state.status = UxStateStatus.BLOCKED
@@ -634,7 +645,24 @@ class MissionUXService:
             None,
         )
         env_diag_ev = (env_diag_t or {}).get("evidence") or {}
-        if env_diag_t is not None:
+        # R1-005: evidence RECOMMENDATION environment (dari timeline environment.recommend).
+        env_rec_t = next(
+            (t for t in timeline if t.get("stage") == "environment.recommend"),
+            None,
+        )
+        env_rec_ev = (env_rec_t or {}).get("evidence") or {}
+        if env_rec_t is not None:
+            rec_scrubbed = (env_rec_t or {}).get("scrubbed") or {}
+            state.evidence = [{
+                "kind": "environment_recommendation",
+                "recommendation_count": env_rec_ev.get("recommendation_count", 0),
+                "recommendations": env_rec_ev.get("recommendations", []),
+                "diagnosis_ref": env_rec_ev.get("diagnosis_ref", ""),
+                "summary": env_rec_ev.get("summary", ""),
+                "ok": bool(rec_scrubbed.get("ok")),
+            }]
+        # R1-004: evidence DIAGNOSIS environment (dari timeline environment.diagnose).
+        elif env_diag_t is not None:
             diag_scrubbed = (env_diag_t or {}).get("scrubbed") or {}
             state.evidence = [{
                 "kind": "environment_diagnosis",
@@ -646,6 +674,10 @@ class MissionUXService:
                 "sufficiency": env_diag_ev.get("sufficiency", env_diag_ev.get("verdict", "")),
                 "ok": bool(diag_scrubbed.get("ok")),
             }]
+            # R1-005: cache DiagnosisResult CANONICAL (objek utuh, bukan Dict)
+            # agar misi recommendation berikutnya makan dari diagnosis terakhir.
+            if result.get("_canonical_diagnosis") is not None:
+                self._last_diagnosis_result = result.get("_canonical_diagnosis")
         elif env_inv_t is not None:
             inv_scrubbed = (env_inv_t or {}).get("scrubbed") or {}
             state.evidence = [{
@@ -754,6 +786,16 @@ class MissionUXService:
         diag_match = MissionUXService._interpret_environment_diagnose(low)
         if diag_match:
             return diag_match
+
+        # 0b2) Determistik (SEBELUM AI): "rekomendasi/sarankan tindakan"-kelas.
+        #    R1-005 RECOMMENDATION. Dicek SETELAH diagnose (diagnosis harus
+        #    menghasilkan verdict dulu sebelum rekomendasi). Menilai DiagnosisResult
+        #    R1-004 yang di-cache service (canonical) dan menyusun rekomendasi
+        #    canonical HANYA bila ada canonical action mapping TERBUKTI; selain itu
+        #    recommendations=[] jujur (fail-closed). BUKAN recovery/execution.
+        rec_match = MissionUXService._interpret_environment_recommend(low)
+        if rec_match:
+            return rec_match
 
         # 0c) Determistik (SEBELUM AI): "kenapa/mengapa ... lambat?"-sekelas.
         #    R1-003 INVESTIGATION. Bedakan dari observe: observe = "periksa/
@@ -972,6 +1014,42 @@ class MissionUXService:
             "Operasi ini read-only (menilai diagnosis berbasis evidence) - tidak "
             "mengubah state eksternal, namun tetap disediakan persetujuan Anda untuk "
             "transparansi.",
+        )
+
+    @staticmethod
+    def _interpret_environment_recommend(low: str):
+        """Deteksi deterministik instruksi RECOMMENDATION environment (R1-005).
+
+        Dicocokkan SETELAH diagnose (recommend memerlukan diagnosis yang sudah
+        menghasilkan verdict). Mengembalikan tuple _interpret bila cocok, atau None.
+
+        Menilai DiagnosisResult canonical R1-004 (di-cache service) dan menyusun
+        rekomendasi canonical HANYA bila ada canonical action mapping TERBUKTI;
+        bila tidak -> recommendations=[] jujur (fail-closed). Bukan recovery/execution.
+        """
+        is_env_recommend = bool(re.search(
+            r"(rekomend|recommend|sarank?an|tindakan\s+yang\s+layak|"
+            r"tindakan\s+apa|remediasi|perbaikan\s+yang\s+disarankan)", low,
+        ))
+        if not is_env_recommend:
+            return None
+        return (
+            "environment.recommend",
+            "local-machine",
+            "SAM memahami: menyusun rekomendasi tindakan atas diagnosis environment "
+            "sebelumnya (read-only). Rekomendasi mutation HANYA dibuat bila ada "
+            "canonical action mapping terbukti; selain itu rekomendasi kosong jujur.",
+            [
+                "ambil DiagnosisResult canonical dari diagnosis terakhir",
+                "klasifikasi verdict (insufficient/candidate/causal)",
+                "hanya causal + canonical action mapping TERBUKTI -> rekomendasi",
+                "insufficient/candidate/tanpa mapping -> rekomendasi kosong jujur",
+                "STOP sebelum approval/execution (R1-006 terpisah)",
+            ],
+            "SAM akan menyusun rekomendasi tindakan atas diagnosis environment "
+            "(read-only, berhenti sebelum eksekusi).",
+            "Operasi ini read-only (menyusun rekomendasi) - tidak mengubah state "
+            "eksternal, namun tetap disediakan persetujuan Anda untuk transparansi.",
         )
 
     # ------------------------------------------------------------------

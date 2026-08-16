@@ -16,7 +16,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Protocol
+from typing import Any, Dict, List, Protocol
 
 
 # ---------------------------------------------------------------------------
@@ -216,4 +216,55 @@ class Recommendation:
             "target": self.target,
             "rationale": self.rationale,
             "approval_required": self.approval_required,
+        }
+
+
+# ---------------------------------------------------------------------------
+# R1-005 Recommendation (M13-007 boundary; input DiagnosisResult R1-004)
+# ---------------------------------------------------------------------------
+class RecommendationTarget(Protocol):
+    """Kontrak target rekomendasi (M13-007). Realisasi menilai DIAGNOSIS yang
+    SUDAH diproduksi (R1-004) dan menyusun rekomendasi canonical yang layak
+    dipertimbangkan - BUKAN executor, BUKAN mutation, BUKAN investigation ulang.
+
+    Ini DOER (Protocol), sejajar Observation/Investigation/DiagnosisTarget -
+    BUKAN dataclass yang dibungkus oleh DiagnosisResult.
+
+    Input  = DiagnosisResult (R1-004)
+    Output = RecommendationResult (canonical, read-only)
+
+    Action mutation HANYA dibangun bila ada CANONICAL ACTION MAPPING yang
+    TERBUKTI; bila tidak tersedia -> recommendations=[] (jujur, fail-closed).
+    """
+
+    def recommend(self, *, diagnosis: "DiagnosisResult",
+                  capability: str = "recommend") -> "RecommendationResult": ...
+
+
+@dataclass(frozen=True)
+class RecommendationResult:
+    """Kumpulan rekomendasi (read-only) dari SATU DiagnosisResult.
+
+    recommendations TIDAK pernah berisi action mutation bila diagnosis
+    insufficient/candidate ATAU bila tidak ada canonical action mapping.
+    Never fabricated. Lineage reference (diagnosis_ref), bukan salinan.
+
+    diagnosis_ref - reference ke HASIL diagnosis (diisi dari
+                   DiagnosisResult.evidence_ref sbg source-ref traceability).
+                   BUKAN salinan evidence.
+    """
+
+    subject: SubjectRef
+    diagnosis_ref: str
+    recommendations: List[Recommendation] = field(default_factory=list)
+    summary: str = ""
+    error: str = ""
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "subject": self.subject.as_dict(),
+            "diagnosis_ref": self.diagnosis_ref,
+            "recommendations": [r.as_dict() for r in self.recommendations],
+            "summary": self.summary,
+            "error": self.error,
         }
