@@ -26,6 +26,7 @@ from pydantic import BaseModel
 from sam.application.ux.approval import ApprovalDecisionIntent
 from sam.application.ux.conversation import ConversationService
 from sam.application.ux.identity import SessionStore, UserStore
+from sam.application.ux.mission_registry import MultiMissionService
 from sam.application.ux.service import MissionUXService
 from sam.application.ux.persistence import build_conversation_persistence_unit
 
@@ -93,6 +94,25 @@ class UxRoutes:
 
     def __init__(self) -> None:
         self.service = MissionUXService()
+        # AD-ENG-005 §7 (Opsi 2): MultiMissionService = coordination/registration
+        # boundary utk Mission dari Conversation. Factory memanggil MissionUXService
+        # dengan persistence unit MISSION yang SAMA dgn unit enumerasi Mission List
+        # (self.mission_unit), sehingga Mission konversasi persist ke repo yang
+        # SAMA dengan yang dibaca /ux/missions (deterministik). MultiMissionService
+        # TIDAK membuat Mission identity kedua; ia meregistrasikan canonical
+        # mission-* hasil `submit()` ke registry.
+        self.multi = MultiMissionService(
+            service_factory=self._build_mission_service
+        )
+        # AD-ENG-005: unit persistence MISSION utk enumerasi Mission List
+        # (repository durable = sumber enumerasi, §3.1). Dibangun SEKALI di sini
+        # agar enumeration & factory mission-konversasi memakai unit yang SAMA.
+        # Dev (tanpa PG) -> InMemoryMissionRepository (list jalan utk dev);
+        # produksi PG siap -> PostgresPersistenceUnit; produksi fail-closed ->
+        # mission_persistence_ready=False (route /ux/missions -> 503).
+        self.mission_unit = None
+        self._mission_repo_blocked_reason = ""
+        self._init_mission_persistence()
         self.users = UserStore()
         self.sessions = SessionStore()
         # S2-3: ConversationService (adapter HTTP conversation). Repository
@@ -116,7 +136,54 @@ class UxRoutes:
         self.conversations = ConversationService(
             conversation_repo=_repo,
             mission_service=self.service,
+            multi_mission=self.multi,
         )
+
+    def _init_mission_persistence(self) -> None:
+        """Bangun unit persistence MISSION utk enumerasi Mission List (ADR-005 §3.1).
+
+        Memakai `build_persistence_unit()` (factory yang sama dgn service) dgn
+        logika ready: dev (bukan produksi) -> unit apa pun yg dipilih factory
+        (InMemory) dipakai; produksi fail-closed (PG down) -> mission_unit=None
+        & blocked_reason di-set (route /ux/missions menolak 503).
+        """
+        from sam.application.ux.persistence import build_persistence_unit
+
+        try:
+            _unit, _info = build_persistence_unit()
+        except Exception as exc:  # pragma: no cover — defensif
+            self._mission_repo_blocked_reason = f"mission persistence init gagal: {exc}"
+            self.mission_unit = None
+            return
+        if _info.get("production") and not _info.get("ready", True):
+            # produksi fail-closed: PG tidak siap -> jangan pakai InMemory fallback
+            self.mission_unit = None
+            self._mission_repo_blocked_reason = _info.get(
+                "reason", "mission persistence unavailable"
+            )
+            return
+        self.mission_unit = _unit
+
+    @property
+    def mission_repo(self) -> Optional[object]:
+        """Repository mission durable utk enumerasi Mission List (ADR-005 §3.1).
+
+        Baca dari `self.mission_unit.missions` (unit yang SAMA dipakai factory
+        mission-konversasi utk persist). None bila persistence tidak tersedia
+        (produksi fail-closed) — route /ux/missions -> 503.
+        """
+        if self.mission_unit is None:
+            return None
+        return getattr(self.mission_unit, "missions", None)
+
+    def _build_mission_service(self):
+        """Factory MissionUXService utk MultiMissionService (AD-ENG-005 §7).
+
+        Inject persistence unit MISSION (`self.mission_unit`) sehingga Mission
+        yang lahir dari Conversation dipersist ke repository yang SAMA dengan
+        enumerasi Mission List (deterministik, sinkron di dev/prod).
+        """
+        return MissionUXService(persistence=self.mission_unit)
 
     @property
     def production(self) -> bool:
@@ -187,6 +254,106 @@ class UxRoutes:
             )
         return identity
 
+    # ------------------------------------------------------------------
+    # AD-ENG-005 — Mission List (Layer 2, read-only)
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _project_mission_card(mission_id: str, data: Optional[dict]) -> Optional[dict]:
+        """Proyeksi `UxMissionState.as_dict()` -> card aman (non-secret).
+
+        HANYA field ringkas (ADR §4.1). Tidak pernah menampilkan secrets /
+        evidence mentah sensitif. Mengembalikan None bila data tidak ada/invalid.
+        """
+        if not isinstance(data, dict):
+            return None
+        understanding = data.get("understanding") or {}
+        plan = data.get("plan") or {}
+        execution = data.get("execution") or {}
+        observability = data.get("observability") or {}
+        # Lifecycle status canonical (UxStateStatus); fallback ke observability.
+        status = (
+            execution.get("status")
+            or observability.get("status")
+            or data.get("status")
+            or "unknown"
+        )
+        return {
+            "mission_id": mission_id,
+            "status": status,
+            "what_sam_understood": understanding.get("what_sam_understood") or "",
+            "operation": understanding.get("operation") or "",
+            "target": understanding.get("target") or "",
+            "updated_at": data.get("updated_at") or "",
+            "approval_required": bool(plan.get("approval_required", False)),
+        }
+
+    def _live_registry_state(
+        self, tenant: str, mission_id: str
+    ) -> Optional[dict]:
+        """Ambil state live dari MissionRegistry utk mission-* (bila ada).
+
+        ADR §3.2: live runtime state (registry ACTIVE entry) menang. Untuk
+        Opsi-2 (1 command = 1 mission-*), tiap mission-* punya <= 1 entry di
+        registry (execution_id = mission-*). Ambil entry pertama yang cocok.
+        Bila tidak ada entry -> None (pakai durable).
+        """
+        reg = self.multi.registry()
+        keys = reg.list_keys(tenant=tenant, mission_id=mission_id)
+        if not keys:
+            return None
+        # Ambil entry live (terakhir ditulis = status paling segar).
+        latest = keys[-1]
+        return reg.get(tenant, latest["mission_id"], latest.get("execution_id"))
+
+    def _list_mission_cards(self, tenant: str):
+        """Enumerasi Mission List (ADR §3.1): repository durable + overlay registry.
+
+        - Enumerasi dari repository durable (mission-*): deterministik, survive
+          restart (registry kosong TIDAK menghilangkan mission).
+        - Overlay live state dari MissionRegistry bila ada (precedence live > durable).
+        - Bila persistence tidak tersedia (produksi fail-closed) -> HTTP 503.
+        Proyeksi card non-secret; urut updated_at menurun.
+        """
+        repo = self.mission_repo
+        if repo is None:
+            raise HTTPException(
+                status_code=503,
+                detail=self._mission_repo_blocked_reason
+                or "mission persistence tidak tersedia (fail-closed)",
+            )
+        mission_ids = repo.list_missions()
+        cards = []
+        for mid in mission_ids:
+            live = self._live_registry_state(tenant, mid)
+            if live is not None:
+                card = self._project_mission_card(mid, live)
+            else:
+                durable = repo.load_mission(mid)
+                card = self._project_mission_card(mid, durable)
+            if card is not None:
+                cards.append(card)
+        cards.sort(key=lambda c: c.get("updated_at") or "", reverse=True)
+        return cards
+
+    def _get_mission_card(self, tenant: str, mission_id: str):
+        """Detail satu mission (ADR §4.2): live registry state ATAU durable repo.
+
+        Precedence §3.2: live > durable. TIDAK ada fallback mission-* ->
+        request_id / m_*. Not found -> None (route -> 404).
+        """
+        live = self._live_registry_state(tenant, mission_id)
+        if live is not None:
+            return self._project_mission_card(mission_id, live)
+        repo = self.mission_repo
+        if repo is None:
+            raise HTTPException(
+                status_code=503,
+                detail=self._mission_repo_blocked_reason
+                or "mission persistence tidak tersedia (fail-closed)",
+            )
+        durable = repo.load_mission(mission_id)
+        return self._project_mission_card(mission_id, durable)
+
 
 # Cookie httpOnly pembawa token sesi (M11-005). Browser mengirimnya otomatis;
 # token TIDAK pernah disimpan di JS (tanpa localStorage) — memenuhi hardening M9-008.
@@ -215,6 +382,32 @@ async def ux_state():
     if state is None:
         return {"request_id": None, "message": "belum ada mission"}
     return state.as_dict()
+
+
+@router.get("/missions")
+async def ux_missions():
+    """Mission List (Layer 2, read-only — AD-ENG-005 §3/§4.1).
+
+    Enumerasi dari repository durable (mission-*) + overlay live state dari
+    MissionRegistry (precedence live > durable). Read-only: TIDAK membuat /
+    mengubah mission, TIDAK approve/execute/verify. Output: array card
+    non-secret.
+    """
+    return {"missions": _routes._list_mission_cards("default")}
+
+
+@router.get("/missions/{mission_id}")
+async def ux_missions_detail(mission_id: str):
+    """Detail satu mission (Layer 2, read-only — AD-ENG-005 §4.2).
+
+    Lookup: live registry state ATAU durable repository state (precedence
+    §3.2). TIDAK ada fallback mission-* -> request_id / m_*. Not found -> 404
+    (fail-closed). Approval/execution tetap via canonical decide(), BUKAN di sini.
+    """
+    card = _routes._get_mission_card("default", mission_id)
+    if card is None:
+        raise HTTPException(status_code=404, detail="mission tidak ditemukan")
+    return card
 
 
 @router.post("/decide")

@@ -159,6 +159,57 @@ class MultiMissionService:
         )
         return st.as_dict()
 
+    def submit_mission(
+        self,
+        tenant: str,
+        text: str,
+        idempotency_key: str = None,
+    ) -> "object":
+        """Opsi-2 orchestration (AD-ENG-005 §7): MissionUXService -> register mission-*.
+
+        Boundary COORDINATION/REGISTRATION utk Mission yang lahir dari
+        Conversation. TIDAK membuat Mission kedua, TIDAK membuat m_* baru,
+        TIDAK mengubah semantic contract `MissionUXService.submit()`.
+
+        Flow:
+          1. panggil MissionUXService.submit(text)  -> pembentukan Mission +
+             persist (bila svc punya persistence); menghasilkan canonical
+             mission-*.
+          2. ambil `mission_id = observability.mission_id` (canonical mission-*).
+          3. register mission-* + snapshot state ke MissionRegistry keyed
+             canonical mission-* (runtime projection utk Mission List overlay).
+
+        Returns:
+            UxMissionState (canonical state; caller bisa `.as_dict()`).
+
+        Executes `svc.submit()` (bukan `create()+submit`) sehingga TIDAK ada
+        mission_id kedua: satu aggregate, satu canonical identity.
+        """
+        from sam.application.ux.service import MissionUXService
+
+        svc: MissionUXService = (
+            self._factory() if self._factory else _default_svc_factory()
+        )
+        st = svc.submit(text, idempotency_key=idempotency_key)
+        mission_id = (st.observability or {}).get("mission_id") or st.request_id or ""
+        # Register runtime projection keyed CANONICAL mission-* (bukan m_*,
+        # bukan Mission kedua). execution_id diisi mission_id mengikuti contract
+        # existing registry/submit (execution_id confusion tetap follow-up).
+        if mission_id:
+            self._registry.save(
+                _norm_tenant(tenant), mission_id, mission_id, st.as_dict()
+            )
+            # Catat mission_id -> tenant utk isolasi & mission_count (tanpa
+            # membuat instance MissionUXService kedua utk identity; svc di sini
+            # milik alur ini).
+            self._missions[mission_id] = {
+                "tenant": _norm_tenant(tenant),
+                "service": svc,
+                "registered": True,
+            }
+        return st
+
+
     def decide(
         self, tenant: str, mission_id: str, execution_id: str, intent: str, approver: str = "user"
     ) -> dict:

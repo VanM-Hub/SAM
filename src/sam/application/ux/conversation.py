@@ -171,6 +171,8 @@ class ConversationService:
         mission_service: Optional["object"] = None,
         participant: str = "user",
         conversational_reasoner: Optional["object"] = None,
+        multi_mission: Optional["object"] = None,
+        tenant: str = "default",
     ) -> None:
         """Wire repository conversation + MissionUXService (+ CHAT port).
 
@@ -186,6 +188,15 @@ class ConversationService:
           default `ProviderConversationalReasonerAdapter()` (adapter infra yang
           membungkus existing ProviderExecutor; infra di-inject DI, application
           tidak pernah memilih provider). (AD-ENG-004.)
+        - multi_mission: instance `MultiMissionService` (AD-ENG-005 §7 coordination/
+          registration boundary). Bila disediakan, jalur MISSION memanggil
+          `MultiMissionService.submit_mission(tenant, ...)` yang memanggil
+          `MissionUXService.submit()` lalu meregistrasikan canonical mission-*
+          ke registry — sehingga Mission konversasi masuk Mission List (layer 2)
+          tanpa membuat Mission kedua / m_*. Bila None, jalur MISSION memakai
+          `mission_service.submit(...)` (perilaku lama, regresi S2-3 aman).
+        - tenant: tenant aktif utk mission-command (default "default"), isolasi
+          M12-012.
         """
         if conversation_repo is None:
             from sam.application.ux.repositories import (
@@ -199,6 +210,8 @@ class ConversationService:
 
             mission_service = MissionUXService()
         self._mission = mission_service
+        self._multi_mission = multi_mission
+        self._tenant = (tenant or "default").strip() or "default"
         self._participant = participant
         if conversational_reasoner is None:
             # Lazy import infra adapter (membungkus ProviderExecutor) — sama pola
@@ -366,7 +379,18 @@ class ConversationService:
         #    State mission canonical MILIK MissionUXService & survive restart via
         #    `_recover_from_store`; conversation tidak menyimpan duplikat sumber
         #    kebenaran mission agar tidak jadi "persistence kedua" diam-diam.)
-        state = self._mission.submit(text=text, idempotency_key=idempotency_key)
+        #    AD-ENG-005 §7 (Opsi 2): bila `multi_mission` disediakan, jalur
+        #    MISSION lewat `MultiMissionService.submit_mission` -> memanggil
+        #    MissionUXService.submit() + registrasikan canonical mission-* ke
+        #    MissionRegistry (masuk Mission List) tanpa membuat Mission kedua.
+        if self._multi_mission is not None:
+            state = self._multi_mission.submit_mission(
+                self._tenant,
+                text,
+                idempotency_key=idempotency_key,
+            )
+        else:
+            state = self._mission.submit(text=text, idempotency_key=idempotency_key)
 
         # 3) Bangun assistant text dari state NYATA (bukan LLM).
         assistant_content = _state_to_assistant_text(state)
