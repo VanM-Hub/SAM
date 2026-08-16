@@ -33,8 +33,21 @@ from fastapi.testclient import TestClient
 from sam.api.routes import ux as ux_routes
 from sam.api.server import app
 from sam.application.ux.conversation import ConversationService
+from sam.application.ux.conversational_reasoner import ConversationalResponse
 from sam.application.ux.repositories import InMemoryConversationRepository
 from sam.application.ux.state import UxMissionState, UxStateStatus
+
+
+class _FakeChatReasoner:
+    """Fake port Chat utk route test — mencatat dipanggil, mengembalikan teks."""
+
+    def __init__(self, content="Selamat datang. Ada yang bisa saya bantu?"):
+        self.content = content
+        self.calls = []
+
+    def converse(self, ctx):
+        self.calls.append(ctx)
+        return ConversationalResponse(content=self.content, ok=True)
 
 
 class _StubMission:
@@ -324,6 +337,54 @@ class ConversationRouteTest(unittest.TestCase):
         )
         # conversation A tetap 2 pesan (tidak tercampur tambahan dari B)
         self.assertEqual(len(ga["messages"]), 2)
+
+    # --- AD-ENG-004 acceptance (Van): POST halo -> CHAT -> port -> persisted ---
+    def test_chat_halo_routes_to_port_and_persists(self):
+        reasoner = _FakeChatReasoner(content="Selamat datang. Ada yang bisa saya bantu?")
+        ux_routes._routes.conversations = ConversationService(
+            conversation_repo=self.repo,
+            mission_service=self.stub,
+            conversational_reasoner=reasoner,
+        )
+        r = self.client.post(
+            "/ux/conversation/message", json={"text": "halo"}
+        )
+        self.assertEqual(r.status_code, 200)
+        body = r.json()
+        # Port benar2 dipanggil (ProviderExecutor via adapter) — BUKAN hanya op=="".
+        self.assertEqual(len(reasoner.calls), 1)
+        self.assertEqual(reasoner.calls[0].user_message, "halo")
+        # Mission TIDAK dipanggil (NO MissionRequest/Plan/Approval).
+        self.assertEqual(self.stub.submit_calls, 0)
+        # Assistant content dari port dipersisted (YES).
+        self.assertTrue(body["assistant_persisted"])
+        self.assertEqual(body["messages"][1]["role"], "assistant")
+        self.assertIn("Selamat datang", body["messages"][1]["content"])
+        # state CHAT: operation kosong, tanpa approval.
+        self.assertEqual(body["mission_state"]["execution"]["status"], "understood")
+
+    # --- AD-ENG-004: mission text tetap lewat submit di route (tidak berubah) ---
+    def test_mission_text_unchanged_through_route(self):
+        reasoner = _FakeChatReasoner()
+        ux_routes._routes.conversations = ConversationService(
+            conversation_repo=self.repo,
+            mission_service=self.stub,
+            conversational_reasoner=reasoner,
+        )
+        r = self.client.post(
+            "/ux/conversation/message",
+            json={"text": "Buat GitHub issue 'route-mission'"},
+        )
+        self.assertEqual(r.status_code, 200)
+        body = r.json()
+        # Mission tetap lewat submit (jalur existing tidak berubah).
+        self.assertEqual(self.stub.submit_calls, 1)
+        self.assertEqual(self.stub.last_text, "Buat GitHub issue 'route-mission'")
+        # Port CHAT tidak dipanggil utk mission.
+        self.assertEqual(len(reasoner.calls), 0)
+        self.assertEqual(
+            body["mission_state"]["execution"]["status"], "waiting_approval"
+        )
 
 
 if __name__ == "__main__":

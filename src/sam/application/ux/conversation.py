@@ -31,6 +31,7 @@ state mission canonical MILIK MissionUXService & survive restart via
 `_recover_from_store`; ConversationService membaca/proyeksinya saja, tanpa
 menduplikasi sumber kebenaran (menghindari "persistence kedua" diam-diam).
 """
+
 from __future__ import annotations
 
 import uuid
@@ -48,11 +49,61 @@ from sam.universal_ai.conversation_session import (
 from sam.universal_ai.message_model import Message, MessageRole
 
 from sam.application.ux.repositories import ConversationRepository
-from sam.application.ux.state import UxMissionState
+from sam.application.ux.state import UxMissionState, UxStateStatus
 
 
 def _now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+# ---------------------------------------------------------------------------
+# Helper CHAT (AD-ENG-004): proyeksi aman utk context port & state ringkas.
+# ---------------------------------------------------------------------------
+def _msg_to_turn(msg: Message):
+    """Konversi Message -> MessageTurn ringkas (non-secret) utk context port."""
+    from sam.application.ux.conversational_reasoner import MessageTurn
+
+    role = "assistant" if msg.role == MessageRole.ASSISTANT else "user"
+    return MessageTurn(role=role, content=msg.content)
+
+
+def _state_to_brief(state: Optional[UxMissionState]):
+    """Proyeksi state mission aktif -> MissionBrief ringkas (tersanitasi) bila
+    relevan; None bila tidak ada mission aktif (D-12 / Refinement Van).
+    HANYA field ringkas tanpa secret."""
+    from sam.application.ux.conversational_reasoner import MissionBrief
+
+    if state is None:
+        return None
+    operation = (state.operation or "").strip()
+    if not operation:
+        return None  # tidak ada misi aktif yang relevan -> jangan sertakan
+    return MissionBrief(
+        operation=operation,
+        status=(state.status or "").strip(),
+        target=(state.target or "").strip(),
+        summary=(state.what_sam_understood or "").strip(),
+    )
+
+
+def _relevant_evidence(state: Optional[UxMissionState]):
+    """Evidence canonical yg relevan (bila sudah ada di state mission)."""
+    from sam.governed_reasoning.structured_reasoning import EvidenceRef
+
+    if state is None:
+        return ()
+    refs = []
+    for e in state.evidence or []:
+        if not isinstance(e, dict):
+            continue
+        refs.append(
+            EvidenceRef(
+                evidence_id=str(e.get("evidence_id") or e.get("url") or ""),
+                source_type=str(e.get("source_type") or ""),
+                source_id=str(e.get("url") or e.get("target") or ""),
+            )
+        )
+    return tuple(refs)
 
 
 # ---------------------------------------------------------------------------
@@ -85,7 +136,7 @@ def _state_to_assistant_text(state: "UxMissionState") -> str:
     if operation:
         parts.append(f"Operasi: {operation}")
     if planned:
-        steps = "; ".join(f"{i+1}. {s}" for i, s in enumerate(planned))
+        steps = "; ".join(f"{i + 1}. {s}" for i, s in enumerate(planned))
         parts.append(f"Rencana: {steps}")
     if approval_status:
         parts.append(f"Persetujuan: {approval_status}")
@@ -97,8 +148,7 @@ def _state_to_assistant_text(state: "UxMissionState") -> str:
         parts.append(f"Catatan: {failure_message}")
     if evidence:
         refs = "; ".join(
-            e.get("url") or e.get("target") or e.get("detail") or str(e)
-            for e in evidence
+            e.get("url") or e.get("target") or e.get("detail") or str(e) for e in evidence
         )
         parts.append(f"Bukti: {refs}")
 
@@ -120,8 +170,9 @@ class ConversationService:
         conversation_repo: Optional[ConversationRepository] = None,
         mission_service: Optional["object"] = None,
         participant: str = "user",
+        conversational_reasoner: Optional["object"] = None,
     ) -> None:
-        """Wire repository conversation + MissionUXService.
+        """Wire repository conversation + MissionUXService (+ CHAT port).
 
         - conversation_repo: implementasi `ConversationRepository` (wajib;
           bisa InMemory utk dev/test, Postgres utk produksi). Bila None, dibuat
@@ -130,6 +181,11 @@ class ConversationService:
           Bila None, dibuat default `MissionUXService()` (tanpa persistence
           khusus -> perilaku in-memory default, aman & non-destruktif).
         - participant: identitas sisi user untuk conversation (default "user").
+        - conversational_reasoner: implementasi application port
+          `ConversationalReasoner` (READ-ONLY) utk jalur CHAT. Bila None, dibuat
+          default `ProviderConversationalReasonerAdapter()` (adapter infra yang
+          membungkus existing ProviderExecutor; infra di-inject DI, application
+          tidak pernah memilih provider). (AD-ENG-004.)
         """
         if conversation_repo is None:
             from sam.application.ux.repositories import (
@@ -144,6 +200,15 @@ class ConversationService:
             mission_service = MissionUXService()
         self._mission = mission_service
         self._participant = participant
+        if conversational_reasoner is None:
+            # Lazy import infra adapter (membungkus ProviderExecutor) — sama pola
+            # lazy import ProviderExecutor di service._interpret_via_ai.
+            from sam.application.ux.conversational_reasoner_adapter import (
+                ProviderConversationalReasonerAdapter,
+            )
+
+            conversational_reasoner = ProviderConversationalReasonerAdapter()
+        self._reasoner = conversational_reasoner
 
     # ------------------------------------------------------------------
     # 1) create / resume conversation (ID stabil, resume bila ada)
@@ -178,10 +243,7 @@ class ConversationService:
             convo = self._repo.load_conversation(cid)
             if convo is None:
                 continue
-            if (
-                convo.participant == participant
-                and convo.status == ConversationStatus.OPEN
-            ):
+            if convo.participant == participant and convo.status == ConversationStatus.OPEN:
                 return convo
         return None
 
@@ -276,6 +338,20 @@ class ConversationService:
         # 1) Persist user message TERLEBIH DAHULU (harus tersimpan sebelum apa pun).
         user_msg = self.append_user_message(conversation_id=conversation_id, content=text)
 
+        # 1b) DETEKSI CHAT (AD-ENG-004): percakapan biasa -> jalur CHAT via port
+        #     `ConversationalReasoner` (READ-ONLY). TIDAK membuat MissionRequest /
+        #     MissionPlan / Approval (acceptance Van: NO). Guard deterministik
+        #     `_is_conversational` SAMA dengan `MissionUXService._interpret`
+        #     (boundary 2026-08-16) -> CHAT vs MISSION konsisten & non-flaky.
+        from sam.application.ux.service import MissionUXService
+
+        if MissionUXService._is_conversational(text):
+            return self._submit_chat(
+                conversation_id=conversation_id,
+                text=text,
+                user_msg=user_msg,
+            )
+
         # 2) Orkestrasi ke MissionUXService -> state canonical.
         #    (Keputusan audit S2-3: TIDAK ada assosiasi `_mission_link` RAM.
         #    State mission canonical MILIK MissionUXService & survive restart via
@@ -308,6 +384,112 @@ class ConversationService:
 
         return {
             "state": state,
+            "conversation_id": conversation_id,
+            "user_message_id": user_msg.message_id,
+            "assistant_message_id": assistant_msg.message_id,
+            "assistant_persisted": assistant_persisted,
+        }
+
+    # ------------------------------------------------------------------
+    # 3b) jalur CHAT (AD-ENG-004): port ConversationalReasoner (READ-ONLY)
+    # ------------------------------------------------------------------
+    def _submit_chat(
+        self,
+        conversation_id: str,
+        text: str,
+        user_msg: Message,
+    ) -> Dict[str, Any]:
+        """Jalur CHAT: hasilkan respons percakapan via port `ConversationalReasoner`.
+
+        AD-ENG-004 (Accepted):
+          - TIDAK memanggil `MissionUXService.submit()` -> TIDAK ada pembuatan
+            MissionRequest / MissionPlan / Approval (acceptance Van: NO).
+          - Port READ-ONLY (`converse`) -> content jadi assistant message -> persist.
+          - Idempotency & persistence tetap di `ConversationService.submit_command`.
+          - Mission execution/governance pipeline TIDAK tersentuh.
+
+        Returns dict (sama shape dengan submit_command):
+          {
+            "state": UxMissionState (CHAT projection ringkas, bukan MissionRequest),
+            "chat": True,  # penanda jalur CHAT (utk acceptance/audit)
+            "conversation_id": str,
+            "user_message_id": str,
+            "assistant_message_id": str,
+            "assistant_persisted": bool,
+          }
+        """
+        # Susun ConversationContext (sanitize; history terbatas = application
+        # policy; active_mission & evidence HANYA bila relevan).
+        history_msgs = list(self._repo.list_messages(conversation_id))
+        # Hanya pesan non-secret; opsi history ≤ 8 turn terbaru (application policy).
+        turns = [
+            _msg_to_turn(m)
+            for m in history_msgs
+            if m.message_id != user_msg.message_id  # user message dipakai sbg `user_message`
+        ][-8:]
+
+        from sam.application.ux.conversational_reasoner import (
+            ConversationContext,
+        )
+
+        mission_brief = _state_to_brief(self._mission.get_state())
+        ctx = ConversationContext(
+            conversation_id=conversation_id,
+            user_message=text,
+            history=tuple(turns),
+            evidence_refs=_relevant_evidence(self._mission.get_state()),
+            active_mission=mission_brief,
+            language_hint="id",
+        )
+        response = self._reasoner.converse(ctx)
+
+        session = self._ensure_open_session(conversation_id)
+        assistant_msg = Message(
+            message_id=f"msg-{uuid.uuid4().hex[:12]}",
+            role=MessageRole.ASSISTANT,
+            content=response.content,
+            conversation_id=conversation_id,
+            session_id=session.session_id,
+            evidence_refs=(),
+            created_at=_now_utc(),
+        )
+
+        # Persist assistant message. Bila gagal -> penanda jujur, bukan klaim sukses.
+        assistant_persisted = True
+        try:
+            self._repo.append_message(assistant_msg)
+        except Exception:  # noqa: BLE001 — defnsif; jangan mengklaim sukses
+            assistant_persisted = False
+
+        # State CHAT projection ringkas (BUKAN MissionRequest/Plan/Approval).
+        chat_state = UxMissionState(
+            request_id="",
+            request_text=text,
+            what_sam_understood=("SAM memahami: ini percakapan biasa (CHAT), bukan perintah misi."),
+            operation="",
+            target="",
+            planned_steps=[],
+            approval_required=False,
+            action_summary="",
+            approval_status=UxStateStatus.NONE,
+            status=UxStateStatus.UNDERSTOOD,
+        )
+        chat_state.observability = {
+            "request_id": "",
+            "mission_id": "",
+            "status": UxStateStatus.UNDERSTOOD,
+            "capability": "chat",
+            "external_target": "",
+            "start_time": _now_utc(),
+            "end_time": "",
+            "verification_result": "",
+            "failure_reason": "",
+            "approver": "",
+        }
+
+        return {
+            "state": chat_state,
+            "chat": True,
             "conversation_id": conversation_id,
             "user_message_id": user_msg.message_id,
             "assistant_message_id": assistant_msg.message_id,

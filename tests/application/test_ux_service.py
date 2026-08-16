@@ -100,7 +100,7 @@ class MissionUXServiceApprovalGateTest(unittest.TestCase):
         self.assertEqual(svc.get_evidence(), [])
 
 
-class MissionUXServiceBoundaryTest(unittest.TestCase):
+class MissionUXSensorityBoundaryTest(unittest.TestCase):
     """M9-006 core: UI tidak bypass; satu jalur canonical."""
 
     def test_service_does_not_expose_secret_values(self):
@@ -113,6 +113,85 @@ class MissionUXServiceBoundaryTest(unittest.TestCase):
         self.assertEqual(DEFAULT_TEST_REPO, "VanM-Hub/test-issues")
         svc = MissionUXService()
         self.assertIn("test", svc._test_repo)
+
+
+class MissionChatVsMissionBoundaryTest(unittest.TestCase):
+    """Boundary audit 2026-08-16: CHAT vs MISSION terpisah dari approval.
+
+    Model canonical (diverifikasi terhadap source aktual):
+      conversation input
+        -> operation resolution
+             operation == ""   -> CHAT (bukan Mission, tidak ada approval)
+             operation != ""  -> MISSION
+                  -> approval_required? (sinyal TERPISAH dari ke-mission-an)
+                       read-only (observe/investigate/diagnose/recommend) -> tanpa approval
+                       mutating (github.create_issue)
+
+    Pengujian ini hanya CLASSIFIKASI STATE (tanpa eksekusi) — wiring eksekusi
+    read-only dan Mission List ditunda sampai persetujuan Van.
+    """
+
+    def test_halo_is_chat_not_waiting_approval(self):
+        """'halo' -> CHAT: operation kosong, TIDAK WAITING_APPROVAL."""
+        svc = MissionUXService()
+        state = svc.submit("halo")
+        self.assertEqual(state.operation, "")           # bukan Mission
+        self.assertFalse(state.approval_required)        # tidak butuh approval
+        self.assertNotEqual(state.status, "waiting_approval")  # regression: bukan waiting
+        self.assertNotEqual(state.approval_status, "waiting_approval")
+        self.assertEqual(state.status, "understood")     # CHAT = paham, bukan menunggu
+        self.assertEqual(state.planned_steps, [])
+
+    def test_conversational_question_is_chat(self):
+        """Pertanyaan percakapan biasa (bukan perintah eksekusi) -> CHAT."""
+        svc = MissionUXService()
+        state = svc.submit("siapa kamu dan apa yang bisa kamu lakukan?")
+        self.assertEqual(state.operation, "")            # bukan Mission
+        self.assertFalse(state.approval_required)
+        self.assertNotEqual(state.status, "waiting_approval")
+
+    def test_observe_is_mission_without_approval(self):
+        """observe -> MISSION read-only, TANPA approval (operation terisi)."""
+        svc = MissionUXService()
+        state = svc.submit("periksa komputer saya")
+        self.assertEqual(state.operation, "environment.observe")  # Mission (read-only)
+        self.assertFalse(state.approval_required)                  # tanpa approval
+        self.assertNotEqual(state.status, "waiting_approval")
+        self.assertEqual(state.status, "understood")
+        self.assertTrue(state.planned_steps)
+        self.assertTrue(MissionUXService._operation_is_read_only("environment.observe"))
+
+    def test_investigate_is_mission_without_approval(self):
+        """investigate -> MISSION read-only, TANPA approval."""
+        svc = MissionUXService()
+        state = svc.submit("kenapa komputer saya lambat")
+        self.assertEqual(state.operation, "environment.investigate")  # Mission (read-only)
+        self.assertFalse(state.approval_required)
+        self.assertNotEqual(state.status, "waiting_approval")
+        self.assertEqual(state.status, "understood")
+        self.assertTrue(MissionUXService._operation_is_read_only("environment.investigate"))
+
+    def test_github_mutation_is_mission_with_approval(self):
+        """github.create_issue (mutating) -> MISSION + approval."""
+        svc = MissionUXService(test_repo="VanM-Hub/test-issues")
+        state = svc.submit("Buat GitHub issue dengan judul 'regresi chat mission'")
+        self.assertEqual(state.operation, "github.create_issue")  # Mission (mutating)
+        self.assertTrue(state.approval_required)                   # butuh approval
+        self.assertEqual(state.status, "waiting_approval")
+        self.assertEqual(state.approval_status, "waiting_approval")
+        self.assertFalse(MissionUXService._operation_is_read_only("github.create_issue"))
+
+    def test_approval_required_is_not_synonym_of_chat(self):
+        """approval_required=False BUKAN berarti CHAT: read-only adalah Mission."""
+        svc = MissionUXService()
+        st = svc.submit("diagnosa apa penyebab komputer lambat")
+        # diagnose read-only -> Mission tanpa approval
+        self.assertEqual(st.operation, "environment.diagnose")
+        self.assertFalse(st.approval_required)
+        self.assertNotEqual(st.status, "waiting_approval")
+        # TAPI tetap Mission (operation terisi + planned steps)
+        self.assertNotEqual(st.operation, "")
+        self.assertTrue(st.planned_steps)
 
 
 if __name__ == "__main__":

@@ -203,10 +203,20 @@ class ConversationServiceTest(unittest.TestCase):
         import inspect
 
         src = inspect.getsource(ConversationService)
-        # Tidak ada method/klausa yang membuat executor mission kedua.
-        self.assertNotIn("Executor", src)
+        # TIDAK ada klausa yang membuat executor MISSION kedua (runner/execute_mission).
         self.assertNotIn("execute_mission", src)
-        # SATU-satunya pintu eksekusi tetap MissionUXService.decide (proxy ke gate existing).
+        self.assertNotIn("run_mission", src)
+        # ConversationService TIDAK instantiate ProviderExecutor langsung.
+        self.assertNotIn("ProviderExecutor()", src)
+        self.assertNotIn("from sam.providers.execution.provider_executor import", src)
+        # AD-ENG-004 (2026-08-16): ConversationService kini menyebut nama adapter
+        # infra `ProviderConversationalReasonerAdapter` (CHAT READ-ONLY port) — ini
+        # BUKAN executor mission kedua; adapter hanya membungkus text generation.
+        # Untuk menjaga niat test (no second MISSION executor), yang dilarang adalah
+        # membuat runner/pemanggilan eksekusi nyata, bukan menyebut nama adapter.
+        self.assertIn("ProviderConversationalReasonerAdapter", src)
+        # SATU-satunya pintu eksekusi mission tetap MissionUXService.decide
+        # (proxy ke gate existing).
         self.assertIn("self._mission.decide", src)
 
     # --- Acceptance 11: error persistence -> tidak klaim sukses ---

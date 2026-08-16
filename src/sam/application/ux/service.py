@@ -368,20 +368,45 @@ class MissionUXService:
         if idempotency_key:
             self._idem[idempotency_key]["request_id"] = req.request_id
 
+        # Model canonical CHAT vs MISSION (boundary audit 2026-08-16, Aster + Van):
+        #   operation == ""      -> CHAT (bukan Mission, tidak ada approval)
+        #   operation != ""     -> MISSION (terlepas dari approval)
+        #       read-only       -> MISSION tanpa approval (observe/investigate/
+        #                           diagnose/recommend — tidak mengubah state eksternal)
+        #       mutating        -> MISSION + approval (github.create_issue dsb)
+        # approval_required adalah SINYAL TERPISAH dari ke-mission-an, bukan sinonim
+        # "apakah ini mission". M10-006 tetap berlaku: approval HANYA dijalankan utk
+        # operasi yang butuh approval (request invalid tetap tanpa jalur eksekusi).
+        # Ke-mission-an = operation != ""; approval adalah sinyal terpisah.
+        approval_required = bool(operation) and not self._operation_is_read_only(operation)
+        # status internal pasca-submit (sebelum keputusan/eksekusi):
+        #   CHAT / MISSION read-only -> UNDERSTOOD (SAM paham, tidak menunggu approval)
+        #   MISSION mutating         -> WAITING_APPROVAL (menunggu keputusan user)
+        _pending = (
+            UxStateStatus.WAITING_APPROVAL if approval_required
+            else UxStateStatus.UNDERSTOOD
+        )
+
         plan = MissionPlan(
             plan_id=f"plan-{uuid.uuid4().hex[:8]}",
             request_id=req.request_id,
             what_sam_understood=understood,
             planned_steps=planned,
-            approval_required=bool(operation),
+            approval_required=approval_required,
             approval_reason=approval_reason,
-            status=MissionPlanStatus.PENDING_APPROVAL,
+            # DRAFT = Mission dibentuk tapi tidak menunggu approval (candidate/
+            # read-only); PENDING_APPROVAL = menunggu keputusan user. Grounding
+            # ulang MissionPlanStatus yang sudah ada (bukan state machine baru).
+            status=(
+                MissionPlanStatus.PENDING_APPROVAL if approval_required
+                else MissionPlanStatus.DRAFT
+            ),
         )
         self._plan = plan
 
         # Pending approval (UI akan menampilkan [Approve][Reject]) — HANYA utk
-        # operasi yang dikenali (M10-006: request invalid TIDAK boleh punya
-        # jalur approval yang bisa dieksekusi).
+        # operasi yang BUTUH approval (M10-006: request invalid / read-only TIDAK
+        # boleh punya jalur approval yang bisa dieksekusi utk mengubah state).
         action = action_summary or f"SAM akan: {planned[0] if planned else 'melakukan tindakan'}"
         approval_req = ApprovalRequest(
             approval_id=f"apr-{uuid.uuid4().hex[:8]}",
@@ -390,7 +415,7 @@ class MissionUXService:
             action_summary=action,
             gates=[s for s in planned],
         )
-        if operation:
+        if approval_required:
             self._approval.record_pending(approval_req)
 
         _now = datetime.now(timezone.utc).isoformat()
@@ -401,10 +426,11 @@ class MissionUXService:
             operation=operation,
             target=target,
             planned_steps=planned,
-            approval_required=bool(operation),
+            approval_required=approval_required,
             action_summary=action,
-            approval_status=UxStateStatus.WAITING_APPROVAL,
-            status=UxStateStatus.WAITING_APPROVAL,
+            approval_status=(UxStateStatus.WAITING_APPROVAL if approval_required
+                             else UxStateStatus.NONE),
+            status=_pending,
         )
         # M10-003: observability sejak submit — misi, capability, target, waktu.
         state.observability = {
@@ -415,7 +441,7 @@ class MissionUXService:
             "external_target": target or self._test_repo,
             "start_time": _now,
             "end_time": "",
-            "status": UxStateStatus.WAITING_APPROVAL,
+            "status": _pending,
             "verification_result": "",
             "failure_reason": "",
             "approver": "",
@@ -758,6 +784,45 @@ class MissionUXService:
     # internal: interpret request jadi rencana sederhana (vertical slice)
     # ------------------------------------------------------------------
     @staticmethod
+    def _is_conversational(low: str) -> bool:
+        """Deteksi CHAT murni secara deterministik (boundary 2026-08-16).
+
+        Input percakapan biasa (sapaan, terima kasih, identitas diri, kabar,
+        acknowledgment) BUKAN mission — operation harus kosong. Guard dijalankan
+        SEBELUM LLM agar CHAT vs MISSION deterministik (bukan flaky).
+        "kamu bisa apa / apa itu sam" dll -> identitas diri -> CHAT.
+        """
+        low = (low or "").strip().lower()
+        if not low:
+            return True
+        # Sapaan / greeting
+        if re.search(
+            r"^(halo|hai|hello|hi|hallo|hei|yo|salam|p\b|selamat\s+(pagi|siang|sore|malam)|assalamualaikum|wr\.?wb)\b",
+            low,
+        ):
+            return True
+        # Ucapan terima kasih / sopan santun
+        if re.search(r"terima\s*kasih|makasih|thanks|thank\s*you|sama-?sama|maaf(kan)?\b", low):
+            return True
+        # Identitas diri SAM / pertanyaan umum tentang SAM
+        if re.search(
+            r"kamu\s+(siapa|itu\s*apa)|siapa\s+kamu|apa\s+itu\s+sam|sam\s+itu\s+apa|"
+            r"kamu\s+bisa(\s+apa|\s+melakukan\s+apa)|bisa\s+apa\s*\?|\bkamu\s+apa\b",
+            low,
+        ):
+            return True
+        # Kabar / small talk
+        if re.search(r"apa\s+kabar|gimana\s+kabar|lagi\s+apa|kabar\s+baik|sedang\s+apa", low):
+            return True
+        # Acknowledgment singkat
+        if re.match(
+            r"^(ok|oke|okay|siap|noted|baiklah|baik\b|ya\b|yap|hehe|haha|nggak\b|tidak\b|gitu|ooh|oh\b|hm|hmm|iya|iyaa)\b",
+            low,
+        ):
+            return True
+        return False
+
+    @staticmethod
     def _interpret(text: str) -> Tuple[str, str, str, List[str], str, str]:
         """Deteksi operasi dari teks.
 
@@ -769,6 +834,22 @@ class MissionUXService:
         """
         t = (text or "").strip()
         low = t.lower()
+
+        # 0* ) Guard CHAT deterministik (BOUNDARY 2026-08-16): input percakapan
+        #      murni (sapaan / terima kasih / identitas diri / kabar / acknowledgment)
+        #      -> operation kosong -> CHAT. Running SEBELUM LLM agar klasifikasi
+        #      CHAT vs MISSION deterministik (tidak bergantung flaky LLM yang
+        #      kadang mengarang operasi utk percakapan biasa).
+        if MissionUXService._is_conversational(low):
+            return (
+                "",
+                "",
+                "SAM memahami: ini percakapan biasa, bukan perintah untuk "
+                "menjalankan mission. Tidak ada operasi yang dieksekusi.",
+                [],
+                "",
+                "",
+            )
 
         # 0) Determistik (SEBELUM AI): "periksa komputer saya"-sekelas.
         #    Ini perintah eksplisit yg TIDAK boleh bergantung pada routing AI
@@ -889,6 +970,29 @@ class MissionUXService:
             "",
             "",
         )
+
+    @staticmethod
+    def _operation_is_read_only(operation: str) -> bool:
+        """Apakah operasi bersifat read-only (tidak mengubah state eksternal)?
+
+        Menjadi dasar pemisahan `approval_required` dari ke-mission-an (boundary
+        audit 2026-08-16): read-only operation (observe/investigate/diagnose/
+        recommend) dapat merupakan MISSION tanpa membutuhkan approval, karena
+        tidak menghasilkan efek eksternal. Mutation (mis. github.create_issue)
+        tetap membutuhkan approval sebagai execution gate NYATA (M9-003/M10-006).
+        """
+        op = (operation or "").strip().lower()
+        # Mutasi nyata (efek eksternal) — butuh approval.
+        if op.startswith("github."):
+            return False
+        # Read-only: hanya environment.* (observe/investigate/diagnose/recommend)
+        # yang dijadikan Mission-tanpa-approval (VAN 2026-08-16). web.*/http.*/
+        # db.* tetap approval-gated karena menyasar target EKSTERNAL dan dijamin
+        # oleh keputusan berdasar test nyata E2E (test_web_open_full_journey).
+        if op.startswith("environment."):
+            return True
+        # Operasi dikenal sbg mission tapi belum tentu read-only -> butuh approval.
+        return False
 
     @staticmethod
     def _interpret_environment_observe(low: str):
@@ -1060,12 +1164,13 @@ class MissionUXService:
         "[email.send] kirim email; "
         "[web.open] buka/baca halaman web; "
         "[http.call] panggil API/HTTP eksternal; "
-        "[ai.think] minta AI berpikir/menjawab; "
         "[db.query] baca/tulis database; "
         "[process.run] jalankan perintah/command lokal; "
         "[environment.observe] periksa/observasi komputer/environment lokal (read-only); "
         "[environment.investigate] investigasi/mencari sebab/masalah di komputer/environment "
-        "lokal (read-only, berhenti di finding kandidat)."
+        "lokal (read-only, berhenti di finding kandidat). "
+        "Jika permintaan hanya percakapan biasa / sapaan / pertanyaan umum (bukan "
+        "perintah eksekusi), gunakan operation KOSONG tanpa nama operasi."
     )
 
     @staticmethod
@@ -1153,6 +1258,13 @@ class MissionUXService:
         selalu dikunci ke GITHUB_TEST_REPO / default.
         """
         operation = str(parsed.get("operation") or "")
+        # ai.think bukan operasi Mission nyata (tidak ada jalur eksekusi di
+        # runner.py) — ia mewakili CHAT/percakapan biasa. Boundary audit
+        # 2026-08-16: CHAT harus operation kosong (bukan Mission). Jadi
+        # permintaan yang hanya ingin SAM "berpikir/menjawab" -> bukan misi ->
+        # None, dan caller menangani sbg CHAT (operation="").
+        if operation in ("ai.think", "ai.chat", "chat"):
+            return None
         if not operation:
             return None  # belum operasi yang dikenali -> biarkan fallback/tolak
         target = str(parsed.get("target") or "")
