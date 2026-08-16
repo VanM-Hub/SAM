@@ -9,11 +9,12 @@ Menegakkan keputusan canonical architecture (M9):
   - Failure semantics dibedakan: BLOCKED (credential hilang) vs FAILED (HTTP/
     token invalid) vs REJECTED (user tolak).
 """
+
 from __future__ import annotations
 
 import unittest
 
-from sam.application.ux.approval import ApprovalDecisionIntent, ApprovalStatus
+from sam.application.ux.approval import ApprovalDecisionIntent
 from sam.application.ux.service import MissionUXService, DEFAULT_TEST_REPO
 
 
@@ -49,8 +50,11 @@ class MissionUXServiceSubmitTest(unittest.TestCase):
         blob = str(state.as_dict())
         # tidak ada placeholder token/secret yang masuk state
         for token_marker in ("ghp_", "Bearer ", "sk-", "authorization"):
-            self.assertNotIn(token_marker.lower(), blob.lower(),
-                             f"state membocorkan marker secret: {token_marker}")
+            self.assertNotIn(
+                token_marker.lower(),
+                blob.lower(),
+                f"state membocorkan marker secret: {token_marker}",
+            )
 
 
 class MissionUXServiceApprovalGateTest(unittest.TestCase):
@@ -81,11 +85,11 @@ class MissionUXServiceApprovalGateTest(unittest.TestCase):
 
     def test_approve_without_credentials_is_blocked_not_fake(self):
         """Approve tanpa GITHUB_TOKEN -> BLOCKED (no side effect), bukan fake success."""
-        svc = MissionUXService(test_repo="VanM-Hub/test-issues",
-                               artifact_dir="tests/_m9_tmp")
+        svc = MissionUXService(test_repo="VanM-Hub/test-issues", artifact_dir="tests/_m9_tmp")
         svc.submit("Buat GitHub issue 'coba block'")
         # pastikan env token kosong untuk test deterministik
         import os
+
         saved = os.environ.get("GITHUB_TOKEN")
         os.environ.pop("GITHUB_TOKEN", None)
         try:
@@ -135,18 +139,18 @@ class MissionChatVsMissionBoundaryTest(unittest.TestCase):
         """'halo' -> CHAT: operation kosong, TIDAK WAITING_APPROVAL."""
         svc = MissionUXService()
         state = svc.submit("halo")
-        self.assertEqual(state.operation, "")           # bukan Mission
-        self.assertFalse(state.approval_required)        # tidak butuh approval
+        self.assertEqual(state.operation, "")  # bukan Mission
+        self.assertFalse(state.approval_required)  # tidak butuh approval
         self.assertNotEqual(state.status, "waiting_approval")  # regression: bukan waiting
         self.assertNotEqual(state.approval_status, "waiting_approval")
-        self.assertEqual(state.status, "understood")     # CHAT = paham, bukan menunggu
+        self.assertEqual(state.status, "understood")  # CHAT = paham, bukan menunggu
         self.assertEqual(state.planned_steps, [])
 
     def test_conversational_question_is_chat(self):
         """Pertanyaan percakapan biasa (bukan perintah eksekusi) -> CHAT."""
         svc = MissionUXService()
         state = svc.submit("siapa kamu dan apa yang bisa kamu lakukan?")
-        self.assertEqual(state.operation, "")            # bukan Mission
+        self.assertEqual(state.operation, "")  # bukan Mission
         self.assertFalse(state.approval_required)
         self.assertNotEqual(state.status, "waiting_approval")
 
@@ -155,7 +159,7 @@ class MissionChatVsMissionBoundaryTest(unittest.TestCase):
         svc = MissionUXService()
         state = svc.submit("periksa komputer saya")
         self.assertEqual(state.operation, "environment.observe")  # Mission (read-only)
-        self.assertFalse(state.approval_required)                  # tanpa approval
+        self.assertFalse(state.approval_required)  # tanpa approval
         self.assertNotEqual(state.status, "waiting_approval")
         self.assertEqual(state.status, "understood")
         self.assertTrue(state.planned_steps)
@@ -176,7 +180,7 @@ class MissionChatVsMissionBoundaryTest(unittest.TestCase):
         svc = MissionUXService(test_repo="VanM-Hub/test-issues")
         state = svc.submit("Buat GitHub issue dengan judul 'regresi chat mission'")
         self.assertEqual(state.operation, "github.create_issue")  # Mission (mutating)
-        self.assertTrue(state.approval_required)                   # butuh approval
+        self.assertTrue(state.approval_required)  # butuh approval
         self.assertEqual(state.status, "waiting_approval")
         self.assertEqual(state.approval_status, "waiting_approval")
         self.assertFalse(MissionUXService._operation_is_read_only("github.create_issue"))
@@ -192,6 +196,38 @@ class MissionChatVsMissionBoundaryTest(unittest.TestCase):
         # TAPI tetap Mission (operation terisi + planned steps)
         self.assertNotEqual(st.operation, "")
         self.assertTrue(st.planned_steps)
+
+    # --- Regression boundary (Van 2026-08-16): contextual vs investigative ---
+    # Prinsip: wh-question != CHAT. Tentukan berdasar SEMANTIC INTENT, bukan
+    # awalan kalimat. Contextual/explanatory -> CHAT; target-sistem+kondisi
+    # (diagnostic) -> environment.investigate read-only (no approval).
+
+    def test_contextual_wh_question_is_chat(self):
+        """Contextual/explanatory wh-question -> CHAT (bukan mission)."""
+        svc = MissionUXService()
+        for text in ("kenapa?", "kenapa tadi gagal?", "kenapa begitu?"):
+            with self.subTest(text=text):
+                state = svc.submit(text)
+                self.assertEqual(state.operation, "")  # bukan mission
+                self.assertFalse(state.approval_required)
+                self.assertNotEqual(state.status, "waiting_approval")
+
+    def test_diagnostic_wh_question_is_investigate_no_approval(self):
+        """Diagnostic wh-question (target sistem + kondisi) -> environment.investigate
+        (Mission read-only, TANPA approval)."""
+        svc = MissionUXService()
+        for text in (
+            "kenapa komputer saya lambat",
+            "kenapa komputer saya lambat?",
+            "kenapa CPU saya tinggi",
+            "periksa kenapa komputer saya lambat",
+        ):
+            with self.subTest(text=text):
+                state = svc.submit(text)
+                self.assertEqual(state.operation, "environment.investigate")
+                self.assertFalse(state.approval_required)  # read-only
+                self.assertNotEqual(state.status, "waiting_approval")
+                self.assertTrue(state.planned_steps)  # tetap Mission
 
 
 if __name__ == "__main__":

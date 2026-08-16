@@ -13,6 +13,7 @@ Aturan:
     sederhana (regex kata kunci) — bukan AI perencana; planning yang lebih
     kaya akan ditambah saat diintegrasikan dengan MCR.
 """
+
 from __future__ import annotations
 
 import os
@@ -39,11 +40,13 @@ from sam.application.ux.runner import (
 )
 from sam.application.ux.state import UxMissionState, UxFailureKind, UxStateStatus
 from sam.application.ux.store import MissionStore
+
 # M11-002: backend persistent opsional. Bila env SAM_PG_DSN diset, service
 # otomatis memakai PostgresMissionStore (plugin) — JSON tetap default. Semua
 # via API yang sama (load/save/enable/clear), jadi jalur & test lama tidak berubah.
 try:
     from sam.application.ux.pgstore import PostgresMissionStore
+
     _HAS_PG = True
 except Exception:  # pragma: no cover - psycopg2 tidak terpasang
     _HAS_PG = False
@@ -53,6 +56,7 @@ except Exception:  # pragma: no cover - psycopg2 tidak terpasang
 # tanpa persistence -> perilaku in-memory/JSON lama (regresi M10 aman).
 try:  # pragma: no cover - import opsional bila jalur repo tidak tersedia
     from sam.application.ux.persistence import build_persistence_unit
+
     _HAS_REPO = True
 except Exception:  # pragma: no cover
     _HAS_REPO = False
@@ -63,6 +67,28 @@ from sam.application.ux.metrics import metrics as _metrics  # type: ignore
 
 # Repo test default untuk GitHub mutation (repo TEST, bukan production).
 DEFAULT_TEST_REPO = "VanM-Hub/test-issues"
+
+# Kosakata DOMAIN environment (SATU SUMBER): target sistem + kondisi observable.
+# Ini bukan template kalimat, melainkan kosakata domain yang dipakai konsisten oleh
+# (a) guard CHAT untuk MEMBIARKAN frasa diagnosa sistem lolos ke resolver, dan
+# (b) operation resolver (_interpret_environment_investigate) sebagai authority.
+# Prinsip (Van 2026-08-16): wh-question != CHAT; pisahkan contextual/explanatory
+# question (CHAT) dari system/environment diagnostic question (environment.investigate)
+# berdasar SEMANTIC INTENT (ada target sistem + kondisi), bukan awalan kalimat.
+_ENV_SYSTEM_TARGETS = re.compile(
+    r"\b(komputer|pc|mesin|host|sistem|system|environment|env|lokal|local|"
+    r"cpu|prosesor|process|proc|ram|memory|disk|storage|port|network|jaringan|wifi|baterai|battery)\b",
+    re.IGNORECASE,
+)
+_ENV_OBSERVABLE_CONDITIONS = re.compile(
+    r"\b(lambat|lelet|macet|hang|berat|sering|lambat|lag|lemot|tinggi|tinggal|penuh|habis|gagal|error|bermasalah|tidak\s+bisa|nggak\s+bisa)\b",
+    re.IGNORECASE,
+)
+# Kata kerja perintah: bila frasa memuat ini, TETAP mission (bukan CHAT).
+_CMD_VERBS = re.compile(
+    r"\b(buat|jalankan|jalani|lakukan|restart|reboot|kirim|periksa|scan|diagnos|simulasikan|hapus|install|uninstall|buka|tutup|eksekusi|execute|run|stop|start|investiga|selidik)\b",
+    re.IGNORECASE,
+)
 
 
 def _blocked_state(reason: str) -> "UxMissionState":
@@ -168,7 +194,8 @@ class MissionUXService:
             st.request_id = state_dict.get("request_id", "")
             st.request_text = state_dict.get("request", "")
             st.what_sam_understood = (state_dict.get("understanding") or {}).get(
-                "what_sam_understood", "")
+                "what_sam_understood", ""
+            )
             st.operation = (state_dict.get("understanding") or {}).get("operation", "")
             st.target = (state_dict.get("understanding") or {}).get("target", "")
             plan = state_dict.get("plan") or {}
@@ -239,7 +266,8 @@ class MissionUXService:
         if not mission_id:
             mission_id = st.request_id or "mission-unknown"
         self._persistence.missions.save_mission(
-            mission_id, st.as_dict(),
+            mission_id,
+            st.as_dict(),
         )
         exec_id = (st.observability or {}).get("execution_id")
         if exec_id:
@@ -256,7 +284,8 @@ class MissionUXService:
         # idempotency keys -> persistent (M12-002 base)
         for k, v in self._idem.items():
             self._persistence.idempotency.save_idempotency(
-                k, {"request_id": v.get("request_id", ""), "text": v.get("text", "")},
+                k,
+                {"request_id": v.get("request_id", ""), "text": v.get("text", "")},
                 mission_id,
             )
 
@@ -278,7 +307,10 @@ class MissionUXService:
             for k in self._persistence.idempotency.list_keys():
                 rec = self._persistence.idempotency.load_idempotency(k)
                 if rec:
-                    self._idem[k] = {"request_id": rec.get("request_id", ""), "text": rec.get("text", "")}
+                    self._idem[k] = {
+                        "request_id": rec.get("request_id", ""),
+                        "text": rec.get("text", ""),
+                    }
         except Exception:  # pragma: no cover
             self._idem = {}
         # Tandai: repo sudah jadi sumber audit & idempotency, agar JSON store
@@ -297,7 +329,8 @@ class MissionUXService:
             st.request_id = state_dict.get("request_id", "")
             st.request_text = state_dict.get("request", "")
             st.what_sam_understood = (state_dict.get("understanding") or {}).get(
-                "what_sam_understood", "")
+                "what_sam_understood", ""
+            )
             st.operation = (state_dict.get("understanding") or {}).get("operation", "")
             st.target = (state_dict.get("understanding") or {}).get("target", "")
             plan = state_dict.get("plan") or {}
@@ -331,8 +364,11 @@ class MissionUXService:
         # tolak mission baru (0 operasi, 0 side effect).
         if self._production_blocked:
             _metrics.inc("sam_mission_blocked")
-            st = self._state if (self._state and self._state.status == str(UxStateStatus.BLOCKED)) \
+            st = (
+                self._state
+                if (self._state and self._state.status == str(UxStateStatus.BLOCKED))
                 else _blocked_state("Fail-closed: persistence produksi tidak siap")
+            )
             self._state = st
             return st
         # M10-005: Idempotency-Key identical -> kembalikan state yg SAMA
@@ -353,8 +389,8 @@ class MissionUXService:
         _metrics.inc("sam_mission_received")
 
         # Pahami request terlebih dahulu (SAM memahami sebelum menyimpan).
-        operation, target, understood, planned, action_summary, approval_reason = (
-            self._interpret(text)
+        operation, target, understood, planned, action_summary, approval_reason = self._interpret(
+            text
         )
 
         req = MissionRequest(
@@ -382,10 +418,7 @@ class MissionUXService:
         # status internal pasca-submit (sebelum keputusan/eksekusi):
         #   CHAT / MISSION read-only -> UNDERSTOOD (SAM paham, tidak menunggu approval)
         #   MISSION mutating         -> WAITING_APPROVAL (menunggu keputusan user)
-        _pending = (
-            UxStateStatus.WAITING_APPROVAL if approval_required
-            else UxStateStatus.UNDERSTOOD
-        )
+        _pending = UxStateStatus.WAITING_APPROVAL if approval_required else UxStateStatus.UNDERSTOOD
 
         plan = MissionPlan(
             plan_id=f"plan-{uuid.uuid4().hex[:8]}",
@@ -398,8 +431,7 @@ class MissionUXService:
             # read-only); PENDING_APPROVAL = menunggu keputusan user. Grounding
             # ulang MissionPlanStatus yang sudah ada (bukan state machine baru).
             status=(
-                MissionPlanStatus.PENDING_APPROVAL if approval_required
-                else MissionPlanStatus.DRAFT
+                MissionPlanStatus.PENDING_APPROVAL if approval_required else MissionPlanStatus.DRAFT
             ),
         )
         self._plan = plan
@@ -428,8 +460,9 @@ class MissionUXService:
             planned_steps=planned,
             approval_required=approval_required,
             action_summary=action,
-            approval_status=(UxStateStatus.WAITING_APPROVAL if approval_required
-                             else UxStateStatus.NONE),
+            approval_status=(
+                UxStateStatus.WAITING_APPROVAL if approval_required else UxStateStatus.NONE
+            ),
             status=_pending,
         )
         # M10-003: observability sejak submit — misi, capability, target, waktu.
@@ -457,8 +490,11 @@ class MissionUXService:
         # M12-005: Fail-closed produksi — tolak keputusan bila persistence
         # produksi tidak siap (tidak boleh lanjut ke eksekusi).
         if self._production_blocked:
-            st = self._state if (self._state and self._state.status == str(UxStateStatus.BLOCKED)) \
+            st = (
+                self._state
+                if (self._state and self._state.status == str(UxStateStatus.BLOCKED))
                 else _blocked_state("Fail-closed: persistence produksi tidak siap")
+            )
             self._state = st
             return st
         if self._state is None or self._request is None or self._plan is None:
@@ -474,16 +510,19 @@ class MissionUXService:
             )
             # TIDAK pernah memanggil executor. 0 side effect.
             obs = dict(self._state.observability or {})
-            obs.update({"status": UxStateStatus.REJECTED,
-                        "failure_reason": "invalid capability (denied)"})
+            obs.update(
+                {"status": UxStateStatus.REJECTED, "failure_reason": "invalid capability (denied)"}
+            )
             self._state.observability = obs
-            self._audit.append({
-                "stage": "approval",
-                "event": "denied_invalid_capability",
-                "ok": False,
-                "blocked": True,
-                "detail": "Capability tidak dikenali — eksekusi ditolak (0 mutation)",
-            })
+            self._audit.append(
+                {
+                    "stage": "approval",
+                    "event": "denied_invalid_capability",
+                    "ok": False,
+                    "blocked": True,
+                    "detail": "Capability tidak dikenali — eksekusi ditolak (0 mutation)",
+                }
+            )
             self._persist()
             return self._state
 
@@ -501,23 +540,27 @@ class MissionUXService:
             obs = dict(state.observability or {})
             # Approver user yang sesungguhnya (gate set kosong saat reject).
             _approver = approver or "user"
-            obs.update({
-                "status": UxStateStatus.REJECTED,
-                "end_time": datetime.now(timezone.utc).isoformat(),
-                "verification_result": "none (ditolak, 0 mutation)",
-                "failure_reason": "rejected oleh approver",
-                "approver": _approver,
-            })
+            obs.update(
+                {
+                    "status": UxStateStatus.REJECTED,
+                    "end_time": datetime.now(timezone.utc).isoformat(),
+                    "verification_result": "none (ditolak, 0 mutation)",
+                    "failure_reason": "rejected oleh approver",
+                    "approver": _approver,
+                }
+            )
             state.observability = obs
             # M9-004: audit terekam untuk SEMUA keputusan, termasuk reject.
-            self._audit.append({
-                "stage": "approval",
-                "event": "rejected",
-                "ok": True,
-                "blocked": True,
-                "detail": "Approval ditolak user — tanpa eksekusi (0 mutation)",
-                "approver": _approver,
-            })
+            self._audit.append(
+                {
+                    "stage": "approval",
+                    "event": "rejected",
+                    "ok": True,
+                    "blocked": True,
+                    "detail": "Approval ditolak user — tanpa eksekusi (0 mutation)",
+                    "approver": _approver,
+                }
+            )
             _metrics.inc("sam_mission_rejected")
             self._persist()
             return state
@@ -531,11 +574,13 @@ class MissionUXService:
 
         _exec_id = f"exec-{uuid.uuid4().hex[:12]}"
         obs = dict(state.observability or {})
-        obs.update({
-            "status": UxStateStatus.RUNNING,
-            "execution_id": _exec_id,
-            "approver": (outcome.as_dict().get("approver") or approver or "user"),
-        })
+        obs.update(
+            {
+                "status": UxStateStatus.RUNNING,
+                "execution_id": _exec_id,
+                "approver": (outcome.as_dict().get("approver") or approver or "user"),
+            }
+        )
         state.observability = obs
 
         operation = (self._request.operation or "").strip()
@@ -563,17 +608,24 @@ class MissionUXService:
             state.failure_kind = UxFailureKind.BLOCKED
             state.failure_message = str(exc)
             obsb = dict(state.observability or {})
-            obsb.update({
-                "status": UxStateStatus.BLOCKED,
-                "end_time": datetime.now(timezone.utc).isoformat(),
-                "verification_result": "none (unsupported - 0 side effect)",
-                "failure_reason": str(exc),
-            })
+            obsb.update(
+                {
+                    "status": UxStateStatus.BLOCKED,
+                    "end_time": datetime.now(timezone.utc).isoformat(),
+                    "verification_result": "none (unsupported - 0 side effect)",
+                    "failure_reason": str(exc),
+                }
+            )
             state.observability = obsb
-            self._audit.append({
-                "stage": "execute", "event": "unsupported_operation",
-                "ok": False, "blocked": True, "detail": str(exc),
-            })
+            self._audit.append(
+                {
+                    "stage": "execute",
+                    "event": "unsupported_operation",
+                    "ok": False,
+                    "blocked": True,
+                    "detail": str(exc),
+                }
+            )
             self._persist()
             return state
         except Exception as exc:  # noqa: BLE001 — interface harus tetap hidup
@@ -581,17 +633,24 @@ class MissionUXService:
             state.failure_kind = UxFailureKind.FAILED
             state.failure_message = f"mission gagal: {exc}"
             obs2 = dict(state.observability or {})
-            obs2.update({
-                "status": UxStateStatus.FAILED,
-                "end_time": datetime.now(timezone.utc).isoformat(),
-                "verification_result": "none (gagal di eksekusi)",
-                "failure_reason": str(exc),
-            })
+            obs2.update(
+                {
+                    "status": UxStateStatus.FAILED,
+                    "end_time": datetime.now(timezone.utc).isoformat(),
+                    "verification_result": "none (gagal di eksekusi)",
+                    "failure_reason": str(exc),
+                }
+            )
             state.observability = obs2
-            self._audit.append({
-                "stage": "execute", "event": "mission_failed",
-                "ok": False, "blocked": False, "detail": str(exc),
-            })
+            self._audit.append(
+                {
+                    "stage": "execute",
+                    "event": "mission_failed",
+                    "ok": False,
+                    "blocked": False,
+                    "detail": str(exc),
+                }
+            )
             self._persist()
             return state
 
@@ -611,9 +670,7 @@ class MissionUXService:
         elif state.status == UxStateStatus.FAILED:
             _metrics.inc("sam_execution_failed")
         state.failure_kind = verdict["failure_kind"] or UxFailureKind.NONE
-        state.failure_message = (
-            "" if verdict["status"] == "completed" else verdict["message"]
-        )
+        state.failure_message = "" if verdict["status"] == "completed" else verdict["message"]
         state.result_summary = result.get("title", "") + (
             " (ok)" if result.get("ok") else " (gagal)"
         )
@@ -624,32 +681,44 @@ class MissionUXService:
             None,
         )
         obs3 = dict(state.observability or {})
-        obs3.update({
-            "status": state.status,
-            "end_time": datetime.now(timezone.utc).isoformat(),
-            "verification_result": (
-                (gh_verify or {}).get("detail")
-                or ("ok (evidence eksternal)" if state.status == UxStateStatus.COMPLETED
-                    else verdict["message"])
-            ),
-            "failure_reason": verdict["message"]
-            if state.status in (UxStateStatus.BLOCKED, UxStateStatus.FAILED)
-            else "",
-        })
+        obs3.update(
+            {
+                "status": state.status,
+                "end_time": datetime.now(timezone.utc).isoformat(),
+                "verification_result": (
+                    (gh_verify or {}).get("detail")
+                    or (
+                        "ok (evidence eksternal)"
+                        if state.status == UxStateStatus.COMPLETED
+                        else verdict["message"]
+                    )
+                ),
+                "failure_reason": verdict["message"]
+                if state.status in (UxStateStatus.BLOCKED, UxStateStatus.FAILED)
+                else "",
+            }
+        )
         state.observability = obs3
 
         # Evidence chain runut (M9-004).
         timeline = result.get("timeline", []) or []
         state.timeline = [
-            {"stage": t.get("stage"), "ok": t.get("ok"), "blocked": t.get("blocked"),
-             "detail": t.get("detail", "")}
+            {
+                "stage": t.get("stage"),
+                "ok": t.get("ok"),
+                "blocked": t.get("blocked"),
+                "detail": t.get("detail", ""),
+            }
             for t in timeline
         ]
         # Untuk "what actually happened" (M9-002) — tampilkan issue_url jika ada
         # (nilai dari `scrubbed` boundary; `masked`/secret TIDAK pernah diambil).
         gh = next(
-            (t for t in timeline if t.get("stage") in ("github_api", "execute", "act")
-             and t.get("scrubbed")),
+            (
+                t
+                for t in timeline
+                if t.get("stage") in ("github_api", "execute", "act") and t.get("scrubbed")
+            ),
             None,
         )
         scrubbed = (gh or {}).get("scrubbed") or {}
@@ -679,42 +748,48 @@ class MissionUXService:
         env_rec_ev = (env_rec_t or {}).get("evidence") or {}
         if env_rec_t is not None:
             rec_scrubbed = (env_rec_t or {}).get("scrubbed") or {}
-            state.evidence = [{
-                "kind": "environment_recommendation",
-                "recommendation_count": env_rec_ev.get("recommendation_count", 0),
-                "recommendations": env_rec_ev.get("recommendations", []),
-                "diagnosis_ref": env_rec_ev.get("diagnosis_ref", ""),
-                "summary": env_rec_ev.get("summary", ""),
-                "ok": bool(rec_scrubbed.get("ok")),
-            }]
+            state.evidence = [
+                {
+                    "kind": "environment_recommendation",
+                    "recommendation_count": env_rec_ev.get("recommendation_count", 0),
+                    "recommendations": env_rec_ev.get("recommendations", []),
+                    "diagnosis_ref": env_rec_ev.get("diagnosis_ref", ""),
+                    "summary": env_rec_ev.get("summary", ""),
+                    "ok": bool(rec_scrubbed.get("ok")),
+                }
+            ]
         # R1-004: evidence DIAGNOSIS environment (dari timeline environment.diagnose).
         elif env_diag_t is not None:
             diag_scrubbed = (env_diag_t or {}).get("scrubbed") or {}
-            state.evidence = [{
-                "kind": "environment_diagnosis",
-                "verdict": env_diag_ev.get("verdict", ""),
-                "confidence": env_diag_ev.get("confidence"),
-                "diagnosis": env_diag_ev.get("diagnosis", []),
-                "evidence_ref": env_diag_ev.get("evidence_ref", ""),
-                "summary": env_diag_ev.get("summary", ""),
-                "sufficiency": env_diag_ev.get("sufficiency", env_diag_ev.get("verdict", "")),
-                "ok": bool(diag_scrubbed.get("ok")),
-            }]
+            state.evidence = [
+                {
+                    "kind": "environment_diagnosis",
+                    "verdict": env_diag_ev.get("verdict", ""),
+                    "confidence": env_diag_ev.get("confidence"),
+                    "diagnosis": env_diag_ev.get("diagnosis", []),
+                    "evidence_ref": env_diag_ev.get("evidence_ref", ""),
+                    "summary": env_diag_ev.get("summary", ""),
+                    "sufficiency": env_diag_ev.get("sufficiency", env_diag_ev.get("verdict", "")),
+                    "ok": bool(diag_scrubbed.get("ok")),
+                }
+            ]
             # R1-005: cache DiagnosisResult CANONICAL (objek utuh, bukan Dict)
             # agar misi recommendation berikutnya makan dari diagnosis terakhir.
             if result.get("_canonical_diagnosis") is not None:
                 self._last_diagnosis_result = result.get("_canonical_diagnosis")
         elif env_inv_t is not None:
             inv_scrubbed = (env_inv_t or {}).get("scrubbed") or {}
-            state.evidence = [{
-                "kind": "environment_investigation",
-                "finding_count": env_inv_ev.get("finding_count", 0),
-                "findings": env_inv_ev.get("findings", []),
-                "insufficient": bool(env_inv_ev.get("insufficient")),
-                "summary": env_inv_ev.get("summary", ""),
-                "evidence_ref": env_inv_ev.get("evidence_ref", ""),
-                "ok": bool(inv_scrubbed.get("ok")),
-            }]
+            state.evidence = [
+                {
+                    "kind": "environment_investigation",
+                    "finding_count": env_inv_ev.get("finding_count", 0),
+                    "findings": env_inv_ev.get("findings", []),
+                    "insufficient": bool(env_inv_ev.get("insufficient")),
+                    "summary": env_inv_ev.get("summary", ""),
+                    "evidence_ref": env_inv_ev.get("evidence_ref", ""),
+                    "ok": bool(inv_scrubbed.get("ok")),
+                }
+            ]
             # R1-004 W1: cache findings investigasi untuk misi diagnosis terpisah.
             inv_sc = (env_inv_t or {}).get("scrubbed") or {}
             cached = env_inv_ev.get("findings", [])
@@ -726,40 +801,48 @@ class MissionUXService:
                 self._last_investigation_findings = []
         elif env_t is not None:
             env_scrubbed = (env_t or {}).get("scrubbed") or {}
-            state.evidence = [{
-                "kind": "environment_observation",
-                "entity_count": env_ev.get("entity_count", 0),
-                "sources": env_ev.get("sources", []),
-                "failures": env_ev.get("failures", []),
-                "entities": env_ev.get("entities", []),
-                "detail": (env_t or {}).get("detail", ""),
-                "ok": bool(env_scrubbed.get("ok")),
-            }]
+            state.evidence = [
+                {
+                    "kind": "environment_observation",
+                    "entity_count": env_ev.get("entity_count", 0),
+                    "sources": env_ev.get("sources", []),
+                    "failures": env_ev.get("failures", []),
+                    "entities": env_ev.get("entities", []),
+                    "detail": (env_t or {}).get("detail", ""),
+                    "ok": bool(env_scrubbed.get("ok")),
+                }
+            ]
         elif scrubbed.get("ok"):
-            state.evidence = [{
-                "kind": "external_github_issue",
-                "url": scrubbed.get("issue_url", ""),
-                "number": scrubbed.get("number"),
-                "detail": scrubbed.get("detail", ""),
-            }]
+            state.evidence = [
+                {
+                    "kind": "external_github_issue",
+                    "url": scrubbed.get("issue_url", ""),
+                    "number": scrubbed.get("number"),
+                    "detail": scrubbed.get("detail", ""),
+                }
+            ]
         elif result.get("target") and not scrubbed:
             # Non-GitHub (web.*/http.*): rekam target hasil eksekusi sbg evidence
             # read-only (tanpa secret).
-            state.evidence = [{
-                "kind": "read_only_result",
-                "target": result.get("target", ""),
-                "detail": result.get("detail", ""),
-            }]
+            state.evidence = [
+                {
+                    "kind": "read_only_result",
+                    "target": result.get("target", ""),
+                    "detail": result.get("detail", ""),
+                }
+            ]
         state.artifact_ref = result.get("artifact_path", "")
         state.audit_ref = f"audit_count={result.get('audit_count', 0)}"
         # M9-004: append mission timeline ke audit trail (sanitized, no secret).
-        for t in (result.get("timeline") or []):
-            self._audit.append({
-                "stage": t.get("stage"),
-                "ok": t.get("ok"),
-                "blocked": t.get("blocked"),
-                "detail": t.get("detail", ""),
-            })
+        for t in result.get("timeline") or []:
+            self._audit.append(
+                {
+                    "stage": t.get("stage"),
+                    "ok": t.get("ok"),
+                    "blocked": t.get("blocked"),
+                    "detail": t.get("detail", ""),
+                }
+            )
         self._persist()
         return state
 
@@ -818,6 +901,30 @@ class MissionUXService:
         if re.match(
             r"^(ok|oke|okay|siap|noted|baiklah|baik\b|ya\b|yap|hehe|haha|nggak\b|tidak\b|gitu|ooh|oh\b|hm|hmm|iya|iyaa)\b",
             low,
+        ):
+            return True
+        # Kapabilitas SAM (sync dgn blok identitas di atas, tapi golongan frasa
+        # "apa yang bisa kamu lakukan" yang kata-katanya terbalik dari "kamu bisa apa")
+        if re.search(
+            r"apa\s+(saja|yang|yg)?\s*(bisa|dapat)\s+kamu|yang\s+(bisa|dapat)\s+kamu\s+(lakukan|kerja|buat)|kamu\s+(bisa|dapat)\s+(lakukan|kerja|buat)\s+apa|ada\s+yang\s+(bisa|dapat)\s+kamu\s+(bantu|tolong)",
+            low,
+        ):
+            return True
+        # Contextual/explanatory question -> CHAT (prinsip Van: wh-question != CHAT).
+        # Guard ini HANYA men-capture wh-question yang TIDAK memuat target sistem
+        # environment TANPA kondisi observable: "kenapa?", "kenapa tadi gagal?",
+        # "kenapa begitu?" -> CHAT. Bila frasa memuat target sistem +/ kondisi
+        # (mis. "kenapa komputer lambat", "kenapa CPU tinggi"), guard TIDAK
+        # menyentuhnya -> lolos ke operation resolver (authority) yg menghasilkan
+        # environment.investigate. Tidak ada template kalimat literal; murni memakai
+        # kosakata domain _ENV_SYSTEM_TARGETS/_ENV_OBSERVABLE_CONDITIONS.
+        if (
+            re.match(
+                r"^(apa|apakah|kenapa|mengapa|bagaimana|kapan|siapa|dimana|di mana|berapa|bisa)",
+                low,
+            )
+            and not _CMD_VERBS.search(low)
+            and not _ENV_SYSTEM_TARGETS.search(low)
         ):
             return True
         return False
@@ -897,8 +1004,7 @@ class MissionUXService:
 
         # Fallback: pola regex (mode offline / Ollama tidak tersedia).
         is_github_issue = bool(
-            re.search(r"github", low)
-            and re.search(r"(issue|masalah|tiket|new issue|create)", low)
+            re.search(r"github", low) and re.search(r"(issue|masalah|tiket|new issue|create)", low)
         )
 
         if is_github_issue:
@@ -911,41 +1017,42 @@ class MissionUXService:
             else:
                 title = t
                 body = t
-            understood = (
-                f"SAM memahami: membuat GitHub issue di repo '{target}'."
-            )
+            understood = f"SAM memahami: membuat GitHub issue di repo '{target}'."
             planned = [
                 "memverifikasi koneksi GitHub (boundary)",
                 f"membuat issue di repo '{target}' dengan judul dari permintaan",
                 "melakukan verifikasi independen (GET issue dari GitHub)",
             ]
-            action_summary = (
-                f"SAM akan membuat GitHub issue di repo '{target}'."
-            )
+            action_summary = f"SAM akan membuat GitHub issue di repo '{target}'."
             approval_reason = (
                 "Tindakan ini menghasilkan efek eksternal nyata pada GitHub "
                 "(repo uji). Persetujuan Anda diperlukan sebelum eksekusi."
             )
-            return (
-                operation, target, understood, planned, action_summary, approval_reason
-            )
+            return (operation, target, understood, planned, action_summary, approval_reason)
 
         # Fallback web (read-only): "buka website X" / "buka <url>".
         # Tangkap URL eksplisit atau domain, agar target eksekusi benar.
         url_match = re.search(
             r"(https?://[^\s]+|www\.[^\s]+|[a-z0-9-]+\.[a-z]{2,}(?:/[^\s]*)?)",
-            t, flags=re.I,
+            t,
+            flags=re.I,
         )
         is_web = bool(re.search(r"(buka|brows|open|web|website|site|halaman)", low))
         if is_web:
             operation = "web.open"
             raw_url = (url_match.group(1) if url_match else "") or ""
-            target = raw_url if raw_url.startswith("http") else f"https://{raw_url}" if raw_url else ""
+            target = (
+                raw_url if raw_url.startswith("http") else f"https://{raw_url}" if raw_url else ""
+            )
             if not target:
                 # Tidak ada URL/domain yang ditangkap -> tidak bisa dieksekusi.
                 return (
-                    "", "", "SAM tidak menemukan URL untuk dibuka pada permintaan ini.",
-                    [], "", "",
+                    "",
+                    "",
+                    "SAM tidak menemukan URL untuk dibuka pada permintaan ini.",
+                    [],
+                    "",
+                    "",
                 )
             understood = f"SAM memahami: membuka halaman web '{target}' (read-only)."
             planned = [
@@ -958,9 +1065,7 @@ class MissionUXService:
                 "Operasi ini read-only (membaca halaman web) — tidak mengubah state "
                 "eksternal, namun tetap disediakan persetujuan Anda untuk transparansi."
             )
-            return (
-                operation, target, understood, planned, action_summary, approval_reason
-            )
+            return (operation, target, understood, planned, action_summary, approval_reason)
 
         return (
             "",
@@ -1005,18 +1110,31 @@ class MissionUXService:
         Read-only: menemukan entitas nyata (process/port/file/env) TANPA
         katalog aplikasi. Bukan katalog Word/PDF/OpenClaw.
         """
-        is_env_observe = bool(re.search(
-            r"(periksa|cek|scan|inspect|monitor|amati|obs\.?erv|lihat)\s*.{0,40}"
-            r"(komputer|pc|mesin|sistem|environment|lokal|host)",
-            low,
-        )) or bool(re.search(
-            r"(komputer|pc|mesin|sistem|environment|host)\s*.{0,40}"
-            r"(periksa|cek|scan|inspect|monitor|amati|sehat|kesehatan|status)",
-            low,
-        ))
-        is_env_show = bool(re.search(
-            r"(ada apa|tunjukkan|daftar|list|apa saja)", low)) and bool(
-            re.search(r"(komputer|pc|mesin|sistem|environment|lokal|host)", low))
+        # Prioritas resolver (satu sumber, prinsip semantic intent): bila frasa
+        # mengandung TANYA-SEBAB (kenapa/mengapa/penyebab/masalah/selidik) yg
+        # menarget sistem, observe MENYERAH ke investigate (blok 0c). Pemeran:
+        # "periksa kenapa komputer lambat" -> environment.investigate (bukan observe).
+        # Ini BUKAN template literal; itu keputusan prioritas antar-resolver
+        # berdasar ada-tidaknya intent tanya-sebab.
+        if re.search(r"(kenapa|mengapa|penyebab|masalah|selidik|investigasi|trouble)\b", low):
+            return None
+
+        is_env_observe = bool(
+            re.search(
+                r"(periksa|cek|scan|inspect|monitor|amati|obs\.?erv|lihat)\s*.{0,40}"
+                r"(komputer|pc|mesin|sistem|environment|lokal|host)",
+                low,
+            )
+        ) or bool(
+            re.search(
+                r"(komputer|pc|mesin|sistem|environment|host)\s*.{0,40}"
+                r"(periksa|cek|scan|inspect|monitor|amati|sehat|kesehatan|status)",
+                low,
+            )
+        )
+        is_env_show = bool(re.search(r"(ada apa|tunjukkan|daftar|list|apa saja)", low)) and bool(
+            re.search(r"(komputer|pc|mesin|sistem|environment|lokal|host)", low)
+        )
         if not (is_env_observe or is_env_show):
             return None
         return (
@@ -1051,14 +1169,17 @@ class MissionUXService:
         penyebab (R1-004). INSUFFICIENT ditangani jujur di bawah (evidence tak
         cukup -> tanpa temuan, tanpa fabrikasi).
         """
-        # Investigasi: kata kunci tanya-sebab + konteks komputer/environment/lambat.
-        is_env_investigate = bool(re.search(
-            r"(kenapa|mengapa|apa\s*(yg|yang)|diagnos|selidik|investiga|masalah|"
-            r"trouble|sumber|penyebab)", low,
-        )) and bool(re.search(
-            r"(komputer|pc|mesin|sistem|environment|lokal|host|lambat|lelet|"
-            r"macet|hang|berat|sering)", low,
-        ))
+        # Investigasi: kata kunci tanya-sebab + target sistem environment/keadaan.
+        # Pakai kosakata domain _ENV_SYSTEM_TARGETS/_ENV_OBSERVABLE_CONDITIONS
+        # (SATU SUMBER, bukan template literal). "kenapa komputer saya lambat",
+        # "kenapa CPU saya tinggi", "periksa kenapa komputer lambat" -> investigate.
+        is_env_investigate = bool(
+            re.search(
+                r"(kenapa|mengapa|apa\s*(yg|yang)|diagnos|selidik|investiga|masalah|"
+                r"trouble|sumber|penyebab|kenapa)\b",
+                low,
+            )
+        ) and bool(_ENV_SYSTEM_TARGETS.search(low) or _ENV_OBSERVABLE_CONDITIONS.search(low))
         if not is_env_investigate:
             return None
         return (
@@ -1094,10 +1215,13 @@ class MissionUXService:
         R1-003 yang di-cache service (W1). Tanpa investigasi -> cache kosong ->
         INSUFFICIENT jujur. TIDAK mengarang penyebab.
         """
-        is_env_diagnose = bool(re.search(
-            r"(diagnos|diagnosa|diagnosis|simpulkan|kesimpulan|"
-            r"apa\s*penyebab|root\s*cause|sebab(?:nya\s*apa|nya)?)", low,
-        ))
+        is_env_diagnose = bool(
+            re.search(
+                r"(diagnos|diagnosa|diagnosis|simpulkan|kesimpulan|"
+                r"apa\s*penyebab|root\s*cause|sebab(?:nya\s*apa|nya)?)",
+                low,
+            )
+        )
         if not is_env_diagnose:
             return None
         return (
@@ -1131,10 +1255,13 @@ class MissionUXService:
         rekomendasi canonical HANYA bila ada canonical action mapping TERBUKTI;
         bila tidak -> recommendations=[] jujur (fail-closed). Bukan recovery/execution.
         """
-        is_env_recommend = bool(re.search(
-            r"(rekomend|recommend|sarank?an|tindakan\s+yang\s+layak|"
-            r"tindakan\s+apa|remediasi|perbaikan\s+yang\s+disarankan)", low,
-        ))
+        is_env_recommend = bool(
+            re.search(
+                r"(rekomend|recommend|sarank?an|tindakan\s+yang\s+layak|"
+                r"tindakan\s+apa|remediasi|perbaikan\s+yang\s+disarankan)",
+                low,
+            )
+        )
         if not is_env_recommend:
             return None
         return (
@@ -1193,7 +1320,7 @@ class MissionUXService:
             "Instruksi: Dari permintaan berikut, tentukan operasi SAM yang paling "
             "cocok (di antara daftar di atas). Jika tidak cocok sama sekali, pakai "
             "operation kosong. Jawab HANYA dengan JSON valid tanpa teks lain, format:\n"
-            '{"operation": "<salah satu operation atau \"\">", '
+            '{"operation": "<salah satu operation atau "">", '
             '"target": "<objek sasaran, atau kosong>", '
             '"understood": "<kalimat singkat apa yang SAM pahami>", '
             '"planned": ["<langkah 1>", "<langkah 2>"]}\n\n'
@@ -1205,19 +1332,17 @@ class MissionUXService:
                 ProviderExecutor,
                 ProviderUnavailableError,
             )
+
             executor = ProviderExecutor()
             raw = executor.execute(
                 "deepseek",
                 "chat",
-                {"prompt": prompt, "model": "deepseek-chat",
-                 "max_tokens": 256, "temperature": 0.1},
+                {"prompt": prompt, "model": "deepseek-chat", "max_tokens": 256, "temperature": 0.1},
                 timeout_seconds=45,
             )
-            parsed = MissionUXService._parse_ai_json(
-                MissionUXService._extract_ai_text(raw))
+            parsed = MissionUXService._parse_ai_json(MissionUXService._extract_ai_text(raw))
             if parsed:
-                out = MissionUXService._assemble_interpretation(
-                    parsed, source="DeepSeek")
+                out = MissionUXService._assemble_interpretation(parsed, source="DeepSeek")
                 if out is not None:
                     return out
         except (ProviderUnavailableError, Exception):  # noqa: BLE001
@@ -1229,6 +1354,7 @@ class MissionUXService:
                 ProviderExecutor,
                 ProviderUnavailableError,
             )
+
             executor = ProviderExecutor()
             raw = executor.execute(
                 "ollama",
@@ -1236,11 +1362,9 @@ class MissionUXService:
                 {"prompt": prompt, "model": "gemma3:1b", "max_tokens": 256},
                 timeout_seconds=90,
             )
-            parsed = MissionUXService._parse_ai_json(
-                MissionUXService._extract_ai_text(raw))
+            parsed = MissionUXService._parse_ai_json(MissionUXService._extract_ai_text(raw))
             if parsed:
-                out = MissionUXService._assemble_interpretation(
-                    parsed, source="Ollama")
+                out = MissionUXService._assemble_interpretation(parsed, source="Ollama")
                 if out is not None:
                     return out
         except (ProviderUnavailableError, Exception):  # noqa: BLE001
@@ -1276,7 +1400,7 @@ class MissionUXService:
         if understood and not understood.startswith("SAM memahami"):
             understood = f"SAM memahami: {understood}"
         elif not understood:
-            understood = (f"SAM memahami: menjalankan operasi '{operation}'.")
+            understood = f"SAM memahami: menjalankan operasi '{operation}'."
         planned_raw = parsed.get("planned") or []
         planned = [str(x) for x in planned_raw if str(x)] or [
             "melakukan operasi {}".format(operation)
@@ -1311,6 +1435,7 @@ class MissionUXService:
     def _parse_ai_json(content: str) -> Optional[Dict[str, Any]]:
         """Parse JSON dari output model; toleran kutipan salah / teks tambahan."""
         import json as _json
+
         if not content:
             return None
         try:
@@ -1323,7 +1448,7 @@ class MissionUXService:
             start = content.find("{")
             end = content.rfind("}")
             if 0 <= start < end:
-                d = _json.loads(content[start:end + 1])
+                d = _json.loads(content[start : end + 1])
                 if isinstance(d, dict):
                     return d
         except Exception:  # noqa: BLE001
