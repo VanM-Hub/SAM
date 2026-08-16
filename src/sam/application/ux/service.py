@@ -1070,78 +1070,113 @@ class MissionUXService:
 
     @staticmethod
     def _interpret_via_ai(text: str) -> Optional[Tuple[str, str, str, List[str], str, str]]:
-        """Pahami permintaan via Gemma3:1b (Ollama lokal, no internet).
+        """Pahami permintaan via LLM reasoning (DeepSeek dulu, fallback Ollama).
 
-        Menghasilkan JSON terstruktur. Bila Ollama tidak tersedia / timeout /
+        Prioritas provider (REAL reasoning, bukan hanya regex):
+          1. DeepSeek (cloud, DEEPSEEK_API_KEY dari env Windows) — sistem PICAKAN.
+          2. Ollama lokal (gemma3:1b) — fallback offline/tanpa internet.
+          3. regex (mode offline penuh) — dipanggil caller bila None.
+
+        Menghasilkan JSON terstruktur. Bila SEMUA LLM tidak tersedia / timeout /
         hasil tidak valid -> kembalikan None (caller fallback ke regex).
-        Aman offline: tidak ada side effect bila gagal.
+        Aman: tidak ada side effect bila gagal; tidak pernah menetapkan repo.
         """
         if not text.strip():
             return None
+        prompt = (
+            f"{MissionUXService._AI_CAPABILITIES}\n\n"
+            "Instruksi: Dari permintaan berikut, tentukan operasi SAM yang paling "
+            "cocok (di antara daftar di atas). Jika tidak cocok sama sekali, pakai "
+            "operation kosong. Jawab HANYA dengan JSON valid tanpa teks lain, format:\n"
+            '{"operation": "<salah satu operation atau \"\">", '
+            '"target": "<objek sasaran, atau kosong>", '
+            '"understood": "<kalimat singkat apa yang SAM pahami>", '
+            '"planned": ["<langkah 1>", "<langkah 2>"]}\n\n'
+            f"Permintaan: {text}"
+        )
+        # 1) DeepSeek (provider REAL, cloud) — prioritas utama.
         try:
             from sam.providers.execution.provider_executor import (
                 ProviderExecutor,
                 ProviderUnavailableError,
             )
             executor = ProviderExecutor()
-            prompt = (
-                f"{MissionUXService._AI_CAPABILITIES}\n\n"
-                "Instruksi: Dari permintaan berikut, tentukan operasi SAM yang paling "
-                "cocok (di antara daftar di atas). Jika tidak cocok sama sekali, pakai "
-                "operation kosong. Jawab HANYA dengan JSON valid tanpa teks lain, format:\n"
-                '{"operation": "<salah satu operation atau \"\">", '
-                '"target": "<objek sasaran, atau kosong>", '
-                '"understood": "<kalimat singkat apa yang SAM pahami>", '
-                '"planned": ["<langkah 1>", "<langkah 2>"]}\n\n'
-                f"Permintaan: {text}"
+            raw = executor.execute(
+                "deepseek",
+                "chat",
+                {"prompt": prompt, "model": "deepseek-chat",
+                 "max_tokens": 256, "temperature": 0.1},
+                timeout_seconds=45,
             )
+            parsed = MissionUXService._parse_ai_json(
+                MissionUXService._extract_ai_text(raw))
+            if parsed:
+                out = MissionUXService._assemble_interpretation(
+                    parsed, source="DeepSeek")
+                if out is not None:
+                    return out
+        except (ProviderUnavailableError, Exception):  # noqa: BLE001
+            pass  # fallback ke Ollama
+
+        # 2) Ollama lokal (gemma3:1b) — fallback offline, zero internet.
+        try:
+            from sam.providers.execution.provider_executor import (
+                ProviderExecutor,
+                ProviderUnavailableError,
+            )
+            executor = ProviderExecutor()
             raw = executor.execute(
                 "ollama",
                 "chat",
                 {"prompt": prompt, "model": "gemma3:1b", "max_tokens": 256},
                 timeout_seconds=90,
             )
-            content = MissionUXService._extract_ai_text(raw)
-            parsed = MissionUXService._parse_ai_json(content)
-            if not parsed:
-                return None
-            operation = str(parsed.get("operation") or "")
-            if not operation:
-                return None  # belum operasi yang dikenali -> biarkan fallback/tolak
-            # (S2-4) JANGAN pernah percaya target repo dari AI untuk GitHub.
-            # Gemma/Ollama sering mengembalikan target yang mengecoh (mis. mencopot
-            # hint teks jadi "[github.create_issue] S2-4") -> repo invalid -> eksekusi
-            # BLOCKED/gagal. Selalu kunci repo GitHub ke repo TEST yang aman
-            # (GITHUB_TEST_REPO / default), sesuai prinsip "repo TEST, bukan production".
-            # Begitupun web/url target: normalisasi, jangan sampai URL mentah justru
-            # membuat eksekusi salah arah.
-            target = str(parsed.get("target") or "")
-            if operation == "github.create_issue":
-                target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
-            elif not target:
-                target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
-            understood = str(parsed.get("understood") or "")
-            # Normalisasi: selalu awali "SAM memahami:" agar konsisten dengan
-            # mode regex & harapan UI (jangan ubah kalau sudah ada).
-            understood = understood.strip()
-            if understood and not understood.startswith("SAM memahami"):
-                understood = f"SAM memahami: {understood}"
-            elif not understood:
-                understood = (f"SAM memahami: menjalankan operasi '{operation}'.")
-            planned_raw = parsed.get("planned") or []
-            planned = [str(x) for x in planned_raw if str(x)] or [
-                "melakukan operasi {}".format(operation)
-            ]
-            action_summary = f"SAM akan menjalankan operasi '{operation}'"
-            if target:
-                action_summary += f" pada '{target}'"
-            reason = (
-                "Pemahaman dihasilkan AI lokal (Gemma3:1b). Tindakan ini dapat "
-                "menghasilkan efek eksternal; persetujuan Anda diperlukan."
-            )
-            return (operation, target, understood, planned, action_summary, reason)
+            parsed = MissionUXService._parse_ai_json(
+                MissionUXService._extract_ai_text(raw))
+            if parsed:
+                out = MissionUXService._assemble_interpretation(
+                    parsed, source="Ollama")
+                if out is not None:
+                    return out
         except (ProviderUnavailableError, Exception):  # noqa: BLE001
-            return None
+            pass  # fallback regex di caller
+        return None
+
+    @staticmethod
+    def _assemble_interpretation(
+        parsed: Dict[str, Any], source: str
+    ) -> Optional[Tuple[str, str, str, List[str], str, str]]:
+        """Susun tuple interpretasi dari JSON LLM (shared DeepSeek/Ollama).
+
+        Source dimasukkan ke understood/reason agar UI jujur dari mana SAM
+        menalar. Tidak pernah menentukan repo GitHub dari AI (S2-4); repo
+        selalu dikunci ke GITHUB_TEST_REPO / default.
+        """
+        operation = str(parsed.get("operation") or "")
+        if not operation:
+            return None  # belum operasi yang dikenali -> biarkan fallback/tolak
+        target = str(parsed.get("target") or "")
+        if operation == "github.create_issue":
+            target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
+        elif not target:
+            target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
+        understood = str(parsed.get("understood") or "").strip()
+        if understood and not understood.startswith("SAM memahami"):
+            understood = f"SAM memahami: {understood}"
+        elif not understood:
+            understood = (f"SAM memahami: menjalankan operasi '{operation}'.")
+        planned_raw = parsed.get("planned") or []
+        planned = [str(x) for x in planned_raw if str(x)] or [
+            "melakukan operasi {}".format(operation)
+        ]
+        action_summary = f"SAM akan menjalankan operasi '{operation}'"
+        if target:
+            action_summary += f" pada '{target}'"
+        reason = (
+            f"Pemahaman dihasilkan LLM ({source}). Tindakan ini dapat "
+            "menghasilkan efek eksternal; persetujuan Anda diperlukan."
+        )
+        return (operation, target, understood, planned, action_summary, reason)
 
     @staticmethod
     def _extract_ai_text(raw: Dict[str, Any]) -> str:

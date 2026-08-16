@@ -26,6 +26,54 @@
 .toast{position:fixed;right:18px;bottom:18px;background:#202a24;color:#fff;padding:8px 11px;border-radius:7px;font-size:8.5px;opacity:0;transform:translateY(5px);transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:none}
 @media(max-width:1000px){.app{grid-template-columns:58px 1fr}.brand span,.navlabel,.nav button span,.sidefoot{display:none}.brand .mark{margin:auto}.nav button{text-align:center;font-size:16px;padding:9px 0}.ico{width:auto}.statuses .status:nth-child(n+4){display:none}.mc{grid-template-columns:1fr 1fr}.mcbox.workspace{grid-column:1/-1;height:450px}.guardpage,.wardpage{grid-template-columns:1fr}.cpgrid{grid-template-columns:1fr}.cprecords{grid-column:auto}}
 @media(max-width:650px){html,body{overflow:auto}.app{display:block;height:auto;min-height:100vh}.side{display:none}.top{height:auto;padding:7px 10px}.statuses{display:grid;grid-template-columns:1fr 1fr;width:100%}.statuses .status:first-child{grid-column:1/-1}.spacer,.rt,.avatar{display:none}.content{height:auto;min-height:calc(100vh - 70px);padding:11px}.page{height:auto;min-height:calc(100vh - 90px)}.grid2,.mc,.guardpage,.wardpage,.cpgrid{grid-template-columns:1fr}.mcbox.workspace{grid-column:auto;height:500px}.chat,.missionbox{height:360px}.recordtiles{grid-template-columns:1fr}.cprecords{grid-column:auto}.metrics,.evidence{grid-template-columns:1fr 1fr}}
+
+/* ===== S2-6 MissionControl: ConversationPanel | MissionListPanel | MissionPanel =====
+     3 kolom desktop: Conversation (pusat) + Mission List (daftar) + Mission detail (konteks). */
+.missioncontrol{display:grid;grid-template-columns:1fr 1fr 2fr;gap:10px;flex:1;min-height:0}
+.mcbox.convpanel{min-width:0;min-height:0;display:flex;flex-direction:column}
+.mcbox.mlpanel{min-width:0;min-height:0;display:flex;flex-direction:column}
+.mcbox.mispanel{min-width:0;min-height:0;display:flex;flex-direction:column}
+.mcbox.mlpanel .missionlist-body{flex:1;min-height:0;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
+.missionlist-body .ml-item{border:1px solid var(--line);border-radius:8px;background:#fff;padding:8px;flex:none;cursor:pointer}
+.missionlist-body .ml-item:hover{background:var(--soft)}
+.missionlist-body .ml-item.selected{border-color:var(--gs);background:#f2faf3}
+.missionlist-body .ml-item .ml-top{display:flex;align-items:center;gap:6px}
+.missionlist-body .ml-item .ml-title{font-size:9.5px;font-weight:800;color:var(--bs);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.missionlist-body .ml-item .ml-meta{font-size:7.8px;color:var(--muted);margin-top:3px}
+.mcbox.mispanel .missionpanel-body{flex:1;min-height:0;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:9px}
+.missionpanel-body .mc-card{border:1px solid var(--line);border-radius:8px;background:#fff;padding:9px;flex:none}
+.missionpanel-body .mc-card .eyebrow{font-size:7.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.mc-card h3{font-size:10.5px;margin:3px 0}
+.mc-card p{font-size:8.2px;color:var(--muted);margin:0;line-height:1.5}
+.mc-card .kvt{display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;font-size:8.2px}
+.mc-card .kvt b{display:block;margin-top:1px}
+.mc-card .kvt .lbl{color:var(--muted)}
+/* finding rows */
+.mc-findings{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.mc-finding{font-size:8.2px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--soft)}
+.mc-finding b{display:block;font-size:8.2px}
+.mc-finding span{display:block;color:var(--muted);font-size:7.8px;margin-top:1px}
+/* pipeline */
+.mc-pipeline{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
+.mc-stage{flex:1;min-width:44px;background:#eef0ee;color:var(--muted);padding:4px 1px;border-radius:5px;text-align:center;font-size:7px;font-weight:800}
+.mc-stage.done{background:var(--gs);color:var(--green)}
+.mc-stage.current{background:var(--bs);color:var(--blue)}
+.mc-stage.fail{background:var(--as);color:var(--amber)}
+/* tabs progressive disclosure */
+.mc-tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:7px;flex:none}
+.mc-tab{border:0;background:none;font-size:8px;font-weight:800;color:var(--muted);padding:6px 8px;border-bottom:2px solid transparent;cursor:pointer}
+.mc-tab.active{color:var(--green);border-bottom-color:var(--green)}
+/* decision */
+.mc-desc-actions{display:flex;gap:5px;margin-top:8px}
+.mc-desc-actions .btn{flex:1}
+.mc-insufficient{border:1px solid var(--as);background:#fffaf0}
+.mc-insufficient .eyebrow{color:var(--amber)}
+.mc-uncertain{border:1px solid var(--as);background:#fffaf0}
+.mc-uncertain .eyebrow{color:var(--amber)}
+.mc-empty{border:1px dashed var(--line);background:var(--soft)}
+/* mobile: stacked */
+@media(max-width:1100px){.missioncontrol{grid-template-columns:1fr 1fr}.mcbox.mlpanel{grid-column:1/-1;min-height:240px}}
+@media(max-width:700px){.missioncontrol{grid-template-columns:1fr}.mcbox.mispanel{min-height:400px}.mcbox.convpanel{min-height:380px}.mcbox.mlpanel{min-height:200px}}
 </style>
 </head>
 <body>
@@ -79,12 +127,25 @@
 
 <section class="page" id="mission">
 <div class="pagehead"><h1>Mission Control</h1><span>apa yang sedang kita kerjakan bersama</span></div>
-<div class="mc">
-<section class="card mcbox"><div class="head"><h2>Chat</h2><span id="chatMode" class="badge">CHAT</span></div><div class="messages" id="messages"><div class="msg sammsg"><div class="who">SAM</div>Belum ada conversation. Kirim pesan untuk memulai.</div></div><div class="chatform"><input id="chat" placeholder="Tulis ke SAM…" onkeydown="if(event.key==='Enter')send()"><button class="send" onclick="send()">Kirim</button></div></section>
-<section class="card mcbox"><div class="head"><h2>Mission</h2><span>select</span></div><div class="body">
-<div id="missionList"></div>
-</div></section>
-<section class="card mcbox workspace"><div class="workspacehead"><div class="eyebrow">MISSION · menunggu state runtime</div><h1>Belum ada mission</h1><div class="stages"><span class="stage" data-key="discover">Discover</span><span class="stage" data-key="understand">Understand</span><span class="stage" data-key="plan">Plan</span><span class="stage" data-key="observe">Observe</span><span class="stage" data-key="investigate">Investigate</span><span class="stage" data-key="diagnose">Diagnose</span><span class="stage" data-key="recommend">Recommend</span><span class="stage" data-key="authority">Authority</span><span class="stage" data-key="execute">Execute</span><span class="stage" data-key="verify">Verify</span></div></div><div class="workspacebody"><div class="insight"><h3>Menunggu data dari runtime</h3><p>State mission di-render dari /ux/state (jujur, bukan data palsu).</p></div></div></section>
+<!-- S2-6: MissionControl = ConversationPanel (pusat) + MissionListPanel (daftar) + MissionPanel (konteks).
+     Tiga kolom desktop, stacked mobile. Semua dari state canonical (/ux). -->
+<div class="missioncontrol">
+  <section class="card mcbox convpanel"><div class="head"><h2>Conversation</h2><span id="chatMode" class="badge">CHAT</span></div>
+    <div class="messages" id="messages"><div class="msg sammsg"><div class="who">SAM</div>Belum ada conversation. Kirim pesan untuk memulai.</div></div>
+    <div class="chatform"><input id="chat" placeholder="Tulis ke SAM…" onkeydown="if(event.key==='Enter')send()"><button class="send" onclick="send()">Kirim</button></div>
+  </section>
+  <section class="card mcbox mlpanel">
+    <div class="head"><h2>Mission List</h2><span id="mlCount" class="badge">0</span></div>
+    <div class="workspacebody missionlist-body" id="missionList">
+      <div class="ml-item"><div class="ml-title">Belum ada mission</div><div class="ml-meta">State mission dari /ux/state (jujur, bukan data palsu).</div></div>
+    </div>
+  </section>
+  <section class="card mcbox mispanel">
+    <div class="head"><h2>Mission</h2><span id="misMode" class="badge">CHAT</span></div>
+    <div class="workspacebody missionpanel-body" id="missionPanel">
+      <div class="insight"><h3>Menunggu data dari runtime</h3><p>State mission di-render dari /ux/state (jujur, bukan data palsu).</p></div>
+    </div>
+  </section>
 </div>
 </section>
 
@@ -306,188 +367,334 @@ async function renderEvidenceAudit(body){
 
 function fmtStatus(s){ s=(s||'').toUpperCase(); return s; }
 
-function renderMission(state){
-  const st=document.querySelector('.stages');
-  const head=document.querySelector('.workspacehead h1');
-  const eyebrow=document.querySelector('.workspacehead .eyebrow');
-  const body=document.querySelector('.workspacebody');
-  const status=fmtStatus(effStatus(state));
-  const ap=(state&&state.approval&&state.approval.status)||'';
-  const ex=(state&&state.execution&&state.execution.status)||'';
+/* =====================================================
+   S2-6 MissionControl projection
+   - UxMissionState canonical -> komponen (UI hanya projection).
+   - CHAT vs MISSION TIDAK deteksi via heuristic: murni dari state server
+     (plan.approval_required & planned_steps & mode terprogresi).
+   - INSUFFICIENT = first-class outcome (bukan error/fabrikasi).
+   - Confidence HANYA jika tersedia nyata di state.evidence; TIDAK mengarang.
+   - Recommendation TIDAK mengarang (recommendations=[] -> tombol "belum ada").
+   - Approval HANYA saat waiting_approval; Execution/Result murni projection.
+   ===================================================== */
 
-  // pipeline dari STATE (bukan boolean/hardcode)
-  let stageIdx=0;
-  const s=(ex||ap||'').toLowerCase();
-  if(/received|understood/.test(s)) stageIdx=1;        // Understand
-  else if(/^understood$|plan/.test(s)) stageIdx=2;
-  else if(/waiting_approval|pending|await/.test(s)) stageIdx=7; // Authority
-  else if(/approved|running/.test(s)) stageIdx=8;      // Execute
-  else if(/completed/.test(s)) stageIdx=9;             // Verify
-  // failure: tandai titik berhenti yg sesuai
-  const termFlag=/blocked|failed|rejected|retryable/.test(s);
-  if(termFlag && !/completed/.test(s)){
-    if(/rejected/.test(s)) stageIdx=7;        // berhenti di keputusan
-    else stageIdx=8;                          // blocked/failed/retryable -> eksekusi
-  }
-  if(st){
-    st.querySelectorAll('.stage').forEach((el,i2)=>{
-      el.className='stage'+(i2<stageIdx?' done':i2===stageIdx?' current':'')
-        +(termFlag&&i2===stageIdx?' fail':'');
-    });
-  }
-  if(head && state&&state.request) head.textContent=String(state.request);
-  if(eyebrow && state) eyebrow.textContent='MISSION · '+(state.request_id||'—')+(status?' · '+status:'');
+function modeFromState(state){
+  if(!state) return 'CHAT';
+  const plan=state.plan||{};
+  const aps=(state.approval&&state.approval.status)||'';
+  const exs=(state.execution&&state.execution.status)||'';
+  const progressed=/approved|running|completed|rejected|blocked|failed|retryable/i.test(aps+' '+exs) && (state.request||aps);
+  const realMission=!!(plan.approval_required && (plan.planned_steps&&plan.planned_steps.length));
+  return (realMission || progressed) ? 'MISSION' : 'CHAT';
+}
 
-  if(!body){ return; }
-  const H=[]; // html parts
+function setChatModeBadge(mode){
+  const b=document.getElementById('chatMode'); if(!b) return;
+  b.textContent=mode; b.className='badge '+(mode==='MISSION'?'running':'good');
+  const m=document.getElementById('misMode'); if(m){ m.textContent=mode; m.className='badge '+(mode==='MISSION'?'running':'good'); }
+}
 
-  // ---- A. Understanding ----
-  if(state && (state.understanding && (state.understanding.what_sam_understood||state.understanding.operation||state.understanding.target))){
-    let hp='<div class="insight"><div class="eyebrow">Apa yang dipahami SAM</div>';
-    if(state.understanding.what_sam_understood)
-      hp+='<h3>'+esc(state.understanding.what_sam_understood)+'</h3>';
-    let kv=[];
-    if(state.understanding.operation) kv.push('<div><span style="color:#707a74">Operation</span><div><b>'+esc(state.understanding.operation)+'</b></div></div>');
-    if(state.understanding.target) kv.push('<div><span style="color:#707a74">Target</span><div><b>'+esc(state.understanding.target)+'</b></div></div>');
-    if(kv.length) hp+='<div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap">'+kv.join('')+'</div>';
-    hp+='</div>';
-    H.push(hp);
-  }
-
-  // ---- B. Plan ----
-  if(state && state.plan){
-    let hp='<div class="insight"><div class="eyebrow">Rencana</div>';
-    if(state.plan.planned_steps && state.plan.planned_steps.length){
-      hp+='<ol style="margin:4px 0 0;padding-left:18px;font-size:8.2px;color:#d7ddd9">';
-      state.plan.planned_steps.forEach(s2=>hp+='<li>'+esc(s2)+'</li>');
-      hp+='</ol>';
+/* helper: ambil confidence JIKA tersedia nyata (tidak mengarang) */
+function findConfidence(state){
+  const ev=state&&state.evidence;
+  if(!Array.isArray(ev)||!ev.length) return null;
+  for(const e of ev){
+    if(e && (e.confidence!==undefined && e.confidence!==null && e.confidence!=='')){
+      return {value:e.confidence, label:e.confidence_label||e.confidence_label_text||('Confidence '+(e.confidence))};
     }
-    if(state.plan.approval_required)
-      hp+='<p style="margin-top:6px;font-size:8.2px;color:#5a7a68">Approval required: YES</p>';
-    hp+='</div>';
-    H.push(hp);
+  }
+  return null;
+}
+
+/* pipeline stage index + terminal - dari state canonical */
+function stageMeta(state){
+  const aps=(state&&state.approval&&state.approval.status)||'';
+  const exs=(state&&state.execution&&state.execution.status)||'';
+  const s=(aps+' '+exs).toLowerCase();
+  let idx=0;
+  if(/received|understood/.test(s)) idx=1;
+  else if(/plan/.test(s)) idx=2;
+  else if(/observe/.test(s)) idx=3;
+  else if(/investigate/.test(s)) idx=4;
+  else if(/diagnos/.test(s)) idx=5;
+  else if(/recommend/.test(s)) idx=6;
+  else if(/waiting_approval|pending|await/.test(s)) idx=7;
+  else if(/approved|running/.test(s)) idx=8;
+  else if(/completed/.test(s)) idx=9;
+  const terminal=/blocked|failed|rejected|retryable/.test(s) && !/completed/.test(s);
+  return {idx:Math.min(idx,9), terminal:terminal, raw:s};
+}
+
+const PIPELINE_STAGES=['Discover','Understand','Plan','Observe','Investigate','Diagnose','Recommend','Authority','Execute','Verify'];
+
+function renderMission(state){
+  const body=document.getElementById('missionPanel');
+  if(!body) return;
+  const meta=stageMeta(state);
+  const mode=modeFromState(state);
+  const scroll=body.scrollTop;
+
+  if(!state || !state.request){
+    body.innerHTML='<div class="mc-card mc-empty"><div class="eyebrow">Mission Control</div>'
+      +'<h3>Belum ada mission</h3>'
+      +'<p>State kosong dari /ux/state (jujur, bukan data palsu). Kirim pesan untuk memulai.</p></div>';
+    return;
   }
 
-  // ---- D. Recommendation (dari action_summary; JANGAN mengarang Risk/Confidence) ----
-  if(state && state.plan && state.plan.action_summary){
-    H.push('<div class="recommend"><div class="eyebrow">Rekomendasi</div>'
-      +'<p>'+esc(state.plan.action_summary)+'</p>'
-      +'<p style="font-size:8px;color:#707a74;margin-top:4px">Risk / Confidence belum tersedia dari runtime — tidak diisi fiktif.</p>'
-      +'</div>');
+  // ---- Mission Header ----
+  const sts=fmtStatus(effStatus(state));
+  let h='';
+  h+='<div class="mc-card"><div class="eyebrow">Mission</div>'
+    +'<h3>'+esc(state.request)+'</h3>'
+    +'<div class="kvt"><div><span class="lbl">Mode</span><b>'+esc(mode)+'</b></div>'
+    +'<div><span class="lbl">Status</span><b>'+esc(sts||'idle')+'</b></div>'
+    +(state.request_id?'<div><span class="lbl">ID</span><b style="font-size:7px">'+esc(state.request_id)+'</b></div>':'')
+    +'</div></div>';
+
+  // ---- Pipeline ----
+  h+='<div class="mc-card"><div class="eyebrow">Pipeline</div>'
+    +'<div class="mc-pipeline">';
+  PIPELINE_STAGES.forEach((label,i)=>{
+    const cls = i<meta.idx ? 'done' : (i===meta.idx&&!meta.terminal ? 'current' : (i===meta.idx&&meta.terminal?'fail':''));
+    h+='<div class="mc-stage '+cls+'">'+label+'</div>';
+  });
+  h+='</div></div>';
+
+  // ---- Understanding ----
+  const und=state.understanding||{};
+  if(und.operation||und.target||und.objective){
+    h+='<div class="mc-card"><div class="eyebrow">Pemahaman</div>';
+    if(und.operation) h+='<p><b>Operasi:</b> '+esc(und.operation)+'</p>';
+    if(und.target) h+='<p><b>Target:</b> '+esc(und.target)+'</p>';
+    if(und.objective) h+='<p>'+esc(und.objective)+'</p>';
+    h+='</div>';
   }
 
-  // ---- C. Evidence (dari state.evidence, bukan hardcode) ----
-  const evList=(state&&Array.isArray(state.evidence))?state.evidence:[];
-  if(evList.length){
-    let hp='<div class="insight"><div class="eyebrow">Evidence</div>';
-    evList.slice(0,8).forEach(ev=>{
-      const name=ev.event_name||ev.type||ev.kind||ev.id||ev.title||'';
-      const status=ev.status||ev.state||'';
-      hp+='<div style="font-size:8.2px;color:#d7ddd9;margin-top:3px">'
-        +(status?('<span style="color:#4f8a6a">✓</span> '):'• ')
-        +esc(name||JSON.stringify(ev))
-        +(status?(' <span style="color:#707a74">('+esc(status)+')</span>'):'')+'</div>';
-    });
-    hp+='</div>';
-    H.push(hp);
+  // ---- Summary (progress tahapan) ----
+  const stages=['discover','understand','plan','observe','investigate','diagnose','recommend','authority','execute','verify'];
+  const doneCount=stages.reduce((n,k)=>{ const v=effectivelyDone(stageState(state,k)); return n+(v?1:0); },0);
+  h+='<div class="mc-card"><div class="eyebrow">Ringkasan</div>'
+    +'<p>'+doneCount+' / '+stages.length+' tahapan tercapai</p>'
+    +'<p style="font-size:7.8px;color:#707a74">Dihitung dari status canonical state (tidak fabrikasi).</p></div>';
+
+  // ---- Evidence & Diagnosis & Recommendation (tabs progressive disclosure) ----
+  // Data diagnosis/recommendation hidup di dalam state.evidence sebagai entry
+  // ber-kind environment_diagnosis / environment_recommendation (hasil Acceptance
+  // S2-6.3 terhadap state real server: tidak ada field top-level state.recommendation
+  // / state.diagnosis - projection murni dari state canonical).
+  const evLen=(Array.isArray(state.evidence)?state.evidence.length:0);
+  const conf=findConfidence(state);
+  const diag = evidenceByKind(state,'environment_diagnosis') || state.diagnosis || {};
+  const rec  = evidenceByKind(state,'environment_recommendation') || state.recommendation || {};
+  const recArr=(rec&&Array.isArray(rec.recommendations)?rec.recommendations:[]);
+  const diagArr=(diag&&Array.isArray(diag.diagnosis)?diag.diagnosis:(diag&&Array.isArray(diag.diagnoses)?diag.diagnoses:[]));
+  const hasEv = evLen>0;
+  const hasDiag = diagArr.length>0 || (diag&&diag.summary);
+  const hasRec = recArr.length>0 || (rec&&rec.summary);
+  const tabActive = hasEv&&hasDiag&&hasRec ? 'evidence' : (hasEv?'evidence':(hasDiag?'diagnosis':(hasRec?'recommendation':'')));
+
+  if(hasEv||hasDiag||hasRec){
+    h+='<div class="mc-card"><div class="mc-tabs">'
+      +(hasEv?'<button class="mc-tab" data-tab="evidence">Evidence</button>':'')
+      +(hasDiag?'<button class="mc-tab" data-tab="diagnosis">Diagnosis</button>':'')
+      +(hasRec?'<button class="mc-tab" data-tab="recommendation">Rekomendasi</button>':'')
+      +'</div><div class="mc-tabbody">'
+      +'<div class="mc-tabpane" data-pane="evidence" style="'+(tabActive==='evidence'?'':'display:none')+'">'
+      +(hasEv?renderEvidenceWrap(state):'<p>Belum ada evidence.</p>')
+      +(conf?'<p style="margin-top:6px;font-size:8.2px;color:#4f8a6a">✓ Confidence: '+esc(String(conf.value))+'</p>':'')
+      +'</div>'
+      +'<div class="mc-tabpane" data-pane="diagnosis" style="'+(tabActive==='diagnosis'?'':'display:none')+'">'
+      +(hasDiag?renderDiagnosisWrap(state):'<p>Belum ada diagnosis.</p>')+'</div>'
+      +'<div class="mc-tabpane" data-pane="recommendation" style="'+(tabActive==='recommendation'?'':'display:none')+'">'
+      +'<div>'+renderRecommendationWrap(state)+'</div></div>'
+      +'</div></div>';
   }
 
-  // ---- failure semantics (SEBELUM decision/result, agar jelas) ----
-  const isBlocked=/blocked/.test(s), isFailed=/failed/.test(s),
-        isRejected=/rejected/.test(s), isRetryable=/retryable/.test(s);
-  const fm=(state&&state.execution&&state.execution.failure_message)?String(state.execution.failure_message):'';
-
-  // ---- E. Decision (HANYA saat waiting_approval) ----
-  if(/waiting_approval/.test(ap)){
-    H.push('<div class="recommend"><div class="eyebrow">Keputusan diperlukan</div>'
-      +'<h3>'+esc('SAM merekomendasikan: '+(state&&state.plan&&state.plan.action_summary||'lanjutkan'))+'</h3>'
-      +'<p style="font-size:8.2px;color:#707a74">Approval ≠ Execution. Keputusan diteruskan ke canonical ApprovalGate.</p>'
-      +'<div class="twobutton" style="margin-top:8px">'
-      +'<button class="btn primary" onclick="decide(\'approve\')">Setujui & lanjutkan</button>'
-      +'<button class="btn" onclick="decide(\'reject\')">Tolak</button></div></div>');
+  // ---- Decision (HANYA saat waiting_approval) ----
+  if((state.approval&&state.approval.status) && /waiting_approval|pending|await/i.test(String(state.approval.status))){
+    const recTxt=(rec&&rec.summary)||(state.plan&&state.plan.action_summary)||'';
+    h+='<div class="mc-card"><div class="eyebrow">Keputusan diperlukan</div>'
+      +'<p>'+esc(recTxt||'SAM merekomendasikan untuk melanjutkan.')+'</p>'
+      +'<div class="mc-desc-actions"><button class="btn primary" onclick="decide(\'approve\')">Setujui & lanjutkan</button>'
+      +'<button class="btn" onclick="decide(\'reject\')">Tolak</button></div></div>';
   }
 
-  // ---- F. Execution (running: teks, bukan 68%) ----
-  if(/running/.test(s)){
-    H.push('<div class="insight"><div class="eyebrow">Eksekusi</div>'
+  // ---- Execution / Result (projection murni) ----
+  const exs=(state.execution&&state.execution.status)||'';
+  const rs=(state.execution&&state.execution.result_summary)?String(state.execution.result_summary):'';
+  const fm=(state.execution&&state.execution.failure_message)?String(state.execution.failure_message):'';
+  if(/running|approved/i.test(exs) && !/completed/.test(exs)){
+    h+='<div class="mc-card"><div class="eyebrow">Eksekusi</div>'
       +'<p>SAM sedang mengeksekusi melalui canonical runtime.</p>'
-      +'<p style="font-size:8px;color:#707a74">Progress numerik tidak tersedia dari state — tidak ditampilkan angka fiktif.</p>'
-      +'</div>');
+      +'<p style="font-size:7.8px;color:#707a74">Progress numerik tidak tersedia dari state - tidak ditampilkan angka fiktif.</p></div>';
+  }
+  if(/completed/.test(exs)||/completed/.test(String(state.approval&&state.approval.status))){
+    h+='<div class="mc-card"><div class="eyebrow">Hasil</div><h3>'+esc(rs||'Misi selesai')+'</h3>'
+      +(evLen?'<p style="font-size:7.8px;color:#4f8a6a">✓ Evidence tercatat ('+evLen+' item)</p>':'')
+      +(state.audit_ref?'<p style="font-size:7.8px;color:#4f8a6a">✓ Audit: '+esc(state.audit_ref)+'</p>':'')
+      +'</div>';
+  }
+  if(/rejected/i.test(exs)||/rejected/i.test(String(state.approval&&state.approval.status))){
+    h+='<div class="mc-card mc-uncertain"><div class="eyebrow">Ditolak</div><h3>'+esc(rs||'Misi ditolak - tidak ada eksekusi (0 mutation)')+'</h3>'
+      +(fm?'<p style="color:#b08a3a;font-size:8px;margin-top:4px">'+esc(fm)+'</p>':'')
+      +'</div>';
+  }
+  if(/blocked/i.test(exs)){
+    h+='<div class="mc-card mc-uncertain"><div class="eyebrow">Terblokir</div><h3>'+esc(rs||'Misi terblokir - sumber/kredibilitas tidak tersedia')+'</h3>'
+      +(fm?'<p style="color:#b04a3a;font-size:8px;margin-top:4px">'+esc(fm)+'</p>':'')
+      +'</div>';
+  }
+  if(/failed/i.test(exs)){
+    h+='<div class="mc-card mc-uncertain"><div class="eyebrow">Gagal</div><h3>'+esc(rs||'Eksekusi gagal')+'</h3>'
+      +(fm?'<p style="color:#b04a3a;font-size:8px;margin-top:4px">'+esc(fm)+'</p>':'')
+      +'</div>';
+  }
+  if(/retryable/i.test(exs)){
+    h+='<div class="mc-card mc-uncertain"><div class="eyebrow">Dapat dicoba ulang</div><h3>'+esc(rs||'Timeout / dapat dijalankan ulang')+'</h3>'
+      +(fm?'<p style="color:#b08a3a;font-size:8px;margin-top:4px">'+esc(fm)+'</p>':'')
+      +'</div>';
   }
 
-  // ---- G. Result (+ verification) ----
-  const rs=(state&&state.execution&&state.execution.result_summary)?String(state.execution.result_summary):'';
-  if(/completed/.test(s)){
-    H.push('<div class="recommend"><div class="eyebrow">Selesai</div>'
-      +'<h3>'+esc(rs||'Misi selesai')+'</h3>'
-      +'<p style="font-size:8.2px;color:#4f8a6a">✓ Evidence tercatat'+(state&&state.evidence&&state.evidence.length?' ('+state.evidence.length+' item)':'')+'</p>'
-      +'<p style="font-size:8.2px;color:#4f8a6a">✓ Audit tercatat'+(state&&state.audit_ref?' · '+esc(state.audit_ref):'')+'</p>'
-      +'</div>');
-  }
-  if(isRejected){
-    H.push('<div class="recommend"><div class="eyebrow">Ditolak</div>'
-      +'<h3>'+esc(rs||'Misi ditolak — tidak ada eksekusi (0 mutation)')+'</h3>'
-      +(fm?('<p style="color:#b08a3a;font-size:8.2px;margin-top:4px">'+esc(fm)+'</p>'):'')
-      +'</div>');
-  }
-  if(isBlocked){
-    H.push('<div class="recommend"><div class="eyebrow">Terblokir</div>'
-      +'<h3>'+esc(rs||'Misi terblokir — sumber/kredibilitas tidak tersedia')+'</h3>'
-      +(fm?('<p style="color:#b04a3a;font-size:8.2px;margin-top:4px">'+esc(fm)+'</p>'):'')
-      +'</div>');
-  }
-  if(isFailed){
-    H.push('<div class="recommend"><div class="eyebrow">Gagal</div>'
-      +'<h3>'+esc(rs||'Eksekusi gagal')+'</h3>'
-      +(fm?('<p style="color:#b04a3a;font-size:8.2px;margin-top:4px">'+esc(fm)+'</p>'):'')
-      +'</div>');
-  }
-  if(isRetryable){
-    H.push('<div class="recommend"><div class="eyebrow">Dapat dicoba ulang</div>'
-      +'<h3>'+esc(rs||'Timeout / dapat dijalankan ulang')+'</h3>'
-      +(fm?('<p style="color:#b08a3a;font-size:8.2px;margin-top:4px">'+esc(fm)+'</p>'):'')
-      +'</div>');
+  // ---- INSUFFICIENT first-class ----
+  if(isInsufficient(state)){
+    h+='<div class="mc-card mc-insufficient"><div class="eyebrow">Info tidak cukup</div>'
+      +'<h3>Informasi yang tersedia belum cukup utk mengambil keputusan.</h3>'
+      +'<p>'+esc(insufficientReason(state))+'</p>'
+      +'<p style="font-size:7.8px;color:#707a74;margin-top:4px">Ini hasil analisis nyata dari runtime - bukan kegagalan / error.</p></div>';
   }
 
-  // ---- H. Timeline (dari state.timeline) ----
+  // ---- Timeline ----
   const tl=(state&&Array.isArray(state.timeline))?state.timeline:[];
   if(tl.length){
-    let hp='<div class="insight"><div class="eyebrow">Linimasa</div>';
+    h+='<div class="mc-card"><div class="eyebrow">Linimasa</div>';
     tl.slice(0,12).forEach(ev=>{
       const when=(ev.ts||ev.time||ev.when||'');
-      hp+='<div style="font-size:8px;color:#707a74;margin-top:2px">'
+      h+='<div style="font-size:7.8px;color:#707a74;margin-top:2px">'
         +(when?('<span>'+esc(String(when).slice(11,19))+'</span> '):'')
-        +'• '+esc(ev.stage||ev.kind||ev.event||ev.type||'')+' '+esc(ev.detail||ev.summary||ev.status||'')+'</div>';
+        +'▸ '+esc(ev.stage||ev.kind||ev.event||ev.type||'')+' '+esc(ev.detail||ev.summary||ev.status||'')+'</div>';
     });
-    hp+='</div>';
-    H.push(hp);
+    h+='</div>';
   }
 
-  // ---- status umum (selalu tampil) ----
-  if(status){
-    let stc='<div class="insight"><div class="eyebrow">Status</div><p><b>'+esc(status)+'</b></p>';
-    if(fm) stc+='<p style="color:'+(isBlocked||isFailed?'#b04a3a':isRejected||isRetryable?'#b08a3a':'#707a74')+';font-size:8.2px;margin-top:3px">'+esc(fm)+'</p>';
-    stc+='</div>';
-    H.push(stc);
-  }
+  body.innerHTML=h;
+  body.scrollTop=scroll;
 
-  if(!H.length){
-    H.push('<div class="insight"><h3>Belum ada mission aktif</h3><p>State kosong dari runtime (jujur, bukan data palsu).</p></div>');
+  // wire tab click (progressive disclosure)
+  body.querySelectorAll('.mc-tab').forEach(t=>{
+    t.onclick=()=>{
+      body.querySelectorAll('.mc-tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const target=t.getAttribute('data-tab');
+      body.querySelectorAll('.mc-tabpane').forEach(p=>p.style.display=(p.getAttribute('data-pane')===target?'':'none'));
+    };
+  });
+  const at=body.querySelector('.mc-tab[data-tab="'+tabActive+'"]'); if(at) at.classList.add('active');
+  setChatModeBadge(mode);
+}
+
+function renderEvidenceWrap(state){
+  const evList=Array.isArray(state.evidence)?state.evidence:[];
+  let h='';
+  evList.slice(0,8).forEach(ev=>{
+    const name=ev.event_name||ev.type||ev.kind||ev.id||ev.title||'';
+    const status=ev.status||ev.state||'';
+    h+='<div style="font-size:8px;color:#3a463f;margin-top:3px">'
+      +(status?('<span style="color:#4f8a6a">●</span> '):'\u2022 ')
+      +esc(name||JSON.stringify(ev))
+      +(status?(' <span style="color:#707a74">('+esc(status)+')</span>'):'')+'</div>';
+  });
+  return h || '<p>Belum ada evidence.</p>';
+}
+
+/* projection murni: ambil entri evidence berdasarkan kind (state canonical). */
+function evidenceByKind(state, kind){
+  const ev=Array.isArray(state.evidence)?state.evidence:[];
+  for(const e of ev){ if(e && (e.kind===kind || (e.name&&e.name===kind) || (e.type&&e.type===kind))) return e; }
+  return null;
+}
+
+function renderDiagnosisWrap(state){
+  const diag = evidenceByKind(state,'environment_diagnosis') || state.diagnosis || {};
+  const dia=Array.isArray(diag.diagnosis)?diag.diagnosis:(Array.isArray(diag.diagnoses)?diag.diagnoses:[]);
+  const conf=diag.confidence;
+  let h='';
+  if(conf!==undefined&&conf!==null&&conf!=='') h+='<p style="font-size:8.2px;color:#4f8a6a">✓ Confidence: '+esc(String(conf))+'</p>';
+  if(diag.summary) h+='<p>'+esc(diag.summary)+'</p>';
+  if(diag.verdict) h+='<p><b>Verdict:</b> '+esc(diag.verdict)+'</p>';
+  if(dia.length){
+    h+='<div class="mc-findings">';
+    dia.forEach(d=>{ h+='<div class="mc-finding"><b>'+esc(d.title||d.kind||d.cause||'')+'</b><span>'+esc(d.detail||d.summary||d.recommendation||'')+'</span></div>'; });
+    h+='</div>';
   }
-  body.innerHTML=H.join('');
-  renderEvidenceAudit(body); // async tambahan dari /ux/evidence & /ux/audit (bukan fabrikasi)
+  return h || '<p>Belum ada diagnosis.</p>';
+}
+
+function renderRecommendationWrap(state){
+  const rec = evidenceByKind(state,'environment_recommendation') || state.recommendation || {};
+  const recArr=Array.isArray(rec.recommendations)?rec.recommendations:[];
+  const conf=rec.confidence;
+  let h='';
+  if(conf!==undefined&&conf!==null&&conf!=='') h+='<p style="font-size:8.2px;color:#4f8a6a">✓ Confidence: '+esc(String(conf))+'</p>';
+  if(rec.summary) h+='<p>'+esc(rec.summary)+'</p>';
+  if(recArr.length){
+    h+='<ol style="margin:4px 0 0;padding-left:18px;font-size:8.2px;color:#3a463f">';
+    recArr.forEach(r=>h+='<li>'+esc(r.title||r.action||r.text||(typeof r==='string'?r:JSON.stringify(r)))+'</li>');
+    h+='</ol>';
+  } else {
+    h+='<p style="font-size:8px;color:#707a74;margin-top:4px">Belum ada tindakan canonical.</p>';
+  }
+  return h;
+}
+
+function stageState(state,k){ return (state&&state[k])||null; }
+function effectivelyDone(v){ return !!(v && (v.done || v.ok || v.status==='completed')); }
+function isInsufficient(state){
+  const recR = state && (evidenceByKind(state,'environment_recommendation') || state.recommendation || null);
+  const diagR = state && (evidenceByKind(state,'environment_diagnosis') || state.diagnosis || null);
+  const rec = recR || {}; const diag = diagR || {};
+  const recIns = (rec.insufficient===true) || /insufficient/i.test(String(rec.status||rec.summary||rec.sufficiency||''));
+  const diagIns = (diag.insufficient===true) || /insufficient/i.test(String(diag.status||diag.sufficiency||diag.sufficiency_reason||''));
+  return !!(recIns || diagIns || (state&&state.execution&&/insufficient/i.test(String(state.execution.status||''))));
+}
+function insufficientReason(state){
+  const recR = state && (evidenceByKind(state,'environment_recommendation') || state.recommendation || null);
+  const diagR = state && (evidenceByKind(state,'environment_diagnosis') || state.diagnosis || null);
+  const rec=recR||{}; const diag=diagR||{};
+  return (rec.sufficiency_reason)||(rec.summary)||(diag.sufficiency_reason)||(diag.summary)||'Belum ada cukup bukti dari runtime.';
 }
 
 
-async function renderChatAndState(){  try{
-    const state=await loadState();
-    renderMission(state);
-    setChatModeBadge(detectMode(state));   // S2-5: mode CHAT vs MISSION dari state canonical
-    renderHome(state);
-    renderMissionList(state);
-    // status bar SAM
-    const sts=effStatus(state);
-    document.querySelector('.status .val') && (document.querySelector('.status .val').textContent='● '+(sts||'idle'));
+/* SATU refresh cycle (catatan S2-6.3): state + conversation diambil BERSAMA
+   (Promise.all), lalu render SEKALI dari set data yang sama - hindari MissionPanel
+   dari respons baru sementara MessageList dari respons lama. */
+async function fetchUxCycle(){
+  const tasks=[loadState()];
+  if(_currentConversation && _currentConversation.conversation_id){
+    tasks.push(api('/ux/conversation/'+_currentConversation.conversation_id)
+      .then(c=>({conversation:c}))
+      .catch(()=>({conversation:null})));
+  } else {
+    tasks.push(Promise.resolve({conversation:null}));
+  }
+  const [state, convWrap]=await Promise.all(tasks);
+  const conv=convWrap.conversation;
+  if(conv && conv.conversation_id && conv.messages){
+    // rehydrate conversation dari backend (source-of-truth), bukan DOM.
+    _currentConversation={conversation_id:conv.conversation_id, messages:conv.messages};
+    renderChatMessages(conv.messages);
+  }
+  return state;
+}
+
+/* render mission + home + list + status dari SATU set state canonical. */
+function applyUxState(state){
+  renderMission(state);
+  setChatModeBadge(modeFromState(state));   // S2-6: mode murni dari state canonical (bukan heuristic)
+  renderHome(state);
+  renderMissionList(state);
+  // status bar SAM
+  const sts=effStatus(state);
+  document.querySelector('.status .val') && (document.querySelector('.status .val').textContent='● '+(sts||'idle'));
     document.querySelector('#last') && (document.querySelector('#last').textContent=(state.updated_at||'—').toString().slice(11,16));
     // counter jujur (bukan angka fabrikasi)
     const hasActive = !!(state && state.request && sts && !/^REJECTED|^COMPLETED|^FAILED|^BLOCKED/i.test(sts));
@@ -495,9 +702,6 @@ async function renderChatAndState(){  try{
     const am=document.getElementById('navMissionCount'); if(am){ am.textContent=hasActive?1:''; am.style.display=hasActive?'':'none'; }
     const wEl=document.getElementById('stWards'); if(wEl) wEl.textContent='— (Phase 2)';
     const at=document.getElementById('stAttention'); if(at) at.textContent='— (Phase 2)';
-  }catch(e){
-    toast('Gagal baca state runtime: '+e.message, true);
-  }
 }
 
 /* Home hooks: alert, mission aktif, decision — semua dari runtime (§55) */
@@ -520,13 +724,17 @@ function renderHome(state){
   }
 }
 
-/* Mission list — satu mission aktif (phase 1: state tunggal dari /ux/state) */
+/* Mission list — satu mission aktif (phase 1: state tunggal dari /ux/state).
+   Panel MISSION LIST = daftar misi nyata dari state canonical, bukan contoh. */
 function renderMissionList(state){
   const ml=document.getElementById('missionList'); if(!ml) return;
+  const cnt=document.getElementById('mlCount');
   const sts=effStatus(state);
-  ml.innerHTML = (state && state.request)
-    ? '<div class="mission selected"><span class="badge running">Berjalan</span><div class="mtitle">'+esc(state.request)+'</div><div class="meta">'+esc(sts||'')+' · '+esc(state.request_id||'')+'</div></div>'
-    : '<div class="mission"><div class="mtitle">Belum ada mission</div><div class="meta">State kosong dari runtime.</div></div>';
+  const has = !!(state && state.request);
+  if(cnt){ cnt.textContent = has ? '1' : '0'; }
+  ml.innerHTML = has
+    ? '<div class="ml-item selected" onclick="go(\'mission\')"><div class="ml-top"><span class="badge running">Berjalan</span><b class="ml-title">'+esc(state.request)+'</b></div><div class="ml-meta">'+esc(sts||'')+' · '+esc(state.request_id||'')+' · tahap '+esc(PIPELINE_STAGES[Math.min(stageMeta(state).idx,PIPELINE_STAGES.length-1)]||'')+'</div></div>'
+    : '<div class="ml-item"><div class="ml-title">Belum ada mission</div><div class="ml-meta">State mission dari /ux/state (jujur, bukan data palsu).</div></div>';
 }
 
 /* ============ S2-5 — Chat = interface ke governance machine ============
@@ -551,20 +759,6 @@ let _currentConversation = null;   // {conversation_id, messages[]} dari backend
    dgn planned_steps/operation). CHAT = percakapan biasa / operasi tak dikenali
    (approval_required=False, plan kosong) — bukan mislabeled sebagai mission.
    Tidak menebak-nebak; semua sinyal dari backend. */
-function detectMode(missionState){
-  const s=missionState||{};
-  const plan=s.plan||{};
-  const realMission = !!(plan.approval_required && (plan.planned_steps && plan.planned_steps.length));
-  const progressed = /approved|running|completed|rejected|blocked|failed|retryable/i.test(
-      effStatus(s)) && (s.request || (s.approval&&s.approval.status));
-  return (realMission || progressed) ? 'MISSION' : 'CHAT';
-}
-
-function setChatModeBadge(mode){
-  const b=document.getElementById('chatMode'); if(!b) return;
-  b.textContent=mode;
-  b.className='badge '+(mode==='MISSION'?'running':'good');
-}
 
 /* render pesan chat SELURUHNYA dari daftar pesan backend (source-of-truth).
    role 'user' -> kanan, 'assistant' -> kiri (SAM). Tidak ada teks di-append
@@ -600,10 +794,9 @@ async function send(){
     const data=await api('/ux/conversation/message',{method:'POST',body:JSON.stringify(body)});
     _currentConversation={conversation_id:data.conversation_id, messages:data.messages};
     renderChatMessages(data.messages);
-    setChatModeBadge(detectMode(data.mission_state||null));
-    // status bar, home & workspace mission tetap di-rehydrate dari /ux/state
-    // canonical (konsisten dgn mission_state backend).
-    await renderChatAndState();
+    // S2-6: satu render cycle dari mission_state canonical yg dikembalikan POST
+    // (state + conversation SAMA respons -> render konsisten, bukan 2 sumber)
+    applyUxState(data.mission_state||null);
   }catch(e){
     const box=document.getElementById('messages');
     const s=document.createElement('div'); s.className='msg sammsg';
@@ -621,7 +814,7 @@ async function decide(decision){
   try{
     await api('/ux/decide',{method:'POST',body:JSON.stringify({intent:decision})});
     toast(decision==='approve'?'Keputusan approve dikirim · eksekusi lewat canonical runtime':'Keputusan reject dikirim · 0 mutation');
-    await renderChatAndState();
+    const s=await fetchUxCycle(); applyUxState(s);  // SATU refresh cycle (state+conversation, render sekali)
   }catch(e){ if(e.status===401){ /* login overlay sudah dimunculkan by api() */ }
     else toast('Gagal kirim keputusan: '+e.message, true); }
 }
@@ -650,7 +843,7 @@ async function loadEvents(){
 }
 
 /* smooth rehydration setelah mutasi (§55) */
-async function refreshAll(){ await Promise.all([renderChatAndState(),loadHealth(),loadEvents(),refreshAuth()]); }
+async function refreshAll(){ await Promise.all([ (async()=>{ const s=await fetchUxCycle(); applyUxState(s); })(), loadHealth(), loadEvents(), refreshAuth() ]).catch(()=>{}); }
 function refresh(){ refreshAll(); }
 
 /* ---------- element tanpa backend (Phase 2-6) -> honest "belum tersedia" (§50/§63) ---------- */
