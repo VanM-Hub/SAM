@@ -30,6 +30,18 @@ class UxRouteTest(unittest.TestCase):
         else:
             os.environ.pop("GITHUB_TOKEN", None)
 
+    def _submit(self, text: str):
+        """Submit mission & kembalikan dict state + mission_id.
+
+        AD-ENG-006: decide WAJIB `mission_id` (target eksplisit).
+        """
+        r = self.client.post("/ux/submit", json={"text": text})
+        self.assertEqual(r.status_code, 200)
+        s = r.json()
+        mid = (s.get("observability") or {}).get("mission_id")
+        self.assertTrue(mid, "submit harus menghasilkan mission-*")
+        return s, mid
+
     def test_submit_returns_waiting_approval_state(self):
         r = self.client.post("/ux/submit", json={"text": "Buat GitHub issue 'uji route'"})
         self.assertEqual(r.status_code, 200)
@@ -45,8 +57,8 @@ class UxRouteTest(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
 
     def test_decide_reject_marks_rejected(self):
-        self.client.post("/ux/submit", json={"text": "Buat GitHub issue 'tolak route'"})
-        r = self.client.post("/ux/decide", json={"intent": "reject", "approver": "user"})
+        _, mid = self._submit("Buat GitHub issue 'tolak route'")
+        r = self.client.post("/ux/decide", json={"intent": "reject", "mission_id": mid, "approver": "user"})
         self.assertEqual(r.status_code, 200)
         body = r.json()
         self.assertEqual(body["approval"]["status"], "rejected")
@@ -55,8 +67,8 @@ class UxRouteTest(unittest.TestCase):
 
     def test_decide_approve_without_token_is_blocked_not_fake(self):
         """Approve tanpa token -> BLOCKED, bukan fake success."""
-        self.client.post("/ux/submit", json={"text": "Buat GitHub issue 'block route'"})
-        r = self.client.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+        _, mid = self._submit("Buat GitHub issue 'block route'")
+        r = self.client.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
         self.assertEqual(r.status_code, 200)
         body = r.json()
         self.assertEqual(body["execution"]["status"], "blocked")
@@ -64,10 +76,16 @@ class UxRouteTest(unittest.TestCase):
         self.assertIn("GITHUB_TOKEN", body["execution"]["failure_message"])
 
     def test_decide_invalid_intent_rejected(self):
-        self.client.post("/ux/submit", json={"text": "Buat GitHub issue 'x'"})
-        r = self.client.post("/ux/decide", json={"intent": "nonsense"})
+        _, mid = self._submit("Buat GitHub issue 'x'")
+        r = self.client.post("/ux/decide", json={"intent": "nonsense", "mission_id": mid})
         self.assertEqual(r.status_code, 200)
         self.assertIn("error", r.json())
+
+    def test_decide_without_mission_id_is_422(self):
+        """AD-ENG-006: tanpa mission_id -> 422 (zero mutation)."""
+        self._submit("Buat GitHub issue 'tanpa mid'")
+        r = self.client.post("/ux/decide", json={"intent": "reject"})
+        self.assertEqual(r.status_code, 422)
 
     def test_http_response_never_leaks_secret(self):
         """Respons HTTP state tidak pernah memuat nilai/placeholder secret."""

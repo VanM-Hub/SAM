@@ -448,7 +448,7 @@ function renderMission(state){
     +'<h3>'+esc(state.request)+'</h3>'
     +'<div class="kvt"><div><span class="lbl">Mode</span><b>'+esc(mode)+'</b></div>'
     +'<div><span class="lbl">Status</span><b>'+esc(sts||'idle')+'</b></div>'
-    +(state.request_id?'<div><span class="lbl">ID</span><b style="font-size:7px">'+esc(state.request_id)+'</b></div>':'')
+    +((state.observability&&state.observability.mission_id)?'<div><span class="lbl">Mission ID</span><b style="font-size:7px">'+esc(state.observability.mission_id)+'</b></div>':'')
     +'</div></div>';
 
   // ---- Pipeline ----
@@ -510,13 +510,15 @@ function renderMission(state){
       +'</div></div>';
   }
 
-  // ---- Decision (HANYA saat waiting_approval) ----
+  // ---- Decision: DIPINDAH ke Mission Detail (Phase UI-2). ----
+  // Keputusan approve/reject dikirim dgn target mission_id EKSPLISIT
+  // (selectedMissionId) via Mission Detail — bukan dari state current tunggal
+  // (AD-ENG-006: jangan gunakan current/latest sbg target tanpa eksplisit).
   if((state.approval&&state.approval.status) && /waiting_approval|pending|await/i.test(String(state.approval.status))){
     const recTxt=(rec&&rec.summary)||(state.plan&&state.plan.action_summary)||'';
-    h+='<div class="mc-card"><div class="eyebrow">Keputusan diperlukan</div>'
+    h+='<div class="mc-card"><div class="eyebrow">Keputusan menunggu</div>'
       +'<p>'+esc(recTxt||'SAM merekomendasikan untuk melanjutkan.')+'</p>'
-      +'<div class="mc-desc-actions"><button class="btn primary" onclick="decide(\'approve\')">Setujui & lanjutkan</button>'
-      +'<button class="btn" onclick="decide(\'reject\')">Tolak</button></div></div>';
+      +'<p style="font-size:7.8px;color:#707a74">Keputusan utk mission ini dilakukan di <b>Mission Detail</b> (pilih mission dulu) — target mission_id eksplisit, bukan state current.</p></div>';
   }
 
   // ---- Execution / Result (projection murni) ----
@@ -688,10 +690,13 @@ async function fetchUxCycle(){
 
 /* render mission + home + list + status dari SATU set state canonical. */
 function applyUxState(state){
-  renderMission(state);
+  // AD-ENG-005 Phase UI-1: Mission Detail TIDAK lagi dirender dari state current
+  // tunggal; Detail di-drive oleh selectedMissionId via GET /ux/missions/{mission-*}.
+  // Mission List juga dari server (GET /ux/missions), bukan proyeksi state tunggal.
+  // renderHome + status bar tetap dari state canonical (Home = mission aktif live).
+
   setChatModeBadge(modeFromState(state));   // S2-6: mode murni dari state canonical (bukan heuristic)
   renderHome(state);
-  renderMissionList(state);
   // status bar SAM
   const sts=effStatus(state);
   document.querySelector('.status .val') && (document.querySelector('.status .val').textContent='● '+(sts||'idle'));
@@ -702,6 +707,8 @@ function applyUxState(state){
     const am=document.getElementById('navMissionCount'); if(am){ am.textContent=hasActive?1:''; am.style.display=hasActive?'':'none'; }
     const wEl=document.getElementById('stWards'); if(wEl) wEl.textContent='— (Phase 2)';
     const at=document.getElementById('stAttention'); if(at) at.textContent='— (Phase 2)';
+  // AD-ENG-005 Phase UI-1: Mission List + Detail di-refresh dari server (mission baru muncul)
+  loadMissionList();
 }
 
 /* Home hooks: alert, mission aktif, decision — semua dari runtime (§55) */
@@ -718,24 +725,156 @@ function renderHome(state){
   if(hm){ const active = state && state.request && sts && !/^REJECTED|^COMPLETED|^FAILED|^BLOCKED/i.test(sts);
     hm.innerHTML = active
       ? '<div class="mission" onclick="go(\'mission\')"><div class="mtop"><span class="badge running">Berjalan</span></div><div class="mtitle">'+esc(state.request)+'</div>'
-        +'<div class="meta">'+esc(sts)+' · '+esc(state.request_id||'')+' · tahap '+esc(PIPELINE[Math.min(prog.idx,PIPELINE.length-1)].label)+'</div>'
+        +'<div class="meta">'+esc(sts)+' · '+((state.observability&&state.observability.mission_id)?state.observability.mission_id:'')+' · tahap '+esc(PIPELINE[Math.min(prog.idx,PIPELINE.length-1)].label)+'</div>'
         +'<div class="bar"><span style="width:'+Math.round((prog.idx/(PIPELINE.length-1))*100)+'%"></span></div></div>'
       : '<div class="insight" style="padding:10px;font-size:8.2px;color:#707a74">Belum ada mission aktif dari runtime.</div>';
   }
 }
 
-/* Mission list — satu mission aktif (phase 1: state tunggal dari /ux/state).
-   Panel MISSION LIST = daftar misi nyata dari state canonical, bukan contoh. */
-function renderMissionList(state){
+/* AD-ENG-005 Phase UI-1 + AD-ENG-006 Phase UI-2:
+   Mission List = enumerasi dari SERVER (GET /ux/missions).
+   cards[] = array mission-* (non-secret). request_id TIDAK jadi identity display.
+   Klik card -> selectMission(mission-*) -> GET /ux/missions/{mission-*} -> Detail.
+   Decision dilakukan di Mission Detail (selectedMissionId) dgn mission_id eksplisit. */
+function renderMissionList(cards){
   const ml=document.getElementById('missionList'); if(!ml) return;
   const cnt=document.getElementById('mlCount');
-  const sts=effStatus(state);
-  const has = !!(state && state.request);
-  if(cnt){ cnt.textContent = has ? '1' : '0'; }
-  ml.innerHTML = has
-    ? '<div class="ml-item selected" onclick="go(\'mission\')"><div class="ml-top"><span class="badge running">Berjalan</span><b class="ml-title">'+esc(state.request)+'</b></div><div class="ml-meta">'+esc(sts||'')+' · '+esc(state.request_id||'')+' · tahap '+esc(PIPELINE_STAGES[Math.min(stageMeta(state).idx,PIPELINE_STAGES.length-1)]||'')+'</div></div>'
-    : '<div class="ml-item"><div class="ml-title">Belum ada mission</div><div class="ml-meta">State mission dari /ux/state (jujur, bukan data palsu).</div></div>';
+  const list=Array.isArray(cards)?cards:[];
+  if(cnt){ cnt.textContent=String(list.length); }
+  if(!list.length){
+    ml.innerHTML='<div class="ml-item"><div class="ml-title">Belum ada mission</div>'
+      +'<div class="ml-meta">Daftar mission dari /ux/missions (jujur, bukan data palsu). Kirim command ke SAM untuk memulai.</div></div>';
+    return;
+  }
+  ml.innerHTML=list.map(c=>{
+    const mid=c.mission_id||'';
+    const sel=(selectedMissionId && mid===selectedMissionId)?' selected':'';
+    const sts=c.status||'';
+    const und=c.what_sam_understood||'';
+    const op=c.operation||'';
+    const tgt=c.target||'';
+    const req=(c.approval_required)?' butuh persetujuan':'';
+    const badge=/approved|running|completed|understood|received/i.test(sts)?'running':(/blocked|failed|rejected|error/i.test(sts)?'fail':'good');
+    return '<div class="ml-item'+sel+'" data-mission-id="'+esc(mid)+'" onclick="selectMission(\''+esc(mid)+'\')">'
+      +'<div class="ml-top"><span class="badge '+badge+'">'+esc(sts||'')+'</span><b class="ml-title">'+esc(und||op||mid)+'</b></div>'
+      +'<div class="ml-meta">'+esc(mid)
+      +(op?(' &middot; '+esc(op)):'')
+      +(tgt?(' &middot; '+esc(tgt)):'')
+      +req+'</div></div>';
+  }).join('');
 }
+
+/* AD-ENG-005 Phase UI-1: load Mission List dari server (GET /ux/missions).
+   Setelah load, pilih mission (default: paling terbaru) & refresh Detail utk
+   selected (read-only). Fail-closed: 503 -> pesan jujur. */
+async function loadMissionList(){
+  const ml=document.getElementById('missionList');
+  try{
+    const res=await api('/ux/missions');
+    const cards=(res&&Array.isArray(res.missions))?res.missions:[];
+    missionList=cards;
+    if(selectedMissionId && !cards.some(c=>c.mission_id===selectedMissionId)){
+      selectedMissionId=null;
+    }
+    if(!selectedMissionId && cards.length){ selectedMissionId=cards[0].mission_id; }
+    renderMissionList(cards);
+    if(selectedMissionId){ await loadMissionDetail(selectedMissionId); }
+    else { renderMissionDetail(null); }
+  }catch(e){
+    missionList=[]; selectedMissionId=null;
+    renderMissionList([]);
+    if(ml) ml.insertAdjacentHTML('beforeend','<div class="ml-item"><div class="ml-title">Mission unavailable</div><div class="ml-meta">'+esc(e.message)+'</div></div>');
+  }
+}
+
+/* AD-ENG-005 Phase UI-1: klik card -> GET /ux/missions/{mission-*} -> render Detail.
+   request_id TIDAK jadi identity. Fail-closed 404 -> pesan (tanpa fallback).
+   Phase UI-2: Detail berisi tombol keputusan (approve/reject) utk selected. */
+async function selectMission(missionId){
+  if(!missionId) return;
+  selectedMissionId=missionId;
+  renderMissionList(missionList);
+  await loadMissionDetail(missionId);
+}
+
+/* AD-ENG-005 Phase UI-1: load Detail satu mission dari server (read-only).
+   Card detail = field ringkas canonical (mission_id, status, what_sam_understood,
+   operation, target, updated_at, approval_required). Field state penuh
+   (plan/evidence/timeline) TIDAK ada di card -> tampil jujur. */
+async function loadMissionDetail(missionId){
+  const body=document.getElementById('missionPanel'); if(!body) return;
+  let c=null;
+  try{
+    c=await api('/ux/missions/'+encodeURIComponent(missionId));
+  }catch(e){
+    if(e.status===404){ renderMissionDetail(null,'Mission '+esc(missionId)+' tidak ditemukan (fail-closed, tanpa fallback request_id).'); return; }
+    renderMissionDetail(null,'Gagal memuat detail: '+esc(e.message)); return;
+  }
+  renderMissionDetail(c);
+}
+
+/* proyeksi Detail dari card (field ringkas canonical) + keputusan (Phase UI-2).
+   Contract card /ux/missions/{mission-*}: {mission_id, status, what_sam_understood,
+   operation, target, updated_at, approval_required}. Decision TIDAK dihitung lokal:
+   tombol hanya memicu `decide()` yang mengirim {intent, mission_id:selectedMissionId}
+   ke server; hasil approve/reject/eksekusi datang dari SERVER (refresh via selectMission). */
+function renderMissionDetail(c, errMsg){
+  const body=document.getElementById('missionPanel'); if(!body) return;
+  const meta=document.getElementById('misMode');
+  if(errMsg){
+    body.innerHTML='<div class="mc-card mc-empty"><div class="eyebrow">Mission Detail</div>'
+      +'<h3>Detail tidak tersedia</h3><p>'+errMsg+'</p></div>';
+    if(meta){ meta.textContent='UNAVAILABLE'; meta.className='badge fail'; }
+    return;
+  }
+  if(!c){
+    body.innerHTML='<div class="mc-card mc-empty"><div class="eyebrow">Mission Detail</div>'
+      +'<h3>Belum ada mission terpilih</h3><p>Pilih mission dari Mission List untuk melihat detail.</p></div>';
+    if(meta){ meta.textContent='CHAT'; meta.className='badge good'; }
+    return;
+  }
+  const rawSts=String(c.status||'').toLowerCase();
+  const sts=fmtStatus(c.status||'');
+  const req=(c.approval_required)?'Ya':'Tidak';
+  const needsDecision=/waiting_approval|pending|await/i.test(rawSts);
+  const rejected=/rejected|denied/.test(rawSts);
+  const blocked=/blocked|failed|error/.test(rawSts);
+  const completed=/completed|approved|executed/.test(rawSts);
+  let h='';
+  h+='<div class="mc-card"><div class="eyebrow">Mission</div>'
+    +'<h3>'+esc(c.what_sam_understood||c.operation||c.target||c.mission_id)+'</h3>'
+    +'<div class="kvt"><div><span class="lbl">Mission ID</span><b style="font-size:7px">'+esc(c.mission_id)+'</b></div>'
+    +'<div><span class="lbl">Status</span><b>'+esc(sts||'idle')+'</b></div>'
+    +'<div><span class="lbl">Operasi</span><b>'+esc(c.operation||'-')+'</b></div>'
+    +'<div><span class="lbl">Target</span><b>'+esc(c.target||'-')+'</b></div>'
+    +'<div><span class="lbl">Persetujuan</span><b>'+esc(req)+'</b></div>'
+    +(c.updated_at?'<div><span class="lbl">Updated</span><b>'+esc(String(c.updated_at).slice(0,16))+'</b></div>':'')
+    +'</div></div>';
+  // Keputusan (Phase UI-2): HANYA saat status mission menunggu & memerlukan persetujuan.
+  // Kirim mission_id eksplisit; hasil datang dari server (bukan ditentukan lokal).
+  if(needsDecision){
+    h+='<div class="mc-card"><div class="eyebrow">Keputusan</div>'
+      +'<p>SAM mengusulkan operasi berikut. Anda memutuskan approve/reject untuk mission ini.</p>'
+      +'<div class="mc-desc-actions"><button class="btn primary" onclick="decide(\'approve\')">Setujui &amp; lanjutkan</button>'
+      +'<button class="btn" onclick="decide(\'reject\')">Tolak</button></div>'
+      +'<p style="font-size:7.8px;color:#707a74">Keputusan dikirim ke <b>/ux/decide</b> dgn target mission_id eksplisit; hasil approve/reject datang dari server.</p></div>';
+  } else if(rejected){
+    h+='<div class="mc-card mc-uncertain"><div class="eyebrow">Ditolak</div>'
+      +'<h3>Misi ditolak - tidak ada eksekusi (0 mutation)</h3></div>';
+  } else if(blocked){
+    h+='<div class="mc-card mc-uncertain"><div class="eyebrow">Terblokir / Gagal</div>'
+      +'<h3>Misi '+esc(sts)+' - detail eksekusi lihat conversation / state penuh.</h3></div>';
+  } else if(completed){
+    h+='<div class="mc-card"><div class="eyebrow">Selesai / Disetujui</div>'
+      +'<h3>Keputusan telah dibuat utk mission ini.</h3></div>';
+  }
+  h+='<div class="mc-card"><div class="eyebrow">Sumber</div>'
+    +'<p>Detail dari <b>/ux/missions/'+esc(c.mission_id)+'</b> (server, bukan state lokal).</p>'
+    +'<p style="font-size:7.8px;color:#707a74">Field state penuh (plan/evidence/timeline) tersedia via list mission \&amp; conversation; tidak dibuat-buat di sini.</p></div>';
+  body.innerHTML=h;
+  if(meta){ meta.textContent=needsDecision?'KEPUTUSAN':(rawSts?sts:'CHAT'); meta.className='badge '+((rejected||blocked)?'fail':'good'); }
+}
+
 
 /* ============ S2-5 — Chat = interface ke governance machine ============
    Backend canonical conversation adalah source-of-truth: pesan di-render
@@ -747,6 +886,19 @@ function renderMissionList(state){
    dari backend. Tidak ada progress palsu / approval palsu / state lokal sbg
    source-of-truth. Voice/Vision/markdown DIY tidak dibuat. */
 let _currentConversation = null;   // {conversation_id, messages[]} dari backend
+
+/* ---- AD-ENG-005 Phase UI-1: Mission List (read-only) ----
+   Mission List & Detail di-drive oleh server (GET /ux/missions, /ux/missions/{mission-*}),
+   BUKAN dari state tunggal /ux/state. mission-* = identitas canonical; request_id
+   TIDAK dipakai sbg identity display. selectedMissionId = in-memory UI selection
+   (bukan penyimpanan persistent browser; tidak survive hard refresh). Semua read-only:
+   approval/execution untuk selected mission BELUM diaktifkan (Phase UI-2). */
+let selectedMissionId = null;   // mission-* yang sedang dipilih (UI selection, in-memory)
+let missionList = [];           // cache daftar mission-* dari server (render list)
+
+// Phase UI-2: selectedMissionId = TARGET keputusan. approve/reject di Mission
+// Detail mengirim {intent, mission_id: selectedMissionId} ke /ux/decide. Missing
+// selection => UI TIDAK mengirim {intent} polos (bukan terjadi di UI).
 
 /* Setelah muat ulang, conversation di-rehydrate dari BACKEND pada pesan pertama:
    mengirim TANPA conversation_id akan me-resume conversation default dan
@@ -807,16 +959,44 @@ async function send(){
   }
 }
 
-/* decision -> POST /ux/decide (§20/§21/§47) HANYA intent, bukan eksekusi.
-   Contract asli (/ux/decide): {intent:'approve'|'reject'} — tidak ada request_id
-   (state = current service state). Jangan mengarang field (§48). */
+/* decision -> POST /ux/decide (AD-ENG-006 mission-scoped targeting).
+   Target = selectedMissionId (mission-* yang dipilih di Mission Detail), KIRIM
+   eksplisit di body: {intent, mission_id}. Tanpa mission_id yang terseleksi,
+   UI TIDAK mengirim {intent} polos (back-end 422/404-bisa-bocor); tampilkan error
+   jujur & berhenti. Setelah berhasil, hasil approve/reject/eksekusi datang dari
+   SERVER (refresh Mission List/Detail), BUKAN ditentukan lokal. Respons/error
+   server ditampilkan apa adanya (err.data.detail). */
 async function decide(decision){
+  const mid=selectedMissionId;
+  if(!mid){
+    toast('Tidak ada mission terpilih utk keputusan (pilih mission dari Mission List dulu)', true);
+    return;
+  }
   try{
-    await api('/ux/decide',{method:'POST',body:JSON.stringify({intent:decision})});
-    toast(decision==='approve'?'Keputusan approve dikirim · eksekusi lewat canonical runtime':'Keputusan reject dikirim · 0 mutation');
-    const s=await fetchUxCycle(); applyUxState(s);  // SATU refresh cycle (state+conversation, render sekali)
-  }catch(e){ if(e.status===401){ /* login overlay sudah dimunculkan by api() */ }
-    else toast('Gagal kirim keputusan: '+e.message, true); }
+    const data=await api('/ux/decide',{method:'POST',body:JSON.stringify({intent:decision,mission_id:mid,approver:'user'})});
+    // respons server = kebenaran (approval/execution/observability); jangan menebak.
+    const ap=(data&&data.approval&&data.approval.status)||'';
+    const ex=(data&&data.execution&&data.execution.status)||'';
+    const obs=(data&&data.observability&&data.observability.status)||'';
+    const approved=(data&&data.approval&&data.approval.decision&&data.approval.decision.approved);
+    const core=approved?('Disetujui'):'Ditolak';
+    toast(core+' · status='+(obs||ex||ap||'?')+' ('+mid+')');
+    // refresh dari SERVER: Mission List + Detail utk selected (bukan set status lokal)
+    await loadMissionList();
+  }catch(e){
+    if(e.status===401){ /* login overlay sudah dimunculkan by api() */ }
+    else if(e.status===404){
+      // anti-oracle: not found / cross-tenant -> pesan generik server, tanpa fallback
+      const d=(e.data&&e.data.detail)||e.data;
+      toast('Mission tidak ditemukan / bukan milik Anda: '+(((d&&d.error)||e.message))+'. (tidak ada fallback: jangan edarkan UI ke mission lain)', true);
+      selectedMissionId=null; await loadMissionList();
+    }
+    else if(e.status===422){
+      const d=(e.data&&e.data.detail)||e.data;
+      toast('Request keputusan ditolak server: '+(((d&&d.error)||e.message)), true);
+    }
+    else toast('Gagal kirim keputusan: '+(e.message||('HTTP '+(e.status||'?'))), true);
+  }
 }
 
 /* ---------- runtime health (Control Panel Phase 1 safe area) ---------- */

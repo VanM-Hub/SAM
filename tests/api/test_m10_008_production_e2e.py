@@ -83,11 +83,12 @@ class TestProductionE2ELifecycle(unittest.TestCase):
         }
         s = c.post("/ux/submit", json=body).json()
         assert s["approval"]["status"] == "waiting_approval"
+        mid = s["observability"]["mission_id"]
         # retry dengan key sama (simulasi network-timeout retry) -> idem.
         s2 = c.post("/ux/submit", json=body).json()
         assert s2["request_id"] == s["request_id"], "retry harus idempotent"
         # approve -> rantai nyata.
-        done = c.post("/ux/decide", json={"intent": "approve", "approver": "operator-e2e"})
+        done = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "operator-e2e"})
         st = done.json()
         assert st["execution"]["status"] == "completed", str(st["execution"])
         # verification: evidence eksternal (issue_url GitHub).
@@ -103,7 +104,6 @@ class TestProductionE2ELifecycle(unittest.TestCase):
         """Persistence + rantai nyata: mission (HTTP/persist store) survive
         restart -> truth operational tidak hilang pasca-recover."""
         import tempfile
-        from fastapi.testclient import TestClient as TC
         # injeksi store enabled ke service singleton agar HTTP + persistence
         # jalan bareng (production-like: config mengaktifkan store).
         tmp = tempfile.mkdtemp()
@@ -112,8 +112,9 @@ class TestProductionE2ELifecycle(unittest.TestCase):
         ux_mod._routes.service._store = store
         ux_mod._routes.service._recover_from_store()
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue utk M10-008 persistence"})
-        done = c.post("/ux/decide", json={"intent": "approve", "approver": "op-p"}).json()
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue utk M10-008 persistence"}).json()
+        mid = s0["observability"]["mission_id"]
+        done = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "op-p"}).json()
         assert done["execution"]["status"] == "completed"
         # verify state sudah ditulis ke store disk.
         persisted = store.load()
@@ -132,9 +133,10 @@ class TestProductionE2ELifecycle(unittest.TestCase):
     def test_artifact_file_written(self):
         """Mission menulis artifact (file laporan) yang bisa jadi masukan learning."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue utk artifact e2e",
-                                   "idempotency_key": "m10-008-artifact"})
-        st = c.post("/ux/decide", json={"intent": "approve", "approver": "op"}).json()
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue utk artifact e2e",
+                                   "idempotency_key": "m10-008-artifact"}).json()
+        mid = s0["observability"]["mission_id"]
+        st = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "op"}).json()
         assert st["execution"]["status"] == "completed"
         art = st.get("artifact_ref", "")
         if art:

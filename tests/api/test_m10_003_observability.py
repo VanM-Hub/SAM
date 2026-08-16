@@ -13,7 +13,6 @@ metadata operasional).
 from __future__ import annotations
 
 import os
-import re
 import unittest
 
 import pytest
@@ -46,7 +45,17 @@ def _protect_token_for_acceptance():
 def _submit(c, text="Buat github issue utk observability"):
     r = c.post("/ux/submit", json={"text": text})
     assert r.status_code == 200
-    return r.json()
+    s = r.json()
+    assert s["observability"]["mission_id"].startswith("mission-")
+    return s
+
+
+def _mid(s):
+    return s["observability"]["mission_id"]
+
+
+def _decide(c, mid, intent="reject", approver="operator-a"):
+    return c.post("/ux/decide", json={"intent": intent, "mission_id": mid, "approver": approver})
 
 
 class TestObservability(unittest.TestCase):
@@ -73,8 +82,8 @@ class TestObservability(unittest.TestCase):
     def test_reject_records_approver_and_no_execution(self):
         """Reject -> observability mencatat approver, 0 mutation, no exec."""
         c = TestClient(app)
-        _submit(c)
-        r = c.post("/ux/decide", json={"intent": "reject", "approver": "operator-a"})
+        s0 = _submit(c)
+        r = _decide(c, _mid(s0), "reject", "operator-a")
         s = r.json()
         obs = s["observability"]
         assert obs["status"] == "rejected"
@@ -87,8 +96,8 @@ class TestObservability(unittest.TestCase):
     def test_approver_in_audit_timeline(self):
         """Timeline/audit mencatat approver utk pertanyaan 'atas persetujuan siapa'."""
         c = TestClient(app)
-        _submit(c)
-        c.post("/ux/decide", json={"intent": "reject", "approver": "operator-b"})
+        s0 = _submit(c)
+        _decide(c, _mid(s0), "reject", "operator-b")
         aud = (c.get("/ux/audit").json() or {}).get("audit") or []
         assert any(e.get("approver") == "operator-b" for e in aud), (
             "audit harus mencatat approver"
@@ -98,8 +107,8 @@ class TestObservability(unittest.TestCase):
     def test_approve_has_execution_id_and_verification(self):
         """Approve -> execution_id + end_time + verification_result terisi."""
         c = TestClient(app)
-        _submit(c, "Buat github issue utk observability approve")
-        r = c.post("/ux/decide", json={"intent": "approve", "approver": "operator-c"})
+        s0 = _submit(c, "Buat github issue utk observability approve")
+        r = _decide(c, _mid(s0), "approve", "operator-c")
         s = r.json()
         assert s["execution"]["status"] == "completed"
         obs = s["observability"]

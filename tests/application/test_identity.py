@@ -11,7 +11,6 @@ Unit + integrasi:
 from __future__ import annotations
 
 import json
-import os
 
 import pytest
 
@@ -144,10 +143,11 @@ class TestAuthRoute:
         # submit mission sederhana (read-only web, cepat) supaya ada plan utk approve
         sub = client.post("/ux/submit", json={"text": "buka website example.com"})
         assert sub.status_code == 200
+        mid = sub.json()["observability"]["mission_id"]
         # approve dengan token -> identitas sesi (van) dipakai, bukan body
         dec = client.post(
             "/ux/decide",
-            json={"intent": "reject", "approver": "bukan-saya"},
+            json={"intent": "reject", "mission_id": mid, "approver": "bukan-saya"},
             headers={"Authorization": f"Bearer {token}"},
         )
         assert dec.status_code == 200
@@ -186,8 +186,9 @@ class TestAuthRoute:
         monkeypatch.delenv("SAM_ENABLE_AUTH", raising=False)
         sub = client.post("/ux/submit", json={"text": "buka website example.com"})
         assert sub.status_code == 200
+        mid = sub.json()["observability"]["mission_id"]
         dec = client.post(
-            "/ux/decide", json={"intent": "reject", "approver": "operator-b"}
+            "/ux/decide", json={"intent": "reject", "mission_id": mid, "approver": "operator-b"}
         )
         assert dec.status_code == 200
         assert dec.json()["observability"]["approver"] == "operator-b"

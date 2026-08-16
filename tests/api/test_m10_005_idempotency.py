@@ -69,11 +69,12 @@ class TestIdempotencyKey(unittest.TestCase):
         menghasilkan satu eksekusi (evidence tunggal), bukan dua."""
         c = TestClient(app)
         body = {"text": "Buat github issue (idempotency proof)", "idempotency_key": "op-final-7"}
-        c.post("/ux/submit", json=body)
+        s0 = c.post("/ux/submit", json=body).json()
+        mid = s0["observability"]["mission_id"]
         # retry dengan key sama -> state sama (belum approve)
         c.post("/ux/submit", json=body)
         # approve SATU kali saja untuk operasi logis tunggal
-        r = c.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+        r = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
         s = r.json()
         assert s["execution"]["status"] == "completed"
         # evidence harus 1 (satu issue untuk satu operasi logis)
@@ -91,9 +92,10 @@ class TestNoDuplicateExecution(unittest.TestCase):
         """Approve sekali -> satu eksekusi; decide lanjutan (tanpa submit baru)
         TIDAK menambah issue (state sudah terminal)."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue (single)"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue (single)"}).json()
+        mid = s0["observability"]["mission_id"]
         # approve -> completed/blocked (depend env token); intinya tidak ganda.
-        r = c.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+        r = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
         assert r.status_code == 200
         # decide kedua pada state yang sama tidak boleh menciptakan eksekusi baru
         # yang tidak diminta (state tidak menambah evidence tanpa submit baru).

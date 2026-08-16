@@ -75,9 +75,10 @@ class TestApprovalJourneyReal(unittest.TestCase):
         assert s["plan"]["approval_required"] is True
         assert "SAM memahami" in s["understanding"]["what_sam_understood"]
         assert s["plan"]["planned_steps"]  # plan nyata, bukan kosong
+        mid = s["observability"]["mission_id"]
 
         # 2) approve -> real gate -> real execution
-        r = self.client.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+        r = self.client.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
         assert r.status_code == 200
         s = r.json()
         assert s["execution"]["status"] == "completed", (
@@ -130,8 +131,9 @@ class TestRejectNoMutation(unittest.TestCase):
         assert r.status_code == 200
         s = r.json()
         assert s["approval"]["status"] == "waiting_approval"
+        mid = s["observability"]["mission_id"]
 
-        r = self.client.post("/ux/decide", json={"intent": "reject", "approver": "user"})
+        r = self.client.post("/ux/decide", json={"intent": "reject", "mission_id": mid, "approver": "user"})
         assert r.status_code == 200
         s = r.json()
         # REJECTED, bukan completed/blocked/failed

@@ -16,10 +16,8 @@ produksi. Deterministik; tidak butuh token untuk deny-scenarios.
 from __future__ import annotations
 
 import os
-import re
 import unittest
 
-import pytest
 from fastapi.testclient import TestClient
 
 from sam.api.server import app
@@ -66,11 +64,12 @@ class TestBypassDenied(unittest.TestCase):
     def test_missing_credential_blocks_not_runs(self):
         """Credential tidak tersedia -> BLOCKED (deny), bukan eksekusi fake."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue (no cred)"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue (no cred)"}).json()
+        mid = s0["observability"]["mission_id"]
         # env token dihapus utk simulasi deny; tidak boleh eksekusi.
         saved = os.environ.pop("GITHUB_TOKEN", None)
         try:
-            r = c.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+            r = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
             s = r.json()
             assert s["execution"]["status"] in ("blocked", "failed"), str(s["execution"])
             # blocked/failed TIDAK menambah evidence eksternal sah.
@@ -104,9 +103,10 @@ class TestPromptCredentialExfiltration(unittest.TestCase):
         memuat token nyata — deny di level observability."""
         import os as _os
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue (boundary)"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue (boundary)"}).json()
+        mid = s0["observability"]["mission_id"]
         if _os.getenv("GITHUB_TOKEN"):
-            r = c.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+            r = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
             body = str(r.json()).lower()
             assert "ghp_" not in body, "response approve membocorkan token"
             for ep in ("/ux/state", "/ux/evidence", "/ux/audit"):
@@ -121,8 +121,9 @@ class TestUnauthorizedMutationDenied(unittest.TestCase):
         """Approve utk request invalid (bukan capability) TIDAK menghasilkan
         eksekusi/mutation (deny: capability invalid)."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "tiw ken ajanq zzz bukan perintah"})
-        r = c.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+        s0 = c.post("/ux/submit", json={"text": "tiw ken ajanq zzz bukan perintah"}).json()
+        mid = s0["observability"]["mission_id"]
+        r = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
         s = r.json()
         # karena bukan capability, tidak ada eksekusi nyata; state tidak menjadi
         # 'completed dgn evidence' (harus di-deny jujur).

@@ -54,11 +54,23 @@ class SubmitRequest(BaseModel):
 class DecideRequest(BaseModel):
     """Body request: keputusan approval user.
 
+    AD-ENG-006 (Mission-Scoped Decision Targeting):
+      `mission_id` WAJIB. Without it -> HTTP 422 (strict; zero mutation; tidak ada
+      fallback ke current/latest/request_id/m_*). Body bentuk:
+        {"intent": "approve"|"reject", "mission_id": "mission-<hex>"}
+
     M11-004: `approver` TIDAK lagi dipercaya dari client ketika AUTH aktif
     (SAM_ENABLE_AUTH=1). Identitas diambil dari sesi (header Authorization),
     bukan dari body ini. Field dipertahankan utk kompatibilitas mode non-auth.
     """
     intent: str  # "approve" | "reject"
+    # AD-ENG-006: canonical mission-* target WAJIB. Field `Optional` (bukan
+    # required) supaya auth/authorization (401/403) menang SEBELUM validasi
+    # mission_id (422) — tidak bocorkan kebutuhan mission_id dgn info tak
+    # terautentikasi. Validasi wajib dilakukan MANUAL di handler (setelah
+    # `_require_auth`): missing -> HTTP 422 strict, zero mutation, tanpa
+    # fallback ke current/latest/request_id/m_*.
+    mission_id: Optional[str] = None
     approver: str = "user"
 
 
@@ -94,6 +106,12 @@ class UxRoutes:
 
     def __init__(self) -> None:
         self.service = MissionUXService()
+        # AD-ENG-005: unit persistence MISSION utk enumerasi Mission List
+        # (repository durable = sumber enumerasi, §3.1). Dibangun DULU agar
+        # factory mission-konversasi & MultiMissionService memakai unit yang SAMA.
+        self.mission_unit = None
+        self._mission_repo_blocked_reason = ""
+        self._init_mission_persistence()
         # AD-ENG-005 §7 (Opsi 2): MultiMissionService = coordination/registration
         # boundary utk Mission dari Conversation. Factory memanggil MissionUXService
         # dengan persistence unit MISSION yang SAMA dgn unit enumerasi Mission List
@@ -101,18 +119,12 @@ class UxRoutes:
         # SAMA dengan yang dibaca /ux/missions (deterministik). MultiMissionService
         # TIDAK membuat Mission identity kedua; ia meregistrasikan canonical
         # mission-* hasil `submit()` ke registry.
+        # AD-ENG-006 §5.3: `persistence_unit` di-inject utk durable fallback pada
+        # decide (resolve live > durable; registry miss != mission missing).
         self.multi = MultiMissionService(
-            service_factory=self._build_mission_service
+            service_factory=self._build_mission_service,
+            persistence_unit=self.mission_unit,
         )
-        # AD-ENG-005: unit persistence MISSION utk enumerasi Mission List
-        # (repository durable = sumber enumerasi, §3.1). Dibangun SEKALI di sini
-        # agar enumeration & factory mission-konversasi memakai unit yang SAMA.
-        # Dev (tanpa PG) -> InMemoryMissionRepository (list jalan utk dev);
-        # produksi PG siap -> PostgresPersistenceUnit; produksi fail-closed ->
-        # mission_persistence_ready=False (route /ux/missions -> 503).
-        self.mission_unit = None
-        self._mission_repo_blocked_reason = ""
-        self._init_mission_persistence()
         self.users = UserStore()
         self.sessions = SessionStore()
         # S2-3: ConversationService (adapter HTTP conversation). Repository
@@ -370,8 +382,18 @@ async def ux_submit(request: SubmitRequest):
     Adapter murni: meneruskan text ke MissionUXService.submit, mengembalikan
     UxMissionState.as_dict() (ViewModel) untuk UI. Tidak ada eksekusi di sini.
     M10-005: `idempotency_key` memastikan retry TIDAK membuat mission ganda.
+
+    AD-ENG-006: mission yang lahir di sini didaftarkan ke `multi` (live registry)
+    agar dapat ditarget oleh `POST /ux/decide` (yang WAJIB mission_id & memakai
+    MultiMissionService.decide sebagai boundary). TIDAK membuat Mission kedua/
+    m_* baru — ia meregistrasikan mission-* yang SAMA dr state ini.
     """
     state = _routes.service.submit(request.text, idempotency_key=request.idempotency_key)
+    # AD-ENG-006: daftarkan mission-* eksisting ke multi (tanpa identity kedua)
+    # sehingga decide boundary `MultiMissionService.decide` bisa menargetkannya.
+    mid = ((state.observability or {}).get("mission_id") or "").strip()
+    if mid:
+        _routes.multi.register("default", mid, _routes.service)
     return state.as_dict()
 
 
@@ -417,11 +439,22 @@ async def ux_decide(
     sam_session: Optional[str] = Cookie(None),
     x_csrf_token: Optional[str] = Header(None),
 ):
-    """Terapkan keputusan approval user (approve/reject).
+    """Terapkan keputusan approval user (approve/reject) utk mission target eksplisit.
 
-    Adapter murni: meneruskan intent ke MissionUXService.decide, yang
-    memanggil ApprovalGate canonical lalu (bila approved) menjalankan mission
-    nyata via jalur canonical. UI tidak membuat jalur eksekusi sendiri.
+    AD-ENG-006 (Mission-Scoped Decision Targeting, APPROVED/IMPLEMENTATION AUTHORIZED):
+      - Resolve target Mission TERLEBIH DAHULU, baru decision terjadi. TIDAK ada
+        urutan mutate-then-resolve.
+      - Request BENTUK `{intent, mission_id}`. `mission_id` canonical mission-* WAJIB;
+        tanpa mission_id -> HTTP 422 `mission_id_required` (zero mutation).
+      - Route memakai `MultiMissionService.decide(...)` sebagai single application
+        coordination boundary (bukan `_routes.service.decide` current).
+      - Resolution (tenant, mission_id): live registry > durable repository;
+        registry miss != mission missing. Unknown / cross-tenant -> generic 404
+        `MISSION_NOT_FOUND` (anti existence oracle). Tidak ada fallback ke
+        current/latest/request_id/m_*.
+      - Governance didelegasikan `MultiMissionService` -> `MissionUXService.decide`
+        -> ApprovalGate canonical -> existing execution (ADR-003 idempotency).
+      - TIDAK ada endpoint baru, TIDAK ada identitas baru, tidak ada orchestration kedua.
 
     M11-004: bila AUTH aktif (SAM_ENABLE_AUTH=1), identitas diambil dari
     header Authorization (sesi login), BUKAN dari `approver` body. Tanpa token
@@ -436,16 +469,50 @@ async def ux_decide(
 
     # M11-004/M12-011: identitas terverifikasi dari sesi (bila auth aktif),
     # dengan proteksi CSRF utk jalur cookie. Dalam mode non-auth (default),
-    # `approver` body tetap dipakai utk kompatibilitas regresi.
+    # `approver` body tetap dipakai utk kompatibilitas regresi. Auth dicek
+    # SEBELUM mission_id (401/403 tidak membocorkan keberadaan mission).
     identity = _routes._require_auth(authorization, sam_session, x_csrf_token)
+
+    # AD-ENG-006: mission_id WAJIB -> 422 strict, zero mutation.
+    if not (request.mission_id or "").strip():
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "mission_id wajib untuk decision request (target eksplisit)",
+                "code": "mission_id_required",
+            },
+        )
+
     approver = (
         identity.get("username", "user")
         if _routes.auth_enabled
         else (request.approver or "user")
     )
 
-    state = _routes.service.decide(intent, approver=approver)
-    return state.as_dict()
+    # AD-ENG-006: decision boundary = MultiMissionService.decide(tenant, mission_id,
+    # execution_id, intent, approver). execution_id utk mission-* di-set = mission_id
+    # (konsisten dgn submit_mission yang men-save registry dgn execution_id=mission-*;
+    # AD-ENG-005 §8.1 execution_id confusion tetap follow-up, TIDAK disentuh di sini).
+    # Resolve mission dgn tenant "default" (isolasi M12-012; reverse-proxy/identity
+    # tenant scoping lanjutan di M11-004).
+    try:
+        state = _routes.multi.decide(
+            tenant="default",
+            mission_id=request.mission_id,
+            execution_id=request.mission_id,
+            intent=intent,
+            approver=approver,
+        )
+    except KeyError:
+        # unknown / cross-tenant -> generic 404 (anti existence oracle; zero mutation).
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "error": "mission tidak ditemukan atau bukan milik tenant Anda",
+                "code": "MISSION_NOT_FOUND",
+            },
+        )
+    return state
 
 
 @router.post("/conversation/message")

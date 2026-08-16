@@ -105,8 +105,9 @@ class TestStateMachineUX(unittest.TestCase):
         """Setelah approve, state terminal (completed) datang dari runtime /ux/state,
         dan request berikutnya (simulasi refresh) tetap 'completed'."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue untuk state canonical"})
-        r = c.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue untuk state canonical"}).json()
+        mid = s0["observability"]["mission_id"]
+        r = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
         assert r.status_code == 200
         s = r.json()
         assert s["execution"]["status"] == "completed"
@@ -151,8 +152,9 @@ class TestRefreshResilience(unittest.TestCase):
         """Setelah approve, GET /ux/evidence & /ux/audit (request terpisah = refresh)
         tetap mengembalikan data — evidence/audit dari runtime, bukan JS session."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue evidence refresh"})
-        done = c.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue evidence refresh"}).json()
+        mid = s0["observability"]["mission_id"]
+        done = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
         assert done.status_code == 200
         assert done.json()["execution"]["status"] == "completed"
 
@@ -172,8 +174,9 @@ class TestFailureRecoveryUX(unittest.TestCase):
     def test_rejected_maps_from_runtime(self):
         """Reject -> REJECTED dari runtime; /ux/state konsisten (UI == runtime)."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue untuk dicoba tolak"})
-        r = c.post("/ux/decide", json={"intent": "reject", "approver": "user"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue untuk dicoba tolak"}).json()
+        mid = s0["observability"]["mission_id"]
+        r = c.post("/ux/decide", json={"intent": "reject", "mission_id": mid, "approver": "user"})
         assert r.status_code == 200
         s = r.json()
         assert s["execution"]["status"] == "rejected"

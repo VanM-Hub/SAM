@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import unittest
 
-import pytest
 from fastapi.testclient import TestClient
 
 from sam.api.server import app
@@ -96,8 +95,9 @@ class TestFailureClassification(unittest.TestCase):
     def test_rejected_is_separate_semantics(self):
         """REJECTED (user tolak) harus beda dari FAILED/BLOCKED."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue"})
-        r = c.post("/ux/decide", json={"intent": "reject", "approver": "user"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue"}).json()
+        mid = s0["observability"]["mission_id"]
+        r = c.post("/ux/decide", json={"intent": "reject", "mission_id": mid, "approver": "user"})
         s = r.json()
         assert s["execution"]["status"] == "rejected"
         assert s["execution"]["failure_kind"] == "rejected"
@@ -142,8 +142,9 @@ class TestDuplicateAndRestart(unittest.TestCase):
         state terminal yang sudah tercatat tetap terbaca dari server (bukan
         hilang), dan submit baru memberi sesi bersih."""
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue (reject utk restart)"})
-        c.post("/ux/decide", json={"intent": "reject", "approver": "user"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue (reject utk restart)"}).json()
+        mid = s0["observability"]["mission_id"]
+        c.post("/ux/decide", json={"intent": "reject", "mission_id": mid, "approver": "user"})
         # fresh client (seolah server dinyalakan ulang tapi store-nya in-memory)
         c2 = TestClient(app)
         st = c2.get("/ux/state").json()

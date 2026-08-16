@@ -28,7 +28,6 @@ import pytest
 from fastapi.testclient import TestClient
 
 from sam.api.server import app
-from sam.execution_runtime.credential_boundary import SecretScrubber
 
 
 TOKEN_ENV = "GITHUB_TOKEN"
@@ -103,11 +102,11 @@ class TestSecretFlowHTTP(unittest.TestCase):
     def test_approve_flow_response_never_leaks_token(self):
         """Setelah approve (raw nyata di scope), response /ux/decide + THEN
         /ux/state|evidence|audit TIDAK pernah memuat token GitHub."""
-        from sam.runtime_service.secrets.secret_provider import SecretProvider
         tok = os.environ[TOKEN_ENV]
         c = TestClient(app)
-        c.post("/ux/submit", json={"text": "Buat github issue utk m10-002 secret flow"})
-        resp = c.post("/ux/decide", json={"intent": "approve", "approver": "user"})
+        s0 = c.post("/ux/submit", json={"text": "Buat github issue utk m10-002 secret flow"}).json()
+        mid = s0["observability"]["mission_id"]
+        resp = c.post("/ux/decide", json={"intent": "approve", "mission_id": mid, "approver": "user"})
         assert resp.status_code == 200
         # seluruh blok response + state + evidence + audit
         for ep in [_all_endpoints_observable()[-1]] + _all_endpoints_observable()[:-1]:
