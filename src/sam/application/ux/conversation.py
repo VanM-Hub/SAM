@@ -207,7 +207,16 @@ class ConversationService:
                 ProviderConversationalReasonerAdapter,
             )
 
-            conversational_reasoner = ProviderConversationalReasonerAdapter()
+            # Default Van (2026-08-16): Ollama lokal `gemma3:1b` sbg provider
+            # utama CHAT (tanpa API key). Bila Ollama tak tersedia, fallback ke
+            # DeepSeek bila env DEEPSEEK_API_KEY ada. (Sebelumnya default
+            # deepseek-first; kini ollama-first sesuai keputusan Van.)
+            conversational_reasoner = ProviderConversationalReasonerAdapter(
+                provider_id="ollama",
+                model_id="gemma3:1b",
+                fallback_provider_id="deepseek",
+                fallback_model_id="deepseek-chat",
+            )
         self._reasoner = conversational_reasoner
 
     # ------------------------------------------------------------------
