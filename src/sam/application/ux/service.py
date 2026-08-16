@@ -93,6 +93,9 @@ class MissionUXService:
         self._state: Optional[UxMissionState] = None
         self._last_result: Optional[Dict[str, Any]] = None
         self._audit: List[Dict[str, Any]] = []
+        # R1-004 W1: cache findings investigasi terakhir (environment.investigate)
+        # agar misi diagnosis terpisah dapat menilai evidence tanpa investigate ulang.
+        self._last_investigation_findings: Optional[List[Dict[str, Any]]] = None
         # M12-001: PersistenceUnit opsional (Repository Pattern). Bila diberikan
         # (atau env PG/produksi dikonfigurasi), state ditulis per-entity ke repo.
         # M12-004/005: produksi (SAM_ENV=production) WAJIB PG ready; bila tidak
@@ -514,6 +517,9 @@ class MissionUXService:
                 repo=repo,
                 artifact_dir=self._artifact_dir,
                 approval_reason=f"APPROVED by {approver or 'user'}",
+                # R1-004: cache findings investigasi terakhir (W1). Hanya
+                # environment.diagnose yang membaca field ini; yang lain mengabaikan.
+                findings=self._last_investigation_findings,
             )
         except UnsupportedOperationError as exc:
             state.status = UxStateStatus.BLOCKED
@@ -622,7 +628,25 @@ class MissionUXService:
             None,
         )
         env_inv_ev = (env_inv_t or {}).get("evidence") or {}
-        if env_inv_t is not None:
+        # R1-004: evidence DIAGNOSIS environment (dari timeline environment.diagnose).
+        env_diag_t = next(
+            (t for t in timeline if t.get("stage") == "environment.diagnose"),
+            None,
+        )
+        env_diag_ev = (env_diag_t or {}).get("evidence") or {}
+        if env_diag_t is not None:
+            diag_scrubbed = (env_diag_t or {}).get("scrubbed") or {}
+            state.evidence = [{
+                "kind": "environment_diagnosis",
+                "verdict": env_diag_ev.get("verdict", ""),
+                "confidence": env_diag_ev.get("confidence"),
+                "diagnosis": env_diag_ev.get("diagnosis", []),
+                "evidence_ref": env_diag_ev.get("evidence_ref", ""),
+                "summary": env_diag_ev.get("summary", ""),
+                "sufficiency": env_diag_ev.get("sufficiency", env_diag_ev.get("verdict", "")),
+                "ok": bool(diag_scrubbed.get("ok")),
+            }]
+        elif env_inv_t is not None:
             inv_scrubbed = (env_inv_t or {}).get("scrubbed") or {}
             state.evidence = [{
                 "kind": "environment_investigation",
@@ -633,6 +657,15 @@ class MissionUXService:
                 "evidence_ref": env_inv_ev.get("evidence_ref", ""),
                 "ok": bool(inv_scrubbed.get("ok")),
             }]
+            # R1-004 W1: cache findings investigasi untuk misi diagnosis terpisah.
+            inv_sc = (env_inv_t or {}).get("scrubbed") or {}
+            cached = env_inv_ev.get("findings", [])
+            if cached:
+                self._last_investigation_findings = list(cached)
+            elif inv_sc.get("ok") is True or env_inv_ev.get("insufficient"):
+                # Investigasi selesai tanpa findings nyata -> simpan kosong agar
+                # diagnosis berikutnya jujur INSUFFICIENT (bukan None/unknown).
+                self._last_investigation_findings = []
         elif env_t is not None:
             env_scrubbed = (env_t or {}).get("scrubbed") or {}
             state.evidence = [{
@@ -713,12 +746,21 @@ class MissionUXService:
         if env_match:
             return env_match
 
-        # 0b) Determistik (SEBELUM AI): "kenapa/mengapa ... lambat?"-sekelas.
+        # 0b) Determistik (SEBELUM AI): "diagnosa/simpulkan/apa penyebabnya"-
+        #    kelas. R1-004 DIAGNOSIS. Dicek SEBELUM investigate: kata "diagnosa/
+        #    simpulkan/kesimpulan" = permintaan EPSILIT kesimpulan/verdict atas
+        #    evidence yang SUDAH diproduksi investigasi (di-cache service, W1),
+        #    BUKAN "cari bukti baru". Tidak mengarang sebab tanpa evidence.
+        diag_match = MissionUXService._interpret_environment_diagnose(low)
+        if diag_match:
+            return diag_match
+
+        # 0c) Determistik (SEBELUM AI): "kenapa/mengapa ... lambat?"-sekelas.
         #    R1-003 INVESTIGATION. Bedakan dari observe: observe = "periksa/
-        #    cek/lihat sehat", investigate = "kenapa/mengapa/diagnos/masalah/
-        #    selidik". Investigasi memahami permintaan mencari sebab/masalah.
-        #    Tidak pernah menyimpulkan root cause (itu R1-004); berhenti di
-        #    finding kandidat + confidence, INSUFFICIENT bila evidence tak cukup.
+        #    cek/lihat sehat", investigate = "kenapa/mengapa/masalah/selidik".
+        #    Investigasi memahami permintaan MENCARI sebab/masalah (menghasilkan
+        #    bukti). Berhenti di finding kandidat + confidence; TIDAK menyimpulkan
+        #    root cause (itu R1-004); INSUFFICIENT bila evidence tak cukup.
         inv_match = MissionUXService._interpret_environment_investigate(low)
         if inv_match:
             return inv_match
@@ -894,9 +936,46 @@ class MissionUXService:
             "untuk transparansi.",
         )
 
+    @staticmethod
+    def _interpret_environment_diagnose(low: str):
+        """Deteksi deterministik instruksi DIAGNOSIS environment (R1-004).
+
+        Dicocokkan SEBELUM AI (setelah investigate) agar "diagnosa/simpulkan"
+        tidak bergantung routing Gemma yang flaky. Mengembalikan tuple _interpret
+        bila cocok, atau None.
+
+        Menilai verdict (causal/candidate/insufficient) atas evidence investigasi
+        R1-003 yang di-cache service (W1). Tanpa investigasi -> cache kosong ->
+        INSUFFICIENT jujur. TIDAK mengarang penyebab.
+        """
+        is_env_diagnose = bool(re.search(
+            r"(diagnos|diagnosa|diagnosis|simpulkan|kesimpulan|"
+            r"apa\s*penyebab|root\s*cause|sebab(?:nya\s*apa|nya)?)", low,
+        ))
+        if not is_env_diagnose:
+            return None
+        return (
+            "environment.diagnose",
+            "local-machine",
+            "SAM memahami: menilai verdict diagnosis atas evidence investigasi "
+            "environment sebelumnya (read-only). Tidak mengarang penyebab bila "
+            "evidence belum cukup.",
+            [
+                "ambil selected evidence dari investigasi terakhir",
+                "klasifikasi sinyal kausal yang dibawa evidence",
+                "hitung evidence confidence (reuse assessor)",
+                "susun verdict causal/candidate/insufficient + diagnosis",
+                "INSUFFICIENT jujur bila belum ada investigasi / tanpa sinyal kausal",
+            ],
+            "SAM akan menilai verdict diagnosis atas temuan investigasi environment "
+            "(read-only, tanpa menyimpulkan sebab tanpa evidence).",
+            "Operasi ini read-only (menilai diagnosis berbasis evidence) - tidak "
+            "mengubah state eksternal, namun tetap disediakan persetujuan Anda untuk "
+            "transparansi.",
+        )
+
     # ------------------------------------------------------------------
     # pemahaman cerdas via AI lokal (Gemma3:1b / Ollama) — tanpa internet
-    # ------------------------------------------------------------------
     _AI_CAPABILITIES = (
         "Operasi SAM yang diketahui: "
         "[github.create_issue] buat/tingkat issue GitHub; "

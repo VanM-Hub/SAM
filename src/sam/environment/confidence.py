@@ -26,6 +26,7 @@ class Evidence:
     statement: str        # apa yang diamati
     strength: float = 1.0 # bobot 0..1 (seberapa kuat kesimpulan ini)
     negative: bool = False  # evidence tentang KETIDAKHADIRAN
+    causal: bool = False  # evidence ini membawa HUBUNGAN KAUSAL (bukan sekadar anomali)
 
     def as_dict(self) -> Dict[str, Any]:
         return {
@@ -33,6 +34,7 @@ class Evidence:
             "statement": self.statement,
             "strength": self.strength,
             "negative": self.negative,
+            "causal": self.causal,
         }
 
 

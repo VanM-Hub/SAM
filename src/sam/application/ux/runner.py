@@ -11,7 +11,7 @@ di repo test, sudah PROVEN M8-002 + M8-006). Setelah rencana ditambah
 from __future__ import annotations
 
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from sam.execution_runtime.m8_mission_framework import m8_002_build
 from sam.execution_runtime.real_harness import AuditTrail
@@ -188,6 +188,92 @@ def run_environment_investigation_mission(
     }
 
 
+def run_environment_diagnosis_mission(
+    findings: Optional[List[Dict[str, Any]]] = None,
+    subject_id: str = "local-machine",
+):
+    """Jalankan diagnosis environment via EnvironmentDiagnosisAdapter
+    (read-only evaluator, R1-004).
+
+    Menerima FINDINGS dari investigasi R1-003 (W1: di-cache service saat misi
+    investigate selesai), MENGEKSTRAK selected evidence, lalu menyerahkan ke
+    adapter.diagnose().
+
+    Murni evaluator: menilai verdict (causal/candidate/insufficient) atas evidence
+    yang SUDAH ada. TIDAK mencari bukti baru (itu investigation ulang, dilarang),
+    TIDAK recommendation, TIDAK mutation. Evidence tidak cukup -> INSUFFICIENT jujur.
+
+    Mengembalikan dict bentuk timeline yg dipahami service/UI:
+      {ok, operation, target, timeline:[{stage: environment.diagnose,...}],
+       detail, evidence}
+    """
+    from sam.ward.capability.contracts import SubjectRef
+    from sam.ward.adapters.environment_diagnosis import (
+        EnvironmentDiagnosisAdapter,
+    )
+
+    subject = SubjectRef(subject_id=subject_id, subject_type="citizen",
+                         kind="environment", name="local-machine")
+    selected = _extract_selected_evidence(findings or [])
+    adapter = EnvironmentDiagnosisAdapter(subject=subject)
+    result = adapter.diagnose(evidence=selected, capability="diagnose")
+
+    verdict = result.verdict
+    ok = not result.error  # evaluator sukses; error hanya bila internal
+    stage_detail = result.summary or f"diagnosis verdict={verdict}"
+    diagnosis = [f.as_dict() for f in result.diagnosis]
+    evidence_dict = {
+        "kind": "environment_diagnosis",
+        "verdict": verdict,
+        "confidence": result.confidence,
+        "diagnosis": diagnosis,
+        "evidence_ref": result.evidence_ref or "",
+        "summary": result.summary or "",
+        "error": result.error or "",
+        "sufficiency": verdict,  # eksplisit: verdict = diagnostic sufficiency
+    }
+    return {
+        "ok": ok,
+        "operation": "environment.diagnose",
+        "target": subject_id,
+        "timeline": [{
+            "stage": "environment.diagnose",
+            "ok": ok,
+            "blocked": None if ok else True,
+            "detail": stage_detail,
+            "evidence": evidence_dict,
+            "scrubbed": {
+                "ok": ok,
+                "verdict": verdict,
+                "confidence": result.confidence,
+                "diagnosis": diagnosis,
+                "evidence_ref": result.evidence_ref or "",
+                "sufficiency": verdict,
+            },
+        }],
+        "detail": stage_detail,
+        "evidence": evidence_dict,
+    }
+
+
+def _extract_selected_evidence(
+    findings: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Ekstrak SELECTED EVIDENCE (flatten) dari findings investigasi R1-003.
+
+    Setiap finding = {..., "evidence": [e.as_dict()]}. Diagnosis menerima
+    List evidence (bukan findings mentah - DiagnosisTarget BUKAN salinan
+    InvestigationResult). Bila findings kosong -> [] (adapter jawab
+    insufficient jujur).
+    """
+    out: List[Dict[str, Any]] = []
+    for f in findings or []:
+        for e in (f.get("evidence") or []):
+            if isinstance(e, dict):
+                out.append(dict(e))
+    return out
+
+
 def run_environment_observation_mission(subject_id: str = "local-machine"):
     """Jalankan observasi environment via EnvironmentObservationAdapter (read-only).
 
@@ -244,6 +330,7 @@ def run_mission(
     artifact_dir: str = "docs/engineering/reports",
     repo: Optional[str] = None,
     approval_reason: str = "",
+    findings: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Satu dispatcher eksekusi — pilih eksekutor berdasarkan `operation`.
 
@@ -256,6 +343,10 @@ def run_mission(
       - github.create_issue -> m8_002_build (PROVEN M8-006/M9)
       - web.open / web.get  -> RealBrowserConnector (read-only)
       - http.<endpoint>     -> RealHttpConnector (read-only)
+      - environment.observe -> EnvironmentObservationAdapter (read-only, R1-002)
+      - environment.investigate -> EnvironmentInvestigationAdapter (read-only, R1-003)
+      - environment.diagnose -> EnvironmentDiagnosisAdapter (read-only, R1-004);
+        `findings` = cache investigasi terakhir sbg SELECTED EVIDENCE
       - (email.send / db.write / process.run) -> BELUM dibuka -> BLOCKED
     """
     op = (operation or "").strip()
@@ -267,6 +358,12 @@ def run_mission(
         # Berhenti di Finding kandidat + evidence + confidence; BUKAN root cause.
         subject_id = (target or "").strip() or "local-machine"
         return run_environment_investigation_mission(subject_id=subject_id)
+    if op == "environment.diagnose" or op.startswith("environment.diagnose"):
+        # R1-004: verdict diagnosis jujur atas evidence investigasi R1-003.
+        # findings (= cache investigasi terakhir) dipakai sbg SELECTED EVIDENCE.
+        subject_id = (target or "").strip() or "local-machine"
+        return run_environment_diagnosis_mission(findings=findings,
+                                                 subject_id=subject_id)
     if op.startswith("environment."):
         # R1-002: read-only observasi environment nyata (periksa komputer).
         # target = identitas subjek (default local-machine).
@@ -315,7 +412,7 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         (t for t in timeline
          if t.get("stage") in ("github_api", "web.fetch", "http.get",
                                 "environment.observe", "environment.investigate",
-                                "execute", "act")
+                                "environment.diagnose", "execute", "act")
          and (t.get("ok") is not None or t.get("blocked") is not None)),
         None,
     )
@@ -338,6 +435,7 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         "http.get": "panggilan HTTP",
         "environment.observe": "observasi environment",
         "environment.investigate": "investigasi environment",
+        "environment.diagnose": "diagnosis environment",
     }.get(conn, "eksekusi")
     _blocked_msg = {
         "github_api": ("GitHub tidak dapat digunakan karena GITHUB_TOKEN tidak "
@@ -346,6 +444,7 @@ def classify_mission_outcome(result: Dict[str, Any]) -> Dict[str, str]:
         "http.get": "Panggilan HTTP terblokir (endpoint/kredensial).",
         "environment.observe": "Observasi environment terblokir (probe tidak menghasilkan entitas).",
         "environment.investigate": "Investigasi environment terblokir (probe tidak menghasilkan entitas).",
+        "environment.diagnose": "Diagnosis environment terblokir (tidak ada evidence untuk dinilai).",
     }.get(conn, "Eksekusi terblokir (0 side effect).")
 
     if _exec_stage.get("blocked"):

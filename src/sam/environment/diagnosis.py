@@ -88,10 +88,10 @@ class DiagnosisEngine:
         pct = (free / total) * 100 if total else 0
         if pct < 10:
             return [Evidence("disk_space", f"free {pct:.1f}% < 10% warning",
-                             strength=0.9)]
+                             strength=0.9, causal=True)]
         if pct < 20:
             return [Evidence("disk_space", f"free {pct:.1f}% < 20% cautious",
-                             strength=0.5)]
+                             strength=0.5, causal=True)]
         return [Evidence("disk_space", f"free {pct:.1f}% ok", strength=0.9,
                          negative=False)]
 

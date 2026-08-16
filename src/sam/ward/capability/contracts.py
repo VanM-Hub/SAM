@@ -151,6 +151,49 @@ class Finding:
         }
 
 
+class DiagnosisTarget(Protocol):
+    """Kontrak target diagnosis (M13-006). Realisasi menilai SELECTED EVIDENCE
+    dari investigasi - BUKAN findings mentah, BUKAN investigation ulang.
+
+    Ini DOER (Protocol), sejajar InvestigationTarget - BUKAN dataclass yang
+    dibungkus oleh InvestigationResult. Input adalah evidence yang sudah
+    diseleksi dari InvestigationResult.findings, bukan findings itu sendiri.
+    """
+
+    def diagnose(self, *, evidence: List[Dict[str, Any]],
+                 capability: str = "diagnose") -> "DiagnosisResult": ...
+
+
+@dataclass(frozen=True)
+class DiagnosisResult:
+    """Hasil diagnosis satu subject.
+
+    verdict     - diagnostic sufficiency: "causal" | "candidate" | "insufficient"
+    confidence  - keyakinan bahwa EVIDENCE nyata (observasi), 0.0-1.0. TERPISAH
+                  dari verdict; TIDAK dipaksa 0.0 saat verdict insufficient.
+    diagnosis   - List[Finding] canonical, terisi bila verdict causal/candidate.
+    """
+
+    subject: SubjectRef
+    verdict: str
+    diagnosis: List[Finding] = field(default_factory=list)
+    confidence: float = 0.0      # EVIDENCE confidence (bukan sufficiency)
+    evidence_ref: str = ""
+    summary: str = ""
+    error: str = ""
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "subject": self.subject.as_dict(),
+            "verdict": self.verdict,
+            "diagnosis": [f.as_dict() for f in self.diagnosis],
+            "confidence": self.confidence,
+            "evidence_ref": self.evidence_ref,
+            "summary": self.summary,
+            "error": self.error,
+        }
+
+
 # ---------------------------------------------------------------------------
 # M13-007 Recovery (canonical - tidak ada jalur langsung ke connector)
 # ---------------------------------------------------------------------------
