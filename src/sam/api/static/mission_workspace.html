@@ -417,7 +417,13 @@ async function api(path, opts = {}) {
     headers['X-CSRF-Token'] = window._sam_csrf;
   }
   const res = await fetch(path, Object.assign({}, opts, { headers }));
-  if (res.status === 401) { showLogin(true); throw new Error('unauthorized'); }
+  // noAuthOverlay: utk request baca yang boleh 401 saat belum login (mis. /wards/)
+  // tanpa memicu overlay login yang menutupi dashboard dan memblokir klik misi.
+  // Mutasi (default) TETAP memunculkan overlay saat 401.
+  if (res.status === 401) {
+    if (!opts.noAuthOverlay) { showLogin(true); }
+    throw new Error('unauthorized');
+  }
   let data = null; try { data = await res.json(); } catch (e) {}
   if (!res.ok) {
     const err = new Error((data && data.detail) || ('HTTP ' + res.status));
@@ -489,12 +495,18 @@ function showLogin(force){
   ov.style.display='flex';
 }
 async function refreshAuth(){
-  try{ const me=await api('/ux/me'); const a=document.querySelector('.avatar');
+  // Pakai fetch langsung (BUKAN api()) agar 401 dari /ux/me saat page-load
+  // TIDAK memicu loginOverlay yang menutupi seluruh dashboard (bug: klik misi terblokir).
+  // Overlay login hanya muncul saat aksi yang benar-benar butuh login (mutasi).
+  try{
+    const resp=await fetch('/ux/me',{credentials:'include'});
+    let me=null; try{ me=await resp.json(); }catch(e){}
+    if(!resp.ok || !me){ return; } // tanpa sesi -> diam, dashboard tetap terbuka & bisa diklik
+    const a=document.querySelector('.avatar');
     const u=((me.user||{}).username||'').trim();
-    // simpan CSRF sesi dari /ux/me (dibutuhkan utk mutasi cookie-mode pd page-load)
     if(me && me.csrf) window._sam_csrf = me.csrf;
-    if(a) a.textContent=u?u.slice(0,2).toUpperCase():'·';
-  }catch(e){ const a=document.querySelector('.avatar'); if(a) a.textContent='·'; }
+    if(a) a.textContent=u?u.slice(0,2).toUpperCase():'';
+  }catch(e){}
 }
 
 /* ---------- phase 1: Home + Mission Control ---------- */
@@ -1135,7 +1147,16 @@ function renderChatMessages(messages){
 async function send(){
   const i=document.getElementById('chat'), v=i.value.trim();
   if(!v) return;
-  i.disabled=true; i.value='';
+  await postChatText(v);
+}
+
+/* inti kirim pesan ke /ux/conversation/message. Dipakai 'Kirim' DAN tombol
+   W3 ([Lanjutkan]/[Batalkan]/pilihan ambiguous) — SAMA contract/path existing
+   W3 (BUKAN /ux/decide, BUKAN approval record).
+   `w3` metadata dari respons dipakai menampilkan kontrol proposal W3. */
+async function postChatText(v){
+  const i=document.getElementById('chat');
+  if(i){ i.disabled=true; i.value=''; }
   try{
     const body={text:v};
     if(_currentConversation && _currentConversation.conversation_id)
@@ -1146,15 +1167,49 @@ async function send(){
     // S2-6: satu render cycle dari mission_state canonical yg dikembalikan POST
     // (state + conversation SAMA respons -> render konsisten, bukan 2 sumber)
     applyUxState(data.mission_state||null);
+    // W3: tampilkan kontrol proposal/confirmation bila ada (read-only W3).
+    renderW3Controls(data.w3||null);
   }catch(e){
     const box=document.getElementById('messages');
     const s=document.createElement('div'); s.className='msg sammsg';
     s.innerHTML='<div class="who">SAM</div>Kirim gagal: '+esc(e.message)+'';
     if(box){ box.appendChild(s); box.scrollTop=box.scrollHeight; }
   }finally{
-    i.disabled=false; i.focus();
+    if(i){ i.disabled=false; i.focus(); }
   }
 }
+
+/* W3: tampilkan kontrol [Lanjutkan]/[Batalkan] (read-only) ATAU daftar
+   pilihan (ambiguous) di bawah pesan SAM terakhir. Confirmation CHAT BUKAN
+   approval: tombol Lanjutkan/Batalkan mengirim 'ya'/'tidak' (atau pilihan)
+   ke POST /ux/conversation/message yang SAMA — tanpa /ux/decide & tanpa
+   approval record. Tidak dibuat saat w3 null/pending=false. */
+function renderW3Controls(w3){
+  const box=document.getElementById('messages'); if(!box) return;
+  if(!w3 || !w3.pending) return;
+  const kind=(w3.kind||'read_only');
+  let row=document.createElement('div');
+  row.className='msg sammsg w3-controls';
+  row.style.marginTop='4px';
+  let html=''; 
+  if(kind==='ambiguous'){
+    html='<div class="who">SAM — pilih Ward</div><div class="reply" style="display:flex;gap:6px;flex-wrap:wrap">';
+    (w3.candidates||[]).forEach((c,i)=>{
+      html+='<button type="button" class="w3pick" onclick="postChatText(\''+escJs(c)+'\')">'+esc(c)+'</button>';
+    });
+    html+='</div>';
+  }else{
+    html='<div class="reply" style="display:flex;gap:6px">'
+      +'<button type="button" class="w3confirm" onclick="postChatText(\'ya\')">Lanjutkan</button>'
+      +'<button type="button" class="w3cancel" onclick="postChatText(\'tidak\')">Batalkan</button>'
+      +'</div>';
+  }
+  row.innerHTML=html;
+  box.appendChild(row);
+  box.scrollTop=box.scrollHeight;
+}
+
+function escJs(s){ return (s||'').replace(/[\\']/g, function(m){ return '\\'+m; }); }
 
 /* decision -> POST /ux/decide (AD-ENG-006 mission-scoped targeting).
    Target = selectedMissionId (mission-* yang dipilih di Mission Detail), KIRIM
@@ -1239,7 +1294,7 @@ function backdrop(ev,id){ if(ev.target && ev.target.id===id) closeModal(id); }
 var _WARD_TYPE_LABEL={application:'Application',repository:'Repository',container:'Container',host:'Host',database:'Database'};
 async function loadWards(){
   try{
-    const data=await api('/wards/');
+    const data=await api('/wards/', {noAuthOverlay:true});
     const list=(data&&data.wards)||[];
     const rows=document.querySelector('.wardrows'); if(rows){
       rows.innerHTML = list.length ? list.map(w=>'<div class="wardrow"><div class="icon">'+

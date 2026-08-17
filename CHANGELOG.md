@@ -4,6 +4,13 @@
 > **SAM 4.0.0 (2026-08-10) adalah rilis Federated Governance Platform terakhir yang Architecture Accepted**
 > (MISSION-4.1..4.6 COMPLETE).
 
+## Unreleased - Fix UI: loginOverlay tidak lagi memblokir klik misi
+
+- **Perbaikan bug UI:** overlay login transparan (`loginOverlay`) menutupi seluruh dashboard sehingga klik ke Mission List terserap dan tombol approval (`Setujui & lanjutkan`/`Tolak`) tidak pernah tampil.
+- `refreshAuth()` kini memakai `fetch` langsung ke `/ux/me` (bukan wrapper `api()`), sehingga 401 saat page-load tanpa sesi **tidak memicu overlay**.
+- `api(path, {noAuthOverlay:true})` ditambahkan: request baca yang boleh 401 saat belum login (mis. `/wards/`) tidak memunculkan overlay. Mutasi (default) **tetap** memunculkan overlay saat 401.
+- Verifikasi: CDP headless page-load tanpa sesi → `loginOverlay` tidak tampil, 7 misi bisa diklik, klik misi `waiting_approval` merender tombol `Setujui & lanjutkan` + `Tolak`.
+
 ## SAM 5.2.0 (2026-08-14) - M13 Universal Governance of External Wards
 
 SAM memperluas `Universal` dari sekadar banyak connector menjadi **satu governance model untuk berbagai subject** (`Citizen | Ward`). Kemampuan internal yang sudah terbukti (observe/investigate/diagnose/recover/learn/verify) **digeneralisasi** agar menerima subjek internal (Citizen) maupun eksternal yang dipercayakan (Ward) — BUKAN dibuat ulang. (M13-001..015 CERTIFIED, order resmi Van.)
