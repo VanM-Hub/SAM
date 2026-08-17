@@ -417,32 +417,67 @@ async function api(path,opts={}){
 }
 
 /* ---------- login ---------- */
+var _lgMode='login'; // 'login' | 'register'
+function buildLoginOverlay(ov){
+  const heading=_lgMode==='register'?'Buat Akun':'Login SAM';
+  const sub=_lgMode==='register'
+    ?'Buat akun operator baru. Password disimpan ter-hash (tidak plaintext).'
+    :'Identitas operator dibutuhkan untuk keputusan.';
+  const btn=_lgMode==='register'?'Daftar':'Masuk';
+  ov.innerHTML='<div style="background:#fff;border:1px solid #d9dfda;border-radius:12px;padding:22px 26px;width:min(340px,86vw);box-shadow:0 20px 60px #0003">'
+    +'<h2 style="margin:0 0 4px;font-size:15px">'+heading+'</h2>'
+    +'<div style="font-size:11px;color:#707a74;margin-bottom:14px">'+sub+'</div>'
+    +'<div class="field" style="margin-bottom:9px"><label>Username</label><input id="lgUser" autocomplete="username"></div>'
+    +'<div class="field" style="margin-bottom:13px"><label>Password</label><input id="lgPass" type="password" autocomplete="'+( _lgMode==='register'?'new-password':'current-password')+'"></div>'
+    +'<div id="lgRegErr" style="color:#8a2f2f;font-size:10px;margin-bottom:8px;display:none"></div>'
+    +'<div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn" id="lgCancel">Batal</button><button class="btn primary" id="lgGo">'+btn+'</button></div>'
+    +'<div style="margin-top:11px;font-size:11px;color:#305e44"><span id="lgToggle">'+( _lgMode==='register'?'Sudah punya akun? Masuk':'Belum punya akun? Buat akun')+'</span></div>'
+    +'<div id="lgErr" style="color:#8a2f2f;font-size:10px;margin-top:9px"></div></div>';
+  ov.querySelector('#lgCancel').onclick=()=>{ov.style.display='none'};
+  ov.querySelector('#lgToggle').onclick=function(){
+    _lgMode=(_lgMode==='register')?'login':'register';
+    buildLoginOverlay(ov);
+    if(ov.querySelector('#lgUser')) ov.querySelector('#lgUser').focus();
+  };
+  ov.querySelector('#lgGo').onclick=function(){ doLogin(ov); };
+  ov.querySelector('#lgPass').addEventListener('keydown',function(ev){ if(ev.key==='Enter') doLogin(ov); });
+}
+async function doLogin(ov){
+  const u=ov.querySelector('#lgUser').value.trim(), p=ov.querySelector('#lgPass').value;
+  const errEl=ov.querySelector('#lgErr');
+  function showErr(msg){ errEl.textContent=msg; }
+  if(_lgMode==='register'){
+    try{
+      const r=await api('/ux/register',{method:'POST',body:JSON.stringify({username:u,password:p})});
+      ov.style.display='none'; refreshAll();
+      try{ refreshAuth(); }catch(e){}
+    }catch(e){ errEl.textContent='Gagal daftar: '+(e.message||('HTTP '+e.status)); }
+  } else {
+    try{
+      await api('/ux/login',{method:'POST',body:JSON.stringify({username:u,password:p})});
+      ov.style.display='none'; refreshAll();
+      try{ refreshAuth(); }catch(e){}
+    }catch(e){ errEl.textContent='Login gagal: '+(e.message||('HTTP '+e.status)); }
+  }
+}
 function showLogin(force){
   let ov=document.getElementById('loginOverlay');
   if(!ov){
     ov=document.createElement('div');
     ov.id='loginOverlay';
     ov.style.cssText='position:fixed;inset:0;background:#122017b8;z-index:200;display:flex;align-items:center;justify-content:center';
-    ov.innerHTML='<div style="background:#fff;border:1px solid #d9dfda;border-radius:12px;padding:22px 26px;width:min(340px,86vw);box-shadow:0 20px 60px #0003">'
-      +'<h2 style="margin:0 0 4px;font-size:15px">Login SAM</h2>'
-      +'<div style="font-size:11px;color:#707a74;margin-bottom:14px">Identitas operator dibutuhkan untuk keputusan.</div>'
-      +'<div class="field" style="margin-bottom:9px"><label>Username</label><input id="lgUser" autocomplete="username"></div>'
-      +'<div class="field" style="margin-bottom:13px"><label>Password</label><input id="lgPass" type="password" autocomplete="current-password"></div>'
-      +'<div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn" id="lgCancel">Batal</button><button class="btn primary" id="lgGo">Masuk</button></div>'
-      +'<div id="lgErr" style="color:#8a2f2f;font-size:10px;margin-top:9px"></div></div>';
     document.body.appendChild(ov);
+    _lgMode='login';
+    buildLoginOverlay(ov);
+    setTimeout(function(){ const inp=ov.querySelector('#lgUser'); if(inp) inp.focus(); },50);
     ov.querySelector('#lgCancel').onclick=()=>{ov.style.display='none'};
-    ov.querySelector('#lgGo').onclick=async()=>{
-      const u=ov.querySelector('#lgUser').value.trim(), p=ov.querySelector('#lgPass').value;
-      try{ await api('/ux/login',{method:'POST',body:JSON.stringify({username:u,password:p})}); ov.style.display='none'; refreshAll(); }
-      catch(e){ ov.querySelector('#lgErr').textContent='Login gagal: '+e.message; }
-    };
   }
   ov.style.display='flex';
 }
 async function refreshAuth(){
   try{ const me=await api('/ux/me'); const a=document.querySelector('.avatar');
-    if(me&&me.user) a.textContent=(me.user.slice(0,2).toUpperCase());
+    const u=((me.user||{}).username||'').trim();
+    if(a) a.textContent=u?u.slice(0,2).toUpperCase():'·';
   }catch(e){ const a=document.querySelector('.avatar'); if(a) a.textContent='·'; }
 }
 

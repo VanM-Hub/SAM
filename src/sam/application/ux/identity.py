@@ -120,6 +120,56 @@ class UserStore:
         self._cache = self._load()
         return dict(self._cache)
 
+    def create_user(
+        self, username: str, password: str, role: str = "operator"
+    ) -> Dict[str, str]:
+        """Buat user baru & simpan ke file (register akun dari UI).
+
+        - username dipakai sebagai key (trim).
+        - bila username SUDAH ada -> raise ValueError (409 di route).
+        - password TIDAK pernah disimpan plaintext; di-hash pbkdf2 (iter tinggi).
+        - menulis SEMUA user (lama + baru) ke `users.json` tanpa menimpa yang lain.
+        - file berada DI LUAR project (default ~/.sam/users.json), tidak pernah
+          di-commit; dibuat otomatis bila belum ada.
+
+        Return dict {'username','role'} milik user baru.
+        """
+        name = (username or "").strip()
+        if not name:
+            raise ValueError("username wajib diisi")
+        if not password or len(password) < 6:
+            raise ValueError("password minimal 6 karakter")
+
+        # baca data file saat ini (tidak hanya cache) utk jumlah record akurat
+        data: Dict[str, list] = {"users": []}
+        try:
+            if self._path.exists():
+                with open(self._path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+        except Exception:
+            data = {"users": []}
+        data = data if isinstance(data, dict) else {"users": []}
+        data.setdefault("users", [])
+
+        # cek duplikat (case-sensitive, sesuai key login)
+        existing = {str(u.get("username") or "").strip() for u in data["users"]}
+        if name in existing:
+            raise ValueError(f"username '{name}' sudah ada")
+
+        record = {
+            "username": name,
+            "role": role or "operator",
+            "password": _hash_password(password),
+        }
+        data["users"].append(record)
+
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self._path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        self._cache = self._load()  # segarkan cache
+        return {"username": name, "role": record["role"]}
+
     def verify(self, username: str, password: str) -> Optional[Dict[str, str]]:
         """Return {'username','role'} bila credential valid, else None."""
         users = self.users()

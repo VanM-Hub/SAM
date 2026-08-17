@@ -95,6 +95,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class RegisterRequest(BaseModel):
+    """Buat akun baru (self-service dari UI). Password minimal 6 char."""
+
+    username: str
+    password: str
+    role: str = "operator"
+
+
 class UxRoutes:
     """Factory adapter — memegang satu instance MissionUXService (composition).
 
@@ -632,6 +640,45 @@ async def ux_login(request: LoginRequest, response: Response):
     )
     # kembalikan csrf token sekali (produksi/cookie mode perlu utk mutasi)
     return {"token": token, "user": identity, "csrf": _routes.sessions.csrf_for(token)}
+
+
+@router.post("/register")
+async def ux_register(request: RegisterRequest, response: Response):
+    """Buat akun baru dari UI (self-service register).
+
+    - Menulis user ke UserStore (users.json di luar project, hash pbkdf2).
+    - Username sudah ada -> 409 Conflict (bukan 500).
+    - Password terlalu pendek -> 422 (pydantic min_length bila dipakai) / 400.
+    - Setelah dibuat, langsung buat sesi + set cookie httpOnly (auto-login).
+    - Password TIDAK pernah dikembalikan/dilog.
+    """
+    username = (request.username or "").strip()
+    password = request.password or ""
+    if not username:
+        raise HTTPException(status_code=400, detail="username wajib diisi")
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="password minimal 6 karakter")
+    try:
+        identity = _routes.users.create_user(username, password, role=request.role)
+    except ValueError as exc:
+        # duplikat username
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    token = _routes.sessions.login(identity)
+    response.set_cookie(
+        key=SESSION_COOKIE,
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=_routes.production,
+        path="/",
+    )
+    return {
+        "created": True,
+        "user": identity,
+        "token": token,
+        "csrf": _routes.sessions.csrf_for(token),
+    }
 
 
 @router.post("/logout")

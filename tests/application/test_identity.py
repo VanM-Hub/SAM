@@ -11,6 +11,7 @@ Unit + integrasi:
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -59,6 +60,37 @@ class TestUserStore:
     def test_file_missing_returns_none(self, tmp_path):
         u = UserStore(path=str(tmp_path / "none.json"))
         assert u.verify("x", "y") is None
+
+    def test_create_user_adds_and_verifies(self, tmp_path):
+        path = tmp_path / "users.json"
+        u = UserStore(path=str(path))
+        ident = u.create_user("ali", "rahasia-1")
+        assert ident == {"username": "ali", "role": "operator"}
+        # file dibuat + user bisa login
+        assert path.exists()
+        assert u.verify("ali", "rahasia-1") == {"username": "ali", "role": "operator"}
+        # password tidak plaintext di file
+        raw = path.read_text(encoding="utf-8")
+        assert "rahasia-1" not in raw
+
+    def test_create_user_does_not_overwrite_existing(self, users_file):
+        path = Path(users_file)
+        u = UserStore(path=str(path))
+        id2 = u.create_user("baru", "pass-baru12")
+        assert id2["username"] == "baru"
+        # user lama tetap valid
+        assert u.verify("van", "pass-van") == {"username": "van", "role": "operator"}
+        assert u.verify("baru", "pass-baru12")
+
+    def test_create_user_duplicate_raises(self, users_file):
+        u = UserStore(path=str(users_file))
+        with pytest.raises(ValueError):
+            u.create_user("van", "pass-abcdef")
+
+    def test_create_user_short_password_raises(self, tmp_path):
+        u = UserStore(path=str(tmp_path / "users.json"))
+        with pytest.raises(ValueError):
+            u.create_user("x", "123")
 
 
 # ---------------------------------------------------------------------------
@@ -179,6 +211,40 @@ class TestAuthRoute:
         monkeypatch.setenv("SAM_ENABLE_AUTH", "1")
         r = client.post("/ux/login", json={"username": "van", "password": "salah"})
         assert r.status_code == 401
+
+    def test_register_creates_and_autologin(self, ux_router, monkeypatch):
+        """Register -> user baru dibuat + langsung dapat sesi (auto-login)."""
+        ux_mod, client, users_file = ux_router
+        monkeypatch.setenv("SAM_ENABLE_AUTH", "1")
+        r = client.post("/ux/register", json={"username": "budi", "password": "budi-rahasia"})
+        assert r.status_code == 200
+        body = r.json()
+        assert body["created"] is True
+        assert body["user"]["username"] == "budi"
+        assert body["token"]
+        # password tidak pernah dikembalikan
+        assert "password" not in json.dumps(body).lower() or "budi-rahasia" not in json.dumps(body)
+        # user langsung terverifikasi (siap login berikutnya)
+        u = UserStore(path=str(users_file))
+        assert u.verify("budi", "budi-rahasia")
+
+    def test_register_duplicate_conflict(self, ux_router, monkeypatch):
+        ux_mod, client, _ = ux_router
+        monkeypatch.setenv("SAM_ENABLE_AUTH", "1")
+        r = client.post("/ux/register", json={"username": "van", "password": "pass-abcdef"})
+        assert r.status_code == 409  # username sudah ada
+
+    def test_register_short_password_400(self, ux_router, monkeypatch):
+        ux_mod, client, _ = ux_router
+        monkeypatch.setenv("SAM_ENABLE_AUTH", "1")
+        r = client.post("/ux/register", json={"username": "ciko", "password": "123"})
+        assert r.status_code == 400
+
+    def test_register_no_username_400(self, ux_router, monkeypatch):
+        ux_mod, client, _ = ux_router
+        monkeypatch.setenv("SAM_ENABLE_AUTH", "1")
+        r = client.post("/ux/register", json={"username": "", "password": "pass-abcdef"})
+        assert r.status_code == 400
 
     def test_decide_non_auth_compat(self, ux_router, monkeypatch):
         """Mode AUTH nonaktif (default) -> approver body tetap dipakai (regresi M10)."""
