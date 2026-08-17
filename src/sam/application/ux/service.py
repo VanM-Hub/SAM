@@ -619,9 +619,36 @@ class MissionUXService:
 
         # outcome == APPROVED -> jalankan mission nyata via jalur canonical.
         _metrics.inc("sam_mission_approved")
+        return self._execute_mission(
+            approval_status=UxStateStatus.APPROVED,
+            approval_decision=outcome.as_dict(),
+            approver=approver,
+        )
+
+    def _execute_mission(self, *, approval_status, approval_decision, approver, ward_tenant=None) -> UxMissionState:
+        """Jalankan mission via SATU execution boundary canonical (run_mission).
+
+        Dipanggil oleh dua jalur yang TIDAK saling menggantikan:
+          1) decide() APPROVED  (human approval nyata)  -> approval_status=APPROVED
+          2) execute_policy_authorized() (read-only, tanpa human approval nyata,
+             otorisasi dari policy capability)          -> approval_status=<honest>
+
+        BUKAN execution path kedua: ini SATU-satunya tempat run_mission dipanggil
+        dari service ini. Kedua jalur melewati boundary yang sama -> evidence +
+        verification + audit identik. TIDAK ada fake approval: jalur read-only
+        tidak pernah membuat ApprovalRequest/pending record.
+
+        `ward_tenant` = identitas tenant yang dipakai untuk mengikat WardManager
+        (WardGovernanceBoundary ownership). Default = approver (jalur human
+        approval). Jalur policy-authorized memakai identitas user peminta yang
+        nyata (bukan marker policy), sehingga entrustment Ward tetap tersolve
+        (cross-tenant untuk tenant lain tetap fail-closed).
+        """
+        state = self._state
+        _ward_tenant = ward_tenant if ward_tenant is not None else approver
         _metrics.inc("sam_execution_started")
-        state.approval_status = UxStateStatus.APPROVED
-        state.approval_decision = outcome.as_dict()
+        state.approval_status = approval_status
+        state.approval_decision = approval_decision
         state.status = UxStateStatus.RUNNING
 
         _exec_id = f"exec-{uuid.uuid4().hex[:12]}"
@@ -630,25 +657,31 @@ class MissionUXService:
             {
                 "status": UxStateStatus.RUNNING,
                 "execution_id": _exec_id,
-                "approver": (outcome.as_dict().get("approver") or approver or "user"),
+                "approver": (approval_decision.get("approver") or approver or "user"),
             }
         )
         state.observability = obs
 
         operation = (self._request.operation or "").strip()
         repo = self._request.target or self._test_repo
+        # approval_reason tetap jujur: mencerminkan jalur otorisasi yang dipakai
+        # (human approval vs policy-authorized read-only), bukan palsu.
+        if approval_status == UxStateStatus.APPROVED:
+            _approval_reason = f"APPROVED by {approver or 'user'}"
+        else:
+            _approval_reason = f"policy-authorized read-only (no human approval; policy: {approver or 'read_only'})"
         try:
             # Dispatcher eksekusi (B1/B2): pilih jalur canonical sesuai operasi.
             # GitHub -> m8_002_build (blok existing di bawah). web.*/http.* ->
             # connector read-only. Operasi lain -> UnsupportedOperationError
             # (BLOCKED jujur, 0 side effect).
-            _ward_mgr = _build_ward_manager_for_tenant(approver)
+            _ward_mgr = _build_ward_manager_for_tenant(_ward_tenant)
             result = run_mission(
                 operation=operation,
                 target=self._request.target,
                 repo=repo,
                 artifact_dir=self._artifact_dir,
-                approval_reason=f"APPROVED by {approver or 'user'}",
+                approval_reason=_approval_reason,
                 # R1-004: cache findings investigasi terakhir (W1). Hanya
                 # environment.diagnose yang membaca field ini; yang lain mengabaikan.
                 findings=self._last_investigation_findings,
@@ -899,6 +932,96 @@ class MissionUXService:
             )
         self._persist()
         return state
+
+    def execute_policy_authorized(self, approver: str = "policy:read_only", ward_tenant: Optional[str] = None) -> UxMissionState:
+        """Jalankan read-only Mission TANPA fake approval (W2 Option C).
+
+        Boundary canonical decision: read-only Mission yang `approval_required=False`
+        (operation environment.observe/investigate/diagnose/recommend) TIDAK butuh
+        human approval — otorisasi datang dari POLICY (capability read-only),
+        bukan dari keputusan user. JADI:
+          - TIDAK membuat ApprovalRequest/pending record (bukan fake approval).
+          - TIDAK memanggil ApprovalCoordinator.decide (tidak ada user intent).
+          - TIDAK mengubah approval_required menjadi True (tetap False).
+          - Tetap lewat SATU canonical execution boundary = _execute_mission()
+            -> run_mission -> WardGovernanceBoundary (identik dgn mission mutating).
+
+        Guard (fail-closed):
+          - Mission harus ada & sudah dipahami (UNDERSTOOD).
+          - approval_required HARUS False (kalau True -> butuh decide() human).
+          - operation HARUS read-only (kalau mutation -> tolak, wajib human approve).
+
+        `approver` = marker otorisasi POLICY (dicatat jujur di approval_decision,
+        bukan fake user). `ward_tenant` = identitas tenant NYATA peminta (dipakai
+        utk mengikat WardManager agar entrustment Ward tersolve; cross-tenant
+        untuk tenant lain tetap fail-closed).
+        """
+        if self._state is None or self._request is None or self._plan is None:
+            raise RuntimeError(
+                "tidak ada mission untuk dieksekusi (policy-authorized)"
+            )
+        state = self._state
+        # Fail-closed: hanya Mission yang memang tidak butuh approval boleh lewat
+        # jalur policy-authorized. Kalau butuh approval, wajib decide() human.
+        if state.approval_required:
+            state.status = UxStateStatus.REJECTED
+            state.failure_kind = UxFailureKind.REJECTED
+            state.failure_message = (
+                "Mission butuh human approval \u2014 gunakan decide() \u2014 bukan policy-authorized."
+            )
+            self._audit.append(
+                {
+                    "stage": "approval",
+                    "event": "denied_policy_authorized_for_approval_required",
+                    "ok": False,
+                    "blocked": True,
+                    "detail": "Mission approval_required=True coba dieksekusi via policy-authorized \u2014 ditolak",
+                }
+            )
+            self._persist()
+            return state
+        operation = (self._request.operation or "").strip()
+        # Guard mutasi: policy-authorized HANYA untuk read-only. Mutation wajib
+        # melewati decide() human approval (bukan jalur ini).
+        if not self._operation_is_read_only(operation):
+            state.status = UxStateStatus.REJECTED
+            state.failure_kind = UxFailureKind.REJECTED
+            state.failure_message = (
+                "Operasi mutating tidak boleh dieksekusi via policy-authorized \u2014 wajib human approval."
+            )
+            self._audit.append(
+                {
+                    "stage": "approval",
+                    "event": "denied_policy_authorized_for_mutation",
+                    "ok": False,
+                    "blocked": True,
+                    "detail": (
+                        f"Operasi {operation} bersifat mutating \u2014 policy-authorized ditolak "
+                        "(0 mutation). Wajib decide(approve)."
+                    ),
+                }
+            )
+            self._persist()
+            return state
+
+        # Otorisasi jujur dari policy (bukan fake approval): ApprovalDecision
+        # dicatat dengan approver=policy & reason read-only. TIDAK ada record
+        # pending ApprovalRequest yang dibuat di ApprovalCoordinator.
+        _policy_decision = {
+            "approval_id": f"ap-policy-{uuid.uuid4().hex[:8]}",
+            "execution_id": f"policy-{uuid.uuid4().hex[:24]}",
+            "approved": True,
+            "reason": "read-only operation: no human approval required (policy-authorized)",
+            "approver": approver,
+        }
+        _metrics.inc("sam_mission_policy_authorized")
+        self._state = self._execute_mission(
+            approval_status="policy_authorized",
+            approval_decision=_policy_decision,
+            approver=approver,
+            ward_tenant=ward_tenant,
+        )
+        return self._state
 
     # ------------------------------------------------------------------
     # 3) get_state — ViewModel saat ini untuk UI.
