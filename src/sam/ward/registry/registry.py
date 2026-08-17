@@ -17,8 +17,14 @@
 # Ward, tapi authorization (lihat Entrustment) menolak apapun sampai konsen
 # dari Owner ada. Revoked Ward -> langsung kehilangan akses.
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+
+if TYPE_CHECKING:
+    from sam.ward.identity.models import WardAccessScope, WardMetadata, WardOwner
+    from sam.ward.persistence import WardStore
 
 from sam.ward.identity.models import Ward, WardIdentity
 from sam.ward.entrustment.models import Entrustment
@@ -66,11 +72,21 @@ class WardRepository:
     Murni read/write data terstruktur. TIDAK ada eksekusi, TIDAK ada mutasi
     eksternal, TIDAK ada authority. Segala aksi terhadap Ward harus melewati
     AuthorizationGate + canonical execution di lapisan lain.
+
+    Persistence (W1): opsional. Bila `persistence` disediakan (WardStore
+    PostgreSQL, mengikuti Repository Pattern existing), setiap mutasi
+    (register/entrust/update_metadata/revoke) di-persist per-entity.
+    Default tanpa persistence -> perilaku in-memory (regresi M13 aman).
+    Bila persistence tersedia, __init__ memuat ulang state yang tersimpan
+    (survive restart, accept E/F W1).
     """
 
-    def __init__(self) -> None:
+    def __init__(self, persistence: Optional["WardStore"] = None) -> None:
         self._by_id: Dict[str, WardEntry] = {}
         self._entrustments: Dict[str, Entrustment] = {}  # ward_id -> entrustment
+        self._persistence = persistence
+        if persistence is not None:
+            self._recover_from_store()
 
     # --- registrasi (eksplisit; tidak ada hidden registration) ---
 
@@ -99,6 +115,7 @@ class WardRepository:
             ward=ward, registered_at=registered_at, origin=origin)
         if entrustment is not None:
             self._entrustments[identity.ward_id] = entrustment
+        self._persist()
         return self._by_id[identity.ward_id]
 
     def get(self, ward_id: str) -> Optional[Ward]:
@@ -144,6 +161,7 @@ class WardRepository:
         self._by_id[ward_id] = WardEntry(ward=new_ward,
                                          registered_at=entry.registered_at,
                                          origin=entry.origin)
+        self._persist()
         return new_ward
 
     def revoke(self, ward_id: str, *, revoked_at: str = "") -> Ward:
@@ -167,6 +185,7 @@ class WardRepository:
                 access_scope=ent.access_scope,
                 approval_policy=ent.approval_policy,
                 created_at=ent.created_at, revoked_at=revoked_at or ent.created_at)
+        self._persist()
         return new_ward
 
     def get_entrustment(self, ward_id: str) -> Optional[Entrustment]:
@@ -176,6 +195,87 @@ class WardRepository:
     def set_entrustment(self, entrustment: Entrustment) -> None:
         """Tetapkan / perbarui entrustment untuk Ward (konsen owner)."""
         self._entrustments[entrustment.ward_id] = entrustment
+        self._persist()
 
     def count(self) -> int:
         return len(self._by_id)
+
+    # ----------------------------------------------------------------------
+    # Persistence (W1): plugin-opsional. Mengikuti Repository Pattern existing
+    # (MissionStore -> PostgresMissionStore; PersistenceUnit). TIDAK membuat
+    # backup JSON baru utk Ward — pakai backend yang disuntikkan (PostgreSQL).
+    # ----------------------------------------------------------------------
+
+    def _persist(self) -> None:
+        if self._persistence is None:
+            return
+        try:
+            snapshot = {
+                "wards": [
+                    {"ward": e.ward.as_dict(),
+                     "registered_at": e.registered_at,
+                     "origin": e.origin}
+                    for e in self._by_id.values()
+                ],
+                "entrustments": [
+                    e.as_dict() for e in self._entrustments.values()
+                ],
+            }
+            self._persistence.save(snapshot, scope="ward")
+        except Exception:  # noqa: BLE001 - persistence tidak boleh mematikan repo
+            pass
+
+    def _recover_from_store(self) -> None:
+        """Muat ulang state Ward dari persistence (survive restart, accept F).
+
+        Toleran: bila kosong/korup biarkan repo dalam-memory kosong (fail-open
+        utk registrasi eksplisit; authorization tetap menolak tanpa entrustment).
+        """
+        if self._persistence is None:
+            return
+        try:
+            data = self._persistence.load(scope="ward")
+        except Exception:  # noqa: BLE001
+            data = None
+        if not data:
+            return
+        from sam.ward.identity.models import Ward
+        from sam.ward.entrustment.models import Entrustment
+        self._by_id = {}
+        self._entrustments = {}
+        for entry in data.get("wards") or []:
+            try:
+                wd = entry.get("ward") or {}
+                ward = Ward.from_dict(wd)
+                self._by_id[ward.identity.ward_id] = WardEntry(
+                    ward=ward,
+                    registered_at=entry.get("registered_at", ""),
+                    origin=entry.get("origin", ""),
+                )
+            except Exception:  # noqa: BLE001 - skip corrupt entry
+                continue
+        for ent in data.get("entrustments") or []:
+            try:
+                e = Entrustment(
+                    ward_id=str(ent.get("ward_id", "")),
+                    owner_id=str(ent.get("owner_id", "")),
+                    allowed_capabilities=tuple(ent.get("allowed_capabilities") or ()),
+                    access_scope=str(ent.get("access_scope", "")),
+                    approval_policy=_approval_policy_from_dict(ent.get("approval_policy") or {}),
+                    created_at=str(ent.get("created_at", "")),
+                    revoked_at=str(ent.get("revoked_at", "") or ""),
+                )
+                self._entrustments[e.ward_id] = e
+            except Exception:  # noqa: BLE001
+                continue
+
+
+def _approval_policy_from_dict(data: dict):
+    """Rebuild ApprovalPolicy dari dict (persistence recovery)."""
+    from sam.ward.entrustment.models import ApprovalPolicy
+    d = data or {}
+    return ApprovalPolicy(
+        required=bool(d.get("required", True)),
+        approver_role=str(d.get("approver_role", "operator")),
+        timeout_seconds=int(d.get("timeout_seconds", 3600) or 3600),
+    )

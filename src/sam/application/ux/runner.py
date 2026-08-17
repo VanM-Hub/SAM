@@ -62,6 +62,131 @@ def _detail_of_result(result: Dict[str, Any]) -> str:
     )
 
 
+def _maybe_resolve_ward(subject_id: str, operation: str, ward_manager) -> Optional[Dict[str, Any]]:
+    """W1: Resolve target Ward eksternal (mis. OpenClaw) lewat Ward boundary.
+
+    Dipanggil dari run_mission utk operasi environment.*. Return:
+      - None   : target adalah citizen (local-machine dll.) -> jalur existing
+                 (EnvironmentDiscovery) dipakai. BUKAN Ward.
+      - dict   : hasil observasi Ward (ok/refused) utk dikembalikan langsung.
+                 refused/blocked -> {ok:False, blocked:True} (0 mutation).
+
+    alur (Van #7 W1): authenticated tenant -> Ward resolution ->
+    status/entrustment -> capability scope -> governance boundary -> adapter
+    -> evidence.
+    """
+    try:
+        from sam.ward.manager import WardManager
+        if not isinstance(ward_manager, WardManager):
+            from sam.ward.wiring import get_ward_manager
+            ward_manager = get_ward_manager()
+    except Exception:  # noqa: BLE001 - tak ada Ward wiring -> citizen path saja
+        ward_manager = None
+
+    if ward_manager is None:
+        return None  # Ward subsystem tidak tersedia -> jalur citizen existing
+
+    # local-machine dkk tetap citizen, BUKAN Ward (Van #6).
+    if ward_manager.is_citizen_env_target(subject_id):
+        return None
+
+    op = (operation or "").strip()
+    # W1 scope: hanya environment.observe yg dibuka utk Ward Lab (OpenClaw).
+    # investigate/diagnose/recommend pada Ward eksternal -> refused jujur
+    # (scope awal read-only observe saja; mutation TIDAK diaktifkan, Van #4).
+    if not op.startswith("environment.observe"):
+        return {
+            "ok": False,
+            "operation": op,
+            "target": subject_id,
+            "blocked": True,
+            "timeline": [{
+                "stage": op, "ok": False, "blocked": True,
+                "detail": f"W1: operation '{op}' pada Ward '{subject_id}' belum dibuka "
+                           f"(scope awal hanya environment.observe read-only; lainnya refused, 0 mutation)",
+                "evidence": {"verified_read": False, "ward": subject_id},
+            }],
+            "detail": f"refused: operation '{op}' di luar scope observe W1 utk Ward '{subject_id}'",
+            "evidence": {"verified_read": False, "ward": subject_id},
+        }
+
+    resolution = ward_manager.auth_ward(subject_id, op)
+    if not resolution.ok:
+        # fail-closed: tidak ada eksekusi. reason (tenant/status/scope/cross-tenant).
+        return {
+            "ok": False,
+            "operation": op,
+            "target": subject_id,
+            "blocked": True,
+            "timeline": [{
+                "stage": "environment.observe", "ok": False, "blocked": True,
+                "detail": "refused: " + resolution.reason,
+                "evidence": {"verified_read": False, "ward": subject_id,
+                              "reason": resolution.reason},
+            }],
+            "detail": "refused: " + resolution.reason,
+            "evidence": {"verified_read": False, "ward": subject_id,
+                          "reason": resolution.reason},
+        }
+
+    # resolve sukses -> observasi Ward nyata via adapter OpenClaw (reuse M14).
+    return _run_ward_openclaw_observe(resolution.subject, subject_id)
+
+
+def _run_ward_openclaw_observe(subject, subject_label: str) -> Dict[str, Any]:
+    """Observasi Ward OpenClaw (read-only) via OpenClawObservationAdapter.
+
+    Adapter ini MEMAKAI OpenClawHealthCollector (M14 canonical) — bukan
+    integrasi kedua. Evidence = status komponen NYATA. Bila tak tersedia ->
+    honest NOT READY (0 sukses palsu).
+    """
+    from sam.ward.adapters.openclaw_observation import OpenClawObservationAdapter
+
+    adapter = OpenClawObservationAdapter(subject=subject)
+    obs = adapter.observe(capability="observe")
+    ev = (obs.evidence if hasattr(obs, "evidence") else {}) or {}
+    comps = ev.get("components") or []
+    comp_count = ev.get("component_count", len(comps))
+    runtime = ev.get("runtime_status") or "unknown"
+    gateway_used = bool(ev.get("gateway_used"))
+    ok = bool(obs.successful)
+    stage_detail = (
+        f"OpenClaw Ward {subject_label} diobservasi (runtime={runtime}, "
+        f"komponen={comp_count}, gateway={gateway_used})"
+        if ok
+        else f"OpenClaw Ward {subject_label} tidak tersedia (NOT READY: {obs.error or ''})"
+    )
+    return {
+        "ok": ok,
+        "operation": "environment.observe",
+        "target": subject_label,
+        "ward_subject": subject.as_dict(),
+        "timeline": [{
+            "stage": "environment.observe", "ok": ok, "blocked": None if ok else True,
+            "detail": stage_detail,
+            "evidence": {
+                "kind": "openclaw_ward_observation",
+                "component_count": comp_count,
+                "components": comps,
+                "runtime_status": runtime,
+                "workspace": ev.get("workspace"),
+                "gateway_used": gateway_used,
+            },
+            "scrubbed": {"ok": ok, "component_count": comp_count, "runtime_status": runtime},
+        }],
+        "detail": stage_detail,
+        "evidence": {
+            "kind": "openclaw_ward_observation",
+            "component_count": comp_count,
+            "components": comps,
+            "runtime_status": runtime,
+            "workspace": ev.get("workspace"),
+            "gateway_used": gateway_used,
+            "verified_read": ok,
+        },
+    }
+
+
 def run_browser_mission(
     operation: str,
     url: str,
@@ -401,6 +526,7 @@ def run_mission(
     approval_reason: str = "",
     findings: Optional[List[Dict[str, Any]]] = None,
     diagnosis: Optional["DiagnosisResult"] = None,
+    ward_manager=None,
 ) -> Dict[str, Any]:
     """Satu dispatcher eksekusi — pilih eksekutor berdasarkan `operation`.
 
@@ -409,44 +535,44 @@ def run_mission(
     operasi yang telah dibuka jalurnya yang dieksekusi; lainnya ->
     UnsupportedOperationError (jujur BLOCKED, 0 side effect).
 
+    W1 (Ward Activation): untuk operasi environment.* dengan target yang BUKAN
+    citizen (`local-machine` dll.), SAM me-resolve target sbg WARD eksternal dan
+    melewati Ward boundary (tenant + status + entrustment + capability scope)
+    SEBELUM adapter dipanggil. `ward_manager` = composition root Ward (optional;
+    default = global get_ward_manager()). Bila ward_manager tak tersedia ATAU
+    target bukan citizen tapi tak terresolve sbg Ward -> refused (BLOCKED, 0
+    mutation). local-machine tetap citizen (EnvironmentDiscovery), BUKAN Ward.
+
     Dibuka bertahap (aman dulu):
       - github.create_issue -> m8_002_build (PROVEN M8-006/M9)
       - web.open / web.get  -> RealBrowserConnector (read-only)
       - http.<endpoint>     -> RealHttpConnector (read-only)
       - environment.observe -> EnvironmentObservationAdapter (read-only, R1-002)
+        ATAU OpenClawObservationAdapter (Ward, W1) bila target adalah Ward.
       - environment.investigate -> EnvironmentInvestigationAdapter (read-only, R1-003)
-      - environment.diagnose -> EnvironmentDiagnosisAdapter (read-only, R1-004);
-        `findings` = cache investigasi terakhir sbg SELECTED EVIDENCE
-      - environment.recommend -> EnvironmentRecommendationAdapter (read-only,
-        R1-005); `diagnosis` = DiagnosisResult canonical (R1-004)
+      - environment.diagnose -> EnvironmentDiagnosisAdapter (read-only, R1-004)
+      - environment.recommend -> EnvironmentRecommendationAdapter (read-only, R1-005)
       - (email.send / db.write / process.run) -> BELUM dibuka -> BLOCKED
     """
     op = (operation or "").strip()
     if op.startswith("github."):
         REPO = repo or target or DEFAULT_TEST_REPO
         return run_github_real_mission(repo=REPO, audit=audit, artifact_dir=artifact_dir)
-    if op == "environment.investigate" or op.startswith("environment.investigate"):
-        # R1-003: read-only investigasi environment nyata (kenapa lambat?).
-        # Berhenti di Finding kandidat + evidence + confidence; BUKAN root cause.
-        subject_id = (target or "").strip() or "local-machine"
-        return run_environment_investigation_mission(subject_id=subject_id)
-    if op == "environment.diagnose" or op.startswith("environment.diagnose"):
-        # R1-004: verdict diagnosis jujur atas evidence investigasi R1-003.
-        # findings (= cache investigasi terakhir) dipakai sbg SELECTED EVIDENCE.
-        subject_id = (target or "").strip() or "local-machine"
-        return run_environment_diagnosis_mission(findings=findings,
-                                                 subject_id=subject_id)
-    if op == "environment.recommend" or op.startswith("environment.recommend"):
-        # R1-005: rekomendasi canonical atas DiagnosisResult R1-004.
-        # MUSTAHIL mengarang action: tanpa canonical action mapping TERBUKTI,
-        # causal -> recommendations=[] jujur (STOP sebelum approval/execution).
-        subject_id = (target or "").strip() or "local-machine"
-        return run_environment_recommendation_mission(diagnosis=diagnosis,
-                                                      subject_id=subject_id)
     if op.startswith("environment."):
-        # R1-002: read-only observasi environment nyata (periksa komputer).
-        # target = identitas subjek (default local-machine).
         subject_id = (target or "").strip() or "local-machine"
+        # W1: Ward resolution utk target non-citizen (mis. OpenClaw).
+        ward_result = _maybe_resolve_ward(subject_id, op, ward_manager)
+        if ward_result is not None:
+            return ward_result
+        # target citizen (local-machine dll.) -> jalur environment existing.
+        if op.startswith("environment.investigate"):
+            return run_environment_investigation_mission(subject_id=subject_id)
+        if op.startswith("environment.diagnose"):
+            return run_environment_diagnosis_mission(findings=findings,
+                                                     subject_id=subject_id)
+        if op.startswith("environment.recommend"):
+            return run_environment_recommendation_mission(diagnosis=diagnosis,
+                                                          subject_id=subject_id)
         return run_environment_observation_mission(subject_id=subject_id)
     if op.startswith("web."):
         url = (target or "").strip()

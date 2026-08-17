@@ -97,6 +97,19 @@ class WardIdentity:
             labels=labels,
         )
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "WardIdentity":
+        """Rebuild identitas dari dict (persistence recovery). Immutable."""
+        d = data or {}
+        labels = tuple(tuple(x) for x in (d.get("labels") or []))
+        return cls(
+            ward_id=str(d.get("ward_id", "")),
+            ward_type=str(d.get("ward_type", "unknown")),
+            name=str(d.get("name", "")),
+            namespace=str(d.get("namespace", "")),
+            labels=labels,  # type: ignore[arg-type]
+        )
+
 
 @dataclass(frozen=True)
 class WardOwner:
@@ -112,6 +125,15 @@ class WardOwner:
             "owner_name": self.owner_name,
             "owner_role": self.owner_role,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "WardOwner":
+        d = data or {}
+        return cls(
+            owner_id=str(d.get("owner_id", "")),
+            owner_name=str(d.get("owner_name", "")),
+            owner_role=str(d.get("owner_role", "")),
+        )
 
 
 @dataclass(frozen=True)
@@ -134,6 +156,16 @@ class WardAccessScope:
             "endpoints": list(self.endpoints),
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "WardAccessScope":
+        d = data or {}
+        endpoints = tuple(x for x in (d.get("endpoints") or []))
+        return cls(
+            scope=str(d.get("scope", "")),
+            resource=str(d.get("resource", "")),
+            endpoints=endpoints,
+        )
+
 
 @dataclass(frozen=True)
 class WardMetadata:
@@ -147,6 +179,15 @@ class WardMetadata:
             "description": self.description,
             "data": list(self.data),
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "WardMetadata":
+        d = data or {}
+        pairs = tuple(tuple(x) for x in (d.get("data") or []))
+        return cls(
+            description=str(d.get("description", "")),
+            data=pairs,  # type: ignore[arg-type]
+        )
 
 
 @dataclass(frozen=True)
@@ -195,3 +236,15 @@ class Ward:
             "metadata": self.metadata.as_dict(),
             "status": self.status,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Ward":
+        """Rebuild agregat Ward dari dict (persistence recovery). W1."""
+        d = data or {}
+        return cls(
+            identity=WardIdentity.from_dict(d.get("identity") or {}),
+            owner=WardOwner.from_dict(d.get("owner") or {}),
+            access_scope=WardAccessScope.from_dict(d.get("access_scope") or {}),
+            metadata=WardMetadata.from_dict(d.get("metadata") or {}),
+            status=str(d.get("status", "active")),
+        )

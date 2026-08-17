@@ -68,6 +68,27 @@ from sam.application.ux.metrics import metrics as _metrics  # type: ignore
 # Repo test default untuk GitHub mutation (repo TEST, bukan production).
 DEFAULT_TEST_REPO = "VanM-Hub/test-issues"
 
+
+def _build_ward_manager_for_tenant(approver: Optional[str] = None):
+    """W1: Bangun WardManager terikat tenant (reuse AD-ENG-006 identity).
+
+    Memakai composition root Ward (get_ward_manager) dan mengikat tenant aktif
+    = {username: approver, role: operator}. Ownership entrustment Ward dicocokkan
+    terhadap username ini (cross-tenant -> fail-closed). Bila Ward subsystem
+    tak tersedia -> None (jalur citizen existing tidak berubah).
+    """
+    try:
+        from sam.ward.wiring import get_ward_manager
+        mgr = get_ward_manager()
+        if mgr is None:
+            return None
+        return mgr.with_tenant({
+            "username": (approver or "user").strip() or "user",
+            "role": "operator",
+        })
+    except Exception:  # noqa: BLE001 - Ward belum tersedia -> None (citizen path)
+        return None
+
 # Kosakata DOMAIN environment (SATU SUMBER): target sistem + kondisi observable.
 # Ini bukan template kalimat, melainkan kosakata domain yang dipakai konsisten oleh
 # (a) guard CHAT untuk MEMBIARKAN frasa diagnosa sistem lolos ke resolver, dan
@@ -621,6 +642,7 @@ class MissionUXService:
             # GitHub -> m8_002_build (blok existing di bawah). web.*/http.* ->
             # connector read-only. Operasi lain -> UnsupportedOperationError
             # (BLOCKED jujur, 0 side effect).
+            _ward_mgr = _build_ward_manager_for_tenant(approver)
             result = run_mission(
                 operation=operation,
                 target=self._request.target,
@@ -633,6 +655,7 @@ class MissionUXService:
                 # R1-005: cache DiagnosisResult CANONICAL terakhir. Hanya
                 # environment.recommend yang membaca field ini; yang lain mengabaikan.
                 diagnosis=self._last_diagnosis_result,
+                ward_manager=_ward_mgr,
             )
         except UnsupportedOperationError as exc:
             state.status = UxStateStatus.BLOCKED
