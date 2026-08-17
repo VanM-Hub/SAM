@@ -18,6 +18,11 @@ rem ============================================================
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%\src"
 set "PYTHONIOENCODING=utf-8"
+rem --- AUTH (login nyata operator) aktif. ---
+rem Hanya SAM_ENABLE_AUTH=1 (tanpa SAM_ENV=production) agar cookie tidak
+rem secure (server jalan di http 127.0.0.1, bukan HTTPS). SAM_ENV=production
+rem dipakai bila di belakang Caddy/HTTPS (cookie secure + auth mandatory).
+set "SAM_ENABLE_AUTH=1"
 
 rem --- Cek port 8080 (apakah SAM sudah jalan) ---
 netstat -ano | findstr "8080" | findstr "LISTENING" >nul 2>&1
