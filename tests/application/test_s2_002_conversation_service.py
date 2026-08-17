@@ -320,5 +320,51 @@ class ConversationServiceMissionUXIntegrationTest(unittest.TestCase):
         self.assertEqual(msgs[1].role, MessageRole.ASSISTANT)
         self.assertIn("github.create_issue", msgs[1].content)
 
+    # --- B1 (keputusan Van 2026-08-18): juru tanya, bukan penebak ---
+    def test_b1_ambiguous_action_asks_clarification_no_mission(self):
+        """B1: 'ganti provider' (aksi ambigu, tak cocok pola tepercaya) ->
+        SAM bertanya klarifikasi, TIDAK membuat mission, TIDAK memanggil
+        submit(), 0 eksekusi. Ini pengganti tebakan LLM (web.open) lama."""
+        from sam.application.ux.service import MissionUXService
+
+        svc = ConversationService(
+            conversation_repo=InMemoryConversationRepository(),
+            mission_service=MissionUXService(),
+            participant="alice",
+        )
+        convo = svc.create_or_resume_conversation()
+        result = svc.submit_command(convo.conversation_id, "ganti provider")
+        # Jalur klarifikasi: operation kosong, tidak ada request/mission.
+        self.assertIs(result.get("clarify"), True)
+        self.assertTrue(result.get("chat"))
+        st = result["state"]
+        self.assertEqual(st.operation, "")
+        self.assertEqual(st.request_id, "")
+        self.assertFalse(st.approval_required)
+        # Tidak ada mission list entry / observability mission_id kosong.
+        self.assertEqual((st.observability or {}).get("mission_id"), "")
+        # Assistant membalas pertanyaan klarifikasi, bukan misi.
+        msgs = svc.get_conversation(convo.conversation_id)
+        self.assertEqual(len(msgs), 2)
+        self.assertEqual(msgs[1].role, MessageRole.ASSISTANT)
+        self.assertIn("perjelas", msgs[1].content)
+        self.assertIn("SAM belum yakin", msgs[1].content)
+
+    def test_b1_clear_readonly_still_mission(self):
+        """B1 tidak merusak jalur tepercaya: 'periksa komputer saya' tetap
+        jadi mission environment.observe (read-only), bukan clarify."""
+        from sam.application.ux.service import MissionUXService
+
+        svc = ConversationService(
+            conversation_repo=InMemoryConversationRepository(),
+            mission_service=MissionUXService(),
+            participant="alice",
+        )
+        convo = svc.create_or_resume_conversation()
+        result = svc.submit_command(convo.conversation_id, "periksa komputer saya")
+        self.assertIsNone(result.get("clarify"))
+        self.assertEqual(result["state"].operation, "environment.observe")
+
+
 if __name__ == "__main__":
     unittest.main()

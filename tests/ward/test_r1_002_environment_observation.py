@@ -127,7 +127,7 @@ class EnvironmentObservationAdapterTest(unittest.TestCase):
 class EnvironmentRecognizerTest(unittest.TestCase):
     def test_recognizes_periksa_komputer(self):
         from sam.application.ux.service import MissionUXService
-        op, tgt, und, planned, _, _ = MissionUXService._interpret("Periksa komputer saya")
+        op, tgt, und, planned, _, _, _ = MissionUXService._interpret("Periksa komputer saya")
         self.assertEqual(op, "environment.observe")
         self.assertEqual(tgt, "local-machine")
         self.assertTrue(planned)

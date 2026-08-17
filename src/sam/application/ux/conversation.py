@@ -456,6 +456,21 @@ class ConversationService:
         if proposal is not None:
             return proposal
 
+        # 1c B1 (keputusan Van 2026-08-18) — KLARIFIKASI sebelum submit().
+        #    `_interpret` kini DETERMINISTIK murni (tanpa `_interpret_via_ai`),
+        #    jadi aman dipanggil di sini SEBELUM `submit()`. Bila frasa user
+        #    terlihat seperti permintaan aksi tapi tidak cocok pola tepercaya
+        #    (resolve_reason == "clarify"), JANGAN panggil `submit()` -> 0 mission,
+        #    0 eksekusi. Balas pertanyaan klarifikasi (juru tanya, bukan penebak).
+        #    Ini perilaku B1 penuh.
+        _pre = MissionUXService._interpret(text)
+        if _pre and len(_pre) >= 7 and _pre[6] == "clarify":
+            return self._submit_clarify(
+                conversation_id=conversation_id,
+                text=text,
+                user_msg=user_msg,
+            )
+
         # 2) Orkestrasi ke MissionUXService -> state canonical.
         #    (Keputusan audit S2-3: TIDAK ada assosiasi `_mission_link` RAM.
         #    State mission canonical MILIK MissionUXService & survive restart via
@@ -977,6 +992,97 @@ class ConversationService:
         return {
             "state": chat_state,
             "chat": True,
+            "conversation_id": conversation_id,
+            "user_message_id": user_msg.message_id,
+            "assistant_message_id": assistant_msg.message_id,
+            "assistant_persisted": assistant_persisted,
+        }
+
+    # ------------------------------------------------------------------
+    # 3c) jalur KLARIFIKASI (B1 — keputusan Van 2026-08-18): juru tanya, bukan penebak.
+    # ------------------------------------------------------------------
+    def _submit_clarify(
+        self,
+        conversation_id: str,
+        text: str,
+        user_msg: Message,
+    ) -> Dict[str, Any]:
+        """Balas pertanyaan klarifikasi DETERMINISTIK (tanpa LLM) saat SAM
+        tidak yakin maksud permintaan aksi yang tidak cocok pola tepercaya.
+
+        B1: SAM TIDAK menebak operasi, TIDAK membuat MissionRequest/Plan/Approval,
+        dan TIDAK mengeksekusi apa pun (0 mission, 0 side effect). Mengembalikan
+        pertanyaan apa yang ingin user kerjakan + minta penjelasan. Ini behavior
+        yang diinginkan utk permintaan ambigu (mis. "ganti provider").
+
+        Returns dict (sama shape dgn `_submit_chat`):
+          {
+            "state": UxMissionState (CHAT projection ringkas, bukan mission),
+            "chat": True,
+            "clarify": True,  # penanda jalur klarifikasi B1
+            "conversation_id", "user_message_id", "assistant_message_id",
+            "assistant_persisted",
+          }
+        """
+        from sam.application.ux.state import UxMissionState, UxStateStatus
+
+        content = (
+            "SAM belum yakin persis apa yang ingin Anda kerjakan, dan tidak akan "
+            "menebak-nebak operasi (agar tidak terjadi tindakan yang keliru).\n\n"
+            f"Mengenai \"{text.strip()}\" — silakan perjelas:\n"
+            "1. Apa yang ingin Anda ubah/lakukan? (mis. ganti penyedia AI, ganti "
+            "koneksi internet, perbarui aplikasi, dsb.)\n"
+            "2. Ke apa? (target baru yang diinginkan)\n\n"
+            "Sampaikan maksud Anda dengan lebih jelas, dan SAM akan membantu."
+        )
+        session = self._ensure_open_session(conversation_id)
+        assistant_msg = Message(
+            message_id=f"msg-{uuid.uuid4().hex[:12]}",
+            role=MessageRole.ASSISTANT,
+            content=content,
+            conversation_id=conversation_id,
+            session_id=session.session_id,
+            evidence_refs=(),
+            created_at=_now_utc(),
+        )
+        assistant_persisted = True
+        try:
+            if conversation_id:
+                self._repo.append_message(assistant_msg)
+        except Exception:  # noqa: BLE001 - penanda jujur
+            assistant_persisted = False
+
+        clarify_state = UxMissionState(
+            request_id="",
+            request_text=text,
+            what_sam_understood=(
+                "SAM meminta klarifikasi: permintaan aksi belum jelas, tidak "
+                "dibuat misi."
+            ),
+            operation="",
+            target="",
+            planned_steps=[],
+            approval_required=False,
+            action_summary="",
+            approval_status=UxStateStatus.NONE,
+            status=UxStateStatus.UNDERSTOOD,
+        )
+        clarify_state.observability = {
+            "request_id": "",
+            "mission_id": "",
+            "status": UxStateStatus.UNDERSTOOD,
+            "capability": "clarify",
+            "external_target": "",
+            "start_time": _now_utc(),
+            "end_time": "",
+            "verification_result": "",
+            "failure_reason": "",
+            "approver": "",
+        }
+        return {
+            "state": clarify_state,
+            "chat": True,
+            "clarify": True,
             "conversation_id": conversation_id,
             "user_message_id": user_msg.message_id,
             "assistant_message_id": assistant_msg.message_id,

@@ -41,37 +41,24 @@ class TestBypassDenied(unittest.TestCase):
             )
 
     def test_invalid_capability_makes_no_plan_no_approval(self):
-        """LLM mengusulkan capability TIDAK admissible (lorem->process.run)
-        -> DENIED: no plan, no approval, no execution. ADR-007: exact canonical
-        admission (LLM = candidate, SAM validator = authority). Deterministis
-        (mock LLM -> candidate process.run), tanpa bergantung LLM live yang flaky."""
-        candidate = (
-            "process.run",
-            "",
-            "lorem ipsum random text bukan perintah",
-            ["jalankan perintah lorem"],
-            "SAM akan menjalankan process.run",
-            "",
-            "unsupported_operation",
+        """B1 (keputusan Van 2026-08-18): LLM TIDAK lagi menghasilkan candidate
+        mission dari bahasa bebas. Frasa yang tidak cocok pola DETERMINISTIK
+        tepercaya (mis. 'ganti provider') -> CLARIFY: SAM bertanya, 0 mission,
+        0 plan, 0 approval, 0 eksekusi. Ini penguatan fail-closed (bukan hanya
+        deny capability tak-admissible; kini TIDAK ADA tebakan LLM sama sekali).
+        Deterministis (jalur CHAT klarifikasi), tanpa bergantung LLM live."""
+        c = TestClient(app)
+        r = c.post("/ux/submit", json={"text": "ganti provider"})
+        s = r.json()
+        # B1: operation kosong (tidak ada misi), tidak ada plan/approval/eksekusi.
+        assert not s["plan"]["approval_required"], (
+            "frasa tak-tepercaya tidak boleh minta approval (ada eksekusi?)"
         )
-        with mock.patch.object(
-            MissionUXService, "_interpret_via_ai", return_value=candidate
-        ):
-            c = TestClient(app)
-            r = c.post("/ux/submit", json={"text": "lorem ipsum random text bukan perintah"})
-            s = r.json()
-            assert s["plan"]["approval_required"] is False, (
-                "invalid capability tidak boleh minta approval (ada eksekusi?)"
-            )
-            assert not s["plan"]["planned_steps"], "invalid capability tidak boleh punya plan"
-            st = c.get("/ux/state").json()
-            assert st["execution"]["status"] == "waiting_approval" or True
-            # observability: capability none -> tidak ada target eksekusi
-            assert st["observability"]["capability"] == "none"
-            # ADR-007: resolution invalid + resolve_reason unsupported_operation (trace)
-            assert st["observability"]["resolution"] == "invalid"
-            assert st["observability"]["resolve_reason"] == "unsupported_operation"
-            assert st["plan"]["planned_steps"] == []
+        assert not s["plan"]["planned_steps"], "tidak boleh punya plan"
+        # observability: capability clarify (bukan misi, bukan eksekusi)
+        st = c.get("/ux/state").json()
+        assert st["observability"]["capability"] in ("", "none", "clarify")
+        assert st["plan"]["planned_steps"] == []
 
     def test_no_execution_before_approval(self):
         """Tanpa approval (belum decide) -> TIDAK ada evidence/ekseternal effect."""

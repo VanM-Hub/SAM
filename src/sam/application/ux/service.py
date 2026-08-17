@@ -1212,18 +1212,17 @@ class MissionUXService:
         if inv_match:
             return inv_match + (None,)
 
-        # 1) Coba pemahaman cerdas via AI lokal (Gemma3:1b via Ollama).
-        #    Menutup kesenjangan "SAM hanya kenal pola kata" -> SAM bisa
-        #    memahami permintaan bahasa bebas. Fallback aman bila offline.
-        #    ADR-007: bila LLM mengusulkan operation yang TIDAK admissible
-        #    (resolve_reason != None), hasil invalid DI-PERTAHANKAN (bukan
-        #    di-fallback ke regex) agar no Mission + alasan ter-track.
-        attempt = MissionUXService._interpret_via_ai(t)
-        if attempt is not None:
-            if attempt[0] or attempt[6]:
-                return attempt
+        # 1) (B1 — keputusan Van 2026-08-18) LLM TIDAK lagi menjadi penerjemah
+        #    operasi mission dari bahasa bebas. Tidak ada `_interpret_via_ai`
+        #    di sini. Frasa bebas yang tidak cocok pola DETERMINISTIK tepercaya
+        #    tidak pernah menjadi mission tebakan LLM (risk: salah tafsir ->
+        #    mutation salah / BLOCKED web.open utk "ganti provider"). LLM hanya
+        #    dipakai di jalur CHAT (juru tanya / klarifikasi), bukan menentukan
+        #    operation. Perilaku B1: bila frasa user terlihat seperti permintaan
+        #    aksi tetapi tidak cocok pola tepercaya -> resolve_reason="clarify"
+        #    -> caller (submit_command) merutekan ke CHAT klarifikasi, 0 mission.
 
-        # Fallback: pola regex (mode offline / Ollama tidak tersedia).
+        # Fallback: pola regex (pola eksplisit & tepercaya).
         is_github_issue = bool(
             re.search(r"github", low) and re.search(r"(issue|masalah|tiket|new issue|create)", low)
         )
@@ -1289,8 +1288,27 @@ class MissionUXService:
             )
             return (operation, target, understood, planned, action_summary, approval_reason, None)
 
-        # Tidak ada pola regex yang cocok -> unresolved (BUKAN chat: guard
-        # CHAT sudah berjalan di awal; ini input yang tidak bisa dipetakan).
+        # B1 (keputusan Van 2026-08-18): tidak ada mission dari tebakan LLM.
+        # Bila frasa user terlihat seperti permintaan aksi (ada unsur verb aksi,
+        # tapi tidak cocok pola tepercaya) -> resolve_reason="clarify" -> caller
+        # (submit_command) mengarahkan ke CHAT klarifikasi (bertanya, 0 mission,
+        # 0 eksekusi). Bukan "unresolved" (masih track jujur) & bukan CHAT biasa
+        # (guard CHAT sudah berjalan di awal).
+        if MissionUXService._looks_like_action_request(low, t):
+            return (
+                "",
+                "",
+                "SAM belum yakin persis maksud permintaan Anda, dan tidak akan "
+                "menebak-nebak operasi. Silakan perjelas apa yang ingin Anda "
+                "kerjakan.",
+                [],
+                "",
+                "",
+                "clarify",
+            )
+        # Tidak ada pola regex yang cocok dan bukan permintaan aksi yang jelas
+        # -> unresolved (BUKAN chat: guard CHAT sudah berjalan di awal; ini input
+        #   yang tidak bisa dipetakan).
         return (
             "",
             "",
@@ -1300,6 +1318,35 @@ class MissionUXService:
             "",
             "unresolved",
         )
+
+    @staticmethod
+    def _looks_like_action_request(low: str, original: str = "") -> bool:
+        """B1: Apakah frasa user terlihat seperti permintaan aksi yang ambigu?
+
+        Deterministrik (tanpa LLM). Membedakan masukan yang tampak seperti
+        perintah/aksi (tapi tidak cocok pola tepercaya) dari percakapan biasa.
+        Guard CHAT sudah berjalan sebelum ini, jadi frasa sapaan/wh-frasa biasa
+        tidak sampai ke sini. Digunakan utk memutuskan routing ke klarifikasi.
+        """
+        low = (low or "").strip().lower()
+        if not low:
+            return False
+        # Kata kerja aksi umum (termasuk "ganti", "ubah", "set", "aktifkan",
+        # "nonaktifkan", "pindah", dll) -> terlihat seperti permintaan aksi.
+        if re.search(
+            r"\b(ganti|ubah|set|atur|aktifkan|nonaktifkan|matikan|nyalakan|tambahkan|"
+            "hapus|buat|jalankan|jalani|lakukan|kirim|pindah|pindahkan|restart|reboot|"
+            "install|uninstall|buka|tutup|perbarui|update|upgrade|downgrade|berhenti|stop|start)\\b",
+            low,
+        ):
+            return True
+        # Fallback: ada kata bantu permintaan + kata kerja aksi.
+        if re.search(
+            r"\b(bisa|tolong|mohon|minta)\s+.*\b(ganti|ubah|set|hapus|buat|kirim|buka|restart|stop|start)\b",
+            low,
+        ):
+            return True
+        return False
 
     @staticmethod
     def _operation_is_read_only(operation: str) -> bool:

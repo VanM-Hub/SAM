@@ -155,7 +155,7 @@ class EnvironmentInvestigationAdapterTest(unittest.TestCase):
 class EnvironmentInvestigationRecognizerTest(unittest.TestCase):
     def test_recognizes_kenapa_komputer_lambat(self):
         from sam.application.ux.service import MissionUXService
-        op, tgt, und, planned, _, _ = MissionUXService._interpret(
+        op, tgt, und, planned, _, _, _ = MissionUXService._interpret(
             "kenapa komputer saya lambat?")
         self.assertEqual(op, "environment.investigate")
         self.assertEqual(tgt, "local-machine")
@@ -200,13 +200,15 @@ class EnvironmentInvestigationDispatcherTest(unittest.TestCase):
 
 class EnvironmentInvestigationFlowTest(unittest.TestCase):
     def test_full_service_flow_investigate(self):
-        from sam.application.ux.approval import ApprovalDecisionIntent
         from sam.application.ux.service import MissionUXService
         svc = MissionUXService()
         st = svc.submit("kenapa komputer saya lambat?")
         self.assertEqual(st.operation, "environment.investigate")
-        self.assertEqual(st.status, "waiting_approval")
-        st = svc.decide(ApprovalDecisionIntent.APPROVE)
+        # Read-only (keputusan Van 2026-08-16): TIDAK butuh approval -> understood.
+        self.assertEqual(st.status, "understood")
+        self.assertFalse(st.approval_required)
+        # Eksekusi read-only lewat jalur policy-authorized (tanpa human approval).
+        st = svc.execute_policy_authorized()
         self.assertEqual(st.status, "completed")
         ev = svc.get_evidence()
         self.assertTrue(ev)
@@ -219,12 +221,14 @@ class EnvironmentInvestigationFlowTest(unittest.TestCase):
 
     def test_full_service_flow_insufficient_honest(self):
         # INSUFFICIENT path full-stack: bila discovery bersih (semua proses
-        # sehat, port bound) -> submit/decide menghasilkan completed + evidence
-        # environment_investigation dgn insufficient=True + findings kosong.
+        # sehat, port bound) -> submit + execute_policy_authorized menghasilkan
+        # completed + evidence environment_investigation dgn insufficient=True +
+        # findings kosong. Read-only (keputusan Van 2026-08-16): TIDAK butuh
+        # approval; eksekusi via jalur policy-authorized, BUKAN decide(APPROVE)
+        # (yang kini REJECTED utk read-only).
         # (patch HANYA pada probe OS; seluruh service/runner/adapter/engine
         # tetap jalan kode asli - membuktikan pemetaan insufficient jujur.)
         from unittest.mock import patch
-        from sam.application.ux.approval import ApprovalDecisionIntent
         from sam.application.ux.service import MissionUXService
         from sam.environment.entity import (
             Entity, EntityKind, EntitySource, DiscoveryScan)
@@ -250,8 +254,9 @@ class EnvironmentInvestigationFlowTest(unittest.TestCase):
             svc = MissionUXService()
             st = svc.submit("kenapa komputer saya lambat?")
             self.assertEqual(st.operation, "environment.investigate")
-            self.assertEqual(st.status, "waiting_approval")
-            st = svc.decide(ApprovalDecisionIntent.APPROVE)
+            # Read-only (keputusan Van 2026-08-16): tidak butuh approval -> understood.
+            self.assertEqual(st.status, "understood")
+            st = svc.execute_policy_authorized()
             self.assertEqual(st.status, "completed")
             ev = svc.get_evidence()
             self.assertTrue(ev)
