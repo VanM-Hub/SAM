@@ -758,6 +758,24 @@ class MissionUXService:
             _metrics.inc("sam_execution_failed")
         state.failure_kind = verdict["failure_kind"] or UxFailureKind.NONE
         state.failure_message = "" if verdict["status"] == "completed" else verdict["message"]
+        # W3/Observasi Ward: perhalus pesan gagal dgn detail timeline nyata (mis.
+        # "refused: cross-tenant ... fail-closed") agar SAM menjelaskan hasil dgn
+        # jujur (bukan label generik). Tanpa secret.
+        if state.status in (UxStateStatus.BLOCKED, UxStateStatus.FAILED):
+            _fail_t = next(
+                (t for t in (result.get("timeline") or []) if t.get("stage") == "environment.observe"),
+                None,
+            )
+            # scrubbed berisi field bebas-secret (reason/ok). Fallback ke `detail`
+            # timeline (mis. "refused: cross-tenant ... fail-closed") yg SANITIZED
+            # (tanpa secret) utk penjelasan jujur dan informatif.
+            _fail_detail = (
+                ((_fail_t or {}).get("scrubbed") or {}).get("reason") or ""
+            )
+            if not _fail_detail:
+                _fail_detail = ((_fail_t or {}).get("detail") or "").strip()
+            if _fail_detail:
+                state.failure_message = _fail_detail
         state.result_summary = result.get("title", "") + (
             " (ok)" if result.get("ok") else " (gagal)"
         )
@@ -888,15 +906,36 @@ class MissionUXService:
                 self._last_investigation_findings = []
         elif env_t is not None:
             env_scrubbed = (env_t or {}).get("scrubbed") or {}
+            # W3/Observasi Ward: jaga `kind` asli dari timeline (mis.
+            # `openclaw_ward_observation`) bila ada, jangan timpa sbg
+            # `environment_observation` (yang khusus citizen). Kejujuran
+            # evidence (test W3: real evidence utk Ward).
+            _env_kind = (
+                env_ev.get("kind")
+                or ("openclaw_ward_observation" if env_ev.get("ward") else None)
+                or "environment_observation"
+            )
             state.evidence = [
                 {
-                    "kind": "environment_observation",
+                    "kind": _env_kind,
                     "entity_count": env_ev.get("entity_count", 0),
                     "sources": env_ev.get("sources", []),
                     "failures": env_ev.get("failures", []),
                     "entities": env_ev.get("entities", []),
+                    "components": env_ev.get("components", []),
+                    "component_count": env_ev.get("component_count", 0),
+                    "runtime_status": env_ev.get("runtime_status"),
+                    "workspace": env_ev.get("workspace"),
+                    "gateway_used": env_ev.get("gateway_used"),
+                    "ward": env_ev.get("ward"),
+                    "reason": env_ev.get("reason"),
+                    "verified_read": (
+                        env_ev.get("verified_read")
+                        if "verified_read" in env_ev
+                        else bool(env_scrubbed.get("ok"))
+                    ),
                     "detail": (env_t or {}).get("detail", ""),
-                    "ok": bool(env_scrubbed.get("ok")),
+                    "ok": bool(env_scrubbed.get("ok", env_ev.get("ok"))),
                 }
             ]
         elif scrubbed.get("ok"):

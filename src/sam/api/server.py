@@ -67,6 +67,23 @@ for _router in rest_app.routers:
     app.include_router(_router.router)
 
 
+@app.on_event("startup")
+async def _ward_bootstrap_on_startup():
+    """Pastikan OpenClaw Ward terdaftar + persisted (Postgres) saat boot.
+
+    `bootstrap_openclaw_ward` (via `get_ward_manager`) bersifat lazy di
+    composition root - baru jalan saat endpoint /wards atau percakapan Ward
+    pertama diakses. Hook ini memicu lebih awal supaya Ward terdaftar dan
+    tersimpan ke PostgreSQL segera setelah server hidup (Ward tahan restart).
+    Aman idempotent: bootstrap TIDAK menimpa entri/konsen yang sudah ada.
+    """
+    try:
+        from sam.ward.wiring import get_ward_manager
+        get_ward_manager()
+    except Exception:  # noqa: BLE001 - startup tak boleh gagal karena Ward
+        pass
+
+
 @app.get("/ui", response_class=HTMLResponse)
 async def mission_workspace_ui():
     """SAM Mission Workspace --- thin client UI ke SAM production capability.

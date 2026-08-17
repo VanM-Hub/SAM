@@ -142,4 +142,21 @@ def _asyncio_run_in_current_loop(coro):
     """
     import asyncio
     loop = asyncio.get_event_loop()
+    if loop.is_running():
+        # loop sudah running (mis. handler FastAPI async). `run_until_complete`
+        # TIDAK bisa dipakai -> jalankan coroutine di thread terpisah dgn loop
+        # mandiri agar tidak berebut event loop yang sedang berjalan.
+        import threading
+        result = {}
+        def _run():
+            try:
+                result["value"] = asyncio.run(coro)
+            except Exception as exc:  # noqa: BLE001
+                result["error"] = exc
+        t = threading.Thread(target=_run, daemon=True)
+        t.start()
+        t.join()
+        if "error" in result:
+            raise result["error"]
+        return result["value"]
     return loop.run_until_complete(coro)

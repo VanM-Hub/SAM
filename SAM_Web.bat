@@ -24,6 +24,13 @@ rem secure (server jalan di http 127.0.0.1, bukan HTTPS). SAM_ENV=production
 rem dipakai bila di belakang Caddy/HTTPS (cookie secure + auth mandatory).
 set "SAM_ENABLE_AUTH=1"
 
+rem --- POSTGRES PERSISTENT (Ward tahan restart). ---
+rem Aktifkan store Postgres bila SAM_PG_PASSWORD tersedia (di env User Windows,
+rem di-reset via docker exec pada 2026-08-17). SAM_ENV=production tetap TIDAK
+rem dipakai (cookie non-secure di 127.0.0.1). SAM_PG_DSN/ENABLE ini membuat
+rem WardStore memilih PostgresWardStore (bukan InMemory) -> Ward tahan restart.
+if defined SAM_PG_PASSWORD set "SAM_ENABLE_PG=1"
+
 rem --- Cek port 8080 (apakah SAM sudah jalan) ---
 netstat -ano | findstr "8080" | findstr "LISTENING" >nul 2>&1
 if errorlevel 1 goto :start_server

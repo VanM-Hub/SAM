@@ -274,6 +274,29 @@ class UxRoutes:
             )
         return identity
 
+    def _optional_identity_username(
+        self,
+        authorization: Optional[str],
+        cookie: Optional[str] = None,
+    ) -> str:
+        """Username nyata dari sesi bila valid; fallback "user" (W3).
+
+        TIDAK mewajibkan auth di route conversation (agar regresi anonim aman):
+        no-auth / token invalid / expired -> "user" (bukan reject). Bila auth
+        aktif & token valid -> username sesi (dipakai utk owner Ward, cross-
+        tenant fail-closed di WardManager).
+        """
+        try:
+            if not self.auth_enabled:
+                return "user"
+            token = self._extract_token(authorization, cookie)
+            identity = self.sessions.authenticate(token)
+            if not identity:
+                return "user"
+            return (identity.get("username") or "user").strip() or "user"
+        except Exception:  # noqa: BLE001 - jangan reject route conversation
+            return "user"
+
     # ------------------------------------------------------------------
     # AD-ENG-005 — Mission List (Layer 2, read-only)
     # ------------------------------------------------------------------
@@ -524,7 +547,11 @@ async def ux_decide(
 
 
 @router.post("/conversation/message")
-async def ux_conversation_message(request: ConversationMessageRequest):
+async def ux_conversation_message(
+    request: ConversationMessageRequest,
+    authorization: Optional[str] = Header(None),
+    sam_session: Optional[str] = Cookie(None),
+):
     """Kirim pesan/command ke conversation (S2-3).
 
     Adapter murni -> ConversationService (orchestrator) -> MissionUXService
@@ -536,6 +563,11 @@ async def ux_conversation_message(request: ConversationMessageRequest):
       diam-diam; acceptance "conversation ID tidak dikenal").
     - text kosong -> 422 validation error (BUKAN mission execution).
     - produksi fail-closed conversation -> 503 (PG tidak siap).
+
+    W3: identitas dari sesi (bila auth aktif & token valid) dipakai sbg
+    `ward_tenant` utk resolusi/owner Ward (cross-tenant fail-closed). Bila
+    no-auth / token invalid -> fallback "user" (bukan reject; route ini TIDAK
+    wajib auth).
     """
     if _routes._conv_blocked_reason:
         raise HTTPException(
@@ -563,7 +595,12 @@ async def ux_conversation_message(request: ConversationMessageRequest):
         cid = convo.conversation_id
 
     result = _routes.conversations.submit_command(
-        conversation_id=cid, text=text, idempotency_key=request.idempotency_key
+        conversation_id=cid,
+        text=text,
+        idempotency_key=request.idempotency_key,
+        # W3: username nyata dari sesi (bila ada) utk resolusi/owner Ward;
+        # no-auth / token invalid -> fallback "user" di dalam helper.
+        ward_tenant=_routes._optional_identity_username(authorization, sam_session),
     )
     state = result["state"]
     messages = _routes.conversations.get_conversation(cid)
@@ -581,6 +618,13 @@ async def ux_conversation_message(request: ConversationMessageRequest):
         "messages": [_message_to_viewmodel(m) for m in messages],
         "assistant_persisted": result["assistant_persisted"],
         "mission_state": (state.as_dict() if state is not None else None),
+        # W3: metadata proposal/confirmation (read-only W3, BUKAN approval).
+        "w3": (
+            {"pending": True, **result["w3_proposal"]}
+            if result.get("w3_pending") and result.get("w3_proposal")
+            else {"pending": False} if result.get("w3_pending") is not None
+            else None
+        ),
     }
 
 
