@@ -74,6 +74,43 @@
 /* mobile: stacked */
 @media(max-width:1100px){.missioncontrol{grid-template-columns:1fr 1fr}.mcbox.mlpanel{grid-column:1/-1;min-height:240px}}
 @media(max-width:700px){.missioncontrol{grid-template-columns:1fr}.mcbox.mispanel{min-height:400px}.mcbox.convpanel{min-height:380px}.mcbox.mlpanel{min-height:200px}}
+/* ===== Control Panel: Architecture Aligned visual language ===== */
+#control .cp-template{display:flex;flex-direction:column;flex:1;min-height:0}
+#control .cp-tabs{display:flex;gap:3px;border-bottom:1px solid var(--line);background:#fbfcfb;padding:0 8px;flex:none}
+#control .cp-tab{border:0;background:transparent;color:var(--muted);font-size:8.5px;font-weight:800;padding:9px 11px;border-bottom:2px solid transparent}
+#control .cp-tab.active{color:var(--green);border-bottom-color:var(--green);background:#fff}
+#control .cp-view{display:none;flex:1;min-height:0;padding:10px}
+#control .cp-view.active{display:block;overflow:auto}
+#control .cp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#control .cp-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+#control .cp-template .cp-card{background:#fff;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+#control .cp-template .cp-cardhead{height:36px;padding:0 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+#control .cp-template .cp-cardhead b{font-size:9px}
+#control .cp-template .cp-cardhead span{font-size:7.5px;color:var(--muted)}
+#control .cp-template .cp-body{padding:8px}
+#control .cp-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+#control .cp-row:last-child{border-bottom:0}
+#control .cp-grow{flex:1;min-width:0}
+#control .cp-grow b{display:block;font-size:8.8px}
+#control .cp-grow span{display:block;font-size:7.7px;color:var(--muted);margin-top:1px}
+#control .cp-status{font-size:7px;font-weight:850;padding:2px 6px;border-radius:20px;white-space:nowrap}
+#control .cp-status.ok{background:var(--gs);color:var(--green)}
+#control .cp-status.warn{background:var(--as);color:var(--amber)}
+#control .cp-status.run{background:var(--bs);color:var(--blue)}
+#control .cp-flow{display:flex;gap:3px;margin-top:8px}
+#control .cp-step{flex:1;background:#eef0ee;color:var(--muted);padding:5px 2px;border-radius:5px;text-align:center;font-size:6.8px;font-weight:850}
+#control .cp-step.on{background:var(--gs);color:var(--green)}
+#control .cp-step.runtime{background:var(--bs);color:var(--blue)}
+#control .cp-note{padding:7px;background:#fafcfb;border:1px dashed #cdd8d1;border-radius:7px;font-size:7.4px;color:var(--muted);margin-top:7px}
+#control .cp-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+#control .cp-tile{border:1px solid var(--line);border-radius:8px;padding:8px;min-height:85px}
+#control .cp-tile b{font-size:8.8px}
+#control .cp-tile span{display:block;font-size:7.7px;color:var(--muted);margin:3px 0 7px}
+#control .cp-wide{grid-column:1/-1}
+#control .cp-flowlabel{font-size:7.5px;color:var(--muted);margin-top:7px}
+@media(max-width:900px){#control .cp-grid{grid-template-columns:1fr}#control .cp-wide{grid-column:auto}}
+@media(max-width:650px){#control .cp-tabs{overflow:auto}#control .cp-view{padding:7px}#control .cp-tiles{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -172,15 +209,133 @@
 </section>
 
 <section class="page" id="control">
-<div class="pagehead"><h1>Control Panel</h1><span>Runtime · Governance · Records</span></div>
-<div class="cpintro"><div class="cpintroicon">⚠</div><div><b>System Control</b><span>Tempat mengatur konfigurasi sistem, memahami authority, dan menelusuri record. Bukan tempat menjalankan Mission.</span></div></div>
-<div class="cpgrid">
-<section class="card cpbox"><div class="head"><h2>Runtime</h2><span class="badge" id="runtimeBadge" style="background:#eee;color:#707a74">?</span></div><div class="cpbody">
-<div class="cpstate"><div class="cpstateicon">⌁</div><div><b>Canonical Runtime</b><span>Operational · heartbeat <span id="beat">…</span></span></div></div>
-<div class="cpaction" onclick="openModal('providerModal')"><div class="cpactiontop"><div><b>Providers</b><p>Provider yang dipakai SAM per capability.</p></div><strong>→</strong></div><small>Belum tersedia · Phase 5 (Provider configuration boundary)</small></div>
-<div class="cpaction" onclick="openModal('credentialModal')"><div class="cpactiontop"><div><b>Credentials</b><p>Secure credentials untuk provider dan connector.</p></div><strong>→</strong></div><small>Belum tersedia · Phase 6 (Credential boundary)</small></div>
-<div class="cpaction" onclick="refresh()"><div class="cpactiontop"><div><b>Runtime Health</b><p>Service health, execution state, heartbeat, diagnostics.</p></div><strong>↻</strong></div><small id="health">Memeriksa…</small></div>
-</div></section>
+<div class="pagehead"><h1>Control Panel</h1><span>User configuration · Runtime · Governance · Records</span></div>
+
+<div class="card cp-template">
+  <div class="cp-tabs">
+    <button class="cp-tab active" onclick="cpTab('cpConfiguration',this)">Configuration</button>
+    <button class="cp-tab" onclick="cpTab('cpRuntime',this)">Runtime</button>
+    <button class="cp-tab" onclick="cpTab('cpGovernance',this)">Governance</button>
+    <button class="cp-tab" onclick="cpTab('cpRecords',this)">Records</button>
+  </div>
+
+  <div id="cpConfiguration" class="cp-view active">
+    <div class="cp-grid">
+      <div class="cp-col">
+        <div class="cp-card">
+          <div class="cp-cardhead"><b>Providers</b><span>available provider configurations</span></div>
+          <div class="cp-body">
+            <div class="cp-row">
+              <div class="cp-grow"><b>NVIDIA</b><span>Reasoning provider</span></div>
+              <span class="cp-status ok">READY</span>
+              <button class="btn" onclick="openModal('providerModal')">Configure</button>
+            </div>
+            <div class="cp-row">
+              <div class="cp-grow"><b>OpenAI</b><span>Reasoning provider</span></div>
+              <span class="cp-status warn">NOT CONFIGURED</span>
+              <button class="btn" onclick="openModal('providerModal')">Configure</button>
+            </div>
+            <button class="btn primary" style="margin-top:8px" onclick="openModal('providerModal')">+ Register Provider</button>
+          </div>
+        </div>
+
+        <div class="cp-card">
+          <div class="cp-cardhead"><b>Credentials</b><span>secure secret references</span></div>
+          <div class="cp-body">
+            <div class="cp-row">
+              <div class="cp-grow"><b>NVIDIA Production</b><span>Provider: NVIDIA · API credential</span></div>
+              <span class="cp-status ok">VERIFIED</span>
+              <button class="btn" onclick="openModal('credentialModal')">Manage</button>
+            </div>
+            <div class="cp-row">
+              <div class="cp-grow"><b>OpenAI Production</b><span>Provider: OpenAI · API credential</span></div>
+              <span class="cp-status warn">MISSING</span>
+              <button class="btn" onclick="openModal('credentialModal')">Add</button>
+            </div>
+            <button class="btn primary" style="margin-top:8px" onclick="openModal('credentialModal')">+ Add Credential</button>
+            <div class="cp-note">Raw API keys are never displayed after submission and should not be stored in browser state.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cp-col">
+        <div class="cp-card">
+          <div class="cp-cardhead"><b>Capability Configuration</b><span>what SAM can resolve</span></div>
+          <div class="cp-body">
+            <div class="cp-row">
+              <div class="cp-grow"><b>Reasoning</b><span>Current provider: NVIDIA · NVIDIA Production</span></div>
+              <span class="cp-status ok">READY</span>
+              <button class="btn" onclick="openModal('capabilityModal')">Set</button>
+            </div>
+            <div class="cp-row">
+              <div class="cp-grow"><b>Knowledge</b><span>No provider selected</span></div>
+              <span class="cp-status warn">UNCONFIGURED</span>
+              <button class="btn" onclick="openModal('capabilityModal')">Set</button>
+            </div>
+            <div class="cp-row">
+              <div class="cp-grow"><b>Execution</b><span>Resolved by canonical runtime</span></div>
+              <span class="cp-status run">RUNTIME</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cp-card">
+          <div class="cp-cardhead"><b>Configuration Flow</b><span>user-facing relationship</span></div>
+          <div class="cp-body">
+            <div class="cp-note" style="margin-top:0">Provider and credential are configured by the user. Capability selects which configured provider SAM may resolve. Connector selection remains internal to Runtime.</div>
+            <div class="cp-flow">
+              <div class="cp-step on">Provider</div>
+              <div class="cp-step on">Credential</div>
+              <div class="cp-step on">Capability</div>
+              <div class="cp-step runtime">Resolution</div>
+              <div class="cp-step runtime">Runtime</div>
+              <div class="cp-step runtime">External</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cp-note cp-wide"><b>Catatan kejujuran:</b> Provider / Credential / Capability di tab ini adalah <i>permukaan konfigurasi</i> (fase 5/6). Status READY/VERIFIED/NOT CONFIGURED yang ditampilkan template adalah desain, belum ter-wire ke boundary. Runtime (tab Runtime) mencerminkan health nyata dari <code>/runtime</code> + <code>/health/ready</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cpRuntime" class="cp-view">
+    <div class="cp-grid">
+      <div class="cp-card">
+        <div class="cp-cardhead"><b>Runtime Status</b><span class="badge" id="runtimeBadge" style="background:#eee;color:#707a74">…</span></div>
+        <div class="cp-body">
+          <div class="cp-row"><div class="cp-grow"><b>SAM Runtime</b><span>Application / Runtime boundary</span></div><span class="cp-status" id="cpRuntimeState">CHECKS…</span></div>
+          <div class="cp-row"><div class="cp-grow"><b>Executable Services</b><span>Services sehat / tersedia (dari /runtime)</span></div><span class="cp-status" id="cpRuntimeHealth">…</span></div>
+          <div class="cp-row"><div class="cp-grow"><b>Execution Runtime</b><span>External effects remain governed</span></div><span class="cp-status run">AVAILABLE</span></div>
+        </div>
+      </div>
+      <div class="cp-card">
+        <div class="cp-cardhead"><b>External Access</b><span>runtime-managed</span></div>
+        <div class="cp-body">
+          <div class="cp-note" style="margin-top:0">The UI does not select or invoke connectors directly. Runtime resolves the appropriate execution/access mechanism from canonical configuration and governance.</div>
+          <button class="btn" style="margin-top:8px" onclick="refresh()">Refresh State</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cpGovernance" class="cp-view">
+    <div class="cp-tiles">
+      <div class="cp-tile"><b>Authority</b><span>Who may decide and under which scope.</span><button class="btn" onclick="toast('Authority review opened')">View</button></div>
+      <div class="cp-tile"><b>Policy</b><span>Rules governing what SAM may do.</span><button class="btn" onclick="toast('Policy review opened')">View</button></div>
+      <div class="cp-tile"><b>Verification</b><span>How an outcome is independently established.</span><button class="btn" onclick="toast('Verification review opened')">View</button></div>
+    </div>
+  </div>
+
+  <div id="cpRecords" class="cp-view">
+    <div class="cp-tiles">
+      <div class="cp-tile"><b>Evidence</b><span>Evidence supporting observation, decision, execution and verification.</span><button class="btn" onclick="showRecords('Evidence')">Open</button></div>
+      <div class="cp-tile"><b>Activity</b><span>Human-readable chronology of SAM activity.</span><button class="btn" onclick="showRecords('Activity')">Open</button></div>
+      <div class="cp-tile"><b>Audit</b><span>Authoritative traceability record.</span><button class="btn" onclick="showRecords('Audit')">Open</button></div>
+    </div>
+  </div>
+</div>
+</section>
 
 <section class="card cpbox"><div class="head"><h2>Governance</h2><span>authority & policy</span></div><div class="cpbody">
 <div class="cpstate"><div class="cpstateicon">⚖</div><div><b>Authority Boundary</b><span>Human decision remains authoritative.</span></div></div>
@@ -230,7 +385,14 @@
 <div class="field"><label>Credential name</label><input value="OpenAI Production"></div>
 <div class="field"><label>API Key</label><input type="password" placeholder="Enter secret securely"></div>
 <div class="secure">Raw secret tidak ditampilkan kembali dan tidak boleh masuk Chat, Mission, Evidence, Activity, atau Audit.</div>
-</div><div class="modalfoot"><button class="btn" onclick="closeModal('credentialModal')">Cancel</button><button class="btn primary" onclick="submit('Credential')">Save Securely</button></div></div></div>
+</div><div class="modalfoot"><button class="btn" onclick="closeModal('credentialModal')">Cancel</button><button class="btn primary" onclick="submit('Credential')">Save Securely</button></div>
+<div class="modalback" id="capabilityModal" onclick="backdrop(event,'capabilityModal')"><div class="modal"><div class="modalhead"><h2>Configure Capability</h2><button onclick="closeModal('capabilityModal')">×</button></div><div class="modalbody">
+<div class="field"><label>Capability</label><select><option>Reasoning</option><option>Planning</option></select></div>
+<div class="field"><label>Provider</label><select><option>NVIDIA</option><option>OpenAI</option><option>Anthropic</option></select></div>
+<div class="field"><label>Credential</label><select><option>NVIDIA Production</option><option>OpenAI Production</option><option>+ Add new credential</option></select></div>
+<div class="secure">SAM Runtime akan melakukan capability resolution. UI hanya menyimpan konfigurasi yang dipilih user; connector tidak dipilih di sini.</div>
+</div><div class="modalfoot"><button class="btn" onclick="closeModal('capabilityModal')">Cancel</button><button class="btn primary" onclick="submit('Capability')">Save Configuration</button></div></div></div>
+</div></div>
 
 <div class="toast" id="toast"></div>
 <script>
@@ -1012,6 +1174,11 @@ async function loadHealth(){
   if(rb){ const bad=checks.some(c=>!c.ok); rb.textContent=bad?'UNAVAILABLE':'ONLINE'; rb.style.background=bad?'#f3d9d9':'#e6f0eb'; rb.style.color=bad?'#8a2f2f':'#2f6f5e'; rb.className='badge'; }
   const rt=document.querySelector('.rt');
   if(rt){ const bad=checks.some(c=>!c.ok); rt.innerHTML='<i style="background:'+(bad?'#8a2f2f':'#36a56d')+'"></i>'+(bad?'Runtime unavailable':'Runtime online'); }
+  // Control Panel Runtime Status (template 4-tab) - live dari real health/runtime
+  const cprs=document.getElementById('cpRuntimeState');
+  if(cprs){ const bad=checks.some(c=>!c.ok); cprs.textContent=bad?'UNAVAILABLE':'OPERATIONAL'; cprs.className='cp-status '+(bad?'warn':'ok'); }
+  const cprh=document.getElementById('cpRuntimeHealth');
+  if(cprh){ const r=checks.find(c=>c.name==='Runtime'); cprh.textContent=(r&&r.ok)?r.val:'UNAVAILABLE'; cprh.className='cp-status '+(r&&r.ok?'ok':'warn'); }
 }
 async function loadEvents(){
   const e=document.getElementById('eventList'); if(!e) return;
@@ -1075,6 +1242,27 @@ async function addWard(){
   }catch(e){ toast('Gagal daftar Ward: '+(e.message||('HTTP '+e.status)), true); }
 }
 function showRecords(kind){ toast(kind+' belum tersedia: hubungkan ke canonical record source (Phase 8). ', true); }
+
+
+/* ---------- Control Panel tabs + modal wiring (template) ---------- */
+function cpTab(id, b){
+  const root=document.getElementById('control');
+  root.querySelectorAll('.cp-tab').forEach(x=>x.classList.remove('active'));
+  root.querySelectorAll('.cp-view').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  const v=document.getElementById(id); if(v){ v.classList.add('active'); v.style.display='block'; }
+}
+function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.add('open'); } }
+/* submit(kind): UI config -> canonical runtime. Bukan aksi Ward/Mission. */
+function submit(kind){
+  if(kind==='Ward'){ closeModal('wardModal'); toast('Entrust Ward dikirim ke canonical Ward boundary.'); return; }
+  const modal = kind==='Provider'?'providerModal':kind==='Credential'?'credentialModal':kind==='Capability'?'capabilityModal':null;
+  if(modal) closeModal(modal);
+  if(kind==='Credential') toast('Credential siap dikirim ke secure credential boundary.');
+  else if(kind==='Provider') toast('Provider configuration siap dikirim ke canonical runtime.');
+  else if(kind==='Capability') toast('Capability configuration siap dikirim ke canonical runtime.');
+  else toast(kind+' action siap dikirim ke canonical runtime.');
+}
 
 /* inisialisasi */
 window.addEventListener('DOMContentLoaded',()=>{ 
