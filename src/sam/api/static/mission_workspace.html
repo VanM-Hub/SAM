@@ -150,7 +150,7 @@
 </section>
 
 <section class="page" id="wards">
-<div class="pagehead"><h1>Wards</h1><span>apa yang dipercayakan kepada SAM</span><button class="btn headbtn" disabled style="opacity:.5;cursor:not-allowed">Belum tersedia (Sprint 3)</button></div>
+<div class="pagehead"><h1>Wards</h1><span>apa yang dipercayakan kepada SAM</span><button class="btn headbtn" onclick="openWardModal()">+ Add Ward</button></div>
 <div class="wardpage">
 <section class="card wardlist"><div class="head"><h2>Ward List</h2><span>Phase 2</span></div><div class="wardrows">
 <div class="wardrow"><div class="icon">–</div><div><div class="wardname">Ward list belum tersedia</div><div class="wardtype">canonical Ward source belum di-wire (Phase 2/3). Bukan data palsu.</div></div></div>
@@ -208,11 +208,13 @@
 
 <!-- Add Ward -->
 <div class="modalback" id="wardModal" onclick="backdrop(event,'wardModal')"><div class="modal"><div class="modalhead"><h2>Add Ward</h2><button onclick="closeModal('wardModal')">×</button></div><div class="modalbody">
-<div class="field"><label>Ward type</label><select><option>GitHub Repository</option><option>OpenClaw</option><option>PC / Host</option><option>Backup Target</option></select></div>
-<div class="field"><label>Resource</label><input value="VanM-Hub/SAM"><div class="hint">Discovery menemukan candidate. Tombol Entrust Ward adalah keputusan eksplisit user.</div></div>
-<div class="field"><label>Purpose</label><input value="Observe and investigate"></div>
-<div class="field"><label>Execution</label><select><option>Governed</option><option>Observation only</option></select></div>
-</div><div class="modalfoot"><button class="btn" onclick="closeModal('wardModal')">Cancel</button><button class="btn primary" onclick="submit('Ward')">Entrust Ward</button></div></div></div>
+<div class="field"><label>Ward type</label><select id="wardTypeSel"><option value="application">Application (OpenClaw class)</option><option value="repository">Repository</option><option value="container">Container</option><option value="host">Host / PC</option><option value="database">Database</option></select></div>
+<div class="field"><label>Name</label><input id="wardName" placeholder="mis. OpenClaw-Test"></div>
+<div class="field"><label>Resource</label><input id="wardResource" placeholder="target resource eksternal, mis. openclaw-test-instance"></div>
+<div class="field"><label>Namespace</label><input id="wardNamespace" placeholder="opsional"></div>
+<div class="field"><label>Purpose</label><input id="wardPurpose" placeholder="mis. Observe environment" value="Observe"></div>
+<div class="hint">Owner/tenant diambil dari SESSION login, bukan dari input ini (canonical Ward boundary).</div>
+</div><div class="modalfoot"><button class="btn" onclick="closeModal('wardModal')">Cancel</button><button class="btn primary" onclick="addWard()">Entrust Ward</button></div></div></div>
 
 <!-- Provider -->
 <div class="modalback" id="providerModal" onclick="backdrop(event,'providerModal')"><div class="modal"><div class="modalhead"><h2>Configure Provider</h2><button onclick="closeModal('providerModal')">×</button></div><div class="modalbody">
@@ -1023,14 +1025,54 @@ async function loadEvents(){
 }
 
 /* smooth rehydration setelah mutasi (§55) */
-async function refreshAll(){ await Promise.all([ (async()=>{ const s=await fetchUxCycle(); applyUxState(s); })(), loadHealth(), loadEvents(), refreshAuth() ]).catch(()=>{}); }
+async function refreshAll(){ await Promise.all([ (async()=>{ const s=await fetchUxCycle(); applyUxState(s); })(), loadHealth(), loadEvents(), refreshAuth(), loadWards() ]).catch(()=>{}); }
 function refresh(){ refreshAll(); }
 
-/* ---------- element tanpa backend (Phase 2-6) -> honest "belum tersedia" (§50/§63) ---------- */
-function submit(kind){
-  const map={Ward:'Ward',Provider:'Provider',Credential:'Credential'};
-  closeModal(kind==='Ward'?'wardModal':kind==='Provider'?'providerModal':'credentialModal');
-  toast(map[kind]+' belum tersedia: canonical boundary belum di-wire (Phase '+(kind==='Ward'?'2/3':kind==='Provider'?'5':'6')+')', kind==='Credential');
+/* ---------- W2.5 Ward Administration (canonical Ward boundary) ---------- */
+function openWardModal(){
+  const m=document.getElementById('wardModal'); if(m) m.classList.add('open');
+}
+function closeModal(id){
+  const m=document.getElementById(id); if(m) m.classList.remove('open');
+}
+function backdrop(ev,id){ if(ev.target && ev.target.id===id) closeModal(id); }
+var _WARD_TYPE_LABEL={application:'Application',repository:'Repository',container:'Container',host:'Host',database:'Database'};
+async function loadWards(){
+  try{
+    const data=await api('/wards/');
+    const list=(data&&data.wards)||[];
+    const rows=document.querySelector('.wardrows'); if(rows){
+      rows.innerHTML = list.length ? list.map(w=>'<div class="wardrow"><div class="icon">'+
+        '&nbsp;</div><div><div class="wardname">'+esc(w.name||w.ward_id)+
+        '<span class="badge" style="background:'+(w.active?'#e3f5ea;color:#1b6e3c':'#eee;color:#707a74')+'">'+(w.active?'ACTIVE':w.status)+'</span></div>'+
+        '<div class="wardtype">'+esc((w.ward_type||'')+' · '+(w.resource||''))+' · owner '+(w.owner||'?')+'</div></div></div>')
+        : '<div class="wardrow"><div class="icon">—</div><div><div class="wardname">Belum ada Ward</div><div class="wardtype">Daftar dari GET /wards (canonical Ward boundary).</div></div></div>';
+    }
+    const cnt=document.getElementById('navWardCount'); if(cnt){ cnt.textContent=list.length; cnt.style.display=list.length?'inline-block':'none'; }
+    const st=document.getElementById('stWards'); if(st) st.textContent=list.length;
+    const home=document.getElementById('homeWards'); if(home){
+      home.innerHTML = list.length ? list.slice(0,3).map(w=>'<div class="ward"><div class="icon">—</div><div><b>'+esc(w.name||w.ward_id)+'</b><div class="meta">'+esc(w.ward_type)+' · '+esc(w.resource||'')+' · '+(w.active?'ACTIVE':'inactive')+'</div></div></div>').join('')
+        : '<div class="ward"><div class="icon">—</div><div><b>Ward list kosong</b><div class="meta">canonical Ward source via /wards (W2.5).</div></div></div>';
+    }
+  }catch(e){ /* auth/offline -> biarkan placeholder jujur */ }
+}
+async function addWard(){
+  const type=document.getElementById('wardTypeSel').value||'application';
+  const name=(document.getElementById('wardName').value||'').trim();
+  if(!name){ toast('Nama Ward wajib diisi', true); return; }
+  const body={
+    ward_type:type,
+    name:name,
+    namespace:(document.getElementById('wardNamespace').value||'').trim(),
+    resource:(document.getElementById('wardResource').value||'').trim(),
+    purpose:(document.getElementById('wardPurpose').value||'').trim(),
+  };
+  try{
+    const r=await api('/wards/', {method:'POST', body:JSON.stringify(body)});
+    closeModal('wardModal');
+    toast('Ward terdaftar: '+(r.ward_id||'')+' · owner '+esc(r.owner||'')+' · '+(r.active?'ACTIVE':'pending'));
+    loadWards();
+  }catch(e){ toast('Gagal daftar Ward: '+(e.message||('HTTP '+e.status)), true); }
 }
 function showRecords(kind){ toast(kind+' belum tersedia: hubungkan ke canonical record source (Phase 8). ', true); }
 
