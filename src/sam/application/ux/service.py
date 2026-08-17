@@ -389,8 +389,8 @@ class MissionUXService:
         _metrics.inc("sam_mission_received")
 
         # Pahami request terlebih dahulu (SAM memahami sebelum menyimpan).
-        operation, target, understood, planned, action_summary, approval_reason = self._interpret(
-            text
+        operation, target, understood, planned, action_summary, approval_reason, resolve_reason = (
+            self._interpret(text)
         )
 
         req = MissionRequest(
@@ -414,6 +414,24 @@ class MissionUXService:
         # "apakah ini mission". M10-006 tetap berlaku: approval HANYA dijalankan utk
         # operasi yang butuh approval (request invalid tetap tanpa jalur eksekusi).
         # Ke-mission-an = operation != ""; approval adalah sinyal terpisah.
+        # ADR-007 (FAIL-CLOSED INVARIANT di pintu Mission): setiap operation yang
+        # sampai di sini WAJIB lolos exact canonical capability set. Bind LLM =
+        # candidate, SAM validator = authority (deterministic). Memastikan C1
+        # terlepas dari jalur operation (LLM/regex/mock): operation non-admissible
+        # -> dipaksa "" (no Mission), alasan ditangkap utk observability.
+        if operation:
+            _resolved, _reason_11 = MissionUXService._resolve_capability(operation)
+            if _resolved is None:
+                resolve_reason = _reason_11 if resolve_reason is None else resolve_reason
+                operation = ""
+                target = ""
+                planned = []
+                understood = (
+                    "SAM tidak dapat memetakan operasi ke capability SAM yang "
+                    "sudah terbukti. Tidak ada operasi yang akan dijalankan."
+                )
+                action_summary = ""
+                approval_reason = ""
         approval_required = bool(operation) and not self._operation_is_read_only(operation)
         # status internal pasca-submit (sebelum keputusan/eksekusi):
         #   CHAT / MISSION read-only -> UNDERSTOOD (SAM paham, tidak menunggu approval)
@@ -466,6 +484,17 @@ class MissionUXService:
             status=_pending,
         )
         # M10-003: observability sejak submit — misi, capability, target, waktu.
+        # ADR-007: untuk invalid/unresolved (operation kosong akibat candidate
+        # LLM tak-admissible), simpan resolution + resolve_reason sbg diagnostic/
+        # trace (audit/debug) — TANPA merubah domain lifecycle jadi state baru.
+        #   resolution="chat"     -> percakapan biasa (halo, terima kasih, dll)
+        #   resolution="invalid"  -> input tak-dapat-di-resolve ke capability
+        if resolve_reason is not None:
+            _resolution = "invalid"  # unresolved / candidate tak-admissible
+        elif operation:
+            _resolution = "valid"  # ter-resolve ke capability exact
+        else:
+            _resolution = "chat"  # percakapan biasa (guard deterministik)
         state.observability = {
             "request_id": req.request_id,
             "mission_id": f"mission-{uuid.uuid4().hex[:12]}",
@@ -478,6 +507,8 @@ class MissionUXService:
             "verification_result": "",
             "failure_reason": "",
             "approver": "",
+            "resolution": _resolution,
+            "resolve_reason": resolve_reason,
         }
         self._state = state
         self._persist()
@@ -956,6 +987,7 @@ class MissionUXService:
                 [],
                 "",
                 "",
+                None,
             )
 
         # 0) Determistik (SEBELUM AI): "periksa komputer saya"-sekelas.
@@ -964,7 +996,7 @@ class MissionUXService:
         #    AI utk operasi jitu). Bila cocok -> langsung environment.observe.
         env_match = MissionUXService._interpret_environment_observe(low)
         if env_match:
-            return env_match
+            return env_match + (None,)
 
         # 0b) Determistik (SEBELUM AI): "diagnosa/simpulkan/apa penyebabnya"-
         #    kelas. R1-004 DIAGNOSIS. Dicek SEBELUM investigate: kata "diagnosa/
@@ -973,7 +1005,7 @@ class MissionUXService:
         #    BUKAN "cari bukti baru". Tidak mengarang sebab tanpa evidence.
         diag_match = MissionUXService._interpret_environment_diagnose(low)
         if diag_match:
-            return diag_match
+            return diag_match + (None,)
 
         # 0b2) Determistik (SEBELUM AI): "rekomendasi/sarankan tindakan"-kelas.
         #    R1-005 RECOMMENDATION. Dicek SETELAH diagnose (diagnosis harus
@@ -983,7 +1015,7 @@ class MissionUXService:
         #    recommendations=[] jujur (fail-closed). BUKAN recovery/execution.
         rec_match = MissionUXService._interpret_environment_recommend(low)
         if rec_match:
-            return rec_match
+            return rec_match + (None,)
 
         # 0c) Determistik (SEBELUM AI): "kenapa/mengapa ... lambat?"-sekelas.
         #    R1-003 INVESTIGATION. Bedakan dari observe: observe = "periksa/
@@ -993,14 +1025,18 @@ class MissionUXService:
         #    root cause (itu R1-004); INSUFFICIENT bila evidence tak cukup.
         inv_match = MissionUXService._interpret_environment_investigate(low)
         if inv_match:
-            return inv_match
+            return inv_match + (None,)
 
         # 1) Coba pemahaman cerdas via AI lokal (Gemma3:1b via Ollama).
         #    Menutup kesenjangan "SAM hanya kenal pola kata" -> SAM bisa
         #    memahami permintaan bahasa bebas. Fallback aman bila offline.
+        #    ADR-007: bila LLM mengusulkan operation yang TIDAK admissible
+        #    (resolve_reason != None), hasil invalid DI-PERTAHANKAN (bukan
+        #    di-fallback ke regex) agar no Mission + alasan ter-track.
         attempt = MissionUXService._interpret_via_ai(t)
-        if attempt is not None and attempt[0]:
-            return attempt
+        if attempt is not None:
+            if attempt[0] or attempt[6]:
+                return attempt
 
         # Fallback: pola regex (mode offline / Ollama tidak tersedia).
         is_github_issue = bool(
@@ -1028,7 +1064,7 @@ class MissionUXService:
                 "Tindakan ini menghasilkan efek eksternal nyata pada GitHub "
                 "(repo uji). Persetujuan Anda diperlukan sebelum eksekusi."
             )
-            return (operation, target, understood, planned, action_summary, approval_reason)
+            return (operation, target, understood, planned, action_summary, approval_reason, None)
 
         # Fallback web (read-only): "buka website X" / "buka <url>".
         # Tangkap URL eksplisit atau domain, agar target eksekusi benar.
@@ -1053,6 +1089,7 @@ class MissionUXService:
                     [],
                     "",
                     "",
+                    "unresolved",
                 )
             understood = f"SAM memahami: membuka halaman web '{target}' (read-only)."
             planned = [
@@ -1065,8 +1102,10 @@ class MissionUXService:
                 "Operasi ini read-only (membaca halaman web) — tidak mengubah state "
                 "eksternal, namun tetap disediakan persetujuan Anda untuk transparansi."
             )
-            return (operation, target, understood, planned, action_summary, approval_reason)
+            return (operation, target, understood, planned, action_summary, approval_reason, None)
 
+        # Tidak ada pola regex yang cocok -> unresolved (BUKAN chat: guard
+        # CHAT sudah berjalan di awal; ini input yang tidak bisa dipetakan).
         return (
             "",
             "",
@@ -1074,6 +1113,7 @@ class MissionUXService:
             [],
             "",
             "",
+            "unresolved",
         )
 
     @staticmethod
@@ -1285,23 +1325,58 @@ class MissionUXService:
 
     # ------------------------------------------------------------------
     # pemahaman cerdas via AI lokal (Gemma3:1b / Ollama) — tanpa internet
+    # ADR-007 (APPROVED FOR IMPLEMENTATION 2026-08-17): exact canonical
+    # operation set = capability yang memiliki jalur execution canonical nyata
+    # (runner.run_mission). INTERNAL use: `_resolve_capability` validasi admission
+    # di lapisan interpret; `_AI_CAPABILITIES` (paparan ke LLM) DISINKRONKAN dari
+    # sini (C3 single authority) — capability tanpa jalur eksekusi TIDAK diiklankan.
+    # NOTE: runner internal tetap prefix-tolerant (github.*/http.<any>), tapi
+    # admission rule intent boundary = EXACT set ini (keputusan Van Q1). Runner
+    # TIDAK diubah dalam scope ADR-007 (technical debt dicatat terpisah).
+    _AI_EXECUTION_CAPABILITIES = frozenset(
+        {
+            "github.create_issue",  # mutating (M8-006/M9 PROVEN)
+            "web.open",  # read-only browser (Q2 Van: web.get TIDAK diadvertise)
+            "http.call",  # read-only HTTP
+            "environment.observe",  # read-only R1-002
+            "environment.investigate",  # read-only R1-003
+            "environment.diagnose",  # read-only R1-004
+            "environment.recommend",  # read-only R1-005
+        }
+    )
+
     _AI_CAPABILITIES = (
         "Operasi SAM yang diketahui: "
         "[github.create_issue] buat/tingkat issue GitHub; "
-        "[email.send] kirim email; "
         "[web.open] buka/baca halaman web; "
         "[http.call] panggil API/HTTP eksternal; "
-        "[db.query] baca/tulis database; "
-        "[process.run] jalankan perintah/command lokal; "
         "[environment.observe] periksa/observasi komputer/environment lokal (read-only); "
         "[environment.investigate] investigasi/mencari sebab/masalah di komputer/environment "
-        "lokal (read-only, berhenti di finding kandidat). "
+        "lokal (read-only, berhenti di finding kandidat); "
+        "[environment.diagnose] simpulkan/verdict atas evidence investigasi (read-only); "
+        "[environment.recommend] rekomendasi tindakan atas diagnosis (read-only). "
         "Jika permintaan hanya percakapan biasa / sapaan / pertanyaan umum (bukan "
         "perintah eksekusi), gunakan operation KOSONG tanpa nama operasi."
     )
 
     @staticmethod
-    def _interpret_via_ai(text: str) -> Optional[Tuple[str, str, str, List[str], str, str]]:
+    def _resolve_capability(operation: str) -> Optional[Tuple[str, str]]:
+        """ADR-007: exact canonical admission validator (deterministic authority).
+
+        LLM = CANDIDATE, bukan authority. SAM memutuskan apakah operation
+        candidate admissible (termasuk exact canonical execution set).
+
+        Returns:
+            (resolved_operation, None)  bila valid & exact canonical.
+            (None, resolve_reason)      bila invalid (bukan Mission).
+        """
+        op = (operation or "").strip().lower()
+        if op in MissionUXService._AI_EXECUTION_CAPABILITIES:
+            return (op, None)
+        return (None, "unsupported_operation")
+
+    @staticmethod
+    def _interpret_via_ai(text: str) -> Optional[Tuple[str, str, str, List[str], str, str, Optional[str]]]:
         """Pahami permintaan via LLM reasoning (DeepSeek dulu, fallback Ollama).
 
         Prioritas provider (REAL reasoning, bukan hanya regex):
@@ -1372,14 +1447,18 @@ class MissionUXService:
         return None
 
     @staticmethod
+    @staticmethod
     def _assemble_interpretation(
         parsed: Dict[str, Any], source: str
-    ) -> Optional[Tuple[str, str, str, List[str], str, str]]:
+    ) -> Optional[Tuple[str, str, str, List[str], str, str, Optional[str]]]:
         """Susun tuple interpretasi dari JSON LLM (shared DeepSeek/Ollama).
 
         Source dimasukkan ke understood/reason agar UI jujur dari mana SAM
-        menalar. Tidak pernah menentukan repo GitHub dari AI (S2-4); repo
-        selalu dikunci ke GITHUB_TEST_REPO / default.
+        menalar. ADR-007: candidate operation dari LLM DIPERIKSA terhadap exact
+        canonical capability set (deterministic authority). candidate yang tidak
+        admissible -> operation="" (no Mission) + resolve_reason di elemen ke-7.
+        Tidak pernah menentukan repo GitHub dari AI (S2-4); repo selalu dikunci
+        ke GITHUB_TEST_REPO / default (hanya utk operation github yang VALID).
         """
         operation = str(parsed.get("operation") or "")
         # ai.think bukan operasi Mission nyata (tidak ada jalur eksekusi di
@@ -1391,11 +1470,30 @@ class MissionUXService:
             return None
         if not operation:
             return None  # belum operasi yang dikenali -> biarkan fallback/tolak
+        # ADR-007: exact canonical admission (DDL authority). LLM hanya candidate.
+        resolved, resolve_reason = MissionUXService._resolve_capability(operation)
+        if resolved is None:
+            # candidate TIDAK admissible: BUKAN Mission, BUKAN CHAT -> invalid/
+            # unresolved. operation="" mencegah promosi ke plan/approval/execution;
+            # resolve_reason disalurkan ke observability utk audit/debug.
+            # target tidak pernah diset (tidak ada jalur eksekusi utk invalid).
+            return (
+                "",
+                "",
+                f"SAM tidak dapat memetakan '{operation}' ke capability SAM "
+                "yang sudah terbukti (unsupported_operation). Tidak ada operasi "
+                "yang akan dijalankan.",
+                [],
+                "",
+                "",
+                resolve_reason,
+            )
+        operation = resolved
         target = str(parsed.get("target") or "")
         if operation == "github.create_issue":
             target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
         elif not target:
-            target = os.environ.get("GITHUB_TEST_REPO") or DEFAULT_TEST_REPO
+            target = ""  # ADR-007: target default repo TIDAK diterapkan ke non-github
         understood = str(parsed.get("understood") or "").strip()
         if understood and not understood.startswith("SAM memahami"):
             understood = f"SAM memahami: {understood}"
@@ -1412,7 +1510,7 @@ class MissionUXService:
             f"Pemahaman dihasilkan LLM ({source}). Tindakan ini dapat "
             "menghasilkan efek eksternal; persetujuan Anda diperlukan."
         )
-        return (operation, target, understood, planned, action_summary, reason)
+        return (operation, target, understood, planned, action_summary, reason, None)
 
     @staticmethod
     def _extract_ai_text(raw: Dict[str, Any]) -> str:
