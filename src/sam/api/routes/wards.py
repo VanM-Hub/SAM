@@ -92,13 +92,17 @@ class WardsRoutes:
         authorization: Optional[str],
         cookie: Optional[str] = None,
         csrf_header: Optional[str] = None,
+        require_csrf: bool = False,
     ) -> Dict[str, str]:
         """Wajibkan identitas terverifikasi; owner/tenant HANYA dari sini.
 
         - auth off (dev): tenant default {"username":"user","role":"operator"}
           (kompatibel regresi; TIDAK menerima input bebas utk owner).
-        - auth on: token dari header/cookie; CSRF wajib bila cookie;
-          role wajib operator; forged/expired -> 401; cross-user -> deny.
+        - auth on: token dari header/cookie; role wajib operator;
+          forged/expired -> 401; cross-user -> deny.
+        - CSRF (double-submit) HANYA wajib utk MUTASI (POST/PUT/DELETE,
+          require_csrf=True). GET read-only TIDAK butuh CSRF - hanya autentikasi
+          token (sebelumnya GET /wards/ ikut kena 403 CSRF -> list kosong).
         Mengembalikan dict {'username','role'} yang menjadi owner_id entrustment.
         """
         if not self.auth_enabled:
@@ -107,7 +111,7 @@ class WardsRoutes:
         identity = self.sessions.authenticate(token)
         if not identity:
             raise HTTPException(status_code=401, detail="autentikasi diperlukan (login dulu)")
-        if authorization is None and cookie:
+        if require_csrf and authorization is None and cookie:
             if not self.sessions.verify_csrf(token, csrf_header):
                 raise HTTPException(status_code=403, detail="CSRF token tidak valid")
         if not self.users.can_operate(identity.get("role", "")):
@@ -251,7 +255,7 @@ async def wards_register(
     x_csrf_token: Optional[str] = Header(None),
 ):
     """Daftarkan Ward baru lewat canonical boundary (W2.5). Owner dari session."""
-    identity = _routes._require_identity(authorization, sam_session, x_csrf_token)
+    identity = _routes._require_identity(authorization, sam_session, x_csrf_token, require_csrf=True)
     return _routes.register_ward(request, identity)
 
 

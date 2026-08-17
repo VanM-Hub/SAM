@@ -705,12 +705,17 @@ async def ux_me(
     identitas default 'user' utk kebutuhan UI."""
     if not _routes.auth_enabled:
         return {"authenticated": False, "user": {"username": "user", "role": "operator"}}
-    identity = _routes.sessions.authenticate(
-        _routes._extract_token(authorization, sam_session)
-    )
+    token = _routes._extract_token(authorization, sam_session)
+    identity = _routes.sessions.authenticate(token)
     if not identity:
         raise HTTPException(status_code=401, detail="belum login")
-    return {"authenticated": True, "user": identity}
+    return {
+        "authenticated": True,
+        "user": identity,
+        # CSRF utk sesi aktif (double-submit): UI butuh ini pd page-load
+        # (cookie httpOnly sudah ada) supaya mutasi pertama tak 403.
+        "csrf": _routes.sessions.csrf_for(token),
+    }
 
 
 @router.get("/evidence")

@@ -405,13 +405,27 @@ function toast(s,err){
 }
 
 /* ---------- api helper ---------- */
-async function api(path,opts={}){
-  const res=await fetch(path,Object.assign({headers:{'Content-Type':'application/json'}},opts));
-  if(res.status===401) { showLogin(true); throw new Error('unauthorized'); }
-  let data=null; try{data=await res.json();}catch(e){}
-  if(!res.ok){
-    const err=new Error((data&&data.detail)||('HTTP '+res.status));
-    err.status=res.status; err.data=data; throw err;
+// CSRF token sesi (double-submit, M12-011): disimpan dari response login/register,
+// dilampirkan sebagai header X-CSRF-Token pada mutasi (POST/PUT/DELETE) via cookie.
+// Tanpa ini route mutasi (decide/wards/...) menolak di cookie-mode (403 CSRF).
+window._sam_csrf = null;
+async function api(path, opts = {}) {
+  const method = (opts.method || 'GET').toUpperCase();
+  const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+  // Lampirkan CSRF hanya utk mutasi yang butuh (cookie-mode). GET/OPTIONS tdk perlu.
+  if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS' && window._sam_csrf) {
+    headers['X-CSRF-Token'] = window._sam_csrf;
+  }
+  const res = await fetch(path, Object.assign({}, opts, { headers }));
+  if (res.status === 401) { showLogin(true); throw new Error('unauthorized'); }
+  let data = null; try { data = await res.json(); } catch (e) {}
+  if (!res.ok) {
+    const err = new Error((data && data.detail) || ('HTTP ' + res.status));
+    err.status = res.status; err.data = data; throw err;
+  }
+  // Simpan CSRF dari mutasi yang mengembalikannya (login/register/decision).
+  if (data && typeof data === 'object' && data.csrf && !window._sam_csrf) {
+    window._sam_csrf = data.csrf;
   }
   return data;
 }
@@ -477,6 +491,8 @@ function showLogin(force){
 async function refreshAuth(){
   try{ const me=await api('/ux/me'); const a=document.querySelector('.avatar');
     const u=((me.user||{}).username||'').trim();
+    // simpan CSRF sesi dari /ux/me (dibutuhkan utk mutasi cookie-mode pd page-load)
+    if(me && me.csrf) window._sam_csrf = me.csrf;
     if(a) a.textContent=u?u.slice(0,2).toUpperCase():'·';
   }catch(e){ const a=document.querySelector('.avatar'); if(a) a.textContent='·'; }
 }
