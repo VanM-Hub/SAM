@@ -1230,9 +1230,9 @@ function showRecords(kind){ toast(kind+' belum tersedia: hubungkan ke canonical 
 function cpTab(id, b){
   const root=document.getElementById('control');
   root.querySelectorAll('.cp-tab').forEach(x=>x.classList.remove('active'));
-  root.querySelectorAll('.cp-view').forEach(x=>x.classList.remove('active'));
+  root.querySelectorAll('.cp-view').forEach(x=>{ x.classList.remove('active'); x.style.display=''; });
   b.classList.add('active');
-  const v=document.getElementById(id); if(v){ v.classList.add('active'); v.style.display='block'; }
+  const v=document.getElementById(id); if(v){ v.classList.add('active'); }
 }
 function openModal(id){ const m=document.getElementById(id); if(m){ m.classList.add('open'); } }
 /* submit(kind): UI config -> canonical runtime. Bukan aksi Ward/Mission. */
